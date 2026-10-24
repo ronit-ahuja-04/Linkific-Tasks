@@ -1,39 +1,60 @@
 # Project 01: Responsive Navigation Menu
 
-A modern, accessible, and responsive navigation header built with semantic HTML5 and CSS3 Flexbox as part of **Day 1: HTML5, CSS3 & Responsive Design Training** at Linkific.
+An accessible, responsive navigation system engineered using **Apple Human Interface Guidelines (HIG)** translucency and **Stripe-style** micro-interactions as part of **Day 1: HTML5, CSS3 & Responsive Design Training** at Linkific.
+
+Built following the **BMAD Framework** (Breakthrough Method for Agile AI-Driven Development).
 
 ---
 
-## 🌟 Key Features
-- **Semantic HTML5 Structure**: Built with `<header>`, `<nav>`, `<ul>`, `<li>`, and `<button>` elements ensuring correct document outline.
-- **Accessible (a11y)**: Includes an accessible keyboard skip-link (`.skip-link`), `aria-label`, and interactive `aria-expanded` toggle states.
-- **Modern Flexbox Layout**:
-  - Horizontal alignment on desktop with `justify-content: space-between` and `align-items: center`.
-  - Nested submenu dropdown with hover/focus states.
-- **Mobile-Responsive Drawer**:
-  - Transforms into a smooth side-drawer navigation below `868px`.
-  - CSS animated hamburger icon transforming into an 'X'.
-  - Blurred backdrop overlay and scroll-locking when open.
-  - Keyboard accessible (closes on `Escape` key).
-- **Glassmorphic Aesthetic**: Sticky header with CSS `backdrop-filter: blur(16px)` and scroll-activated elevation shadow.
+## 📐 Design Philosophy & Craft
+- **Apple Translucency**: Translucent glass header (`backdrop-filter: saturate(180%) blur(20px)`) with hairline `1px` border (`rgba(255, 255, 255, 0.09)`).
+- **Stripe Precision**: Pixel-perfect alignment, pill-shaped call-to-action button, and subtle hover elevation.
+- **Restraint Over Fluff**: Zero tacky neon gradients, zero bulky 3-line hamburgers. Instead, an Apple-inspired 2-line minimal toggle that rotates into an elegant '✕'.
 
 ---
 
-## 📐 Breakpoints Tested
-| Viewport | Screen Width | Navigation Behavior |
+## 🎯 Architecture & Semantic Tree
+
+```text
+<header class="site-header">
+  └── <div class="nav-container">
+        ├── <a class="brand"> (Site identity anchor)
+        ├── <button class="nav-toggle" aria-expanded="false"> (Two-line toggle)
+        └── <nav class="primary-nav" aria-label="Primary navigation">
+              ├── <ul class="nav-list"> (Semantic list of routes)
+              │     ├── <li><a class="nav-link">About</a></li>
+              │     ├── <li><a class="nav-link">Projects</a></li>
+              │     ├── <li><a class="nav-link">Skills</a></li>
+              │     └── <li><a class="nav-link">Contact</a></li>
+              └── <div class="nav-cta-wrapper">
+                    └── <a class="nav-cta">Resume ↗</a>
+```
+
+---
+
+## 📱 Viewport Breakpoints Tested
+
+| Viewport Tier | Width Range | Layout & Interaction Behavior |
 | :--- | :--- | :--- |
-| **Mobile** | `375px` | Compact bar with logo and hamburger; drawer slides from right |
-| **Tablet** | `768px` | Drawer navigation with full-width action buttons |
-| **Desktop** | `1200px+` | Full horizontal menu with dropdown & primary CTA |
+| **Desktop** | `≥ 1024px` | 54px sticky frosted bar; balanced 3-zone flex layout (`brand` \| `links` \| `cta`); muted text shifts to full contrast on hover. |
+| **Tablet** | `768px – 1023px` | Compact horizontal flex layout (`gap: 16px – 20px`); preserves visible links without premature hamburger collapse. |
+| **Mobile** | `< 768px` | 48px header; 2-line toggle morphs into '✕'; reveals a full-sheet frosted glass menu with **52px touch targets** (exceeding Apple's 44x44pt rule) and full-width bottom CTA. |
 
 ---
 
-## 💡 Key Learnings & Takeaways
-1. **Flexbox 1D Power**: Flexbox excels at single-dimensional alignment (header rows, horizontal pill lists, vertical drawers).
-2. **ARIA Synchronization**: Keeping `aria-expanded` synchronized with the menu state is essential for screen reader users.
-3. **Box Sizing & Reset**: Setting `box-sizing: border-box` across all elements eliminates calculation bugs when applying padding to navigation links.
+## ♿ Accessibility (a11y) Verification
+
+- **Semantic Landmarks**: `<header>` and `<nav aria-label="Primary navigation">` allow assistive technology to jump directly to site navigation.
+- **Screen Reader Announcements**: `<ul>` and `<li>` announce item count (e.g. *"List, 4 items"*).
+- **State Synchronization**: `aria-expanded` strictly mirrors the drawer's visibility (`false` when closed, `true` when open).
+- **Keyboard Dismiss**: Pressing `Escape` closes the mobile sheet and restores focus to the toggle button (WCAG 2.1 Success Criterion 2.1.2).
+- **Focus Indicators**: Visible high-contrast focus rings (`:focus-visible`) for keyboard navigation.
 
 ---
 
-## 🚀 How to Run Locally
-Open `index.html` using the VS Code **Live Server** extension (`Go Live` in status bar) or directly in any modern browser.
+## 🚀 How to Run & Verify Locally
+1. In VS Code, right-click [`index.html`](./index.html) → **"Open with Live Server"**.
+2. Press `Cmd + Option + I` to open DevTools, toggle Device Mode (`Cmd + Shift + M`), and inspect across:
+   - **Mobile**: 375px (iPhone SE)
+   - **Tablet**: 768px (iPad)
+   - **Desktop**: 1200px (MacBook / Monitor)

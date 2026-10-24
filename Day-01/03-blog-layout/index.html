@@ -1,258 +1,808 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Day 1 Practice Project 03: Mobile-first responsive blog layout using semantic HTML5, aside sidebar, and progressive enhancement media queries.">
-  <title>Mobile-First Blog Layout | Day 1 Linkific</title>
-  
-  <!-- Modern Fonts: Inter & Plus Jakarta Sans -->
+  <meta name="description"
+    content="Ronit Ahuja | Full Stack Developer. Stage 3: Compounding Portfolio with Mobile-First Engineering Case Studies & Sticky Credentials Sidebar.">
+  <title>Ronit Ahuja | Portfolio &amp; Engineering Notes</title>
+
+  <!-- Typography: Inter for clean geometric sans-serif -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
-  <!-- Stylesheet -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="./assets/images/favicon.jpg" type="image/jpeg">
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- Accessible Skip Link -->
-  <a href="#main-feed" class="skip-link">Skip to main content</a>
+  <a href="#blog" class="skip-link">Skip to blog &amp; case studies</a>
 
   <!-- ==============================================
-       HEADER & MASTHEAD (Semantic HTML5)
+       HEADER & NAVIGATION (100% Pure HTML5 & CSS3)
+       All links are in-page anchors: #about, #portfolio, #writing, #contact
        ============================================== -->
-  <header class="blog-header">
-    <div class="container header-inner">
-      <div class="brand">
-        <a href="#" class="logo">
-          <span class="logo-badge">LF</span>
-          <span class="logo-title">TechInsights<span class="dot">.</span></span>
-        </a>
-        <span class="header-tag">Engineering Blog</span>
-      </div>
+  <header class="site-header">
+    <div class="nav-container">
 
-      <nav class="blog-nav" aria-label="Blog Topics">
-        <ul class="nav-pills">
-          <li><a href="#engineering" class="active">Engineering</a></li>
-          <li><a href="#design">UI/UX</a></li>
-          <li><a href="#devops">DevOps</a></li>
-          <li><a href="#career">Training Journey</a></li>
+      <!-- Brand Identity with Logo -->
+      <a href="#" class="brand" aria-label="Ronit Ahuja Home">
+        <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+        <span class="brand-name">Ronit Ahuja</span>
+      </a>
+
+      <!-- Pure CSS Mobile Toggle (Checkbox Hack) -->
+      <input type="checkbox" id="nav-toggle-input" class="nav-toggle-input" aria-label="Toggle navigation menu">
+
+      <label for="nav-toggle-input" class="nav-toggle-label" aria-hidden="true">
+        <span class="toggle-bar line-top"></span>
+        <span class="toggle-bar line-bottom"></span>
+      </label>
+
+      <!-- Primary Navigation -->
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#about" class="nav-link">About</a>
+          </li>
+          <li class="nav-item">
+            <a href="#portfolio" class="nav-link">Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a href="#blog" class="nav-link active">Blog</a>
+          </li>
+          <li class="nav-item">
+            <a href="#contact" class="nav-link">Contact</a>
+          </li>
         </ul>
+
+        <!-- Stripe-Style Pill CTA -->
+        <div class="nav-cta-wrapper">
+          <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="nav-cta">
+            <span>Resume</span>
+            <svg class="cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="12"
+              height="12" aria-hidden="true">
+              <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
       </nav>
+
     </div>
   </header>
 
-  <!-- ==============================================
-       PAGE HERO / BANNER
-       ============================================== -->
-  <div class="blog-banner">
-    <div class="container">
-      <div class="badge-pill">Day 1 Deliverable • Project 03</div>
-      <h1 class="banner-title">Mobile-First Semantic Blog Architecture</h1>
-      <p class="banner-desc">
-        Engineered with a true mobile-first methodology using progressive <code>min-width</code> media queries, 
-        semantic landmark elements (<code>&lt;main&gt;</code>, <code>&lt;article&gt;</code>, <code>&lt;aside&gt;</code>), and sticky sidebar positioning.
-      </p>
-    </div>
-  </div>
-
-  <!-- ==============================================
-       MAIN LAYOUT CONTAINER (FEED + ASIDE)
-       ============================================== -->
-  <div class="container layout-wrapper">
-
-    <!-- Primary Content Area -->
-    <main class="blog-feed" id="main-feed">
-
-      <!-- Featured Longform Article -->
-      <article class="post featured-article">
-        <div class="post-media-container">
-          <div class="post-illustration">
-            <span class="post-icon">📱</span>
-          </div>
-          <span class="post-category">Responsive Architecture</span>
-        </div>
-
-        <div class="post-content">
-          <header class="post-header">
-            <div class="post-meta">
-              <time datetime="2026-10-24">Oct 24, 2026</time>
-              <span class="separator">•</span>
-              <span>7 min read</span>
-              <span class="separator">•</span>
-              <span class="highlight-tag">Featured</span>
-            </div>
-            <h2 class="post-title">
-              Why Mobile-First Design is the Gold Standard for Modern Frontend Engineering
-            </h2>
-          </header>
-
-          <p class="post-excerpt lead">
-            Mobile-first is more than just starting with smaller screen dimensions—it is a discipline of content prioritization, performance optimization, and progressive enhancement.
-          </p>
-
-          <p class="post-excerpt">
-            When designing for compact screens first, developers are forced to eliminate unnecessary bloat and structure clean HTML5 semantics before layering on layout complexity with media queries.
-          </p>
-
-          <blockquote class="post-quote">
-            <p>
-              "Designing for mobile forces you to embrace constraints. If it doesn't fit on mobile, it probably shouldn't be on desktop either."
-            </p>
-            <cite>— Frontend Principles Guide</cite>
-          </blockquote>
-
-          <h3 class="section-heading">Key Technical Takeaways from Day 1 Training</h3>
-          <ul class="styled-list">
-            <li><strong>Content Priority:</strong> Mobile screens demand that primary content sits immediately in view without distracting sidebars.</li>
-            <li><strong>Progressive Enhancement:</strong> Base CSS handles mobile gracefully, while <code>@media (min-width: 768px)</code> and <code>@media (min-width: 1024px)</code> enhance layout for tablets and desktops.</li>
-            <li><strong>Fluid Typography:</strong> Utilizing modern <code>clamp()</code> functions guarantees headlines scale smoothly across all devices.</li>
-          </ul>
-
-          <footer class="post-footer">
-            <div class="tag-row">
-              <span class="tag">#HTML5</span>
-              <span class="tag">#CSS3</span>
-              <span class="tag">#ResponsiveDesign</span>
-              <span class="tag">#MobileFirst</span>
-            </div>
-          </footer>
-        </div>
-      </article>
-
-      <!-- Secondary Articles Section -->
-      <section class="recent-posts-section" aria-labelledby="recent-heading">
-        <h3 id="recent-heading" class="section-title">More Engineering Reads</h3>
-
-        <div class="recent-grid">
-          <!-- Article 2 -->
-          <article class="post mini-card">
-            <div class="mini-illustration grad-blue">
-              <span>⚡</span>
-            </div>
-            <div class="mini-body">
-              <div class="post-meta">
-                <time datetime="2026-10-24">Oct 24, 2026</time>
-                <span class="separator">•</span>
-                <span>4 min read</span>
-              </div>
-              <h4 class="mini-title">
-                <a href="#post-2">CSS Grid vs Flexbox: Deciding the Right Tool for the Job</a>
-              </h4>
-              <p class="mini-excerpt">
-                A quick architectural comparison between 1D Flexbox flow and 2D CSS Grid structure.
-              </p>
-            </div>
-          </article>
-
-          <!-- Article 3 -->
-          <article class="post mini-card">
-            <div class="mini-illustration grad-emerald">
-              <span>♿</span>
-            </div>
-            <div class="mini-body">
-              <div class="post-meta">
-                <time datetime="2026-10-24">Oct 24, 2026</time>
-                <span class="separator">•</span>
-                <span>5 min read</span>
-              </div>
-              <h4 class="mini-title">
-                <a href="#post-3">Web Accessibility (a11y): Heading Hierarchy &amp; Semantic Flow</a>
-              </h4>
-              <p class="mini-excerpt">
-                How correct heading structures (h1-h6) and ARIA attributes make web pages screen-reader friendly.
-              </p>
-            </div>
-          </article>
-        </div>
-      </section>
-
-    </main>
+  <main id="main">
 
     <!-- ==============================================
-         SIDEBAR (Semantic <aside>)
+         STAGE 1 FOUNDATION: HERO SECTION
          ============================================== -->
-    <aside class="blog-sidebar" aria-label="Author Profile & Resources">
-      
-      <!-- Author Profile Card -->
-      <div class="sidebar-card author-card">
-        <div class="author-avatar-badge">RA</div>
-        <h4 class="sidebar-author-name">Ronit Ahuja</h4>
-        <p class="sidebar-author-role">Frontend Trainee @ Linkific</p>
-        <p class="sidebar-bio">
-          IT Engineering student at VESIT Mumbai. Passionate about modern web architecture, clean code, and UI/UX craftsmanship.
+    <section class="hero-section">
+      <div class="container hero-container">
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Full Stack Developer &bull; Mumbai, India</span>
+        </div>
+
+        <div class="hero-avatar-box">
+          <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="76" height="76">
+        </div>
+
+        <h1 class="hero-headline">
+          Ronit Ahuja
+        </h1>
+        <p class="hero-role">Full Stack Developer &amp; IT Student at VESIT</p>
+
+        <p class="hero-lead">
+          I’m an Information Technology student at VESIT, Mumbai, with a strong interest in software development,
+          product design, and building practical technology solutions.
         </p>
-        <div class="author-social-links">
-          <a href="https://github.com/ronit-ahuja-04" target="_blank" rel="noopener noreferrer" class="social-btn" title="GitHub">GitHub</a>
-          <a href="https://www.linkedin.com/in/ronitahujadev/" target="_blank" rel="noopener noreferrer" class="social-btn" title="LinkedIn">LinkedIn</a>
-          <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="social-btn" title="Live Portfolio">Portfolio</a>
-        </div>
-      </div>
 
-      <!-- Training Progress Tracker Widget -->
-      <div class="sidebar-card widget-card">
-        <h4 class="widget-title">Training Status</h4>
-        <div class="progress-box">
-          <div class="progress-label">
-            <span>Day 1: HTML5 &amp; CSS3</span>
-            <span class="status-complete">100%</span>
+        <div class="hero-actions">
+          <a href="#portfolio" class="btn btn-primary">View Projects</a>
+          <a href="#blog" class="btn btn-secondary">Read Case Studies</a>
+        </div>
+
+        <!-- Social Channels (Official High-Precision Vector Icons) -->
+        <div class="social-links-row">
+          <a href="https://github.com/ronit-ahuja-04" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="GitHub Profile" title="GitHub">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M256 32C132.3 32 32 134.8 32 261.7c0 101.5 64.2 187.5 153.2 217.9a17.56 17.56 0 003.8.4c8.3 0 11.5-6.1 11.5-11.4 0-5.5-.2-19.9-.3-39.1a102.4 102.4 0 01-22.6 2.7c-43.1 0-52.9-20.8-56.2-49.8-.5-4.7-4.3-17.4-14.8-20.9-5.1-1.7-12.4-9.3-.1-9.5 11.7-.2 20.1 11 23 15.6 13.2 21.6 34.4 15.3 42.8 11.7 1.3-9.3 4.9-15.6 9.1-19.2-50.6-5.8-103.7-25.7-103.7-113.6 0-25.1 8.7-45.6 23-61.5-2.3-5.8-10-29.2 2.2-60.8 0 0 18.8-6.2 61.6 23.5a210.9 210.9 0 01100 0c42.7-29.7 61.5-23.5 61.5-23.5 12.2 31.6 4.5 55 2.2 60.8 14.3 15.9 23 36.2 23 61.5 0 88.2-53.2 107.8-103.9 113.5 5.8 5.1 10.9 15.2 10.9 30.7 0 22.2-.2 40.1-.2 45.6 0 5.3 3.2 12 11.5 11.4C415.8 449.3 480 363.3 480 261.7 480 134.8 379.7 32 256 32z" />
+            </svg>
+          </a>
+          <a href="https://gitlab.com/ahuja.ronit.0510" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="GitLab Profile" title="GitLab">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M105.2 24.9c-3.1-8.9-15.7-8.9-18.9 0L29.8 199.7h132c-.1 0-56.6-174.8-56.6-174.8zM.9 287.7c-2.6 8 .3 16.9 7.1 22l247.9 184-226.2-294zm160.8-88l94.3 294 94.3-294zm349.4 88l-28.8-88-226.3 294 247.9-184c6.9-5.1 9.8-14 7.2-22zM482.4 199.7L425.7 24.9c-3.1-8.9-15.7-8.9-18.9 0l-56.6 174.8h132.2z" />
+            </svg>
+          </a>
+          <a href="https://www.linkedin.com/in/ronitahujadev/" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="LinkedIn Profile" title="LinkedIn">
+            <svg class="social-icon" viewBox="0 0 448 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z" />
+            </svg>
+          </a>
+          <a href="https://x.com/0510Ahuja" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="Twitter / X Profile" title="Twitter / X">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         STAGE 1 FOUNDATION: ABOUT ME SECTION (#about)
+         ============================================== -->
+    <section class="about-section" id="about">
+      <div class="container">
+
+        <div class="content-card">
+          <h2 class="section-title">About Me</h2>
+
+          <div class="bio-text">
+            <p>
+              I enjoy working across both the technical and creative sides of development — from designing user
+              interfaces in Figma to building applications using Flutter, React, Firebase, and other modern
+              technologies.
+            </p>
+            <p>
+              Currently, I’m exploring areas such as mobile app development, full-stack development, UI/UX, and software
+              engineering. I particularly enjoy turning real-world problems into functional, user-friendly products and
+              collaborating on projects where technology can make a meaningful difference.
+            </p>
+            <p>
+              I’m continuously learning, improving my problem-solving skills, and looking for opportunities to work on
+              challenging projects, gain industry experience, and connect with people passionate about technology.
+            </p>
           </div>
-          <div class="progress-track">
-            <div class="progress-bar" style="width: 100%;"></div>
+
+          <div class="tech-interests-box">
+            <span class="tech-label">Core Focus:</span>
+            <div class="pill-list">
+              <span class="pill">Software Development</span>
+              <span class="pill">Flutter</span>
+              <span class="pill">React</span>
+              <span class="pill">Firebase</span>
+              <span class="pill">UI/UX Design</span>
+              <span class="pill">BMAD SDLC</span>
+            </div>
           </div>
         </div>
-        <ul class="task-checklist">
-          <li class="checked">✓ Dev Environment Setup</li>
-          <li class="checked">✓ HTML5 Semantic Elements</li>
-          <li class="checked">✓ Flexbox Navigation</li>
-          <li class="checked">✓ CSS Grid Module Cards</li>
-          <li class="checked">✓ Mobile-First Blog Layout</li>
-          <li class="checked">✓ Portfolio Landing Page</li>
-        </ul>
-      </div>
 
-      <!-- Newsletter Subscription Form -->
-      <div class="sidebar-card newsletter-card">
-        <h4 class="widget-title">Engineering Dispatch</h4>
-        <p class="widget-desc">Get notified when new Linkific training modules and code breakdowns drop.</p>
-        <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Subscribed to Linkific Updates!');">
-          <label for="newsletter-email" class="sr-only">Email address</label>
-          <input type="email" id="newsletter-email" class="input-field" placeholder="Enter your email" required>
-          <button type="submit" class="subscribe-btn">Subscribe</button>
-        </form>
-      </div>
+        <!-- What I'm Doing (Services Matrix) -->
+        <div class="services-wrapper">
+          <h3 class="subsection-title">What I'm Doing</h3>
 
-      <!-- Trending Topic Tags -->
-      <div class="sidebar-card">
-        <h4 class="widget-title">Trending Tags</h4>
-        <div class="tag-cloud">
-          <a href="#tag-html5" class="tag-link">HTML5</a>
-          <a href="#tag-css3" class="tag-link">CSS3</a>
-          <a href="#tag-flexbox" class="tag-link">Flexbox</a>
-          <a href="#tag-grid" class="tag-link">CSS Grid</a>
-          <a href="#tag-responsive" class="tag-link">Responsive</a>
-          <a href="#tag-git" class="tag-link">Git &amp; GitHub</a>
+          <div class="services-grid">
+            <article class="service-card">
+              <div class="service-icon">📱</div>
+              <div class="service-body">
+                <h4 class="service-heading">Mobile Apps</h4>
+                <p class="service-desc">
+                  Developing cross-platform mobile experiences for iOS and Android using modern frameworks.
+                </p>
+              </div>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">💻</div>
+              <div class="service-body">
+                <h4 class="service-heading">Web Development</h4>
+                <p class="service-desc">
+                  Building responsive, scalable web applications with modern frontend and backend technologies.
+                </p>
+              </div>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">⚡</div>
+              <div class="service-body">
+                <h4 class="service-heading">AI-Assisted Dev</h4>
+                <p class="service-desc">
+                  Leveraging AI tools to accelerate development, optimize architectures, and build smarter software.
+                </p>
+              </div>
+            </article>
+
+            <article class="service-card">
+              <div class="service-icon">📐</div>
+              <div class="service-body">
+                <h4 class="service-heading">SDLC &amp; BMAD</h4>
+                <p class="service-desc">
+                  Using Agile methodologies and frameworks like BMAD for structured, AI-driven software development.
+                </p>
+              </div>
+            </article>
+          </div>
         </div>
+
       </div>
+    </section>
 
-    </aside>
+    <!-- ==============================================
+         STAGE 2 FOUNDATION: FEATURED PROJECTS (#portfolio)
+         ============================================== -->
+    <section class="portfolio-section" id="portfolio">
+      <div class="container">
 
-  </div>
+        <div class="section-header-block">
+          <span class="section-tag">Featured Work</span>
+          <h2 class="section-title">Portfolio Projects</h2>
+          <p class="section-subtitle">
+            A curated showcase of real-world applications engineered across mobile, web, and backend stacks.
+          </p>
+        </div>
+
+        <!-- Pure CSS Category Filter System -->
+        <div class="filter-controls-container">
+          <input type="radio" name="project-filter" id="filter-all" class="filter-radio" checked>
+          <input type="radio" name="project-filter" id="filter-web" class="filter-radio">
+          <input type="radio" name="project-filter" id="filter-mobile" class="filter-radio">
+          <input type="radio" name="project-filter" id="filter-ai" class="filter-radio">
+
+          <div class="filter-tabs" role="tablist" aria-label="Filter Projects">
+            <label for="filter-all" class="filter-tab-label">All Projects</label>
+            <label for="filter-web" class="filter-tab-label">Web Apps</label>
+            <label for="filter-mobile" class="filter-tab-label">Mobile</label>
+            <label for="filter-ai" class="filter-tab-label">AI &amp; Tools</label>
+          </div>
+
+          <!-- 2D CSS Grid Project Showcase -->
+          <div class="projects-grid">
+
+            <!-- Project 1: VESIT AMS -->
+            <article class="project-card" data-category="web ai">
+              <div class="card-top">
+                <div class="project-badge-row">
+                  <span class="category-badge">Web &bull; AI</span>
+                  <span class="status-indicator">08/26 &mdash; Present</span>
+                </div>
+                <h3 class="project-title">VESIT AMS</h3>
+                <p class="project-summary">
+                  A smart, AI-assisted Attendance Management System engineered to streamline college academic attendance
+                  through automated session tracking, proxy prevention, real-time notifications, and automated report
+                  generation.
+                </p>
+              </div>
+              <div class="card-bottom">
+                <div class="tech-stack-pills">
+                  <span class="tech-tag">React</span>
+                  <span class="tech-tag">Node.js</span>
+                  <span class="tech-tag">Python AI</span>
+                  <span class="tech-tag">MongoDB</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="project-link">
+                    <span>Live Showcase</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
+                      height="12">
+                      <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- Project 2: Kingstar Enterprises -->
+            <article class="project-card" data-category="web">
+              <div class="card-top">
+                <div class="project-badge-row">
+                  <span class="category-badge">Web &bull; B2B</span>
+                  <span class="status-indicator">02/26 &mdash; 03/26</span>
+                </div>
+                <h3 class="project-title">Kingstar Enterprises</h3>
+                <p class="project-summary">
+                  A modern B2B e-commerce platform designed to streamline product discovery, category hierarchies, and
+                  business interactions. Features admin controls, advanced multi-facet filtering, and integrated
+                  supplier communication.
+                </p>
+              </div>
+              <div class="card-bottom">
+                <div class="tech-stack-pills">
+                  <span class="tech-tag">React</span>
+                  <span class="tech-tag">Node.js</span>
+                  <span class="tech-tag">MongoDB</span>
+                  <span class="tech-tag">Express</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="project-link">
+                    <span>Live Showcase</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
+                      height="12">
+                      <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- Project 3: Budgetify -->
+            <article class="project-card" data-category="web">
+              <div class="card-top">
+                <div class="project-badge-row">
+                  <span class="category-badge">Web App</span>
+                  <span class="status-indicator">Fintech</span>
+                </div>
+                <h3 class="project-title">Budgetify</h3>
+                <p class="project-summary">
+                  A personal finance and expense tracking web application that allows users to manage budgets, log daily
+                  expenditures, and visualize spending habits through interactive analytical charts and monthly
+                  summaries.
+                </p>
+              </div>
+              <div class="card-bottom">
+                <div class="tech-stack-pills">
+                  <span class="tech-tag">React</span>
+                  <span class="tech-tag">JavaScript</span>
+                  <span class="tech-tag">CSS Grid</span>
+                  <span class="tech-tag">Chart.js</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="project-link">
+                    <span>Live Showcase</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
+                      height="12">
+                      <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- Project 4: Menti Math -->
+            <article class="project-card" data-category="mobile">
+              <div class="card-top">
+                <div class="project-badge-row">
+                  <span class="category-badge">Mobile App</span>
+                  <span class="status-indicator">Flutter</span>
+                </div>
+                <h3 class="project-title">Menti Math</h3>
+                <p class="project-summary">
+                  An engaging, gamified mobile application engineered to sharpen mental arithmetic skills through
+                  speed-based challenges, dynamic score tracking, adaptive difficulty, and responsive cross-platform UI.
+                </p>
+              </div>
+              <div class="card-bottom">
+                <div class="tech-stack-pills">
+                  <span class="tech-tag">Flutter</span>
+                  <span class="tech-tag">Dart</span>
+                  <span class="tech-tag">Mobile UI</span>
+                  <span class="tech-tag">State Mgmt</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="project-link">
+                    <span>Live Showcase</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
+                      height="12">
+                      <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+            <!-- Project 5: FlowLane -->
+            <article class="project-card" data-category="web ai">
+              <div class="card-top">
+                <div class="project-badge-row">
+                  <span class="category-badge">Productivity &bull; AI</span>
+                  <span class="status-indicator">Concept &bull; Dev</span>
+                </div>
+                <h3 class="project-title">FlowLane</h3>
+                <p class="project-summary">
+                  A modern workflow management concept built to streamline agile task coordination, automate routine
+                  milestone check-ins, and minimize cognitive friction during rapid development cycles.
+                </p>
+              </div>
+              <div class="card-bottom">
+                <div class="tech-stack-pills">
+                  <span class="tech-tag">React</span>
+                  <span class="tech-tag">TypeScript</span>
+                  <span class="tech-tag">Tailwind</span>
+                  <span class="tech-tag">AI Workflows</span>
+                </div>
+                <div class="project-links">
+                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                    class="project-link">
+                    <span>Live Showcase</span>
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
+                      height="12">
+                      <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </article>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==============================================
+         STAGE 3 NEW FEATURE: MOBILE-FIRST BLOG / CASE STUDIES (#writing)
+         2-Column Split Grid with Sticky Aside Sidebar
+         ============================================== -->
+    <section class="writing-section" id="blog">
+      <div class="container">
+
+        <div class="section-header-block">
+          <span class="section-tag">Stage 3 Deliverable</span>
+          <h2 class="section-title">Engineering Notes &amp; Case Studies</h2>
+          <p class="section-subtitle">
+            Mobile-first architectural deep dives, full-stack case studies, and practical lessons from real software
+            development.
+          </p>
+        </div>
+
+        <!-- Mobile-First 2-Column Layout Wrapper -->
+        <div class="layout-wrapper">
+
+          <!-- Primary Longform Feed (Semantic <main> Landmark for Content) -->
+          <div class="writing-feed" id="main-writing">
+
+            <!-- Featured Case Study Article: VESIT AMS -->
+            <article class="post-card featured-post">
+              <div class="post-header">
+                <div class="post-meta">
+                  <span class="meta-tag highlight">Featured Case Study</span>
+                  <span class="meta-dot">&bull;</span>
+                  <time datetime="2026-10-24">October 2026</time>
+                  <span class="meta-dot">&bull;</span>
+                  <span class="meta-read-time">7 min read</span>
+                </div>
+                <h3 class="post-title">
+                  Engineering VESIT AMS: Multi-Tenant Attendance Management with Automated Session Tracking
+                </h3>
+              </div>
+
+              <div class="post-body">
+                <p>
+                  Academic institutions often struggle with manual roll calls, paper attendance registries, and
+                  time-consuming
+                  reconciliation. In this case study, I break down the engineering decisions behind <strong>VESIT
+                    AMS</strong>,
+                  a production-ready attendance platform designed for college faculty and students.
+                </p>
+                <p>
+                  We addressed proxy attendance through time-gated dynamic session tokens and geolocation boundaries.
+                  The backend
+                  architecture handles concurrent class check-ins while feeding automated monthly percentage
+                  calculations directly
+                  into academic reporting dashboards.
+                </p>
+
+                <div class="key-takeaways-box">
+                  <h4 class="takeaway-title">Architecture Highlights:</h4>
+                  <ul class="takeaway-list">
+                    <li><strong>Real-Time Session Synchronization:</strong> Websocket-driven status pushes for instant
+                      faculty oversight.</li>
+                    <li><strong>Anti-Proxy Verification:</strong> Ephemeral token generation prevents screenshot and
+                      link sharing.</li>
+                    <li><strong>Report Generation Engine:</strong> Automated PDF exports and attendance shortage alerts.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <footer class="post-footer">
+                <div class="post-tags">
+                  <span class="pill">React</span>
+                  <span class="pill">Node.js</span>
+                  <span class="pill">MongoDB</span>
+                  <span class="pill">System Design</span>
+                </div>
+                <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  class="read-more-link">
+                  <span>Read Full Case Study</span>
+                  <span class="arrow-icon">↗</span>
+                </a>
+              </footer>
+            </article>
+
+            <!-- Secondary Article 1: Kingstar Enterprises -->
+            <article class="post-card">
+              <div class="post-header">
+                <div class="post-meta">
+                  <span class="meta-tag">Full Stack</span>
+                  <span class="meta-dot">&bull;</span>
+                  <time datetime="2026-03-15">March 2026</time>
+                  <span class="meta-dot">&bull;</span>
+                  <span class="meta-read-time">5 min read</span>
+                </div>
+                <h3 class="post-title">
+                  Architecting B2B Catalog Discovery &amp; Order Workflows for Kingstar Enterprises
+                </h3>
+              </div>
+
+              <div class="post-body">
+                <p>
+                  B2B e-commerce differs significantly from consumer retail: order volumes are wholesale, product
+                  catalogs require
+                  multi-tiered categorization, and buyer authentication must tie directly into custom quotation
+                  workflows.
+                </p>
+                <p>
+                  Built with React, Express, and MongoDB, this project emphasized fast facet filtering, server-side
+                  search indexing,
+                  and an intuitive administrative interface that enables instantaneous product dispatch and stock
+                  adjustments.
+                </p>
+              </div>
+
+              <footer class="post-footer">
+                <div class="post-tags">
+                  <span class="pill">B2B Commerce</span>
+                  <span class="pill">REST API</span>
+                  <span class="pill">React</span>
+                </div>
+                <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  class="read-more-link">
+                  <span>Explore Architecture</span>
+                  <span class="arrow-icon">↗</span>
+                </a>
+              </footer>
+            </article>
+
+            <!-- Secondary Article 2: BMAD Method -->
+            <article class="post-card">
+              <div class="post-header">
+                <div class="post-meta">
+                  <span class="meta-tag">Methodology</span>
+                  <span class="meta-dot">&bull;</span>
+                  <time datetime="2026-10-20">October 2026</time>
+                  <span class="meta-dot">&bull;</span>
+                  <span class="meta-read-time">4 min read</span>
+                </div>
+                <h3 class="post-title">
+                  The BMAD Method: Transforming AI Assistance into Structured Agile Engineering
+                </h3>
+              </div>
+
+              <div class="post-body">
+                <p>
+                  Vibe coding and unstructured prompt iteration often result in architectural debt and fragile
+                  codebases.
+                  The <strong>BMAD Framework</strong> (Breakthrough Method for Agile AI-Driven Development) enforces a
+                  strict
+                  separation of concerns: specification planning, verification gates, and incremental execution.
+                </p>
+                <p>
+                  By treating AI as an agile pair programmer rather than an unchecked autopilot, engineers maintain full
+                  code ownership,
+                  semantic compliance, and production standards throughout rapid iteration cycles.
+                </p>
+              </div>
+
+              <footer class="post-footer">
+                <div class="post-tags">
+                  <span class="pill">BMAD</span>
+                  <span class="pill">Agile SDLC</span>
+                  <span class="pill">AI Pair Programming</span>
+                </div>
+                <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  class="read-more-link">
+                  <span>Learn the Workflow</span>
+                  <span class="arrow-icon">↗</span>
+                </a>
+              </footer>
+            </article>
+
+          </div>
+
+          <!-- Sticky Complementary Sidebar (Semantic <aside> Landmark) -->
+          <aside class="sticky-sidebar" aria-label="Author Credentials &amp; Skills">
+
+            <!-- Widget 1: Author Snapshot -->
+            <div class="sidebar-widget author-widget">
+              <div class="author-header">
+                <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja" class="author-avatar" width="56" height="56">
+                <div class="author-info">
+                  <h4 class="author-name">Ronit Ahuja</h4>
+                  <span class="author-status">Full Stack Developer</span>
+                </div>
+              </div>
+              <p class="author-bio">
+                Information Technology student at VESIT with a focus on scalable systems, mobile apps, and structured AI
+                workflows.
+              </p>
+              <div class="author-badges">
+                <span class="trainee-badge">Linkific Trainee &bull; Day 1</span>
+              </div>
+              <div class="author-socials">
+                <a href="https://github.com/ronit-ahuja-04" target="_blank" rel="noopener noreferrer"
+                  class="author-social-link" aria-label="GitHub Profile" title="GitHub">
+                  <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M256 32C132.3 32 32 134.8 32 261.7c0 101.5 64.2 187.5 153.2 217.9a17.56 17.56 0 003.8.4c8.3 0 11.5-6.1 11.5-11.4 0-5.5-.2-19.9-.3-39.1a102.4 102.4 0 01-22.6 2.7c-43.1 0-52.9-20.8-56.2-49.8-.5-4.7-4.3-17.4-14.8-20.9-5.1-1.7-12.4-9.3-.1-9.5 11.7-.2 20.1 11 23 15.6 13.2 21.6 34.4 15.3 42.8 11.7 1.3-9.3 4.9-15.6 9.1-19.2-50.6-5.8-103.7-25.7-103.7-113.6 0-25.1 8.7-45.6 23-61.5-2.3-5.8-10-29.2 2.2-60.8 0 0 18.8-6.2 61.6 23.5a210.9 210.9 0 01100 0c42.7-29.7 61.5-23.5 61.5-23.5 12.2 31.6 4.5 55 2.2 60.8 14.3 15.9 23 36.2 23 61.5 0 88.2-53.2 107.8-103.9 113.5 5.8 5.1 10.9 15.2 10.9 30.7 0 22.2-.2 40.1-.2 45.6 0 5.3 3.2 12 11.5 11.4C415.8 449.3 480 363.3 480 261.7 480 134.8 379.7 32 256 32z" />
+                  </svg>
+                </a>
+                <a href="https://gitlab.com/ahuja.ronit.0510" target="_blank" rel="noopener noreferrer"
+                  class="author-social-link" aria-label="GitLab Profile" title="GitLab">
+                  <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M105.2 24.9c-3.1-8.9-15.7-8.9-18.9 0L29.8 199.7h132c-.1 0-56.6-174.8-56.6-174.8zM.9 287.7c-2.6 8 .3 16.9 7.1 22l247.9 184-226.2-294zm160.8-88l94.3 294 94.3-294zm349.4 88l-28.8-88-226.3 294 247.9-184c6.9-5.1 9.8-14 7.2-22zM482.4 199.7L425.7 24.9c-3.1-8.9-15.7-8.9-18.9 0l-56.6 174.8h132.2z" />
+                  </svg>
+                </a>
+                <a href="https://www.linkedin.com/in/ronitahujadev/" target="_blank" rel="noopener noreferrer"
+                  class="author-social-link" aria-label="LinkedIn Profile" title="LinkedIn">
+                  <svg class="social-icon" viewBox="0 0 448 512" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z" />
+                  </svg>
+                </a>
+                <a href="https://x.com/0510Ahuja" target="_blank" rel="noopener noreferrer"
+                  class="author-social-link" aria-label="Twitter / X Profile" title="Twitter / X">
+                  <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+                    <path fill="currentColor"
+                      d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            <!-- Widget 2: Technical Skills Meters -->
+            <div class="sidebar-widget skills-widget">
+              <h4 class="widget-title">Core Competencies</h4>
+
+              <div class="skills-list">
+                <div class="skill-meter-row">
+                  <div class="meter-info">
+                    <span class="meter-label">Frontend Development</span>
+                    <span class="meter-val">85%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill fill-85"></div>
+                  </div>
+                </div>
+
+                <div class="skill-meter-row">
+                  <div class="meter-info">
+                    <span class="meter-label">Backend Development</span>
+                    <span class="meter-val">75%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill fill-75"></div>
+                  </div>
+                </div>
+
+                <div class="skill-meter-row">
+                  <div class="meter-info">
+                    <span class="meter-label">Databases &amp; APIs</span>
+                    <span class="meter-val">80%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill fill-80"></div>
+                  </div>
+                </div>
+
+                <div class="skill-meter-row">
+                  <div class="meter-info">
+                    <span class="meter-label">Artificial Intelligence</span>
+                    <span class="meter-val">70%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill fill-70"></div>
+                  </div>
+                </div>
+
+                <div class="skill-meter-row">
+                  <div class="meter-info">
+                    <span class="meter-label">BMAD &amp; Agile SDLC</span>
+                    <span class="meter-val">90%</span>
+                  </div>
+                  <div class="meter-track">
+                    <div class="meter-fill fill-90"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Widget 3: Education Timeline -->
+            <div class="sidebar-widget education-widget">
+              <h4 class="widget-title">Education</h4>
+
+              <ol class="mini-timeline">
+                <li class="timeline-entry">
+                  <span class="timeline-year">2024 &mdash; Present</span>
+                  <h5 class="timeline-institution">VESIT, Mumbai</h5>
+                  <p class="timeline-degree">B.E. Information Technology</p>
+                </li>
+                <li class="timeline-entry">
+                  <span class="timeline-year">2022 &mdash; 2024</span>
+                  <h5 class="timeline-institution">Hill Spring International</h5>
+                  <p class="timeline-degree">Higher Secondary &bull; PCM</p>
+                </li>
+                <li class="timeline-entry">
+                  <span class="timeline-year">2021 &mdash; 2022</span>
+                  <h5 class="timeline-institution">B K Birla Public School</h5>
+                  <p class="timeline-degree">Secondary Education &bull; CBSE</p>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Widget 4: Newsletter / Connect -->
+            <div class="sidebar-widget connect-widget">
+              <h4 class="widget-title">Get in Touch</h4>
+              <p class="connect-desc">Open for software engineering opportunities and technical collaboration.</p>
+              <a href="mailto:ronitahuja.0510@gmail.com"
+                class="btn btn-secondary full-width">ronitahuja.0510@gmail.com</a>
+            </div>
+
+          </aside>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
 
   <!-- ==============================================
-       FOOTER (Semantic HTML5)
+       CONTACT & FOOTER SECTION (#contact)
        ============================================== -->
-  <footer class="site-footer">
-    <div class="container footer-content">
-      <p class="copyright">© 2026 Ronit Ahuja • Linkific Training Days 1-3</p>
-      <ul class="footer-links">
-        <li><a href="../01-responsive-nav/">Project 01: Nav</a></li>
-        <li><a href="../02-card-grid/">Project 02: Grid</a></li>
-        <li><a href="../04-portfolio/">Project 04: Portfolio</a></li>
-      </ul>
+  <footer class="site-footer" id="contact">
+    <div class="container footer-container">
+
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand">
+            <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+            <span class="brand-name">Ronit Ahuja</span>
+          </div>
+          <p class="footer-tagline">
+            Building software, designing interfaces, and solving real-world problems.
+          </p>
+        </div>
+
+        <div class="footer-contact-details">
+          <div class="contact-card">
+            <span class="contact-card-label">Email</span>
+            <a href="mailto:ronitahuja.0510@gmail.com" class="contact-card-val">ronitahuja.0510@gmail.com</a>
+          </div>
+          <div class="contact-card">
+            <span class="contact-card-label">Phone</span>
+            <a href="tel:+918422040493" class="contact-card-val">+91 8422040493</a>
+          </div>
+          <div class="contact-card">
+            <span class="contact-card-label">Location</span>
+            <span class="contact-card-val">Mumbai, India</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright">&copy; 2026 Ronit Ahuja. Day 1 Linkific Training Deliverables.</p>
+        <div class="footer-nav">
+          <a href="#about" class="footer-link">About</a>
+          <a href="#portfolio" class="footer-link">Portfolio</a>
+          <a href="#blog" class="footer-link">Blog</a>
+          <a href="#contact" class="footer-link">Contact</a>
+        </div>
+      </div>
+
     </div>
   </footer>
 
 </body>
+
 </html>
