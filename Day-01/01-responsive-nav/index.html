@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Day 1 Practice Project 01: Fully responsive, accessible navigation bar built with semantic HTML5 and CSS Flexbox.">
+  <title>Responsive Navigation Bar | Day 1 Linkific</title>
+  
+  <!-- Modern Font: Poppins & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Accessible Skip Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <!-- ==============================================
+       HEADER & NAVIGATION (Semantic HTML5)
+       ============================================== -->
+  <header class="site-header" id="site-header">
+    <div class="header-container">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="brand-logo" aria-label="Linkific Home">
+        <span class="logo-mark">⚡</span>
+        <span class="logo-text">Linkific<span class="accent-dot">.</span></span>
+      </a>
+
+      <!-- Mobile Hamburger Button -->
+      <button 
+        type="button" 
+        class="nav-toggle" 
+        id="nav-toggle" 
+        aria-controls="primary-nav" 
+        aria-expanded="false" 
+        aria-label="Toggle primary navigation"
+      >
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+        <span class="hamburger-bar"></span>
+      </button>
+
+      <!-- Primary Navigation -->
+      <nav class="primary-nav" id="primary-nav" aria-label="Primary Navigation">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#home" class="nav-link active">Home</a>
+          </li>
+          <li class="nav-item has-dropdown">
+            <a href="#solutions" class="nav-link" id="solutions-toggle" aria-haspopup="true" aria-expanded="false">
+              Solutions
+              <svg class="dropdown-chevron" viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+            <!-- Accessible Sub-menu -->
+            <ul class="dropdown-menu" aria-label="Solutions submenu">
+              <li><a href="#cloud" class="dropdown-link">Cloud Integration</a></li>
+              <li><a href="#analytics" class="dropdown-link">Real-time Analytics</a></li>
+              <li><a href="#security" class="dropdown-link">Enterprise Security</a></li>
+            </ul>
+          </li>
+          <li class="nav-item">
+            <a href="#features" class="nav-link">Features</a>
+          </li>
+          <li class="nav-item">
+            <a href="#pricing" class="nav-link">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a href="#resources" class="nav-link">Resources</a>
+          </li>
+        </ul>
+
+        <!-- Navigation Action Buttons -->
+        <div class="nav-actions">
+          <a href="#signin" class="btn btn-ghost">Sign In</a>
+          <a href="#get-started" class="btn btn-primary">Start Free Trial</a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ==============================================
+       MAIN CONTENT (Hero Demo Area)
+       ============================================== -->
+  <main id="main-content" class="hero-section">
+    <div class="hero-container">
+      <span class="hero-badge">Day 1 Deliverable • Project 01</span>
+      <h1 class="hero-title">Responsive Navigation with Flexbox & Semantic HTML5</h1>
+      <p class="hero-description">
+        Demonstrating a mobile-first, accessible header navigation with responsive breakpoints, 
+        smooth mobile drawer transitions, and keyboard-friendly focus management.
+      </p>
+
+      <div class="features-pill-row">
+        <div class="pill"><span>✓</span> Semantic &lt;header&gt; &amp; &lt;nav&gt;</div>
+        <div class="pill"><span>✓</span> Pure Flexbox Alignment</div>
+        <div class="pill"><span>✓</span> ARIA Accessibility</div>
+        <div class="pill"><span>✓</span> Mobile Hamburger Menu</div>
+        <div class="pill"><span>✓</span> Fluid Breakpoints (375px / 768px / 1200px)</div>
+      </div>
+
+      <!-- Quick Interactive Viewport Info -->
+      <div class="info-card">
+        <h3>💡 How to Test This Component</h3>
+        <p>
+          Resize your browser window or press <kbd>Cmd</kbd> + <kbd>Option</kbd> + <kbd>I</kbd> in Chrome, toggle device mode (<kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>M</kbd>), and check across <strong>375px (Mobile)</strong>, <strong>768px (Tablet)</strong>, and <strong>1200px (Desktop)</strong>.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Overlay for Mobile Drawer Backdrop -->
+  <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+  <!-- JavaScript for Interactive ARIA state & toggle -->
+  <script>
+    const navToggle = document.getElementById('nav-toggle');
+    const primaryNav = document.getElementById('primary-nav');
+    const navOverlay = document.getElementById('nav-overlay');
+    const siteHeader = document.getElementById('site-header');
+
+    // Toggle Mobile Navigation
+    function toggleMenu() {
+      const isExpanded = navToggle.getAttribute('aria-expanded') === 'true';
+      navToggle.setAttribute('aria-expanded', !isExpanded);
+      primaryNav.classList.toggle('nav-open');
+      navOverlay.classList.toggle('active');
+      document.body.classList.toggle('no-scroll');
+    }
+
+    navToggle.addEventListener('click', toggleMenu);
+    navOverlay.addEventListener('click', toggleMenu);
+
+    // Close on Escape Key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && primaryNav.classList.contains('nav-open')) {
+        toggleMenu();
+        navToggle.focus();
+      }
+    });
+
+    // Header Shadow on Scroll
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        siteHeader.classList.add('scrolled');
+      } else {
+        siteHeader.classList.remove('scrolled');
+      }
+    });
+  </script>
+</body>
+</html>
