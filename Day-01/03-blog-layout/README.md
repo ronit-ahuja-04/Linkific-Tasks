@@ -4,12 +4,20 @@
 **Program:** Linkific Training (Days 1–3: Introductory Phase)  
 **Deliverable:** Day 1 — HTML5, CSS3 & Responsive Design Basics  
 **Methodology:** BMAD Framework (Breakthrough Method for Agile AI-Driven Development)  
-**Scope:** Strictly 100% Pure HTML5 & CSS3 (Zero JavaScript)
+**Scope:** HTML5 & CSS3
 
 ---
 
 ## 🌟 Project Overview
-This project represents **Stage 3** of the compounding personal portfolio build. Rather than an isolated homework assignment with placeholder text, it integrates real architectural case studies (*VESIT AMS*, *Kingstar Enterprises*, *The BMAD Method*) with a complementary sticky sidebar detailing Ronit Ahuja's technical skills and educational timeline.
+This project represents **Stage 3** of the compounding personal portfolio build. Rather than an isolated homework assignment with placeholder text, it integrates real architectural case studies with a complementary sticky sidebar detailing Ronit Ahuja's technical skills and educational timeline.
+
+### 📚 Authentic Case Studies & Destinations
+1. **Engineering VESIT AMS: Multi-Tenant Attendance Management with Automated Session Tracking**
+   - **Destination**: [VESIT AMS GitHub README](https://github.com/ronit-ahuja-04/qrAttendanceApp#readme)
+2. **Architecting B2B Catalog Discovery & Order Workflows for Kingstar Enterprises**
+   - **Destination**: [Kingstar Enterprises GitLab README](https://gitlab.com/ahuja.ronit.0510/kingstar#readme)
+3. **The BMAD Method: Transforming AI Assistance into Structured Agile Engineering**
+   - **Destination**: [Official BMAD Framework Documentation](https://github.com/bmad-code-org/BMAD-METHOD#readme)
 
 ---
 
@@ -18,9 +26,9 @@ This project represents **Stage 3** of the compounding personal portfolio build.
 ### 1. Cumulative Superset Progression
 - **Inherited Foundation (Stage 1)**: Apple frosted navigation header with circular brand avatar, favicon, mobile drawer toggle, hero section, and "What I'm Doing" services.
 - **Inherited Foundation (Stage 2)**: 2D CSS Grid Featured Projects showcase with pure CSS `:checked` category filtering.
-- **New Stage 3 Architecture (`#writing`)**:
+- **New Stage 3 Architecture (`#blog`)**:
   - Semantic `<div class="layout-wrapper">`: Hosts the primary content stream (`<main class="writing-feed">`) alongside the sticky sidebar (`<aside class="sticky-sidebar">`).
-  - Seamless in-page smooth navigation: `#about`, `#portfolio`, `#writing`, and `#contact` all function locally on the same page.
+  - Seamless in-page smooth navigation: `#about`, `#portfolio`, `#blog`, and `#contact` all function locally on the same page.
 
 ### 2. Strict Mobile-First CSS Architecture
 Base CSS is authored specifically for small screen viewports without requiring media queries:

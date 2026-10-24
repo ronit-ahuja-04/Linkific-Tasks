@@ -155,9 +155,7 @@ Rather than creating disconnected, synthetic toy exercises with fake placeholder
 
 ---
 
-## 8. Approval & Sign-Off
+## 8. Date & Sign-Off
 
-- **Trainee Lead**: Ronit Ahuja  
-- **Linkific Program Manager**: Technical Training Division  
-- **Approval Date**: October 24, 2026  
-- **Next Milestone**: Day 2 — JavaScript Essentials & DOM Manipulation
+- **Frontend Developer Intern**: Ronit Ahuja  
+- **Date**: October 24, 2026  

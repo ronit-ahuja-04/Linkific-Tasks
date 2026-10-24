@@ -1,6 +1,6 @@
 # Project 04: Capstone Personal Portfolio
 
-The grand culmination of **Day 1: HTML5, CSS3 & Responsive Design Training** at Linkific — a production-grade, single-page personal portfolio for **Ronit Ahuja**, completely reverse-engineered from his live portfolio ([ronit-ahuja-portfolio.vercel.app](https://ronit-ahuja-portfolio.vercel.app/)) adhering to the **BMAD Method** and **Strictly 100% Pure HTML5 & CSS3 (Zero JavaScript)**.
+The grand culmination of **Day 1: HTML5, CSS3 & Responsive Design Training** at Linkific — a production-grade, single-page personal portfolio for **Ronit Ahuja**, completely reverse-engineered from his live portfolio ([ronit-ahuja-portfolio.vercel.app](https://ronit-ahuja-portfolio.vercel.app/)) adhering to the **BMAD Method** and **HTML5 & CSS3**.
 
 ---
 
@@ -17,7 +17,7 @@ Project 04 is the final milestone in Day 1's linear, compounding progression:
 ## 🌟 Key Sections & Technical Features
 
 ### 1. Apple Frosted Navigation & Header
-- **Circular Brand Avatar & Favicon**: Uses real assets (`./assets/images/avatar.jpg` and `./assets/images/favicon.jpg`).
+- **Circular Brand Avatar & Favicon**: Uses real assets from the global directory (`../assets/images/avatar.jpg` and `../assets/images/favicon.jpg`).
 - **In-Page Anchor Smooth Scrolling**: Clean in-page anchors (`#about`, `#portfolio`, `#blog`, `#resume`, `#contact`) with CSS `scroll-behavior: smooth` and `scroll-padding-top`.
 - **Pure CSS Mobile Drawer (Checkbox Hack)**:
   - Uses hidden `#nav-toggle-input` and `<label for="nav-toggle-input">`.
@@ -46,11 +46,11 @@ Project 04 is the final milestone in Day 1's linear, compounding progression:
 
 ### 4. Featured Projects Showcase (2D CSS Grid + Pure CSS Filter)
 - Displays Ronit's 5 real software projects:
-  1. **VESIT AMS**: Smart AI-assisted Attendance Management System.
-  2. **Kingstar Enterprises**: B2B e-commerce platform with product catalogs.
-  3. **Budgetify**: Personal expense tracking and financial analytics web app.
-  4. **Menti Math**: Gamified mental arithmetic mobile app in Flutter.
-  5. **FlowLane**: Agile workflow and task coordination concept.
+  1. **VESIT AMS**: [Live Demo](https://vesit-ams.vercel.app/) • [GitHub Repo](https://github.com/ronit-ahuja-04/qrAttendanceApp) — Smart AI-assisted Attendance Management System.
+  2. **Kingstar Enterprises**: [Live Demo](https://kingstar-wardrobes.netlify.app/) • [GitLab Repo](https://gitlab.com/ahuja.ronit.0510/kingstar) — B2B e-commerce platform with product catalogs.
+  3. **Budgetify**: [GitLab Repo (APK & Source)](https://gitlab.com/ahuja.ronit.0510/budgetify) — Personal finance and expense tracking mobile application (Flutter).
+  4. **Menti Math**: [GitLab Repo (APK & Source)](https://gitlab.com/ahuja.ronit.0510/menti-math) — Gamified mental arithmetic quiz app with global leaderboards (Flutter).
+  5. **FlowLane**: [Live Demo](https://flow-lane.vercel.app/) • [GitLab Repo](https://gitlab.com/ahuja.ronit.0510/flowlane) — Agile workflow and task coordination concept.
 - **Pure CSS Filter Tabs**: Uses hidden radio inputs (`#filter-all`, `#filter-web`, `#filter-mobile`, `#filter-ai`) and the sibling selector (`~`) to toggle visibility without JavaScript:
   ```css
   #filter-web:checked ~ .projects-grid .project-card:not([data-category~="web"]) {
@@ -60,9 +60,9 @@ Project 04 is the final milestone in Day 1's linear, compounding progression:
 
 ### 5. Technical Case Studies & Engineering Notes (`#blog`)
 - 3 authentic long-form technical case studies:
-  - *Engineering VESIT AMS: Multi-Tenant Attendance Management with Automated Session Tracking* (Featured article with architecture highlights).
-  - *Architecting B2B Catalog Discovery & Order Workflows for Kingstar Enterprises*.
-  - *The BMAD Method: Transforming AI Assistance into Structured Agile Engineering*.
+  - *Engineering VESIT AMS: Multi-Tenant Attendance Management with Automated Session Tracking* (Redirects to [GitHub README](https://github.com/ronit-ahuja-04/qrAttendanceApp#readme)).
+  - *Architecting B2B Catalog Discovery & Order Workflows for Kingstar Enterprises* (Redirects to [GitLab README](https://gitlab.com/ahuja.ronit.0510/kingstar#readme)).
+  - *The BMAD Method: Transforming AI Assistance into Structured Agile Engineering* (Redirects to [Official BMAD Documentation](https://github.com/bmad-code-org/BMAD-METHOD#readme)).
 
 ### 6. Resume: Education & Skills Section (`#resume`)
 - **Dual-Column Responsive Grid**:
@@ -72,7 +72,8 @@ Project 04 is the final milestone in Day 1's linear, compounding progression:
   - **Right Column: Competencies & Skills**:
     - Progress meters with percentage displays: Frontend (85%), Backend & APIs (75%), Databases & Cloud (80%), Mobile Apps (75%), AI & Prompting (70%), BMAD SDLC (90%).
     - Categorized sub-pills highlighting modern frameworks and tooling.
-    - Full resume download / external showcase action card.
+    - Full resume download / external showcase action card linking directly to `../assets/docs/Ronit_Ahuja_Resume.pdf`.
+- **Fixed Floating Resume Button**: Bottom-right circular frosted glass download button (`.download-btn-fixed`) reverse-engineered from Ronit's actual portfolio, enabling instant 1-click PDF resume download from any scroll position.
 
 ### 7. Contact Section (`#contact`) & Semantic Footer
 - **Contact Details**: Direct mailto link, phone link, location, and quick online profile chips.

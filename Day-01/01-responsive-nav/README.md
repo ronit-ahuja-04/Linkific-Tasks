@@ -18,14 +18,13 @@ Built following the **BMAD Framework** (Breakthrough Method for Agile AI-Driven 
 ```text
 <header class="site-header">
   └── <div class="nav-container">
-        ├── <a class="brand"> (Site identity anchor)
-        ├── <button class="nav-toggle" aria-expanded="false"> (Two-line toggle)
+        ├── <a class="brand"> (Circular avatar logo & site identity)
+        ├── <input type="checkbox" id="nav-toggle-input"> (Pure CSS checkbox state)
+        ├── <label for="nav-toggle-input"> (Two-line minimal toggle)
         └── <nav class="primary-nav" aria-label="Primary navigation">
               ├── <ul class="nav-list"> (Semantic list of routes)
-              │     ├── <li><a class="nav-link">About</a></li>
-              │     ├── <li><a class="nav-link">Projects</a></li>
-              │     ├── <li><a class="nav-link">Skills</a></li>
-              │     └── <li><a class="nav-link">Contact</a></li>
+              │     ├── <li><a class="nav-link" href="#about">About</a></li>
+              │     └── <li><a class="nav-link" href="#contact">Contact</a></li>
               └── <div class="nav-cta-wrapper">
                     └── <a class="nav-cta">Resume ↗</a>
 ```

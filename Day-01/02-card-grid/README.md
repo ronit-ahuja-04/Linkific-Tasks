@@ -2,17 +2,15 @@
 
 A responsive 2-dimensional project showcase grid built using **CSS Grid** (`repeat(auto-fit, minmax(300px, 1fr))`) and semantic HTML5 as **Stage 2** of Ronit Ahuja's portfolio build during **Day 1: HTML5, CSS3 & Responsive Design Training** at Linkific.
 
-Built following the **BMAD Framework** (Breakthrough Method for Agile AI-Driven Development).
-
 ---
 
 ## 🌟 Real-World Data & Continuity
 This project is not an isolated demo—it is **Stage 2** in the progressive build of Ronit Ahuja's portfolio, carrying forward the Apple frosted glass header from Project 1 and implementing the **Featured Projects Section** with 5 actual production projects:
-1. **VESIT AMS** (*Hybrid*): AI-assisted attendance tracking, session tracking, and faculty dashboard.
-2. **Kingstar Enterprises** (*Web*): B2B e-commerce platform with catalog filtering.
-3. **Budgetify** (*Application*): Mobile financial management and budgeting application.
-4. **Menti Math** (*Application*): Gamified mathematical problem-solving training app.
-5. **FlowLane** (*Web*): Team workflow and milestone productivity automation tool.
+1. **VESIT AMS** (*Hybrid / Web*): [Live Deployment](https://vesit-ams.vercel.app/) • [GitHub Repo](https://github.com/ronit-ahuja-04/qrAttendanceApp) — AI-assisted attendance tracking, session tracking, and faculty dashboard.
+2. **Kingstar Enterprises** (*Web*): [Live Deployment](https://kingstar-wardrobes.netlify.app/) • [GitLab Repo](https://gitlab.com/ahuja.ronit.0510/kingstar) — B2B e-commerce platform with catalog filtering.
+3. **Budgetify** (*Android APK / Flutter*): [GitLab Repo (APK & Source)](https://gitlab.com/ahuja.ronit.0510/budgetify) — Mobile financial management and budgeting application.
+4. **Menti Math** (*Android APK / Flutter*): [GitLab Repo (APK & Source)](https://gitlab.com/ahuja.ronit.0510/menti-math) — Gamified mathematical quiz app with global leaderboards.
+5. **FlowLane** (*Web SaaS*): [Live Deployment](https://flow-lane.vercel.app/) • [GitLab Repo](https://gitlab.com/ahuja.ronit.0510/flowlane) — Team workflow and milestone productivity automation tool.
 
 ---
 

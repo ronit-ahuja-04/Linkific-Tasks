@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="./assets/images/favicon.jpg" type="image/jpeg">
+  <link rel="shortcut icon" href="../assets/images/favicon.jpg" type="image/jpeg">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -25,6 +25,15 @@
   <a href="#about" class="skip-link">Skip to main content</a>
 
   <!-- ==============================================
+       FIXED FLOATING RESUME DOWNLOAD BUTTON (Matches Live Website)
+       ============================================== -->
+  <a href="../assets/docs/Ronit_Ahuja_Resume.pdf" download="Ronit_Ahuja_Resume.pdf" class="download-btn-fixed" aria-label="Download Resume" title="Download Resume (PDF)">
+    <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <!-- ==============================================
        HEADER & NAVIGATION (100% Pure HTML5 & CSS3)
        All links are in-page anchors: #about, #portfolio, #blog, #resume, #contact
        ============================================== -->
@@ -33,7 +42,7 @@
 
       <!-- Brand Identity with Logo -->
       <a href="#" class="brand" aria-label="Ronit Ahuja Home">
-        <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+        <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
         <span class="brand-name">Ronit Ahuja</span>
       </a>
 
@@ -94,7 +103,7 @@
         </div>
 
         <div class="hero-avatar-box">
-          <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="80" height="80">
+          <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="80" height="80">
         </div>
 
         <h1 class="hero-headline">
@@ -291,9 +300,9 @@
                   <span class="tech-tag">MongoDB</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  <a href="https://vesit-ams.vercel.app/" target="_blank" rel="noopener noreferrer"
                     class="project-link">
-                    <span>Live Showcase</span>
+                    <span>Live Demo</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
                       height="12">
                       <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -325,9 +334,9 @@
                   <span class="tech-tag">Express</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  <a href="https://kingstar-wardrobes.netlify.app/" target="_blank" rel="noopener noreferrer"
                     class="project-link">
-                    <span>Live Showcase</span>
+                    <span>Live Demo</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
                       height="12">
                       <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -338,30 +347,29 @@
             </article>
 
             <!-- Project 3: Budgetify -->
-            <article class="project-card" data-category="web">
+            <article class="project-card" data-category="mobile">
               <div class="card-top">
                 <div class="project-badge-row">
-                  <span class="category-badge">Web App</span>
-                  <span class="status-indicator">Fintech</span>
+                  <span class="category-badge">Android APK</span>
+                  <span class="status-indicator">Flutter</span>
                 </div>
                 <h3 class="project-title">Budgetify</h3>
                 <p class="project-summary">
-                  A personal finance and expense tracking web application that allows users to manage budgets, log daily
-                  expenditures, and visualize spending habits through interactive analytical charts and monthly
-                  summaries.
+                  A personal finance and budgeting mobile application offering real-time expense tracking, category
+                  breakdown visualization, and cash flow analysis built with cross-platform Flutter architecture.
                 </p>
               </div>
               <div class="card-bottom">
                 <div class="tech-stack-pills">
-                  <span class="tech-tag">React</span>
-                  <span class="tech-tag">JavaScript</span>
-                  <span class="tech-tag">CSS Grid</span>
-                  <span class="tech-tag">Chart.js</span>
+                  <span class="tech-tag">Flutter</span>
+                  <span class="tech-tag">Firebase</span>
+                  <span class="tech-tag">Dart</span>
+                  <span class="tech-tag">Android APK</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  <a href="https://gitlab.com/ahuja.ronit.0510/budgetify" target="_blank" rel="noopener noreferrer"
                     class="project-link">
-                    <span>Live Showcase</span>
+                    <span>GitLab (APK &amp; Code)</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
                       height="12">
                       <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -375,26 +383,26 @@
             <article class="project-card" data-category="mobile">
               <div class="card-top">
                 <div class="project-badge-row">
-                  <span class="category-badge">Mobile App</span>
+                  <span class="category-badge">Android APK</span>
                   <span class="status-indicator">Flutter</span>
                 </div>
                 <h3 class="project-title">Menti Math</h3>
                 <p class="project-summary">
-                  An engaging, gamified mobile application engineered to sharpen mental arithmetic skills through
-                  speed-based challenges, dynamic score tracking, adaptive difficulty, and responsive cross-platform UI.
+                  An engaging, gamified mobile arithmetic quiz application engineered to sharpen mental calculation
+                  agility, speed challenges, and global leaderboard ranking built with Flutter and Node.js.
                 </p>
               </div>
               <div class="card-bottom">
                 <div class="tech-stack-pills">
                   <span class="tech-tag">Flutter</span>
-                  <span class="tech-tag">Dart</span>
-                  <span class="tech-tag">Mobile UI</span>
-                  <span class="tech-tag">State Mgmt</span>
+                  <span class="tech-tag">Node.js</span>
+                  <span class="tech-tag">SQLite</span>
+                  <span class="tech-tag">Android APK</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  <a href="https://gitlab.com/ahuja.ronit.0510/menti-math" target="_blank" rel="noopener noreferrer"
                     class="project-link">
-                    <span>Live Showcase</span>
+                    <span>GitLab (APK &amp; Code)</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
                       height="12">
                       <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -409,25 +417,25 @@
               <div class="card-top">
                 <div class="project-badge-row">
                   <span class="category-badge">Productivity &bull; AI</span>
-                  <span class="status-indicator">Concept &bull; Dev</span>
+                  <span class="status-indicator">Kanban</span>
                 </div>
                 <h3 class="project-title">FlowLane</h3>
                 <p class="project-summary">
-                  A modern workflow management concept built to streamline agile task coordination, automate routine
-                  milestone check-ins, and minimize cognitive friction during rapid development cycles.
+                  A modern workflow management SaaS concept built to streamline agile task coordination, drag-and-drop
+                  Kanban columns, and milestone progression with a rich responsive interface.
                 </p>
               </div>
               <div class="card-bottom">
                 <div class="tech-stack-pills">
                   <span class="tech-tag">React</span>
-                  <span class="tech-tag">TypeScript</span>
-                  <span class="tech-tag">Tailwind</span>
-                  <span class="tech-tag">AI Workflows</span>
+                  <span class="tech-tag">Node.js</span>
+                  <span class="tech-tag">Kanban</span>
+                  <span class="tech-tag">Workflow</span>
                 </div>
                 <div class="project-links">
-                  <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+                  <a href="https://flow-lane.vercel.app/" target="_blank" rel="noopener noreferrer"
                     class="project-link">
-                    <span>Live Showcase</span>
+                    <span>Live Demo</span>
                     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="12"
                       height="12">
                       <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -508,9 +516,9 @@
                 <span class="pill">MongoDB</span>
                 <span class="pill">System Design</span>
               </div>
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/ronit-ahuja-04/qrAttendanceApp#readme" target="_blank" rel="noopener noreferrer"
                 class="read-more-link">
-                <span>Read Full Case Study</span>
+                <span>Read on GitHub README</span>
                 <span class="arrow-icon">↗</span>
               </a>
             </footer>
@@ -550,9 +558,9 @@
                 <span class="pill">REST API</span>
                 <span class="pill">React</span>
               </div>
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://gitlab.com/ahuja.ronit.0510/kingstar#readme" target="_blank" rel="noopener noreferrer"
                 class="read-more-link">
-                <span>Explore Architecture</span>
+                <span>Read on GitLab README</span>
                 <span class="arrow-icon">↗</span>
               </a>
             </footer>
@@ -591,9 +599,9 @@
                 <span class="pill">Agile SDLC</span>
                 <span class="pill">AI Pair Programming</span>
               </div>
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://github.com/bmad-code-org/BMAD-METHOD#readme" target="_blank" rel="noopener noreferrer"
                 class="read-more-link">
-                <span>Learn the Workflow</span>
+                <span>Official BMAD Documentation</span>
                 <span class="arrow-icon">↗</span>
               </a>
             </footer>
@@ -846,10 +854,12 @@
                 <p class="download-desc">Available for technical roles, internships, and full-stack software positions.
                 </p>
               </div>
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
-                class="btn btn-primary">
-                <span>View Full Resume</span>
-                <span class="arrow-icon">↗</span>
+              <a href="../assets/docs/Ronit_Ahuja_Resume.pdf" download="Ronit_Ahuja_Resume.pdf"
+                class="btn btn-primary" title="Download Resume (PDF)">
+                <span>Download Resume</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
               </a>
             </div>
 
@@ -988,7 +998,7 @@
       <div class="footer-top">
         <div class="footer-brand">
           <div class="brand">
-            <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+            <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
             <span class="brand-name">Ronit Ahuja</span>
           </div>
           <p class="footer-tagline">

@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Favicon -->
-  <link rel="shortcut icon" href="./assets/images/favicon.jpg" type="image/jpeg">
+  <link rel="shortcut icon" href="../assets/images/favicon.jpg" type="image/jpeg">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -25,6 +25,15 @@
   <a href="#about" class="skip-link">Skip to main content</a>
 
   <!-- ==============================================
+       FIXED FLOATING RESUME DOWNLOAD BUTTON (Matches Live Website)
+       ============================================== -->
+  <a href="../assets/docs/Ronit_Ahuja_Resume.pdf" download="Ronit_Ahuja_Resume.pdf" class="download-btn-fixed" aria-label="Download Resume" title="Download Resume (PDF)">
+    <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <!-- ==============================================
        HEADER & NAVIGATION (100% Pure HTML5 & CSS3)
        All links are in-page anchors: #about, #portfolio, #contact
        ============================================== -->
@@ -33,7 +42,7 @@
 
       <!-- Brand Identity with Logo -->
       <a href="#" class="brand" aria-label="Ronit Ahuja Home">
-        <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+        <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
         <span class="brand-name">Ronit Ahuja</span>
       </a>
 
@@ -88,7 +97,7 @@
         </div>
 
         <div class="hero-avatar-box">
-          <img src="./assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="76" height="76">
+          <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="76" height="76">
         </div>
 
         <h1 class="hero-headline">
@@ -284,9 +293,9 @@
             </div>
 
             <footer class="card-footer">
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://vesit-ams.vercel.app/" target="_blank" rel="noopener noreferrer"
                 class="card-cta">
-                <span>View Project</span>
+                <span>Live Demo</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="13" height="13"
                   aria-hidden="true">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -321,9 +330,9 @@
             </div>
 
             <footer class="card-footer">
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://kingstar-wardrobes.netlify.app/" target="_blank" rel="noopener noreferrer"
                 class="card-cta">
-                <span>View Project</span>
+                <span>Live Demo</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="13" height="13"
                   aria-hidden="true">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -338,29 +347,29 @@
               <div class="media-art app-gradient">
                 <span class="media-icon">💳</span>
               </div>
-              <span class="category-badge badge-app">Application</span>
+              <span class="category-badge badge-app">Android APK</span>
             </div>
 
             <div class="card-body">
-              <span class="project-timeline">Personal Project</span>
+              <span class="project-timeline">Mobile Application • Flutter</span>
               <h3 class="project-title">Budgetify</h3>
               <p class="project-desc">
-                A personal finance and budgeting application offering real-time expense tracking, category breakdown
-                visualization, and cash flow analysis built with cross-platform mobile architecture.
+                A personal finance and budgeting mobile app offering real-time expense tracking, category breakdown
+                visualization, and cash flow analysis built with cross-platform Flutter architecture.
               </p>
 
               <div class="tech-stack">
                 <span class="tech-chip">Flutter</span>
                 <span class="tech-chip">Firebase</span>
                 <span class="tech-chip">Dart</span>
-                <span class="tech-chip">UI/UX</span>
+                <span class="tech-chip">Android APK</span>
               </div>
             </div>
 
             <footer class="card-footer">
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://gitlab.com/ahuja.ronit.0510/budgetify" target="_blank" rel="noopener noreferrer"
                 class="card-cta">
-                <span>View Project</span>
+                <span>GitLab (APK &amp; Code)</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="13" height="13"
                   aria-hidden="true">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -375,28 +384,29 @@
               <div class="media-art math-gradient">
                 <span class="media-icon">🧠</span>
               </div>
-              <span class="category-badge badge-app">Application</span>
+              <span class="category-badge badge-app">Android APK</span>
             </div>
 
             <div class="card-body">
-              <span class="project-timeline">Mobile Application</span>
+              <span class="project-timeline">Mobile Application • Flutter</span>
               <h3 class="project-title">Menti Math</h3>
               <p class="project-desc">
-                An interactive mathematical problem-solving application engineered to improve mental calculation
-                agility, speed training, and numerical analytical skills through gamified test modules.
+                An interactive mathematical quiz application engineered to improve mental calculation
+                agility, speed challenges, and global leaderboard ranking built with Flutter and Node.js.
               </p>
 
               <div class="tech-stack">
                 <span class="tech-chip">Flutter</span>
-                <span class="tech-chip">State Management</span>
-                <span class="tech-chip">Mobile</span>
+                <span class="tech-chip">Node.js</span>
+                <span class="tech-chip">SQLite</span>
+                <span class="tech-chip">Android APK</span>
               </div>
             </div>
 
             <footer class="card-footer">
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://gitlab.com/ahuja.ronit.0510/menti-math" target="_blank" rel="noopener noreferrer"
                 class="card-cta">
-                <span>View Project</span>
+                <span>GitLab (APK &amp; Code)</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="13" height="13"
                   aria-hidden="true">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
@@ -425,14 +435,15 @@
               <div class="tech-stack">
                 <span class="tech-chip">React</span>
                 <span class="tech-chip">Node.js</span>
+                <span class="tech-chip">Kanban</span>
                 <span class="tech-chip">Workflow</span>
               </div>
             </div>
 
             <footer class="card-footer">
-              <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer"
+              <a href="https://flow-lane.vercel.app/" target="_blank" rel="noopener noreferrer"
                 class="card-cta">
-                <span>View Project</span>
+                <span>Live Demo</span>
                 <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="13" height="13"
                   aria-hidden="true">
                   <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
