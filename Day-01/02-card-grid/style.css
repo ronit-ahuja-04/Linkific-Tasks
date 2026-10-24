@@ -1,0 +1,384 @@
+/* ==========================================================================
+   Day 1 Deliverable: Responsive Card Layout with CSS Grid
+   Concepts: 2D Grid Architecture, repeat(auto-fit, minmax()), Gap,
+             Internal Flexbox Alignment, Card Elevation, and Micro-interactions.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CSS CUSTOM PROPERTIES (DESIGN TOKENS)
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces & Backgrounds */
+  --bg-page: #0a0d14;
+  --bg-card: #121826;
+  --bg-card-hover: #172033;
+  --bg-tag: rgba(255, 255, 255, 0.06);
+  
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-active: rgba(99, 102, 241, 0.4);
+
+  /* Typography */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-display: 'Outfit', var(--font-body);
+
+  /* Accents & Gradients */
+  --primary: #6366f1;
+  --primary-glow: rgba(99, 102, 241, 0.25);
+  --grad-1: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --grad-2: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+  --grad-3: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  --grad-4: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+  --grad-5: linear-gradient(135deg, #f43f5e 0%, #be123c 100%);
+  --grad-6: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+
+  /* Spacing & Radii */
+  --radius-card: 16px;
+  --radius-badge: 9999px;
+  --transition-card: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* --------------------------------------------------------------------------
+   2. GLOBAL RESET & BASE STYLES
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-page);
+  color: var(--text-main);
+  line-height: 1.6;
+  min-height: 100vh;
+  padding-bottom: 3rem;
+  -webkit-font-smoothing: antialiased;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   3. HEADER & HERO
+   -------------------------------------------------------------------------- */
+.page-header {
+  padding: 4.5rem 0 3rem;
+  text-align: center;
+  background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+}
+
+.badge-wrapper {
+  margin-bottom: 1.25rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.4rem 1.1rem;
+  background-color: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: #a5b4fc;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-badge);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4.5vw, 3.25rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.page-subtitle {
+  max-width: 680px;
+  margin: 0 auto 2.5rem;
+  color: var(--text-muted);
+  font-size: 1.0625rem;
+}
+
+.page-subtitle code {
+  color: #c7d2fe;
+  background: rgba(99, 102, 241, 0.15);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.9em;
+}
+
+/* Category Filter Tabs */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.filter-btn {
+  background: var(--bg-card);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 0.5rem 1.2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: var(--radius-badge);
+  cursor: pointer;
+  transition: all var(--transition-card);
+}
+
+.filter-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-main);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.filter-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  box-shadow: 0 0 16px var(--primary-glow);
+}
+
+/* --------------------------------------------------------------------------
+   4. CSS GRID ARCHITECTURE (CORE SHOWCASE)
+   -------------------------------------------------------------------------- */
+.main-content {
+  padding: 1rem 0 3rem;
+}
+
+.card-grid {
+  /*
+    KEY LEARNING: CSS GRID AUTO-FIT + MINMAX
+    Automatically creates as many columns as will fit, with a minimum
+    width of 320px and equal distribution of remaining space (1fr).
+    Requires ZERO media queries for basic responsiveness!
+  */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+/* --------------------------------------------------------------------------
+   5. INDIVIDUAL CARD ARCHITECTURE (SEMANTIC <ARTICLE>)
+   -------------------------------------------------------------------------- */
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  position: relative;
+  transition: transform var(--transition-card), border-color var(--transition-card), box-shadow var(--transition-card);
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-active);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 20px var(--primary-glow);
+}
+
+/* Featured Card Accent */
+.card.featured {
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+/* Media Preview Header */
+.card-media {
+  position: relative;
+  width: 100%;
+  height: 170px;
+  overflow: hidden;
+}
+
+.media-preview {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-card);
+}
+
+.card:hover .media-preview {
+  transform: scale(1.04);
+}
+
+.media-icon {
+  font-size: 2.75rem;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.3));
+}
+
+.gradient-1 { background: var(--grad-1); }
+.gradient-2 { background: var(--grad-2); }
+.gradient-3 { background: var(--grad-3); }
+.gradient-4 { background: var(--grad-4); }
+.gradient-5 { background: var(--grad-5); }
+.gradient-6 { background: var(--grad-6); }
+
+/* Card Tag Badge */
+.card-tag {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-badge);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.tag-purple  { background: rgba(168, 85, 247, 0.35); color: #e9d5ff; border: 1px solid rgba(168, 85, 247, 0.5); }
+.tag-blue    { background: rgba(59, 130, 246, 0.35); color: #bfdbfe; border: 1px solid rgba(59, 130, 246, 0.5); }
+.tag-emerald { background: rgba(16, 185, 129, 0.35); color: #a7f3d0; border: 1px solid rgba(16, 185, 129, 0.5); }
+.tag-amber   { background: rgba(245, 158, 11, 0.35); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.5); }
+.tag-rose    { background: rgba(244, 63, 94, 0.35);  color: #fecdd3; border: 1px solid rgba(244, 63, 94, 0.5); }
+.tag-cyan    { background: rgba(6, 182, 212, 0.35);  color: #cffafe; border: 1px solid rgba(6, 182, 212, 0.5); }
+
+/* Card Body */
+.card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows body to stretch so footer always sits at bottom */
+}
+
+.card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--text-dim);
+  margin-bottom: 0.75rem;
+}
+
+.difficulty {
+  color: #a5b4fc;
+  font-weight: 500;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
+  margin-bottom: 0.75rem;
+}
+
+.card-title a {
+  color: var(--text-main);
+  text-decoration: none;
+  transition: color var(--transition-card);
+}
+
+.card-title a:hover {
+  color: var(--primary);
+}
+
+.card-description {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  margin-bottom: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   6. CARD FOOTER (PINNED TO BOTTOM)
+   -------------------------------------------------------------------------- */
+.card-footer {
+  margin-top: auto; /* Internal Flexbox trick: keeps all footers strictly aligned */
+  padding: 1rem 1.5rem 1.35rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.avatar-pill {
+  width: 32px;
+  height: 32px;
+  background: var(--grad-1);
+  border-radius: 50%;
+  display: grid;
+  place-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.author-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.author-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.author-role {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: all var(--transition-card);
+}
+
+.card-cta:hover {
+  color: var(--primary);
+  transform: translateX(3px);
+}
+
+/* --------------------------------------------------------------------------
+   7. FOOTER & BREAKPOINT ADJUSTMENTS
+   -------------------------------------------------------------------------- */
+.site-footer {
+  text-align: center;
+  padding: 3rem 0 1rem;
+  color: var(--text-dim);
+  font-size: 0.875rem;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: 3rem;
+}
+
+/* Extra Mobile Adjustments */
+@media (max-width: 480px) {
+  .card-grid {
+    grid-template-columns: 1fr; /* Single column on compact phones */
+    gap: 1.25rem;
+  }
+
+  .page-header {
+    padding: 3rem 0 2rem;
+  }
+}

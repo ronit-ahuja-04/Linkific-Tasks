@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Day 1 Practice Project 02: Responsive Card Layout with CSS Grid, auto-fit, minmax, and micro-animations.">
+  <title>Responsive Card Grid | Day 1 Linkific</title>
+  
+  <!-- Modern Font: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==============================================
+       HEADER SECTION
+       ============================================== -->
+  <header class="page-header">
+    <div class="container">
+      <div class="badge-wrapper">
+        <span class="badge">Day 1 Deliverable • Project 02</span>
+      </div>
+      <h1 class="page-title">Curated Developer Modules</h1>
+      <p class="page-subtitle">
+        Explore self-contained engineering guides built using fluid <strong>CSS Grid</strong> 
+        (<code>repeat(auto-fit, minmax(...))</code>), responsive image containers, and semantic article components.
+      </p>
+
+      <!-- Filter / Category Tabs -->
+      <div class="filter-bar" role="tablist" aria-label="Course categories">
+        <button class="filter-btn active" role="tab" aria-selected="true">All Modules</button>
+        <button class="filter-btn" role="tab" aria-selected="false">Architecture</button>
+        <button class="filter-btn" role="tab" aria-selected="false">Frontend</button>
+        <button class="filter-btn" role="tab" aria-selected="false">Cloud &amp; DevOps</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       MAIN: RESPONSIVE CSS GRID CARDS
+       ============================================== -->
+  <main class="main-content">
+    <div class="container">
+      <div class="card-grid" id="card-grid">
+
+        <!-- Card 1: Semantic HTML & Accessibility -->
+        <article class="card">
+          <div class="card-media">
+            <div class="media-preview gradient-1">
+              <span class="media-icon">📐</span>
+            </div>
+            <span class="card-tag tag-purple">Frontend</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 8 min read</span>
+              <span class="difficulty">Intermediate</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-1">Modern HTML5 Semantics &amp; Accessible Web Architecture</a>
+            </h2>
+            <p class="card-description">
+              Moving beyond generic &lt;div&gt; tags to construct accessible, SEO-optimized page outlines using main, article, and section elements.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on HTML5 Semantics">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Card 2: CSS Grid Mastery -->
+        <article class="card featured">
+          <div class="card-media">
+            <div class="media-preview gradient-2">
+              <span class="media-icon">⚡</span>
+            </div>
+            <span class="card-tag tag-blue">Trending</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 12 min read</span>
+              <span class="difficulty">Advanced</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-2">Mastering 2D Layouts with CSS Grid &amp; MinMax Functions</a>
+            </h2>
+            <p class="card-description">
+              Harness the true power of multi-dimensional layouts, implicit grid auto-placement, grid areas, and responsive fluid breakpoints.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on CSS Grid">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Card 3: Responsive Design & Fluid Breakpoints -->
+        <article class="card">
+          <div class="card-media">
+            <div class="media-preview gradient-3">
+              <span class="media-icon">📱</span>
+            </div>
+            <span class="card-tag tag-emerald">Responsive</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 6 min read</span>
+              <span class="difficulty">Beginner</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-3">Mobile-First Thinking: Viewports, Media Queries &amp; Units</a>
+            </h2>
+            <p class="card-description">
+              Writing scalable CSS using relative units (rem, vw/vh), responsive images with max-width: 100%, and clean media queries.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on Mobile First Design">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Card 4: Flexbox Deep Dive -->
+        <article class="card">
+          <div class="card-media">
+            <div class="media-preview gradient-4">
+              <span class="media-icon">🎯</span>
+            </div>
+            <span class="card-tag tag-amber">Flexbox</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 10 min read</span>
+              <span class="difficulty">Intermediate</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-4">Flexbox In Depth: Direction, Alignment &amp; Flex Factor</a>
+            </h2>
+            <p class="card-description">
+              Deconstructing flex-grow, flex-shrink, and flex-basis for predictable responsive component layouts without floats.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on Flexbox">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Card 5: CSS Box Model & Selectors -->
+        <article class="card">
+          <div class="card-media">
+            <div class="media-preview gradient-5">
+              <span class="media-icon">📦</span>
+            </div>
+            <span class="card-tag tag-rose">Core CSS</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 7 min read</span>
+              <span class="difficulty">Beginner</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-5">CSS Box Model, Specificity &amp; Modern Pseudo-Classes</a>
+            </h2>
+            <p class="card-description">
+              Understanding margin collapsing, padding, border-box sizing, and leveraging :has(), :is(), and :focus-visible.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on CSS Box Model">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+        <!-- Card 6: Git & Workflow Discipline -->
+        <article class="card">
+          <div class="card-media">
+            <div class="media-preview gradient-6">
+              <span class="media-icon">🚀</span>
+            </div>
+            <span class="card-tag tag-cyan">DevOps</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="reading-time">⏱️ 5 min read</span>
+              <span class="difficulty">Core Practice</span>
+            </div>
+            <h2 class="card-title">
+              <a href="#module-6">Git Hygiene, Semantic Commits &amp; GitHub Delivery</a>
+            </h2>
+            <p class="card-description">
+              Managing clean commit histories, setting up .gitignore for macOS/Windows, and creating production-grade repository READMEs.
+            </p>
+          </div>
+          <footer class="card-footer">
+            <div class="author-info">
+              <div class="avatar-pill">RA</div>
+              <div class="author-text">
+                <span class="author-name">Ronit Ahuja</span>
+                <span class="author-role">Linkific Trainee</span>
+              </div>
+            </div>
+            <a href="#learn-more" class="card-cta" aria-label="Read module on Git Hygiene">
+              <span>Explore</span>
+              <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16">
+                <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
+              </svg>
+            </a>
+          </footer>
+        </article>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Navigation Back to Overview -->
+  <footer class="site-footer">
+    <div class="container">
+      <p>Built with Semantic HTML5 &amp; CSS Grid • Linkific Training Day 1</p>
+    </div>
+  </footer>
+
+</body>
+</html>
