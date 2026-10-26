@@ -1,6 +1,6 @@
 # JavaScript Mastery Flashcards (`projects/flashcards`)
 
-Linkific Internship Training · Day 2  
+Frontend JavaScript Applications · Portfolio Project  
 **Owner:** Ronit Ahuja  
 **Tech:** Vanilla JavaScript (ES2020+), ES Modules, HTML5, CSS3, `localStorage`
 

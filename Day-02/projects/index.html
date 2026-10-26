@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>JavaScript Systems Engineering Suite · Linkific</title>
+    <title>JavaScript Applications</title>
     <!-- Architectural Typography: Space Grotesk (Display & Headers) + Plus Jakarta Sans (Interface) + JetBrains Mono (Code) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -87,108 +87,27 @@
 
       /* ===== Masthead / Hero ===== */
       .masthead {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-        padding-bottom: 3rem;
-        border-bottom: 1px solid var(--border-subtle);
-      }
-
-      @media (min-width: 900px) {
-        .masthead {
-          grid-template-columns: 1.4fr 1fr;
-          align-items: center;
-        }
-      }
-
-      .masthead-lead {
         display: flex;
         flex-direction: column;
         gap: 1.25rem;
-      }
-
-      .edition-tag {
-        font-family: var(--font-mono);
-        font-size: 0.82rem;
-        color: var(--accent-cyan);
-        letter-spacing: 0.04em;
+        padding-bottom: 2.75rem;
+        border-bottom: 1px solid var(--border-subtle);
+        max-width: 760px;
       }
 
       .masthead h1 {
         font-family: var(--font-display);
-        font-size: clamp(2.5rem, 5.5vw, 3.8rem);
+        font-size: clamp(2.4rem, 5vw, 3.6rem);
         font-weight: 700;
         letter-spacing: -0.04em;
-        line-height: 1.08;
+        line-height: 1.1;
         color: #ffffff;
       }
 
       .masthead p.bio {
         color: var(--text-secondary);
         font-size: 1.12rem;
-        max-width: 620px;
         line-height: 1.65;
-      }
-
-      /* Telemetry Status Console (Right column of masthead) */
-      .telemetry-console {
-        background-color: var(--surface);
-        border: 1px solid var(--border-subtle);
-        border-radius: 14px;
-        padding: 1.5rem 1.75rem;
-        display: flex;
-        flex-direction: column;
-        gap: 1.15rem;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 20px 40px -10px rgba(0, 0, 0, 0.5);
-      }
-
-      .console-title {
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .live-pulse-dot {
-        width: 8px;
-        height: 8px;
-        background-color: var(--accent-emerald);
-        border-radius: 50%;
-        display: inline-block;
-        box-shadow: 0 0 10px var(--accent-emerald);
-      }
-
-      .console-metrics {
-        display: flex;
-        flex-direction: column;
-        gap: 0.85rem;
-      }
-
-      .console-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.88rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-        padding-bottom: 0.5rem;
-      }
-
-      .console-row:last-child {
-        border-bottom: none;
-        padding-bottom: 0;
-      }
-
-      .console-label {
-        color: var(--text-secondary);
-      }
-
-      .console-val {
-        font-family: var(--font-mono);
-        color: #ffffff;
-        font-weight: 600;
-        font-size: 0.85rem;
       }
 
       /* ===== Section Typography ===== */
@@ -515,54 +434,6 @@
       .card-pokedex-theme:hover { border-color: rgba(244, 63, 94, 0.4); }
       .card-flash-theme:hover { border-color: rgba(16, 185, 129, 0.4); }
 
-      /* ===== Supporting Labs ===== */
-      .labs-workbench {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-      }
-
-      @media (min-width: 768px) {
-        .labs-workbench {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-
-      .lab-workbench-box {
-        background-color: var(--surface-card);
-        border: 1px solid var(--border-subtle);
-        border-radius: 14px;
-        padding: 1.75rem;
-        text-decoration: none;
-        color: inherit;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        gap: 1.25rem;
-        transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-      }
-
-      .lab-workbench-box:hover {
-        background-color: var(--surface-card-hover);
-        border-color: var(--border-highlight);
-        transform: translateY(-2px);
-      }
-
-      .lab-title {
-        font-family: var(--font-display);
-        font-size: 1.25rem;
-        font-weight: 700;
-        color: #ffffff;
-        letter-spacing: -0.015em;
-      }
-
-      .lab-text {
-        font-size: 0.94rem;
-        color: var(--text-secondary);
-        line-height: 1.6;
-        margin-top: 0.35rem;
-      }
-
       /* ===== Footer ===== */
       footer {
         border-top: 1px solid var(--border-subtle);
@@ -585,47 +456,18 @@
     <div class="container">
       <!-- Masthead / Hero -->
       <header class="masthead">
-        <div class="masthead-lead">
-          <span class="edition-tag">Linkific Internship &middot; Phase 1 Systems Suite</span>
-          <h1>Client-side JavaScript Applications</h1>
-          <p class="bio">
-            Four production-grade web systems engineered in pure vanilla ES2020+. Zero external frameworks, deterministic state engines, and dual asynchronous patterns.
-          </p>
-        </div>
-
-        <!-- Telemetry Status Console -->
-        <aside class="telemetry-console" aria-label="System verification status">
-          <div class="console-title">
-            <span>Runtime Specifications</span>
-            <span class="live-pulse-dot" title="Local server running on port 5500"></span>
-          </div>
-          <div class="console-metrics">
-            <div class="console-row">
-              <span class="console-label">Architecture:</span>
-              <span class="console-val">ES Modules (No Build Tools)</span>
-            </div>
-            <div class="console-row">
-              <span class="console-label">Security Protocol:</span>
-              <span class="console-val">Zero Dynamic innerHTML</span>
-            </div>
-            <div class="console-row">
-              <span class="console-label">Storage Integrity:</span>
-              <span class="console-val">Local Calendar Date Traversal</span>
-            </div>
-            <div class="console-row">
-              <span class="console-label">Verification:</span>
-              <span class="console-val">100% P0 Success Matrix Passed</span>
-            </div>
-          </div>
-        </aside>
+        <h1>JavaScript Applications</h1>
+        <p class="bio">
+          Four interactive client-side web applications built with pure modern JavaScript. Fast, responsive, and completely dependency-free.
+        </p>
       </header>
 
       <main>
-        <!-- Primary Interactive Systems -->
-        <section aria-labelledby="systems-heading">
+        <!-- Primary Interactive Projects -->
+        <section aria-labelledby="projects-heading">
           <div class="section-header">
-            <h2 id="systems-heading" class="section-title">Core Systems</h2>
-            <span class="section-meta">4 Interactive Client Applications</span>
+            <h2 id="projects-heading" class="section-title">Projects</h2>
+            <span class="section-meta">4 Interactive Applications</span>
           </div>
 
           <div class="showcase-grid">
@@ -745,7 +587,7 @@
               <div>
                 <h3 class="card-main-title">Mastery Flashcards</h3>
                 <p class="card-copy">
-                  Interactive memory training deck featuring unbiased Fisher–Yates shuffling, 3D card transforms, and full keyboard navigation.
+                  Interactive study deck featuring unbiased Fisher–Yates shuffling, 3D card transforms, and full keyboard navigation.
                 </p>
 
                 <!-- Live Mini Stage: Miniature 3D Card that flips on card hover -->
@@ -780,39 +622,10 @@
           </div>
         </section>
 
-        <!-- Interactive Practice Sandboxes -->
-        <section style="margin-top: 4rem" aria-labelledby="sandboxes-heading">
-          <div class="section-header">
-            <h2 id="sandboxes-heading" class="section-title">Developer Sandboxes</h2>
-            <span class="section-meta">Browser Testing Environments</span>
-          </div>
-          <div class="labs-workbench">
-            <a href="../03-dom-examples/index.html" class="lab-workbench-box">
-              <div>
-                <h3 class="lab-title">DOM Manipulation Interactive Lab</h3>
-                <p class="lab-text">
-                  6 interactive sections demonstrating query selectors, textContent vs innerHTML XSS prevention, classList API, node creation/removal, and event delegation.
-                </p>
-              </div>
-              <span class="direct-action-btn">Open DOM lab</span>
-            </a>
-
-            <a href="../01-fundamentals/modules-demo/index.html" class="lab-workbench-box">
-              <div>
-                <h3 class="lab-title">ES Modules Runtime Demo</h3>
-                <p class="lab-text">
-                  Native browser module loading via standard module script tags verifying named and default imports from math.js.
-                </p>
-              </div>
-              <span class="direct-action-btn">Open modules demo</span>
-            </a>
-          </div>
-        </section>
       </main>
 
       <footer>
-        <p>Linkific Internship Training Phase &middot; Month 1 &middot; Day 2</p>
-        <p>Engineered by Ronit Ahuja &middot; Pure Vanilla JavaScript &middot; October 2026</p>
+        <p>Built with Vanilla JavaScript &middot; Client-Side Architecture</p>
       </footer>
     </div>
 
