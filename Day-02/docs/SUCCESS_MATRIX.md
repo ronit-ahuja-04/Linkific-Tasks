@@ -29,9 +29,9 @@ P0 = must pass for the day to count as complete.
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| T1-1 | P0 | 4 files plus `modules-demo/` exist and every `.js` file runs without errors | `node 01-fundamentals/<file>.js` for each | ☐ |
-| T1-2 | P0 | Covers: `let`/`const`/`var`, all data types, operators, `if/else`, `switch`, ternary, all 5 loop types, 3 function styles | Coverage table in section 3 | ☐ |
-| T1-3 | P0 | Covers: arrow functions with implicit return, template literals, array and object destructuring, spread, rest, default parameters, object shorthand, modules | Coverage table in section 3 | ☐ |
+| T1-1 | P0 | 4 files plus `modules-demo/` exist and every `.js` file runs without errors | `node 01-fundamentals/<file>.js` for each | ☑ |
+| T1-2 | P0 | Covers: `let`/`const`/`var`, all data types, operators, `if/else`, `switch`, ternary, all 5 loop types, 3 function styles | Coverage table in section 3 | ☑ |
+| T1-3 | P0 | Covers: arrow functions with implicit return, template literals, array and object destructuring, spread, rest, default parameters, object shorthand, modules | Coverage table in section 3 | ☑ |
 
 ### D1: Repository hygiene (5)
 
@@ -158,27 +158,27 @@ Fill **Actual location** with the real file and line once built. Every row must 
 
 | Task concept | Planned location | Actual location | ☑ |
 |---|---|---|---|
-| `let` / `const` / `var` | `01-fundamentals/01-variables-and-types.js` | | ☐ |
-| Data types, `null` vs `undefined` | `01-fundamentals/01-variables-and-types.js` | | ☐ |
-| Operators | `01-fundamentals/02-operators-conditionals-loops.js` | | ☐ |
-| `if/else` | `01-fundamentals/02-...`, Habit Tracker | | ☐ |
-| `switch` | `01-fundamentals/02-...`, Typing Test `pickText` | | ☐ |
-| Ternary | `01-fundamentals/02-...`, `streaks.js` | | ☐ |
-| `for` | `01-fundamentals/02-...` | | ☐ |
-| `while` | `streaks.js` | | ☐ |
-| `forEach` | `01-fundamentals/02-...` | | ☐ |
-| `for...of` | Typing Test, `streaks.js` | | ☐ |
-| `for...in` | `01-fundamentals/02-...`, Habit Tracker stats | | ☐ |
-| Function declaration, expression, arrow | `01-fundamentals/03-functions.js` | | ☐ |
-| Implicit return | `01-fundamentals/03-functions.js`, `exercises.js` | | ☐ |
-| Template literals | `04-es6-features.js`, Pokédex `ui.js` | | ☐ |
-| Destructuring (array, object) | `04-es6-features.js`, Pokédex `toPokemonView` | | ☐ |
-| Spread | `state.js`, `deck.js` | | ☐ |
-| Rest parameters | `03-functions.js` (`sum(...nums)`) | | ☐ |
-| Default parameters | `dates.js` (`toDateKey`) | | ☐ |
-| Object shorthand | `deck.js` (`createCard`) | | ☐ |
-| Computed property names | `stats.js` (`checkInsByDate`), `object-manipulation.js` | | ☐ |
-| Modules (`import`/`export`) | `modules-demo/`, Habit Tracker, Pokédex, Flashcards | | ☐ |
+| `let` / `const` / `var` | `01-fundamentals/01-variables-and-types.js` | `01-fundamentals/01-variables-and-types.js:9` | ☑ |
+| Data types, `null` vs `undefined` | `01-fundamentals/01-variables-and-types.js` | `01-fundamentals/01-variables-and-types.js:46` | ☑ |
+| Operators | `01-fundamentals/02-operators-conditionals-loops.js` | `01-fundamentals/02-operators-conditionals-loops.js:9` | ☑ |
+| `if/else` | `01-fundamentals/02-...`, Habit Tracker | `01-fundamentals/02-operators-conditionals-loops.js:47` | ☑ |
+| `switch` | `01-fundamentals/02-...`, Typing Test `pickText` | `01-fundamentals/02-operators-conditionals-loops.js:68` | ☑ |
+| Ternary | `01-fundamentals/02-...`, `streaks.js` | `01-fundamentals/02-operators-conditionals-loops.js:92` | ☑ |
+| `for` | `01-fundamentals/02-...` | `01-fundamentals/02-operators-conditionals-loops.js:105` | ☑ |
+| `while` | `streaks.js` | `01-fundamentals/02-operators-conditionals-loops.js:115` | ☑ |
+| `forEach` | `01-fundamentals/02-...` | `01-fundamentals/02-operators-conditionals-loops.js:127` | ☑ |
+| `for...of` | Typing Test, `streaks.js` | `01-fundamentals/02-operators-conditionals-loops.js:138` | ☑ |
+| `for...in` | `01-fundamentals/02-...`, Habit Tracker stats | `01-fundamentals/02-operators-conditionals-loops.js:148` | ☑ |
+| Function declaration, expression, arrow | `01-fundamentals/03-functions.js` | `01-fundamentals/03-functions.js:8` | ☑ |
+| Implicit return | `01-fundamentals/03-functions.js`, `exercises.js` | `01-fundamentals/03-functions.js:52` | ☑ |
+| Template literals | `04-es6-features.js`, Pokédex `ui.js` | `04-es6-features.js:9` | ☑ |
+| Destructuring (array, object) | `04-es6-features.js`, Pokédex `toPokemonView` | `04-es6-features.js:30` | ☑ |
+| Spread | `state.js`, `deck.js` | `04-es6-features.js:61` | ☑ |
+| Rest parameters | `03-functions.js` (`sum(...nums)`) | `03-functions.js:79` | ☑ |
+| Default parameters | `dates.js` (`toDateKey`) | `03-functions.js:61` | ☑ |
+| Object shorthand | `deck.js` (`createCard`) | `04-es6-features.js:91` | ☑ |
+| Computed property names | `stats.js` (`checkInsByDate`), `object-manipulation.js` | `04-es6-features.js:113` | ☑ |
+| Modules (`import`/`export`) | `modules-demo/`, Habit Tracker, Pokédex, Flashcards | `01-fundamentals/modules-demo/main.js:5` | ☑ |
 | `map` | `exercises.js` 1–4, Typing Test `renderChars` | | ☐ |
 | `filter` | `exercises.js` 5–8, `deck.js` | | ☐ |
 | `reduce` | `exercises.js` 9–12, `stats.js` | | ☐ |
