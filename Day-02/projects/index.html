@@ -326,8 +326,12 @@
       /* Flashcards Live Interactive 3D Preview Stage */
       .flashcard-mini-scene {
         perspective: 800px;
-        height: 110px;
+        min-height: 135px;
+        height: 135px;
+        padding: 0;
         cursor: pointer;
+        background: transparent;
+        border: none;
       }
 
       .flashcard-mini-inner {
@@ -349,31 +353,56 @@
         height: 100%;
         backface-visibility: hidden;
         -webkit-backface-visibility: hidden;
-        border-radius: 8px;
-        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        padding: 1rem 1.15rem;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        background-color: #0e1422;
+        background-color: #080a10;
         border: 1px solid rgba(255, 255, 255, 0.08);
       }
 
       .mini-card-back {
-        background-color: #0b1c2b;
+        background-color: #091322;
         transform: rotateY(180deg);
         border-color: rgba(56, 189, 248, 0.3);
       }
 
+      .mini-card-header,
+      .mini-card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
       .mini-card-text {
-        font-size: 0.95rem;
+        font-size: 0.92rem;
+        line-height: 1.45;
         font-weight: 600;
         color: #ffffff;
+        margin: 0.25rem 0;
+      }
+
+      .mini-answer-text {
+        font-size: 0.84rem;
+        line-height: 1.45;
+        color: #e2e8f0;
       }
 
       .mini-flip-hint {
         font-size: 0.74rem;
         color: var(--accent-cyan);
-        font-family: var(--font-mono);
+        font-weight: 600;
+      }
+
+      .mini-card-counter {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+      }
+
+      .mini-card-topic {
+        font-size: 0.72rem;
+        color: var(--text-muted);
       }
 
       /* Card Content Header */
@@ -594,16 +623,26 @@
                 <div class="live-stage flashcard-mini-scene" aria-hidden="true">
                   <div class="flashcard-mini-inner">
                     <div class="mini-card-face">
-                      <span class="mini-flip-hint">Question (Hover to flip)</span>
+                      <div class="mini-card-header">
+                        <span class="mini-flip-hint">Question &middot; Hover to flip</span>
+                        <span class="mini-card-counter">Card 1 of 12</span>
+                      </div>
                       <p class="mini-card-text">What is the difference between let, const, and var?</p>
-                      <span style="font-size: 0.72rem; color: #64748b;">Card 1 of 12</span>
+                      <div class="mini-card-footer">
+                        <span class="mini-card-topic">Core JavaScript &bull; Scope</span>
+                      </div>
                     </div>
                     <div class="mini-card-face mini-card-back">
-                      <span class="mini-flip-hint" style="color: var(--accent-emerald);">Answer</span>
-                      <p class="mini-card-text" style="font-size: 0.82rem; line-height: 1.45;">
-                        let/const are block-scoped and not initialized (TDZ); var is function-scoped and hoisted.
+                      <div class="mini-card-header">
+                        <span class="mini-flip-hint" style="color: var(--accent-emerald);">Answer</span>
+                        <span class="mini-card-counter" style="color: var(--accent-emerald);">Mastered</span>
+                      </div>
+                      <p class="mini-card-text mini-answer-text">
+                        let/const are block-scoped with TDZ; var is function-scoped and hoisted.
                       </p>
-                      <span style="font-size: 0.72rem; color: var(--accent-emerald);">Mastered &check;</span>
+                      <div class="mini-card-footer">
+                        <span class="mini-card-topic">Status: Retained</span>
+                      </div>
                     </div>
                   </div>
                 </div>
