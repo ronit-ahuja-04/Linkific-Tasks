@@ -119,9 +119,9 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| D4-1 | P0 | All six sections are present and interactive | Click through each | ☐ |
-| D4-2 | P0 | `textContent` vs `innerHTML` demo explains the risk with user input | Read the demo text | ☐ |
-| D4-3 | P1 | Event delegation works on items added after page load | Add an item, click it | ☐ |
+| D4-1 | P0 | All six sections are present and interactive | Click through each | ☑ |
+| D4-2 | P0 | `textContent` vs `innerHTML` demo explains the risk with user input | Read the demo text | ☑ |
+| D4-3 | P1 | Event delegation works on items added after page load | Add an item, click it | ☑ |
 
 ### D5: Async examples (13)
 
@@ -187,11 +187,11 @@ Fill **Actual location** with the real file and line once built. Every row must 
 | `sort` | `exercises.js` 17–20, `stats.js` | `02-array-methods/exercises.js:226` | ☑ |
 | `Object.keys/values/entries` | `object-manipulation.js` O1, Habit Tracker `ui.js` | `02-array-methods/object-manipulation.js:20` | ☑ |
 | Object spread and merge | `object-manipulation.js` O2 | `02-array-methods/object-manipulation.js:60` | ☑ |
-| `querySelector`, `getElementById` | `03-dom-examples/` | | ☐ |
-| `textContent` vs `innerHTML` | `03-dom-examples/` | | ☐ |
-| `classList.add/remove/toggle` | `03-dom-examples/`, Flashcards, Typing Test | | ☐ |
-| Create and append elements | `03-dom-examples/`, Habit Tracker `ui.js` | | ☐ |
-| Events: click, input, submit | `03-dom-examples/`, all projects | | ☐ |
+| `querySelector`, `getElementById` | `03-dom-examples/` | `03-dom-examples/dom-examples.js:15` | ☑ |
+| `textContent` vs `innerHTML` | `03-dom-examples/` | `03-dom-examples/dom-examples.js:46` | ☑ |
+| `classList.add/remove/toggle` | `03-dom-examples/`, Flashcards, Typing Test | `03-dom-examples/dom-examples.js:63` | ☑ |
+| Create and append elements | `03-dom-examples/`, Habit Tracker `ui.js` | `03-dom-examples/dom-examples.js:95` | ☑ |
+| Events: click, input, submit | `03-dom-examples/`, all projects | `03-dom-examples/dom-examples.js:125` | ☑ |
 | Callbacks | `01-callbacks.js`, Typing Test `setInterval` | | ☐ |
 | Promises: `then/catch/finally` | `02-promises.js`, Pokédex browse | | ☐ |
 | `async/await` | `03-async-await.js`, Pokédex search | | ☐ |

@@ -1,1 +1,129 @@
-<!-- dom-examples index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DOM Manipulation Interactive Lab - Day 2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header class="app-header">
+        <a href="../projects/index.html" class="back-link">&larr; Back to Projects Hub</a>
+        <h1>DOM Manipulation Lab</h1>
+        <p class="subtitle">Interactive demonstration of core DOM APIs, security practices, and event patterns.</p>
+      </header>
+
+      <main class="grid-layout">
+        <!-- Section 1: Selecting Elements -->
+        <section class="card" id="sec-selecting" aria-labelledby="heading-selecting">
+          <h2 id="heading-selecting">1. Selecting Elements</h2>
+          <p class="desc">Demonstrates <code>getElementById</code>, <code>querySelector</code>, and <code>querySelectorAll</code>.</p>
+          <div class="demo-box">
+            <p id="target-id" class="sample-item">Sample element with <code>id="target-id"</code></p>
+            <p class="sample-item query-target">Sample element with <code>class="sample-item query-target"</code></p>
+            <p class="sample-item query-target">Second sample element with <code>class="sample-item query-target"</code></p>
+          </div>
+          <div class="actions">
+            <button type="button" id="btn-select-id" class="btn">Select by ID</button>
+            <button type="button" id="btn-select-qs" class="btn">querySelector (.query-target)</button>
+            <button type="button" id="btn-select-qsa" class="btn">querySelectorAll (.sample-item)</button>
+          </div>
+          <div id="selection-output" class="output-log" role="status" aria-live="polite">Click a button above to run selectors.</div>
+        </section>
+
+        <!-- Section 2: textContent vs innerHTML Security -->
+        <section class="card" id="sec-content" aria-labelledby="heading-content">
+          <h2 id="heading-content">2. Content: textContent vs innerHTML</h2>
+          <p class="desc">Shows why user-provided text must ALWAYS be rendered using <code>textContent</code> to prevent Cross-Site Scripting (XSS).</p>
+          <div class="input-group">
+            <label for="xss-input">Try typing HTML or test payload like <code>&lt;b&gt;Bold&lt;/b&gt;</code> or <code>&lt;img src=x onerror=...&gt;</code>:</label>
+            <input type="text" id="xss-input" class="text-input" value="<b style='color:red'>Malicious or Formatted Payload</b>" />
+          </div>
+          <div class="actions">
+            <button type="button" id="btn-render-safe" class="btn btn-success">Render with textContent (Safe)</button>
+            <button type="button" id="btn-render-unsafe" class="btn btn-danger">Render with innerHTML (Unsafe Demo)</button>
+          </div>
+          <div class="comparison-grid">
+            <div>
+              <span class="badge badge-safe">Safe Output (textContent):</span>
+              <div id="safe-output-box" class="preview-box" role="status" aria-live="polite">Safe text renders here.</div>
+            </div>
+            <div>
+              <span class="badge badge-danger">Unsafe Output (innerHTML):</span>
+              <div id="unsafe-output-box" class="preview-box" role="status" aria-live="polite">Unsafe HTML renders here.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 3: Styles & classList -->
+        <section class="card" id="sec-styles" aria-labelledby="heading-styles">
+          <h2 id="heading-styles">3. Styles & classList API</h2>
+          <p class="desc">Demonstrates <code>classList.add()</code>, <code>remove()</code>, <code>toggle()</code>, and <code>contains()</code>.</p>
+          <div id="style-target-box" class="demo-box style-box">
+            Target Box for Class Manipulation
+          </div>
+          <div class="actions">
+            <button type="button" id="btn-class-add" class="btn">add('highlight')</button>
+            <button type="button" id="btn-class-remove" class="btn">remove('highlight')</button>
+            <button type="button" id="btn-class-toggle" class="btn">toggle('highlight')</button>
+            <button type="button" id="btn-class-contains" class="btn">contains('highlight')?</button>
+          </div>
+          <div id="classlist-output" class="output-log" role="status" aria-live="polite">Current class list: none</div>
+        </section>
+
+        <!-- Section 4: Creating & Removing Nodes -->
+        <section class="card" id="sec-nodes" aria-labelledby="heading-nodes">
+          <h2 id="heading-nodes">4. Creating & Removing DOM Nodes</h2>
+          <p class="desc">Demonstrates <code>createElement()</code>, <code>append()</code>, <code>prepend()</code>, and node <code>remove()</code>.</p>
+          <div class="actions">
+            <button type="button" id="btn-prepend-node" class="btn">Prepend Item</button>
+            <button type="button" id="btn-append-node" class="btn">Append Item</button>
+            <button type="button" id="btn-remove-node" class="btn btn-danger">Remove Last Item</button>
+          </div>
+          <ul id="dynamic-node-list" class="node-list" aria-label="Dynamic Node Container">
+            <li class="node-item">Original Item 1</li>
+            <li class="node-item">Original Item 2</li>
+          </ul>
+        </section>
+
+        <!-- Section 5: Event Listeners -->
+        <section class="card" id="sec-events" aria-labelledby="heading-events">
+          <h2 id="heading-events">5. Events (click, input, submit, keydown)</h2>
+          <p class="desc">Handles multiple event types and demonstrates <code>preventDefault()</code> on forms.</p>
+          <form id="sample-form" class="demo-form" novalidate>
+            <div class="input-group">
+              <label for="event-text-input">Type here to test <code>input</code> & <code>keydown</code>:</label>
+              <input type="text" id="event-text-input" class="text-input" placeholder="Type something..." autocomplete="off" />
+            </div>
+            <div class="actions">
+              <button type="submit" id="btn-submit-form" class="btn btn-primary">Submit Form (preventDefault)</button>
+              <button type="button" id="btn-click-event" class="btn">Trigger Click Event</button>
+            </div>
+          </form>
+          <div id="events-log-box" class="output-log" role="status" aria-live="polite">Last event: None yet.</div>
+        </section>
+
+        <!-- Section 6: Event Delegation -->
+        <section class="card" id="sec-delegation" aria-labelledby="heading-delegation">
+          <h2 id="heading-delegation">6. Event Delegation</h2>
+          <p class="desc">A single click listener on the parent <code>&lt;ul&gt;</code> captures events from current AND future child elements.</p>
+          <div class="actions">
+            <button type="button" id="btn-add-delegated-item" class="btn btn-primary">+ Add New Item Dynamically</button>
+          </div>
+          <ul id="delegation-list" class="node-list delegation-list" aria-label="Delegated Item List">
+            <li data-id="1" class="delegated-item">Task Item #1 (Click me!)</li>
+            <li data-id="2" class="delegated-item">Task Item #2 (Click me!)</li>
+          </ul>
+          <div id="delegation-output" class="output-log" role="status" aria-live="polite">Click any item above to test delegation.</div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>Day 2 Training &bull; Vanilla JavaScript DOM Lab &bull; Ronit Ahuja</p>
+      </footer>
+    </div>
+
+    <script src="dom-examples.js"></script>
+  </body>
+</html>
