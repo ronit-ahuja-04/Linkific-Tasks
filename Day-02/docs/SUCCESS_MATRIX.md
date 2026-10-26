@@ -127,10 +127,10 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| D5-1 | P0 | 5 files run and print labelled traces | `node 04-async-examples/<file>.js` | ☐ |
-| D5-2 | P0 | At least two real API calls (JSONPlaceholder and PokeAPI) | Read `04-fetch-api.js` | ☐ |
-| D5-3 | P0 | 404 handled through `response.ok`; network failure handled through `catch` | Run `05-error-handling.js` | ☐ |
-| D5-4 | P0 | Each concept appears: callbacks, `.then/.catch/.finally`, `Promise.all`, `async/await`, `try/catch/finally` | Section 3 table | ☐ |
+| D5-1 | P0 | 5 files run and print labelled traces | `node 04-async-examples/<file>.js` | ☑ |
+| D5-2 | P0 | At least two real API calls (JSONPlaceholder and PokeAPI) | Read `04-fetch-api.js` | ☑ |
+| D5-3 | P0 | 404 handled through `response.ok`; network failure handled through `catch` | Run `05-error-handling.js` | ☑ |
+| D5-4 | P0 | Each concept appears: callbacks, `.then/.catch/.finally`, `Promise.all`, `async/await`, `try/catch/finally` | Section 3 table | ☑ |
 
 ### D6: README (10)
 
@@ -192,11 +192,11 @@ Fill **Actual location** with the real file and line once built. Every row must 
 | `classList.add/remove/toggle` | `03-dom-examples/`, Flashcards, Typing Test | `03-dom-examples/dom-examples.js:63` | ☑ |
 | Create and append elements | `03-dom-examples/`, Habit Tracker `ui.js` | `03-dom-examples/dom-examples.js:95` | ☑ |
 | Events: click, input, submit | `03-dom-examples/`, all projects | `03-dom-examples/dom-examples.js:125` | ☑ |
-| Callbacks | `01-callbacks.js`, Typing Test `setInterval` | | ☐ |
-| Promises: `then/catch/finally` | `02-promises.js`, Pokédex browse | | ☐ |
-| `async/await` | `03-async-await.js`, Pokédex search | | ☐ |
-| Fetch API | `04-fetch-api.js`, Pokédex `api.js` | | ☐ |
-| Error handling with `try/catch` | `05-error-handling.js`, Pokédex, storage wrapper | | ☐ |
+| Callbacks | `01-callbacks.js`, Typing Test `setInterval` | `04-async-examples/01-callbacks.js:8` | ☑ |
+| Promises: `then/catch/finally` | `02-promises.js`, Pokédex browse | `04-async-examples/02-promises.js:8` | ☑ |
+| `async/await` | `03-async-await.js`, Pokédex search | `04-async-examples/03-async-await.js:8` | ☑ |
+| Fetch API | `04-fetch-api.js`, Pokédex `api.js` | `04-async-examples/04-fetch-api.js:9` | ☑ |
+| Error handling with `try/catch` | `05-error-handling.js`, Pokédex, storage wrapper | `04-async-examples/05-error-handling.js:9` | ☑ |
 
 ## 4. Quality gates
 
