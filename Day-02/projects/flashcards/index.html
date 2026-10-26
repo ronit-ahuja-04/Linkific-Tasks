@@ -1,1 +1,159 @@
-<!-- flashcards index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JavaScript Flashcards - Day 2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-wrapper">
+      <header class="app-header">
+        <nav class="nav-bar">
+          <a href="../index.html" class="nav-back-link">&larr; Projects Hub</a>
+          <span class="badge-tag">ES6+ Pure Architecture</span>
+        </nav>
+        <h1 class="app-title">JavaScript Mastery Flashcards</h1>
+        <p class="app-subtitle">
+          Test and reinforce your JS fundamentals, scope rules, array mechanics, and async concepts.
+        </p>
+
+        <!-- Progress Overview -->
+        <section class="progress-section" aria-labelledby="progress-heading">
+          <div class="progress-header">
+            <h2 id="progress-heading" class="sr-only">Study Progress</h2>
+            <span id="progress-text" class="progress-label">0 of 0 cards mastered (0%)</span>
+            <span class="keyboard-tip" aria-hidden="true">Keys: <kbd>Space</kbd> flip &bull; <kbd>&larr;</kbd> <kbd>&rarr;</kbd> navigate</span>
+          </div>
+          <div class="progress-bar-track" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+            <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%"></div>
+          </div>
+          <div id="progress-congrats" class="congrats-banner" hidden role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- Global Status Notification Banner -->
+        <div id="status-message" class="status-banner" hidden role="status" aria-live="polite"></div>
+      </header>
+
+      <main class="main-content">
+        <!-- Deck Controls & Filters -->
+        <section class="controls-bar" aria-label="Deck controls and study filters">
+          <div class="filter-tabs" role="tablist" aria-label="Card mastery filter">
+            <button type="button" class="filter-tab active" data-filter="all" role="tab" aria-selected="true">
+              All Cards <span id="count-all" class="count-pill">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="unknown" role="tab" aria-selected="false">
+              To Learn <span id="count-unknown" class="count-pill">0</span>
+            </button>
+            <button type="button" class="filter-tab" data-filter="known" role="tab" aria-selected="false">
+              Mastered <span id="count-known" class="count-pill">0</span>
+            </button>
+          </div>
+
+          <div class="deck-actions">
+            <button type="button" id="btn-shuffle" class="btn btn-secondary" title="Shuffle deck using Fisher–Yates">
+              🔀 Shuffle
+            </button>
+            <button type="button" id="btn-reset-order" class="btn btn-secondary" title="Restore original order">
+              ↺ Reset Order
+            </button>
+            <button type="button" id="btn-reset-deck" class="btn btn-secondary" title="Restore starter cards">
+              Reset Deck
+            </button>
+          </div>
+        </section>
+
+        <!-- Flashcard Viewer -->
+        <section id="card-viewer" class="card-viewer" aria-labelledby="card-counter">
+          <div class="card-meta">
+            <span id="card-counter" class="card-counter">Card 1 of 12</span>
+            <span id="card-known-status-badge" class="status-badge badge-to-learn">To Learn</span>
+          </div>
+
+          <!-- 3D Flip Card Container -->
+          <div
+            id="card-container"
+            class="flashcard-scene"
+            tabindex="0"
+            role="region"
+            aria-label="Flashcard. Press Space or click Flip button to reveal answer."
+          >
+            <div class="flashcard-inner">
+              <!-- Front Face (Question) -->
+              <div class="card-face card-front">
+                <span class="face-tag">QUESTION</span>
+                <p id="card-front-text" class="card-text">Loading question...</p>
+                <span class="hint-text">Click or press Space to flip &crarr;</span>
+              </div>
+              <!-- Back Face (Answer) -->
+              <div class="card-face card-back">
+                <span class="face-tag">ANSWER</span>
+                <p id="card-back-text" class="card-text">Loading answer...</p>
+                <span class="hint-text">Click or press Space to flip back &crarr;</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Action Controls -->
+          <div class="card-actions">
+            <button type="button" id="btn-prev" class="btn btn-nav" aria-label="Previous card">&larr; Previous</button>
+            <button type="button" id="btn-flip" class="btn btn-primary">Flip to Answer</button>
+            <button type="button" id="btn-toggle-known" class="btn btn-success">Mark as Mastered ✓</button>
+            <button type="button" id="btn-next" class="btn btn-nav" aria-label="Next card">Next &rarr;</button>
+          </div>
+
+          <div class="card-secondary-actions">
+            <button type="button" id="btn-delete-card" class="btn btn-danger-link">
+              Delete This Card
+            </button>
+          </div>
+        </section>
+
+        <!-- Empty State Container -->
+        <div id="empty-state" class="empty-state-box" hidden role="status" aria-live="polite">
+          No flashcards match this filter.
+        </div>
+
+        <!-- Add Custom Card Form -->
+        <section class="add-card-section" aria-labelledby="add-card-title">
+          <h2 id="add-card-title" class="section-title">+ Add a New Flashcard</h2>
+          <form id="add-card-form" class="add-card-form" novalidate>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="card-front-input">Front (Question or Concept):</label>
+                <input
+                  type="text"
+                  id="card-front-input"
+                  class="form-input"
+                  placeholder="e.g. What does Array.prototype.reduce do?"
+                  required
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-field">
+                <label for="card-back-input">Back (Answer or Explanation):</label>
+                <textarea
+                  id="card-back-input"
+                  class="form-textarea"
+                  rows="3"
+                  placeholder="e.g. Executes a reducer function on each element, resulting in a single output value."
+                  required
+                ></textarea>
+              </div>
+            </div>
+            <div class="form-submit-row">
+              <button type="submit" class="btn btn-primary">Add Card to Deck</button>
+            </div>
+          </form>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>Day 2 Linkific Training &bull; Flashcards App &bull; Built with Vanilla JavaScript & ES Modules</p>
+      </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

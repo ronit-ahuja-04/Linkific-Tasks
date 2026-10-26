@@ -97,14 +97,14 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| FC-1 | P0 | At least 10 starter cards with the correct shape | Inspect the deck | ☐ |
-| FC-2 | P0 | Flip works by mouse and keyboard; Prev/Next | Tab to the flip button; press Enter and Space | ☐ |
-| FC-3 | P0 | Known/unknown toggles without mutating the original | Check that `deck.js` uses spread and `map` | ☐ |
-| FC-4 | P0 | Filters with counts and an empty message | Mark none known, choose "known" | ☐ |
-| FC-5 | P0 | Fisher–Yates shuffle on a copy; order can be reset | `grep -n "Math.random() - 0.5"` finds nothing | ☐ |
-| FC-6 | P0 | Add and delete cards | Add, then delete the last card; `index` stays valid | ☐ |
-| FC-7 | P0 | Persistence and Reset deck | Reload; reset | ☐ |
-| FC-8, FC-9 | P1 | Progress with `every`; keyboard shortcuts | Visual check | ☐ |
+| FC-1 | P0 | At least 10 starter cards with the correct shape | Inspect the deck | ☑ |
+| FC-2 | P0 | Flip works by mouse and keyboard; Prev/Next | Tab to the flip button; press Enter and Space | ☑ |
+| FC-3 | P0 | Known/unknown toggles without mutating the original | Check that `deck.js` uses spread and `map` | ☑ |
+| FC-4 | P0 | Filters with counts and an empty message | Mark none known, choose "known" | ☑ |
+| FC-5 | P0 | Fisher–Yates shuffle on a copy; order can be reset | `grep -n "Math.random() - 0.5"` finds nothing | ☑ |
+| FC-6 | P0 | Add and delete cards | Add, then delete the last card; `index` stays valid | ☑ |
+| FC-7 | P0 | Persistence and Reset deck | Reload; reset | ☑ |
+| FC-8, FC-9 | P1 | Progress with `every`; keyboard shortcuts | Visual check | ☑ |
 
 ### D3: Array and object exercises (10)
 
