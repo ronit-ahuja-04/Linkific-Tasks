@@ -17,12 +17,11 @@
     <div class="app-container">
       <header class="app-header">
         <nav class="top-nav">
-          <a href="../index.html" class="nav-back-link">&larr; Projects Hub</a>
-          <span class="badge-tag">Local YYYY-MM-DD Dates</span>
+          <a href="../index.html" class="nav-back-link">&larr; Applications Directory</a>
         </nav>
         <h1 class="app-title">Daily Habit Tracker</h1>
         <p class="app-tagline">
-          Build consistency with daily tracking, current & historical streak analytics, and local persistence.
+          Track daily consistency, calculate streaks with local date arithmetic, and review check-in performance.
         </p>
 
         <!-- Validation & Status Alerts -->
@@ -34,22 +33,22 @@
         <section class="habits-section" aria-labelledby="habits-list-heading">
           <!-- Add Habit Form -->
           <div class="card add-habit-card">
-            <h2 class="card-title">Add a New Habit</h2>
+            <h2 class="card-title">Add a habit</h2>
             <form id="add-habit-form" class="add-form" novalidate>
               <div class="input-row">
                 <div class="field-group">
-                  <label for="habit-name-input">Habit Name (1–40 characters):</label>
+                  <label for="habit-name-input">Habit name (1 to 40 characters)</label>
                   <input
                     type="text"
                     id="habit-name-input"
                     class="form-input"
                     maxlength="40"
-                    placeholder="e.g. Read 20 pages of clean code"
+                    placeholder="e.g. Read 20 pages"
                     required
                     autocomplete="off"
                   />
                 </div>
-                <button type="submit" id="btn-add-habit" class="btn btn-primary">+ Add Habit</button>
+                <button type="submit" id="btn-add-habit" class="btn btn-primary">Add habit</button>
               </div>
             </form>
           </div>
