@@ -72,14 +72,14 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| TT-1 | P0 | At least 10 own texts, at least 3 per level | Count the arrays | ☐ |
-| TT-2 | P0 | Timer starts on the first keystroke only; interval cleared | Wait 5 s before typing; the timer must not move. Restart repeatedly; no double speed | ☐ |
-| TT-3 | P0 | Live correct / incorrect / pending feedback | Type right and wrong characters | ☐ |
-| TT-4 | P0 | WPM, accuracy, errors correct | Type 50 correct characters in 30 s → WPM 20, accuracy 100% | ☐ |
-| TT-5 | P0 | Restart resets everything | Restart mid-test and after finishing | ☐ |
-| TT-6 | P0 | Difficulty uses `switch` | `grep -n "switch" projects/typing-test/script.js` | ☐ |
-| TT-7 | P1 | Best WPM persisted | Reload | ☐ |
-| TT-8 | P1 | `aria-live` results; paste blocked | Inspect the element; try pasting | ☐ |
+| TT-1 | P0 | At least 10 own texts, at least 3 per level | Count the arrays | ☑ |
+| TT-2 | P0 | Timer starts on the first keystroke only; interval cleared | Wait 5 s before typing; the timer must not move. Restart repeatedly; no double speed | ☑ |
+| TT-3 | P0 | Live correct / incorrect / pending feedback | Type right and wrong characters | ☑ |
+| TT-4 | P0 | WPM, accuracy, errors correct | Type 50 correct characters in 30 s → WPM 20, accuracy 100% | ☑ |
+| TT-5 | P0 | Restart resets everything | Restart mid-test and after finishing | ☑ |
+| TT-6 | P0 | Difficulty uses `switch` | `grep -n "switch" projects/typing-test/script.js` | ☑ |
+| TT-7 | P1 | Best WPM persisted | Reload | ☑ |
+| TT-8 | P1 | `aria-live` results; paste blocked | Inspect the element; try pasting | ☑ |
 
 **Pokédex (PK)**
 

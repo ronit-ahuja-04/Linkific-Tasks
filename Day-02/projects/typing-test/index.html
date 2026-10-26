@@ -1,1 +1,114 @@
-<!-- typing-test index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Typing Speed Test - Day 2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="test-container">
+      <header class="test-header">
+        <nav class="test-nav">
+          <a href="../index.html" class="nav-back-link">&larr; Projects Hub</a>
+          <span class="badge-tag">DOM & Timer Mechanics</span>
+        </nav>
+        <h1 class="app-title">Developer Typing Speed Test</h1>
+        <p class="app-subtitle">
+          Test your typing velocity, accuracy, and error rates against technical JavaScript passages.
+        </p>
+      </header>
+
+      <main class="test-main">
+        <!-- Configuration Controls -->
+        <section class="config-bar" aria-label="Typing test settings">
+          <div class="config-item">
+            <label for="difficulty-select">Difficulty:</label>
+            <select id="difficulty-select" class="select-input">
+              <option value="easy">Easy (Fundamentals)</option>
+              <option value="medium" selected>Medium (Language Features)</option>
+              <option value="hard">Hard (Advanced Engine Logic)</option>
+            </select>
+          </div>
+
+          <div class="config-item">
+            <span class="config-label">Duration:</span>
+            <div class="radio-group" role="radiogroup" aria-label="Duration selection">
+              <label class="radio-label">
+                <input type="radio" name="duration" value="30" checked />
+                <span>30s</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="duration" value="60" />
+                <span>60s</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="config-item best-score-wrapper">
+            <span id="best-wpm-badge" class="best-badge">Best WPM: 0</span>
+          </div>
+        </section>
+
+        <!-- Live Metrics HUD -->
+        <section class="metrics-hud" aria-label="Live typing performance metrics">
+          <div class="hud-box">
+            <span class="hud-label">Time Remaining</span>
+            <span id="timer-display" class="hud-val hud-timer">30s</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-label">Net WPM</span>
+            <span id="wpm-display" class="hud-val hud-wpm">0</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-label">Accuracy</span>
+            <span id="accuracy-display" class="hud-val hud-acc">100%</span>
+          </div>
+          <div class="hud-box">
+            <span class="hud-label">Errors</span>
+            <span id="errors-display" class="hud-val hud-err">0</span>
+          </div>
+        </section>
+
+        <!-- Results Announcement Banner (TT-8: aria-live) -->
+        <div id="results-summary" class="results-banner" hidden role="status" aria-live="polite"></div>
+
+        <!-- Target Text Display -->
+        <section class="passage-card" aria-label="Passage to type">
+          <div id="text-display" class="text-display-box" aria-label="Target text passage">
+            <!-- Rendered character spans go here -->
+          </div>
+        </section>
+
+        <!-- Typing Input Area -->
+        <section class="input-section" aria-label="Input field">
+          <div class="field-wrapper">
+            <label for="typing-input" class="sr-only">Type the passage above here</label>
+            <textarea
+              id="typing-input"
+              class="typing-textarea"
+              rows="3"
+              placeholder="Timer starts automatically on your first keystroke. Paste is disabled."
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+            ></textarea>
+          </div>
+
+          <div class="actions-row">
+            <button type="button" id="btn-restart" class="btn btn-primary">
+              ↺ Restart Test (New Passage)
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="test-footer">
+        <p>Day 2 Linkific Training &bull; Typing Speed Test &bull; Vanilla JavaScript & Interval Timers</p>
+      </footer>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
