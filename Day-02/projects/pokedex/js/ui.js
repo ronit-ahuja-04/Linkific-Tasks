@@ -148,7 +148,21 @@ export function renderDetailCard(pokemon) {
   // Dimensions
   const dimRow = document.createElement('div');
   dimRow.className = 'dimensions-row';
-  dimRow.innerHTML = `<span><strong>Height:</strong> ${pokemon.heightM} m</span><span><strong>Weight:</strong> ${pokemon.weightKg} kg</span>`;
+
+  const heightSpan = document.createElement('span');
+  const heightStrong = document.createElement('strong');
+  heightStrong.textContent = 'Height: ';
+  heightSpan.appendChild(heightStrong);
+  heightSpan.appendChild(document.createTextNode(`${pokemon.heightM} m`));
+
+  const weightSpan = document.createElement('span');
+  const weightStrong = document.createElement('strong');
+  weightStrong.textContent = 'Weight: ';
+  weightSpan.appendChild(weightStrong);
+  weightSpan.appendChild(document.createTextNode(`${pokemon.weightKg} kg`));
+
+  dimRow.appendChild(heightSpan);
+  dimRow.appendChild(weightSpan);
   infoCol.appendChild(dimRow);
 
   bodyGrid.appendChild(spriteWrapper);

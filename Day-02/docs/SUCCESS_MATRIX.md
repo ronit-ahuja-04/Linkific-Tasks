@@ -38,8 +38,8 @@ P0 = must pass for the day to count as complete.
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
 | D1-1 | P0 | `Day-02/` is pushed to the public `Linkific-Tasks` repo, layout matches `ARCHITECTURE.md` | Open the repo in an incognito window | ☐ |
-| D1-2 | P1 | At least 10 commits today with descriptive messages | `git log --oneline --since="today" \| wc -l` | ☐ |
-| D1-3 | P0 | No secrets, `.env`, `.DS_Store` or `node_modules` committed | Commands in section 5 | ☐ |
+| D1-2 | P1 | At least 10 commits today with descriptive messages | `git log --oneline --since="today" \| wc -l` | ☑ |
+| D1-3 | P0 | No secrets, `.env`, `.DS_Store` or `node_modules` committed | Commands in section 5 | ☑ |
 
 ### D2: Projects (10 each)
 
@@ -136,11 +136,11 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| D6-1 | P0 | Every concept in the task has a row in the "Concept → where I used it" table with a real file path | Section 3 table matches the README | ☐ |
-| D6-2 | P0 | **No claim without code.** Every feature listed exists | Verification commands plus `docs/FACTS.md` | ☐ |
-| D6-3 | P0 | How to run (Live Server for projects, `node` for scripts) | Follow it on a fresh clone | ☐ |
+| D6-1 | P0 | Every concept in the task has a row in the "Concept → where I used it" table with a real file path | Section 3 table matches the README | ☑ |
+| D6-2 | P0 | **No claim without code.** Every feature listed exists | Verification commands plus `docs/FACTS.md` | ☑ |
+| D6-3 | P0 | How to run (Live Server for projects, `node` for scripts) | Follow it on a fresh clone | ☑ |
 | D6-4 | P1 | Screenshots for each project at 3 widths | Images render on GitHub | ☐ |
-| D6-5 | P0 | Honest notes: tools used (BMAD, AI assistance), known limitations, what I would improve | Read it | ☐ |
+| D6-5 | P0 | Honest notes: tools used (BMAD, AI assistance), known limitations, what I would improve | Read it | ☑ |
 
 ### P: Process and standup (10)
 
