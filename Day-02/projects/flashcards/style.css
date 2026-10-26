@@ -1,21 +1,22 @@
 /* ==========================================================================
-   Flashcards Application Stylesheet
-   Designed with intentional restraint: physical card focus, quiet backdrop,
-   and clean typographic scale.
+   JavaScript Flashcards Stylesheet
+   Tactile 3D Study Deck with Space Grotesk Architectural Typography
    ========================================================================== */
 
 /* ===== Variables & Design Tokens ===== */
 :root {
-  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 
-  --color-canvas: #0b0f17;
-  --color-card-bg: #131926;
-  --color-card-hover: #172033;
-  --color-border: #1e293b;
-  --color-border-hover: #334155;
+  --color-canvas: #06070a;
+  --color-surface: #0c1017;
+  --color-card-bg: #111622;
+  --color-card-hover: #151d2d;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-hover: rgba(255, 255, 255, 0.18);
 
-  --color-text: #f8fafc;
+  --color-text: #ffffff;
   --color-text-muted: #94a3b8;
   --color-text-subtle: #64748b;
 
@@ -23,20 +24,20 @@
   --color-primary-dark: #0284c7;
 
   --color-success: #10b981;
-  --color-success-bg: rgba(16, 185, 129, 0.12);
-  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-success-bg: rgba(16, 185, 129, 0.15);
+  --color-success-border: rgba(16, 185, 129, 0.35);
 
   --color-warning: #f59e0b;
-  --color-warning-bg: rgba(245, 158, 11, 0.12);
-  --color-warning-border: rgba(245, 158, 11, 0.3);
+  --color-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-warning-border: rgba(245, 158, 11, 0.35);
 
   --color-danger: #f43f5e;
-  --color-danger-bg: rgba(244, 63, 94, 0.12);
-  --color-danger-border: rgba(244, 63, 94, 0.3);
+  --color-danger-bg: rgba(244, 63, 94, 0.15);
+  --color-danger-border: rgba(244, 63, 94, 0.35);
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
 }
 
 /* ===== Global Reset ===== */
@@ -53,7 +54,7 @@ body {
   background-color: var(--color-canvas);
   color: var(--color-text);
   line-height: 1.6;
-  min-height: 100vh;
+  min-height: 100svh;
   padding: 3.5rem 1.25rem 5rem;
   -webkit-font-smoothing: antialiased;
 }
@@ -76,17 +77,17 @@ body {
 
 /* ===== Layout Container ===== */
 .app-wrapper {
-  max-width: 760px;
+  max-width: 800px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.25rem;
 }
 
 .app-header {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .nav-bar {
@@ -98,11 +99,11 @@ body {
 .nav-back-link {
   color: var(--color-primary);
   text-decoration: none;
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
   transition: color 0.15s ease;
 }
 
@@ -111,18 +112,19 @@ body {
 }
 
 .app-title {
-  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5vw, 2.9rem);
   color: #ffffff;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
 }
 
 .app-subtitle {
   color: var(--color-text-muted);
-  font-size: 1.05rem;
-  max-width: 620px;
-  line-height: 1.6;
+  font-size: 1.08rem;
+  max-width: 660px;
+  line-height: 1.65;
 }
 
 /* ===== Progress Tracker ===== */
@@ -130,10 +132,11 @@ body {
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 1.25rem 1.4rem;
+  padding: 1.35rem 1.65rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.85rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 15px 35px -10px rgba(0, 0, 0, 0.5);
 }
 
 .progress-header {
@@ -148,6 +151,7 @@ body {
   font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
+  font-family: var(--font-mono);
 }
 
 .keyboard-tip {
@@ -157,52 +161,54 @@ body {
 
 kbd {
   background-color: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 4px;
-  padding: 0.12rem 0.4rem;
+  padding: 0.15rem 0.45rem;
   font-family: var(--font-mono);
   font-size: 0.74rem;
-  color: #e2e8f0;
+  color: #f1f5f9;
 }
 
 .progress-bar-track {
   width: 100%;
-  height: 6px;
-  background-color: #0b0f17;
+  height: 8px;
+  background-color: #06070a;
   border-radius: 9999px;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .progress-bar-fill {
   height: 100%;
-  background-color: var(--color-success);
+  background-color: var(--color-primary);
   border-radius: 9999px;
-  transition: width 0.35s ease;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .congrats-banner {
   background-color: var(--color-success-bg);
   border: 1px solid var(--color-success-border);
   color: #34d399;
-  padding: 0.75rem 1.25rem;
+  padding: 0.85rem 1.4rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+}
+
+.status-banner {
+  padding: 0.8rem 1.35rem;
   border-radius: var(--radius-sm);
   font-size: 0.92rem;
   font-weight: 600;
   text-align: center;
-}
-
-.status-banner {
-  padding: 0.75rem 1.25rem;
-  border-radius: var(--radius-sm);
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-align: center;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
 }
 
 .status-info {
-  background-color: rgba(56, 189, 248, 0.1);
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  background-color: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
   color: var(--color-primary);
 }
 
@@ -224,16 +230,17 @@ kbd {
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.85rem;
+  gap: 1rem;
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1.15rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .filter-tabs {
   display: flex;
-  gap: 0.35rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
 }
 
@@ -241,7 +248,7 @@ kbd {
   background: transparent;
   color: var(--color-text-muted);
   border: 1px solid transparent;
-  padding: 0.45rem 0.85rem;
+  padding: 0.5rem 0.95rem;
   border-radius: var(--radius-sm);
   font-family: var(--font-sans);
   font-size: 0.88rem;
@@ -249,8 +256,8 @@ kbd {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  transition: all 0.15s ease;
+  gap: 0.5rem;
+  transition: all 0.18s ease;
 }
 
 .filter-tab:hover {
@@ -261,14 +268,14 @@ kbd {
 .filter-tab.active {
   background: rgba(56, 189, 248, 0.12);
   color: var(--color-primary);
-  border-color: rgba(56, 189, 248, 0.3);
+  border-color: rgba(56, 189, 248, 0.35);
 }
 
 .count-pill {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.45);
   border-radius: 9999px;
-  padding: 0.1rem 0.5rem;
-  font-size: 0.75rem;
+  padding: 0.12rem 0.55rem;
+  font-size: 0.74rem;
   font-family: var(--font-mono);
   font-weight: 600;
 }
@@ -282,17 +289,17 @@ kbd {
 /* ===== Buttons ===== */
 .btn {
   font-family: var(--font-sans);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  padding: 0.55rem 1.1rem;
+  padding: 0.6rem 1.25rem;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   user-select: none;
 }
 
@@ -310,10 +317,12 @@ kbd {
   background-color: #0284c7;
   color: #ffffff;
   border: 1px solid #0369a1;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: #0369a1;
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
@@ -331,32 +340,24 @@ kbd {
   background-color: #059669;
   color: #ffffff;
   border: 1px solid #047857;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btn-success:hover:not(:disabled) {
   background-color: #047857;
-}
-
-.btn-outline-warning {
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning);
-  border: 1px solid var(--color-warning-border);
-}
-
-.btn-outline-warning:hover:not(:disabled) {
-  background-color: rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
 }
 
 .btn-nav {
   background-color: rgba(255, 255, 255, 0.05);
   color: var(--color-text);
   border: 1px solid var(--color-border);
-  min-width: 100px;
+  min-width: 105px;
 }
 
 .btn-nav:hover:not(:disabled) {
   background-color: rgba(255, 255, 255, 0.09);
-  border-color: var(--color-border-hover);
+  border-color: var(--color-primary);
 }
 
 .btn-danger-link {
@@ -375,11 +376,11 @@ kbd {
   color: var(--color-danger);
 }
 
-/* ===== 3D Flashcard Viewer ===== */
+/* ===== 3D Flashcard Viewer & Stacked Physical Deck Illusion ===== */
 .card-viewer {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1.35rem;
   position: relative;
 }
 
@@ -390,19 +391,20 @@ kbd {
 }
 
 .card-counter {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   color: var(--color-text-muted);
+  font-family: var(--font-mono);
   font-weight: 600;
 }
 
 .status-badge {
   font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0.25rem 0.75rem;
+  font-weight: 700;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .badge-mastered {
@@ -419,32 +421,56 @@ kbd {
 
 /* 3D Scene Container */
 .flashcard-scene {
-  perspective: 1200px;
+  perspective: 1400px;
   cursor: pointer;
   outline: none;
   position: relative;
-  min-height: 280px;
+  min-height: 310px;
   border-radius: var(--radius-lg);
 }
 
-/* Stacked card shadow underneath */
+/* Layer 1 under active card */
+.flashcard-scene::before {
+  content: '';
+  position: absolute;
+  inset: 6px -4px -6px 4px;
+  background-color: #0d121c;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transform: rotate(-1.2deg);
+  z-index: -1;
+  pointer-events: none;
+  transition: transform 0.3s ease;
+}
+
+/* Layer 2 under active card */
 .flashcard-scene::after {
   content: '';
   position: absolute;
-  inset: 8px -4px -8px 4px;
-  background-color: #0e1420;
-  border: 1px solid var(--color-border);
+  inset: 12px -8px -12px 8px;
+  background-color: #090d14;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
-  transform: rotate(0.8deg);
-  z-index: -1;
+  transform: rotate(1.4deg);
+  z-index: -2;
   pointer-events: none;
+  box-shadow: 0 25px 50px -10px rgba(0, 0, 0, 0.8);
+  transition: transform 0.3s ease;
+}
+
+.flashcard-scene:hover::before {
+  transform: rotate(-1.8deg) translate(-2px, 2px);
+}
+
+.flashcard-scene:hover::after {
+  transform: rotate(2.2deg) translate(2px, 4px);
 }
 
 .flashcard-inner {
   position: relative;
   width: 100%;
-  min-height: 280px;
-  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 310px;
+  transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   transform-style: preserve-3d;
 }
 
@@ -466,31 +492,32 @@ kbd {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   border-radius: var(--radius-lg);
-  padding: 2.25rem 2rem;
+  padding: 2.5rem 2.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border: 1px solid var(--color-border);
-  box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+              0 20px 45px -10px rgba(0, 0, 0, 0.7);
 }
 
 .card-front {
-  background-color: #141c2c;
+  background-color: #121826;
 }
 
 .card-back {
-  background-color: #122036;
+  background-color: #0f1c2d;
   transform: rotateY(180deg);
-  border-color: rgba(56, 189, 248, 0.25);
+  border-color: rgba(56, 189, 248, 0.3);
 }
 
 .face-tag {
-  font-size: 0.8rem;
+  font-size: 0.84rem;
   font-weight: 600;
   color: var(--color-primary);
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
 }
 
 .card-back .face-tag {
@@ -498,24 +525,26 @@ kbd {
 }
 
 .card-text {
-  font-size: 1.45rem;
-  line-height: 1.55;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  line-height: 1.5;
   color: #ffffff;
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
   margin: 1.25rem 0;
   word-break: break-word;
 }
 
 @media (min-width: 768px) {
   .card-text {
-    font-size: 1.6rem;
+    font-size: 1.75rem;
   }
 }
 
 .hint-text {
-  font-size: 0.82rem;
+  font-size: 0.84rem;
   color: var(--color-text-subtle);
+  font-family: var(--font-mono);
   text-align: right;
 }
 
@@ -525,7 +554,7 @@ kbd {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.85rem;
   margin-top: 0.5rem;
 }
 
@@ -541,7 +570,7 @@ kbd {
   padding: 3rem 1.5rem;
   text-align: center;
   color: var(--color-text-muted);
-  font-size: 1rem;
+  font-size: 1.05rem;
 }
 
 /* ===== Add Custom Card Form ===== */
@@ -549,12 +578,14 @@ kbd {
   background-color: var(--color-card-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 1.75rem;
+  padding: 2rem;
   margin-top: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .section-title {
-  font-size: 1.25rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
   font-weight: 700;
   color: #ffffff;
   margin-bottom: 1.25rem;
@@ -580,7 +611,7 @@ kbd {
 }
 
 .form-field label {
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   color: var(--color-text-muted);
   font-weight: 600;
 }
@@ -588,12 +619,12 @@ kbd {
 .form-input,
 .form-textarea {
   width: 100%;
-  background-color: #0b0f17;
+  background-color: #06070a;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   color: var(--color-text);
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
+  padding: 0.8rem 1rem;
+  font-size: 0.96rem;
   font-family: inherit;
   transition: border-color 0.15s ease;
 }
@@ -615,7 +646,7 @@ kbd {
 /* ===== Footer ===== */
 .app-footer {
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--color-text-subtle);
   border-top: 1px solid var(--color-border);
   padding-top: 2rem;

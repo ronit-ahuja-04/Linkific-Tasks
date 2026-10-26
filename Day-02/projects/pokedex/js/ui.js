@@ -69,13 +69,13 @@ export function renderState(status, customMessage = '') {
 
   switch (status) {
     case 'loading':
-      messageP.textContent = '⏳ Loading Pokémon details from PokeAPI...';
+      messageP.textContent = 'Retrieving specimen telemetry from PokeAPI...';
       break;
     case 'notFound':
-      messageP.textContent = customMessage || '🔍 Pokémon not found. Please verify the name or ID.';
+      messageP.textContent = customMessage || 'Specimen not found. Please verify the name or Dex ID.';
       break;
     case 'error':
-      messageP.textContent = customMessage || '⚠️ Network error occurred. Please check your connection.';
+      messageP.textContent = customMessage || 'Network communication error. Please check your connection.';
       break;
     case 'success':
       elements.stateContainer.hidden = true;

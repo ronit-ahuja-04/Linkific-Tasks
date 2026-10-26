@@ -78,12 +78,12 @@ export function renderHabits(habits, todayKey) {
     const currentBadge = document.createElement('span');
     currentBadge.className = 'streak-badge current-streak';
     currentBadge.title = 'Current active streak';
-    currentBadge.textContent = `🔥 ${currentStreak}d streak`;
+    currentBadge.textContent = `${currentStreak}d streak`;
 
     const longestBadge = document.createElement('span');
     longestBadge.className = 'streak-badge longest-streak';
     longestBadge.title = 'Longest historical streak';
-    longestBadge.textContent = `🏆 Best: ${longestStreak}d`;
+    longestBadge.textContent = `Best: ${longestStreak}d`;
 
     badges.appendChild(currentBadge);
     badges.appendChild(longestBadge);
@@ -110,7 +110,7 @@ export function renderHabits(habits, todayKey) {
       const dot = document.createElement('span');
       dot.className = `day-dot ${isDone ? 'done' : 'missed'} ${isToday ? 'today' : ''}`;
       dot.title = `${formatDisplayDate(dayKey)}: ${isDone ? 'Completed' : 'Missed'}`;
-      dot.textContent = isDone ? '✓' : '•';
+      dot.textContent = isDone ? 'Y' : '—';
 
       dotsContainer.appendChild(dot);
     });
@@ -124,7 +124,7 @@ export function renderHabits(habits, todayKey) {
     btnToggle.type = 'button';
     btnToggle.className = `btn btn-toggle-done ${isCompletedToday ? 'btn-completed' : 'btn-pending'}`;
     btnToggle.setAttribute('data-action', 'toggle');
-    btnToggle.textContent = isCompletedToday ? 'Completed Today ✓' : 'Mark Done Today';
+    btnToggle.textContent = isCompletedToday ? 'Completed Today' : 'Mark Done Today';
 
     const btnDelete = document.createElement('button');
     btnDelete.type = 'button';

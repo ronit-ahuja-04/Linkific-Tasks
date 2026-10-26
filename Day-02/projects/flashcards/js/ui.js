@@ -69,7 +69,7 @@ export function render(state, visibleDeck, progress) {
   // All known banner
   if (progress.allKnown && progress.total > 0) {
     elements.progressCongrats.hidden = false;
-    elements.progressCongrats.textContent = '🎉 Outstanding! You have mastered every card in this deck!';
+    elements.progressCongrats.textContent = 'Session complete: 100% of cards in this deck are mastered.';
   } else {
     elements.progressCongrats.hidden = true;
   }
@@ -111,7 +111,7 @@ export function render(state, visibleDeck, progress) {
   } else {
     elements.cardKnownStatusBadge.textContent = 'To Learn';
     elements.cardKnownStatusBadge.className = 'status-badge badge-to-learn';
-    elements.btnToggleKnown.textContent = 'Mark as Mastered ✓';
+    elements.btnToggleKnown.textContent = 'Mark as Mastered';
     elements.btnToggleKnown.className = 'btn btn-success';
   }
 

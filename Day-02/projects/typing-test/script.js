@@ -288,7 +288,7 @@ function finishTest(reason) {
     state.bestWpm[state.difficulty] = metrics.netWpm;
     saveBestScores();
     isNewBest = true;
-    elements.bestWpmBadge.textContent = `Best WPM (${state.difficulty}): ${metrics.netWpm} 🌟 New Record!`;
+    elements.bestWpmBadge.textContent = `Best WPM (${state.difficulty}): ${metrics.netWpm} [New Record]`;
   }
 
   // Announce in accessible aria-live region
