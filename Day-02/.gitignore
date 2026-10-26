@@ -8,8 +8,3 @@ node_modules/
 # OS generated files
 .DS_Store
 Thumbs.db
-
-# Agent metadata
-.agents/
-skills-lock.json
-.taste-skill/
