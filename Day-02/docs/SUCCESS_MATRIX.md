@@ -110,10 +110,10 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| D3-1 | P0 | At least 20 numbered exercises; coverage: `map` 4, `filter` 4, `reduce` 4, `find`/`findIndex` 2, `some`/`every` 2, `sort` 4 | `grep -cE "^// Exercise [0-9]+" 02-array-methods/exercises.js` is 20 or more | ☐ |
-| D3-2 | P0 | Runs with `node` and prints each result next to an `// Expected:` comment that matches | Run it and compare | ☐ |
-| D3-3 | P0 | No exercise mutates its input (except where the exercise says so) | Read the `sort` and removal exercises | ☐ |
-| D3-4 | P0 | O1–O3 exist and run | `node 02-array-methods/object-manipulation.js` | ☐ |
+| D3-1 | P0 | At least 20 numbered exercises; coverage: `map` 4, `filter` 4, `reduce` 4, `find`/`findIndex` 2, `some`/`every` 2, `sort` 4 | `grep -cE "^// Exercise [0-9]+" 02-array-methods/exercises.js` is 20 or more | ☑ |
+| D3-2 | P0 | Runs with `node` and prints each result next to an `// Expected:` comment that matches | Run it and compare | ☑ |
+| D3-3 | P0 | No exercise mutates its input (except where the exercise says so) | Read the `sort` and removal exercises | ☑ |
+| D3-4 | P0 | O1–O3 exist and run | `node 02-array-methods/object-manipulation.js` | ☑ |
 
 ### D4: DOM examples (7)
 
@@ -179,14 +179,14 @@ Fill **Actual location** with the real file and line once built. Every row must 
 | Object shorthand | `deck.js` (`createCard`) | `04-es6-features.js:91` | ☑ |
 | Computed property names | `stats.js` (`checkInsByDate`), `object-manipulation.js` | `04-es6-features.js:113` | ☑ |
 | Modules (`import`/`export`) | `modules-demo/`, Habit Tracker, Pokédex, Flashcards | `01-fundamentals/modules-demo/main.js:5` | ☑ |
-| `map` | `exercises.js` 1–4, Typing Test `renderChars` | | ☐ |
-| `filter` | `exercises.js` 5–8, `deck.js` | | ☐ |
-| `reduce` | `exercises.js` 9–12, `stats.js` | | ☐ |
-| `find` | `exercises.js` 13, `state.js` | | ☐ |
-| `some` / `every` | `exercises.js` 15–16, `streaks.js`, `getProgress` | | ☐ |
-| `sort` | `exercises.js` 17–20, `stats.js` | | ☐ |
-| `Object.keys/values/entries` | `object-manipulation.js` O1, Habit Tracker `ui.js` | | ☐ |
-| Object spread and merge | `object-manipulation.js` O2 | | ☐ |
+| `map` | `exercises.js` 1–4, Typing Test `renderChars` | `02-array-methods/exercises.js:19` | ☑ |
+| `filter` | `exercises.js` 5–8, `deck.js` | `02-array-methods/exercises.js:63` | ☑ |
+| `reduce` | `exercises.js` 9–12, `stats.js` | `02-array-methods/exercises.js:115` | ☑ |
+| `find` | `exercises.js` 13, `state.js` | `02-array-methods/exercises.js:168` | ☑ |
+| `some` / `every` | `exercises.js` 15–16, `streaks.js`, `getProgress` | `02-array-methods/exercises.js:197` | ☑ |
+| `sort` | `exercises.js` 17–20, `stats.js` | `02-array-methods/exercises.js:226` | ☑ |
+| `Object.keys/values/entries` | `object-manipulation.js` O1, Habit Tracker `ui.js` | `02-array-methods/object-manipulation.js:20` | ☑ |
+| Object spread and merge | `object-manipulation.js` O2 | `02-array-methods/object-manipulation.js:60` | ☑ |
 | `querySelector`, `getElementById` | `03-dom-examples/` | | ☐ |
 | `textContent` vs `innerHTML` | `03-dom-examples/` | | ☐ |
 | `classList.add/remove/toggle` | `03-dom-examples/`, Flashcards, Typing Test | | ☐ |
