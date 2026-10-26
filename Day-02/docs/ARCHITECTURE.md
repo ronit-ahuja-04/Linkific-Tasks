@@ -1,6 +1,8 @@
-# Architecture: Day 2 – JavaScript Fundamentals & ES6+
+# Architecture Specification: Day-02 Suite
 
-Companion to `PRD.md`. IDs such as `HT-3` or `PK-4` refer to requirements there.
+> **Note:** For the complete, unified product requirements, security protocols, and system architecture, refer to the master [PRD_ARCHITECTURE.md](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-02/docs/PRD_ARCHITECTURE.md).
+
+Companion to [PRD.md](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-02/docs/PRD.md). IDs such as `HT-3` or `PK-4` refer to requirements defined there.
 
 ## 1. Principles
 

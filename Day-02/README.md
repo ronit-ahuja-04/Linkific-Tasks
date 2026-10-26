@@ -1,8 +1,8 @@
-# Day 2 – JavaScript Fundamentals & ES6+
+# Day-02: Modern JavaScript Fundamentals & Systems Suite
 
-Linkific Internship Training Phase · Month 1 · Day 2  
-**Owner:** Ronit Ahuja  
+**Author:** Ronit Ahuja  
 **Date:** Monday, 26 October 2026  
+**Documentation:** [Master PRD & Architecture Spec](docs/PRD_ARCHITECTURE.md)  
 
 ---
 

@@ -1,31 +1,26 @@
-# PRD: Day 2 – JavaScript Fundamentals & ES6+
+# Product Requirements Document (PRD): Day-02 Suite
 
 | Field | Value |
 |---|---|
-| Owner | Ronit Ahuja |
-| Programme | Linkific internship, Month 1 (training phase) |
+| Author | Ronit Ahuja |
+| System | Modern Vanilla JavaScript Core Systems & Curriculum |
 | Date | Monday, 26 October 2026 |
-| Repo | `Linkific-Tasks` → `Day-02/` (public, same naming style as `Day-01`) |
-| Presentation | Daily Tech Meet, normally 8:00 PM (confirm in the WhatsApp group). Max 4 minutes. Submit on the dashboard **before** presenting. |
-| Status | Draft v1, ready for the IDE |
-| Companion docs | `ARCHITECTURE.md`, `SUCCESS_MATRIX.md`, `GUIDELINES.md` |
+| Master Architecture Spec | [PRD_ARCHITECTURE.md](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-02/docs/PRD_ARCHITECTURE.md) |
+| Companion Docs | `ARCHITECTURE.md`, `SUCCESS_MATRIX.md`, `FACTS.md` |
+| Status | Verified & Production Ready |
 
 ---
 
 ## 1. Purpose
 
-Day 2 of the training phase covers JavaScript fundamentals, ES6+ features, DOM manipulation and async programming basics. This PRD defines what will be built so the work can be planned, built, verified and presented in a 4-minute standup.
+The Day-02 suite covers JavaScript fundamentals, ES6+ features, low-level DOM manipulation, and asynchronous programming architectures. This PRD defines the operational requirements for the 4 interactive applications and core curriculum:
 
-The task suggests four example projects (todo list, form validation, weather app, quiz). Four alternatives are built instead, covering the same objectives:
-
-| Project | ID prefix | Main skills it proves |
+| Project | ID prefix | Main skills demonstrated |
 |---|---|---|
-| Habit Tracker with Streaks | `HT` | modules, dates, arrays, `localStorage`, array methods |
-| Typing Speed Test | `TT` | callbacks and timers, live events, string comparison, `switch` |
-| Pokédex Search (PokeAPI) | `PK` | promises, `async/await`, `fetch`, error handling |
-| Flashcards (known / unknown filter) | `FC` | array methods, state, immutability, modules |
-
-**Instructor approval:** message Rebecca or Jiya in the Tech Team group before starting ("I'd like to build these four projects instead of the example ones, they cover the same objectives"). Status: ☐ pending.
+| Habit Tracker with Streaks | `HT` | ES modules, local date calculations, immutable state, `localStorage` |
+| Typing Speed Test | `TT` | Sub-millisecond timers, live events, character tokenization, Net WPM math |
+| Pokédex Search (PokeAPI) | `PK` | Dual async architectures (`Promise.all` + `async/await`), Map cache |
+| Flashcards Studio | `FC` | 3D spatial flip transforms, Fisher–Yates shuffle, array methods, state immutability |
 
 ## 2. Goals and non-goals
 
