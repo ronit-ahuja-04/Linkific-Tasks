@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Typing Speed Test - Day 2</title>
+    <!-- Modern Typography: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
@@ -75,6 +82,15 @@
 
         <!-- Target Text Display -->
         <section class="passage-card" aria-label="Passage to type">
+          <div class="terminal-bar" aria-hidden="true">
+            <div class="terminal-dots">
+              <span class="terminal-dot dot-red"></span>
+              <span class="terminal-dot dot-yellow"></span>
+              <span class="terminal-dot dot-green"></span>
+            </div>
+            <span class="terminal-filename">engine_runtime.js</span>
+            <span class="terminal-mode">UTF-8 &bull; Strict</span>
+          </div>
           <div id="text-display" class="text-display-box" aria-label="Target text passage">
             <!-- Rendered character spans go here -->
           </div>
