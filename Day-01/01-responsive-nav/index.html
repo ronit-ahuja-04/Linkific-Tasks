@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Ronit Ahuja | Full Stack Developer. Pure HTML5 & CSS3 responsive navigation with zero JavaScript.">
+  <title>Ronit Ahuja | Portfolio</title>
+
+  <!-- Typography: Inter for clean geometric sans-serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="../assets/images/favicon.jpg" type="image/jpeg">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- Accessible Skip Link -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- ==============================================
+       FIXED FLOATING RESUME DOWNLOAD BUTTON (Matches Live Website)
+       ============================================== -->
+  <a href="../assets/docs/Ronit_Ahuja_Resume.pdf" download="Ronit_Ahuja_Resume.pdf" class="download-btn-fixed" aria-label="Download Resume" title="Download Resume (PDF)">
+    <svg class="download-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true">
+      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </a>
+
+  <!-- ==============================================
+       HEADER & NAVIGATION (100% Pure HTML5 & CSS3)
+       Zero JavaScript: Powered by CSS :checked pseudo-class
+       ============================================== -->
+  <header class="site-header">
+    <div class="nav-container">
+
+      <!-- Brand Identity with Logo -->
+      <a href="#" class="brand" aria-label="Ronit Ahuja Home">
+        <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja Logo" class="brand-logo-img" width="28" height="28">
+        <span class="brand-name">Ronit Ahuja</span>
+      </a>
+
+      <!-- 
+        PURE CSS TOGGLE:
+        Hidden checkbox + semantic <label> that controls the mobile sheet
+        via the CSS sibling selector (#nav-toggle-input:checked ~ .primary-nav)
+      -->
+      <input type="checkbox" id="nav-toggle-input" class="nav-toggle-input" aria-label="Toggle navigation menu">
+
+      <label for="nav-toggle-input" class="nav-toggle-label" aria-hidden="true">
+        <span class="toggle-bar line-top"></span>
+        <span class="toggle-bar line-bottom"></span>
+      </label>
+
+      <!-- Primary Navigation -->
+      <nav class="primary-nav" aria-label="Primary navigation">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="#about" class="nav-link active">About</a>
+          </li>
+          <li class="nav-item">
+            <a href="#resume" class="nav-link">Resume</a>
+          </li>
+          <li class="nav-item">
+            <a href="#portfolio" class="nav-link">Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a href="#contact" class="nav-link">Contact</a>
+          </li>
+        </ul>
+
+        <!-- Stripe-Style Pill CTA -->
+        <div class="nav-cta-wrapper">
+          <a href="https://ronit-ahuja-portfolio.vercel.app/" target="_blank" rel="noopener noreferrer" class="nav-cta">
+            <span>Resume</span>
+            <svg class="cta-arrow" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" width="12"
+              height="12" aria-hidden="true">
+              <path d="M4 12L12 4M12 4H6M12 4V10" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        </div>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ==============================================
+       MAIN: STAGE 1 — HERO & ABOUT (EXACT DATA)
+       ============================================== -->
+  <main id="main">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="container hero-container">
+
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          <span>Full Stack Developer &bull; Mumbai, India</span>
+        </div>
+
+        <div class="hero-avatar-box">
+          <img src="../assets/images/avatar.jpg" alt="Ronit Ahuja" class="hero-avatar" width="76" height="76">
+        </div>
+
+        <h1 class="hero-headline">
+          Ronit Ahuja
+        </h1>
+        <p class="hero-role">Full Stack Developer &amp; IT Student at VESIT</p>
+
+        <p class="hero-lead">
+          I’m an Information Technology student at VESIT, Mumbai, with a strong interest in software development,
+          product design, and building practical technology solutions.
+        </p>
+
+        <!-- Direct Social / Professional Channels (Official High-Precision Vector Icons) -->
+        <div class="social-links-row">
+          <a href="https://github.com/ronit-ahuja-04" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="GitHub Profile" title="GitHub">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M256 32C132.3 32 32 134.8 32 261.7c0 101.5 64.2 187.5 153.2 217.9a17.56 17.56 0 003.8.4c8.3 0 11.5-6.1 11.5-11.4 0-5.5-.2-19.9-.3-39.1a102.4 102.4 0 01-22.6 2.7c-43.1 0-52.9-20.8-56.2-49.8-.5-4.7-4.3-17.4-14.8-20.9-5.1-1.7-12.4-9.3-.1-9.5 11.7-.2 20.1 11 23 15.6 13.2 21.6 34.4 15.3 42.8 11.7 1.3-9.3 4.9-15.6 9.1-19.2-50.6-5.8-103.7-25.7-103.7-113.6 0-25.1 8.7-45.6 23-61.5-2.3-5.8-10-29.2 2.2-60.8 0 0 18.8-6.2 61.6 23.5a210.9 210.9 0 01100 0c42.7-29.7 61.5-23.5 61.5-23.5 12.2 31.6 4.5 55 2.2 60.8 14.3 15.9 23 36.2 23 61.5 0 88.2-53.2 107.8-103.9 113.5 5.8 5.1 10.9 15.2 10.9 30.7 0 22.2-.2 40.1-.2 45.6 0 5.3 3.2 12 11.5 11.4C415.8 449.3 480 363.3 480 261.7 480 134.8 379.7 32 256 32z" />
+            </svg>
+          </a>
+          <a href="https://gitlab.com/ahuja.ronit.0510" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="GitLab Profile" title="GitLab">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M105.2 24.9c-3.1-8.9-15.7-8.9-18.9 0L29.8 199.7h132c-.1 0-56.6-174.8-56.6-174.8zM.9 287.7c-2.6 8 .3 16.9 7.1 22l247.9 184-226.2-294zm160.8-88l94.3 294 94.3-294zm349.4 88l-28.8-88-226.3 294 247.9-184c6.9-5.1 9.8-14 7.2-22zM482.4 199.7L425.7 24.9c-3.1-8.9-15.7-8.9-18.9 0l-56.6 174.8h132.2z" />
+            </svg>
+          </a>
+          <a href="https://www.linkedin.com/in/ronitahujadev/" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="LinkedIn Profile" title="LinkedIn">
+            <svg class="social-icon" viewBox="0 0 448 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z" />
+            </svg>
+          </a>
+          <a href="https://x.com/0510Ahuja" target="_blank" rel="noopener noreferrer"
+            class="social-link" aria-label="Twitter / X Profile" title="Twitter / X">
+            <svg class="social-icon" viewBox="0 0 512 512" aria-hidden="true">
+              <path fill="currentColor"
+                d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+            </svg>
+          </a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- About Me Section (Exact Text from Live Portfolio) -->
+    <section class="about-section" id="about">
+      <div class="container">
+
+        <div class="content-card">
+          <h2 class="section-title">About Me</h2>
+
+          <div class="bio-text">
+            <p>
+              I enjoy working across both the technical and creative sides of development — from designing user
+              interfaces in Figma to building applications using Flutter, React, Firebase, and other modern
+              technologies.
+            </p>
+            <p>
+              Currently, I’m exploring areas such as mobile app development, full-stack development, UI/UX, and software
+              engineering. I particularly enjoy turning real-world problems into functional, user-friendly products and
+              collaborating on projects where technology can make a meaningful difference.
+            </p>
+            <p>
+              I’m continuously learning, improving my problem-solving skills, and looking for opportunities to work on
+              challenging projects, gain industry experience, and connect with people passionate about technology.
+            </p>
+          </div>
+
+          <!-- Tech Interests Row -->
+          <div class="tech-interests-box">
+            <span class="interests-label">Tech interests</span>
+            <p class="interests-tags">
+              Software Development &bull; Flutter &bull; React &bull; Firebase &bull; UI/UX Design &bull; Full-Stack
+              Development &bull; Problem Solving
+            </p>
+          </div>
+
+          <!-- What I'm Doing (Exact 4 Cards from Live Site) -->
+          <h3 class="subsection-title">What I'm Doing</h3>
+          <div class="services-grid">
+
+            <div class="service-card">
+              <div class="service-icon">📱</div>
+              <div class="service-info">
+                <h4 class="service-title">Mobile apps</h4>
+                <p class="service-desc">
+                  Developing cross-platform mobile experiences for iOS and Android using modern frameworks.
+                </p>
+              </div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">💻</div>
+              <div class="service-info">
+                <h4 class="service-title">Web development</h4>
+                <p class="service-desc">
+                  Building responsive, scalable web applications with modern frontend and backend technologies.
+                </p>
+              </div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">🤖</div>
+              <div class="service-info">
+                <h4 class="service-title">AI-Assisted Development</h4>
+                <p class="service-desc">
+                  Leveraging AI tools to accelerate development, and build smarter software solutions.
+                </p>
+              </div>
+            </div>
+
+            <div class="service-card">
+              <div class="service-icon">📐</div>
+              <div class="service-info">
+                <h4 class="service-title">SDLC</h4>
+                <p class="service-desc">
+                  Using Agile methodologies and frameworks like BMAD for structured, AI-driven software development.
+                </p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer" id="contact">
+    <div class="container footer-inner">
+      <p class="footer-copy">&copy; 2026 Ronit Ahuja </p>
+      <div class="footer-contacts">
+        <a href="mailto:ronitahuja.0510@gmail.com">ronitahuja.0510@gmail.com</a>
+        <span class="sep">&bull;</span>
+        <a href="tel:+918422040493">+91 8422040493</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+
+</html>

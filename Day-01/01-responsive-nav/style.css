@@ -1,0 +1,698 @@
+/* ==========================================================================
+   Project 01: Portfolio Stage 1 — Navigation & About Me
+   Author: Ronit Ahuja
+   100% PURE HTML5 & CSS3 (ZERO JAVASCRIPT)
+   Design Language: Apple HIG (Translucency) + Stripe Simplicity
+   Data: Reverse-Engineered from ronit-ahuja-portfolio.vercel.app
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. DESIGN TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces */
+  --bg-canvas: #090c14;
+  --bg-surface: #101524;
+  --bg-surface-elevated: #161c2e;
+  --bg-header: rgba(14, 18, 29, 0.8);
+  --bg-mobile-sheet: rgba(11, 15, 26, 0.96);
+
+  /* Hairline Borders */
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.18);
+  --border-focus: #38bdf8;
+
+  /* Typography Colors */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* Accents */
+  --accent-color: #38bdf8;
+  --accent-gradient: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+
+  /* Dimensions & Timing */
+  --header-height: 54px;
+  --max-width: 980px;
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 160ms;
+  --duration-smooth: 260ms;
+}
+
+/* --------------------------------------------------------------------------
+   2. RESET & BASE
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Accessible Skip Link */
+.skip-link {
+  position: absolute;
+  top: -60px;
+  left: 16px;
+  background: var(--text-primary);
+  color: #000000;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  z-index: 1000;
+  text-decoration: none;
+  transition: top var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  top: 12px;
+  outline: 2px solid var(--border-focus);
+}
+
+:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 3px;
+}
+
+/* --------------------------------------------------------------------------
+   3. SITE HEADER (APPLE FROSTED TRANSLUCENCY)
+   -------------------------------------------------------------------------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  background-color: var(--bg-header);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--border-hairline);
+  z-index: 100;
+}
+
+.nav-container {
+  max-width: var(--max-width);
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+/* Brand */
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: opacity var(--duration-fast) ease;
+  z-index: 102;
+}
+
+.brand:hover {
+  opacity: 0.85;
+}
+
+.brand-monogram {
+  display: inline-grid;
+  place-content: center;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-hairline);
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.brand-logo-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-hairline);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text-primary);
+}
+
+/* --------------------------------------------------------------------------
+   4. NAVIGATION LINKS (DESKTOP FLEXBOX)
+   -------------------------------------------------------------------------- */
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-list {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  list-style: none;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  padding: 6px 2px;
+  transition: color var(--duration-fast) ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary);
+}
+
+/* Stripe Pill Call to Action */
+.nav-cta-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.nav-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-hairline);
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+.nav-cta:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-hover);
+  transform: translateY(-1px);
+}
+
+.cta-arrow {
+  transition: transform var(--duration-fast) ease;
+}
+
+.nav-cta:hover .cta-arrow {
+  transform: translate(1px, -1px);
+}
+
+/* --------------------------------------------------------------------------
+   5. PURE CSS MOBILE TOGGLE (CHECKBOX HACK)
+   Zero JavaScript: #nav-toggle-input:checked controls .primary-nav
+   -------------------------------------------------------------------------- */
+.nav-toggle-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.nav-toggle-label {
+  display: none; /* Shown on mobile */
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border-radius: 6px;
+  z-index: 102;
+  user-select: none;
+}
+
+.nav-toggle-label:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.toggle-bar {
+  position: absolute;
+  width: 18px;
+  height: 1.5px;
+  background-color: var(--text-primary);
+  border-radius: 2px;
+  transition: transform var(--duration-smooth) var(--ease-apple), top var(--duration-smooth) var(--ease-apple);
+}
+
+.line-top { top: 13px; }
+.line-bottom { top: 21px; }
+
+/* --------------------------------------------------------------------------
+   6. HERO SECTION
+   -------------------------------------------------------------------------- */
+.hero-section {
+  padding: 72px 0 48px;
+}
+
+.hero-container {
+  max-width: 820px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border-hairline);
+  border-radius: 9999px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10b981;
+}
+
+.hero-avatar-box {
+  margin-bottom: 20px;
+}
+
+.hero-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-hairline);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.hero-headline {
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.hero-role {
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: var(--accent-color);
+  margin-bottom: 18px;
+}
+
+.hero-lead {
+  font-size: 1.05rem;
+  color: var(--text-secondary);
+  line-height: 1.65;
+  max-width: 700px;
+  margin-bottom: 24px;
+}
+
+.social-links-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-hairline);
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all var(--duration-fast) ease;
+}
+
+.social-link:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-hairline-hover);
+  color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.social-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  transition: transform var(--duration-fast) ease;
+}
+
+.social-link:hover .social-icon {
+  transform: scale(1.1);
+}
+
+/* --------------------------------------------------------------------------
+   7. ABOUT ME & SERVICES (EXACT PORTFOLIO CONTENT)
+   -------------------------------------------------------------------------- */
+.about-section {
+  padding: 32px 0 80px;
+}
+
+.content-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-hairline);
+  border-radius: 16px;
+  padding: 36px;
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-hairline);
+}
+
+.bio-text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--text-secondary);
+  font-size: 0.975rem;
+  line-height: 1.65;
+  margin-bottom: 28px;
+}
+
+.tech-interests-box {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-bottom: 40px;
+}
+
+.interests-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent-color);
+  margin-bottom: 6px;
+}
+
+.interests-tags {
+  font-size: 13.5px;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.subsection-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.015em;
+  margin-bottom: 20px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.service-card {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-hairline);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  transition: border-color var(--duration-fast) ease;
+}
+
+.service-card:hover {
+  border-color: var(--border-hover);
+}
+
+.service-icon {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.service-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.service-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.service-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   8. FOOTER
+   -------------------------------------------------------------------------- */
+.site-footer {
+  padding: 32px 0;
+  border-top: 1px solid var(--border-hairline);
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-copy {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.footer-contacts {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.footer-contacts a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color var(--duration-fast) ease;
+}
+
+.footer-contacts a:hover {
+  color: var(--text-primary);
+}
+
+.sep {
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   9. RESPONSIVE BREAKPOINTS
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .primary-nav {
+    gap: 18px;
+  }
+  .nav-list {
+    gap: 16px;
+  }
+  .nav-link {
+    font-size: 12.5px;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-toggle-label {
+    display: flex;
+  }
+
+  /*
+    PURE CSS ACCORDION / SHEET:
+    #nav-toggle-input:checked controls .primary-nav and the hamburger lines!
+  */
+  .primary-nav {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background-color: var(--bg-mobile-sheet);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 24px;
+    gap: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity var(--duration-smooth) var(--ease-apple),
+                transform var(--duration-smooth) var(--ease-apple),
+                visibility var(--duration-smooth) var(--ease-apple);
+    overflow-y: auto;
+    z-index: 101;
+  }
+
+  /* PURE CSS OPEN STATE WHEN CHECKBOX IS CHECKED */
+  .nav-toggle-input:checked ~ .primary-nav {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  /* PURE CSS MORPHING OF HAMBURGER INTO 'X' */
+  .nav-toggle-input:checked ~ .nav-toggle-label .line-top {
+    top: 17px;
+    transform: rotate(45deg);
+  }
+
+  .nav-toggle-input:checked ~ .nav-toggle-label .line-bottom {
+    top: 17px;
+    transform: rotate(-45deg);
+  }
+
+  .nav-list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .nav-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .nav-cta-wrapper {
+    margin-top: 12px;
+  }
+
+  .nav-cta {
+    width: 100%;
+    min-height: 44px;
+    justify-content: center;
+    font-size: 14px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .hero-section {
+    padding: 44px 0 32px;
+  }
+
+  .content-card {
+    padding: 22px;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   FIXED RESUME DOWNLOAD BUTTON (MATCHES LIVE PORTFOLIO)
+   -------------------------------------------------------------------------- */
+.download-btn-fixed {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(22, 22, 26, 0.85);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  border: 1px solid var(--border-hover);
+  color: var(--accent-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), 0 0 16px rgba(56, 189, 248, 0.25);
+  z-index: 99;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 250ms var(--ease-apple);
+}
+
+.download-btn-fixed:hover {
+  transform: scale(1.1) translateY(-2px);
+  background: rgba(30, 30, 36, 0.95);
+  border-color: var(--accent-color);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 24px rgba(56, 189, 248, 0.45);
+  color: #ffffff;
+}
+
+.download-btn-fixed:active {
+  transform: scale(0.95);
+}
+
+.download-btn-fixed .download-icon {
+  width: 20px;
+  height: 20px;
+  transition: transform 150ms ease;
+}
+
+.download-btn-fixed:hover .download-icon {
+  transform: translateY(1px);
+}
+
