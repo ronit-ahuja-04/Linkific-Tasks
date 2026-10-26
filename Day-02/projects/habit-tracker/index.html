@@ -1,1 +1,132 @@
-<!-- habit-tracker index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Daily Habit Tracker with Streaks - Day 2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <nav class="top-nav">
+          <a href="../index.html" class="nav-back-link">&larr; Projects Hub</a>
+          <span class="badge-tag">Local YYYY-MM-DD Dates</span>
+        </nav>
+        <h1 class="app-title">Daily Habit Tracker</h1>
+        <p class="app-tagline">
+          Build consistency with daily tracking, current & historical streak analytics, and local persistence.
+        </p>
+
+        <!-- Validation & Status Alerts -->
+        <div id="validation-msg" class="alert-banner" hidden role="status" aria-live="polite"></div>
+      </header>
+
+      <main class="main-layout">
+        <!-- Left / Primary Column: Add Habit & Habit Cards -->
+        <section class="habits-section" aria-labelledby="habits-list-heading">
+          <!-- Add Habit Form -->
+          <div class="card add-habit-card">
+            <h2 class="card-title">Add a New Habit</h2>
+            <form id="add-habit-form" class="add-form" novalidate>
+              <div class="input-row">
+                <div class="field-group">
+                  <label for="habit-name-input">Habit Name (1–40 characters):</label>
+                  <input
+                    type="text"
+                    id="habit-name-input"
+                    class="form-input"
+                    maxlength="40"
+                    placeholder="e.g. Read 20 pages of clean code"
+                    required
+                    autocomplete="off"
+                  />
+                </div>
+                <button type="submit" id="btn-add-habit" class="btn btn-primary">+ Add Habit</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Habits List -->
+          <div class="habits-header-row">
+            <h2 id="habits-list-heading" class="section-title">Your Active Habits</h2>
+          </div>
+
+          <div id="habit-list" class="habit-list" role="region" aria-label="Habits Container">
+            <!-- Habit cards rendered dynamically via ui.js -->
+          </div>
+
+          <div id="empty-state" class="empty-box" hidden role="status" aria-live="polite">
+            <p>No habits tracked yet. Use the form above to start your first daily streak!</p>
+          </div>
+        </section>
+
+        <!-- Right / Secondary Column: Analytics & Stats Panel (HT-7) -->
+        <aside class="stats-aside" aria-labelledby="stats-heading">
+          <div class="card stats-card" id="stats-container">
+            <h2 id="stats-heading" class="card-title">Performance Analytics</h2>
+
+            <!-- Metric Summary Grid -->
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="metric-label">Total Check-Ins</span>
+                <span id="total-checkins-count" class="metric-value">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Active Habits</span>
+                <span id="active-habits-count" class="metric-value">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Best Current Streak</span>
+                <span id="top-streak-value" class="metric-value">0 days</span>
+              </div>
+              <div class="metric-box">
+                <span class="metric-label">Top Active Day</span>
+                <span id="top-active-date-value" class="metric-value metric-small">None</span>
+              </div>
+            </div>
+
+            <!-- Streak Leaderboard (Ranked by Streak) -->
+            <div class="stats-subgroup">
+              <h3 class="subgroup-title">Habits Ranked by Current Streak</h3>
+              <ol id="streak-ranking-list" class="ranking-list" aria-label="Habit Streaks Leaderboard">
+                <!-- Ranked items populated via ui.js -->
+              </ol>
+            </div>
+
+            <!-- Check-Ins per Date (Activity Breakdown) -->
+            <div class="stats-subgroup">
+              <h3 class="subgroup-title">Recent Daily Activity</h3>
+              <div class="table-responsive">
+                <table class="activity-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Date</th>
+                      <th scope="col">Completions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="date-activity-table-body">
+                    <!-- Date rows populated via ui.js -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Danger Zone / Reset -->
+            <div class="reset-zone">
+              <button type="button" id="btn-reset-all" class="btn btn-outline-danger">
+                Reset All Habit Data
+              </button>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="app-footer">
+        <p>Day 2 Linkific Training &bull; Habit Tracker &bull; Pure ES Modules & Local Dates</p>
+      </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>

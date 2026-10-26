@@ -59,14 +59,14 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| HT-1 | P0 | Add habit, validated, duplicates rejected | Try empty, 41 characters, `Read` then `read` | ☐ |
-| HT-2 | P0 | Toggle done today | Click twice; state returns | ☐ |
-| HT-3 | P0 | Current and longest streak correct | Seed `checkIns` for yesterday and the day before; expect streak 3 after checking today. Gap test: a missing day resets the current streak | ☐ |
-| HT-4 | P0 | Delete habit | Reload; it stays deleted | ☐ |
-| HT-5 | P0 | Persists; survives corrupt data | In DevTools set `localStorage['day2.habits.v1'] = '{bad'`, reload, no crash | ☐ |
-| HT-6 | P0 | Local `YYYY-MM-DD` keys | `grep -rn "toISOString" projects/habit-tracker` finds nothing | ☐ |
-| HT-7 | P1 | Stats: total, ranking, per-date | Visual check | ☐ |
-| HT-8 | P1 | Last-7-days indicator | Visual check | ☐ |
+| HT-1 | P0 | Add habit, validated, duplicates rejected | Try empty, 41 characters, `Read` then `read` | ☑ |
+| HT-2 | P0 | Toggle done today | Click twice; state returns | ☑ |
+| HT-3 | P0 | Current and longest streak correct | Seed `checkIns` for yesterday and the day before; expect streak 3 after checking today. Gap test: a missing day resets the current streak | ☑ |
+| HT-4 | P0 | Delete habit | Reload; it stays deleted | ☑ |
+| HT-5 | P0 | Persists; survives corrupt data | In DevTools set `localStorage['day2.habits.v1'] = '{bad'`, reload, no crash | ☑ |
+| HT-6 | P0 | Local `YYYY-MM-DD` keys | `grep -rn "toISOString" projects/habit-tracker` finds nothing | ☑ |
+| HT-7 | P1 | Stats: total, ranking, per-date | Visual check | ☑ |
+| HT-8 | P1 | Last-7-days indicator | Visual check | ☑ |
 
 **Typing Test (TT)**
 
