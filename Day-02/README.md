@@ -2,7 +2,7 @@
 
 **Author:** Ronit Ahuja  
 **Date:** Monday, 26 October 2026  
-**Documentation:** [Master PRD & Architecture Spec](docs/PRD_ARCHITECTURE.md)  
+**Documentation:** [Product Requirements Document (PRD)](PRD.md) · [System Architecture](ARCHITECTURE.md)  
 
 ---
 
