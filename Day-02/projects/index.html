@@ -1,1 +1,329 @@
-<!-- projects hub index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Day 2 Projects Hub - Linkific Internship</title>
+    <style>
+      :root {
+        --color-bg: #090d16;
+        --color-card: #131b2e;
+        --color-card-hover: #1c2742;
+        --color-border: #243452;
+        --color-text: #f8fafc;
+        --color-text-muted: #94a3b8;
+        --color-primary: #38bdf8;
+        --color-accent: #f59e0b;
+        --radius-sm: 6px;
+        --radius-md: 12px;
+        --radius-lg: 16px;
+        --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: var(--font-sans);
+        background-color: var(--color-bg);
+        color: var(--color-text);
+        line-height: 1.6;
+        padding: 2.5rem 1.25rem;
+      }
+      :focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 3px;
+      }
+      .container {
+        max-width: 960px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+      }
+      header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .badge-phase {
+        display: inline-block;
+        align-self: center;
+        background: #1e293b;
+        color: var(--color-primary);
+        font-size: 0.8rem;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.25rem 0.85rem;
+        border-radius: 20px;
+        border: 1px solid var(--color-border);
+      }
+      h1 {
+        font-size: 2.25rem;
+        color: #ffffff;
+        font-weight: 800;
+      }
+      p.subtitle {
+        color: var(--color-text-muted);
+        font-size: 1.05rem;
+        max-width: 640px;
+        margin: 0 auto;
+      }
+      .section-heading {
+        font-size: 1.25rem;
+        color: #ffffff;
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid var(--color-border);
+        padding-bottom: 0.5rem;
+      }
+      .projects-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      @media (min-width: 768px) {
+        .projects-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .project-card {
+        background-color: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 1.25rem;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+      }
+      .project-card:hover {
+        transform: translateY(-4px);
+        background-color: var(--color-card-hover);
+        border-color: var(--color-primary);
+      }
+      .card-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 0.75rem;
+      }
+      .card-icon {
+        font-size: 2rem;
+      }
+      .card-tag {
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: #0b0f19;
+        border: 1px solid var(--color-border);
+        padding: 0.2rem 0.6rem;
+        border-radius: var(--radius-sm);
+        color: var(--color-primary);
+      }
+      .card-title {
+        font-size: 1.35rem;
+        color: #ffffff;
+        margin-bottom: 0.35rem;
+      }
+      .card-desc {
+        color: var(--color-text-muted);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+      .tech-pills {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+      .tech-pill {
+        font-size: 0.75rem;
+        background: #090d16;
+        border: 1px solid var(--color-border);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        color: #cbd5e1;
+      }
+      .card-footer-cta {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--color-primary);
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .labs-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      @media (min-width: 600px) {
+        .labs-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      .lab-item {
+        background-color: #0b0f19;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: border-color 0.2s ease;
+      }
+      .lab-item:hover {
+        border-color: var(--color-primary);
+      }
+      .lab-title {
+        font-size: 1.05rem;
+        color: #ffffff;
+      }
+      .lab-desc {
+        font-size: 0.85rem;
+        color: var(--color-text-muted);
+      }
+      footer {
+        text-align: center;
+        color: var(--color-text-muted);
+        font-size: 0.85rem;
+        border-top: 1px solid var(--color-border);
+        padding-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <span class="badge-phase">Month 1 &bull; Day 2 Deliverables</span>
+        <h1>JavaScript & ES6+ Application Hub</h1>
+        <p class="subtitle">
+          Interactive client-side web applications demonstrating ES6 modules, pure state loops, DOM manipulation, interval timers, and dual asynchronous patterns.
+        </p>
+      </header>
+
+      <main>
+        <!-- 4 Primary Applications -->
+        <section aria-labelledby="apps-heading">
+          <h2 id="apps-heading" class="section-heading">Core Interactive Applications</h2>
+          <div class="projects-grid">
+            <!-- 1. Habit Tracker -->
+            <a href="habit-tracker/index.html" class="project-card">
+              <div>
+                <div class="card-header-row">
+                  <span class="card-icon" aria-hidden="true">🔥</span>
+                  <span class="card-tag">HT-1 to HT-8</span>
+                </div>
+                <h3 class="card-title">Habit Tracker with Streaks</h3>
+                <p class="card-desc">
+                  Track daily habits with local calendar date arithmetic (`YYYY-MM-DD`), backward cursor streak algorithms, 7-day visual history dots, and performance analytics.
+                </p>
+                <div class="tech-pills">
+                  <span class="tech-pill">ES Modules</span>
+                  <span class="tech-pill">Local Dates</span>
+                  <span class="tech-pill">While Loop</span>
+                  <span class="tech-pill">Set</span>
+                  <span class="tech-pill">localStorage</span>
+                </div>
+              </div>
+              <div class="card-footer-cta">Open Habit Tracker &rarr;</div>
+            </a>
+
+            <!-- 2. Typing Speed Test -->
+            <a href="typing-test/index.html" class="project-card">
+              <div>
+                <div class="card-header-row">
+                  <span class="card-icon" aria-hidden="true">⚡</span>
+                  <span class="card-tag">TT-1 to TT-8</span>
+                </div>
+                <h3 class="card-title">Typing Speed Test</h3>
+                <p class="card-desc">
+                  Test keystroke velocity against 12 technical JS passages across 3 difficulty tiers. Real-time character accuracy feedback, interval timers, and paste blocking.
+                </p>
+                <div class="tech-pills">
+                  <span class="tech-pill">setInterval</span>
+                  <span class="tech-pill">input Events</span>
+                  <span class="tech-pill">classList</span>
+                  <span class="tech-pill">Switch</span>
+                  <span class="tech-pill">WPM Formulas</span>
+                </div>
+              </div>
+              <div class="card-footer-cta">Open Typing Speed Test &rarr;</div>
+            </a>
+
+            <!-- 3. Pokédex Explorer -->
+            <a href="pokedex/index.html" class="project-card">
+              <div>
+                <div class="card-header-row">
+                  <span class="card-icon" aria-hidden="true">🔴</span>
+                  <span class="card-tag">PK-1 to PK-10</span>
+                </div>
+                <h3 class="card-title">Pokédex Search & Browse</h3>
+                <p class="card-desc">
+                  Search Pokémon by name/ID and browse with offset pagination. Features Promise chains with Promise.all for grid browsing, async/await for search, and Map caching.
+                </p>
+                <div class="tech-pills">
+                  <span class="tech-pill">PokeAPI</span>
+                  <span class="tech-pill">Promise.all</span>
+                  <span class="tech-pill">async/await</span>
+                  <span class="tech-pill">Map Cache</span>
+                  <span class="tech-pill">Event Delegation</span>
+                </div>
+              </div>
+              <div class="card-footer-cta">Open Pokédex Explorer &rarr;</div>
+            </a>
+
+            <!-- 4. Flashcards -->
+            <a href="flashcards/index.html" class="project-card">
+              <div>
+                <div class="card-header-row">
+                  <span class="card-icon" aria-hidden="true">🃏</span>
+                  <span class="card-tag">FC-1 to FC-9</span>
+                </div>
+                <h3 class="card-title">JavaScript Mastery Flashcards</h3>
+                <p class="card-desc">
+                  Study 12 core JavaScript concept flashcards with accessible 3D card flipping, immutable mastery toggling, Fisher–Yates shuffling, and full keyboard navigation.
+                </p>
+                <div class="tech-pills">
+                  <span class="tech-pill">3D Flip</span>
+                  <span class="tech-pill">Fisher–Yates</span>
+                  <span class="tech-pill">Keyboard Keys</span>
+                  <span class="tech-pill">Immutability</span>
+                  <span class="tech-pill">localStorage</span>
+                </div>
+              </div>
+              <div class="card-footer-cta">Open Flashcards &rarr;</div>
+            </a>
+          </div>
+        </section>
+
+        <!-- Interactive Practice Labs -->
+        <section style="margin-top: 2rem" aria-labelledby="labs-heading">
+          <h2 id="labs-heading" class="section-heading">Supporting Interactive Practice Labs</h2>
+          <div class="labs-grid">
+            <a href="../03-dom-examples/index.html" class="lab-item">
+              <h3 class="lab-title">DOM Manipulation Interactive Lab &rarr;</h3>
+              <p class="lab-desc">6 interactive sections covering selecting, textContent vs innerHTML XSS prevention, classList API, node creation/removal, and event delegation.</p>
+            </a>
+            <a href="../01-fundamentals/modules-demo/index.html" class="lab-item">
+              <h3 class="lab-title">ES Modules Browser Demo &rarr;</h3>
+              <p class="lab-desc">Standard browser module loading via &lt;script type="module"&gt; testing named exports and default export imports from math.js.</p>
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <p>Day 2 Linkific Internship Training &bull; Owner: Ronit Ahuja &bull; Monday, 26 October 2026</p>
+      </footer>
+    </div>
+  </body>
+</html>

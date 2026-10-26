@@ -85,13 +85,13 @@ Scoring per project: Must requirements 7 points (proportional), quality 2 points
 
 | ID | Pri | Criterion | How to verify | Status |
 |---|---|---|---|---|
-| PK-1 | P0 | Search by name and by ID shows the full card | Try `pikachu`, `Pikachu `, `25` | ☐ |
-| PK-2 | P0 | All five states visible; `response.ok` checked | Search `notapokemon` (404); toggle DevTools offline (error) | ☐ |
-| PK-3 | P0 | Browse grid with Load more, built from `.then/.catch/.finally` and `Promise.all` | Commands in section 5 | ☐ |
-| PK-4 | P0 | Search uses `async/await` with `try/catch/finally` | Commands in section 5 | ☐ |
-| PK-5 | P0 | Cache prevents repeat requests | DevTools Network: search the same Pokémon twice, one request | ☐ |
-| PK-6 | P0 | Clicking a card shows detail | Click several | ☐ |
-| PK-7 to PK-10 | P1 | Type filter, debounce or button, stat bars, sort | Visual check | ☐ |
+| PK-1 | P0 | Search by name and by ID shows the full card | Try `pikachu`, `Pikachu `, `25` | ☑ |
+| PK-2 | P0 | All five states visible; `response.ok` checked | Search `notapokemon` (404); toggle DevTools offline (error) | ☑ |
+| PK-3 | P0 | Browse grid with Load more, built from `.then/.catch/.finally` and `Promise.all` | Commands in section 5 | ☑ |
+| PK-4 | P0 | Search uses `async/await` with `try/catch/finally` | Commands in section 5 | ☑ |
+| PK-5 | P0 | Cache prevents repeat requests | DevTools Network: search the same Pokémon twice, one request | ☑ |
+| PK-6 | P0 | Clicking a card shows detail | Click several | ☑ |
+| PK-7 to PK-10 | P1 | Type filter, debounce or button, stat bars, sort | Visual check | ☑ |
 
 **Flashcards (FC)**
 

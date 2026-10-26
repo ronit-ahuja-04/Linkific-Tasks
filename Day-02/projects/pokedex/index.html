@@ -1,1 +1,113 @@
-<!-- pokedex index.html placeholder -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokédex Explorer - Day 2</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="pokedex-app">
+      <header class="app-header">
+        <nav class="top-nav">
+          <a href="../index.html" class="nav-back-link">&larr; Projects Hub</a>
+          <span class="badge-tag">PokeAPI Integration</span>
+        </nav>
+        <h1 class="app-title">Pokédex Explorer</h1>
+        <p class="app-subtitle">
+          Search Pokémon by name or ID, view full base stats, and browse with offset pagination.
+        </p>
+
+        <!-- Search Bar -->
+        <section class="search-section" aria-label="Pokémon Search">
+          <form id="search-form" class="search-form" novalidate>
+            <div class="search-input-wrapper">
+              <label for="search-input" class="sr-only">Search by Pokémon Name or ID:</label>
+              <input
+                type="search"
+                id="search-input"
+                class="search-input"
+                placeholder="Search by name (e.g. charizard) or ID (e.g. 25)..."
+                autocomplete="off"
+                required
+              />
+            </div>
+            <button type="submit" id="btn-search" class="btn btn-primary">Search</button>
+          </form>
+        </section>
+
+        <!-- Application State Banner (PK-2: idle, loading, success, notFound, error) -->
+        <div id="state-container" class="status-card" hidden role="status" aria-live="polite"></div>
+      </header>
+
+      <main class="main-layout">
+        <!-- Pokémon Detail Card Section (PK-1, PK-9) -->
+        <section id="detail-section" class="detail-section" aria-label="Pokémon Detail Card" hidden>
+          <div id="detail-card" class="detail-card">
+            <!-- Rendered by ui.js -->
+          </div>
+        </section>
+
+        <!-- Browse Grid Section (PK-3) -->
+        <section id="grid-section" class="grid-section" aria-label="Browse Pokémon Grid">
+          <div class="grid-controls-bar">
+            <h2 class="section-title">Explore Pokémon</h2>
+
+            <div class="filters-row">
+              <!-- Type Filter (PK-7) -->
+              <div class="filter-group">
+                <label for="type-filter">Type:</label>
+                <select id="type-filter" class="select-control">
+                  <option value="all">All Types</option>
+                  <option value="normal">Normal</option>
+                  <option value="fire">Fire</option>
+                  <option value="water">Water</option>
+                  <option value="grass">Grass</option>
+                  <option value="electric">Electric</option>
+                  <option value="ice">Ice</option>
+                  <option value="fighting">Fighting</option>
+                  <option value="poison">Poison</option>
+                  <option value="ground">Ground</option>
+                  <option value="flying">Flying</option>
+                  <option value="psychic">Psychic</option>
+                  <option value="bug">Bug</option>
+                  <option value="rock">Rock</option>
+                  <option value="ghost">Ghost</option>
+                  <option value="dragon">Dragon</option>
+                  <option value="fairy">Fairy</option>
+                </select>
+              </div>
+
+              <!-- Sort Selector (PK-10) -->
+              <div class="filter-group">
+                <label for="sort-select">Sort By:</label>
+                <select id="sort-select" class="select-control">
+                  <option value="id">ID (Ascending)</option>
+                  <option value="name">Name (A–Z)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cards Grid -->
+          <div id="pokemon-grid" class="pokemon-grid" role="region" aria-label="Loaded Pokémon Cards">
+            <!-- Cards rendered dynamically via ui.js -->
+          </div>
+
+          <!-- Pagination: Load More Button -->
+          <div class="load-more-container">
+            <button type="button" id="btn-load-more" class="btn btn-secondary">
+              Load More Pokémon
+            </button>
+          </div>
+        </section>
+      </main>
+
+      <footer class="app-footer">
+        <p>Day 2 Linkific Training &bull; Pokédex &bull; Dual Async Paradigms & PokeAPI</p>
+      </footer>
+    </div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
