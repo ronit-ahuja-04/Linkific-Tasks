@@ -2,6 +2,9 @@
 import { fetchRepos } from './github.js';
 import { formatApiError } from './errors.js';
 import { generateReport } from './report.js';
+import legacyBannerModule from './legacy.cjs';
+
+const { getSystemBanner, formatBannerText } = legacyBannerModule;
 
 /**
  * Parses CLI arguments without external dependencies.
@@ -38,6 +41,9 @@ async function main() {
   }
 
   try {
+    const banner = getSystemBanner();
+    console.log(`\n${formatBannerText(banner)}`);
+
     const repos = await fetchRepos(username, undefined, includeAll);
     console.log(generateReport(username, repos));
   } catch (error) {
