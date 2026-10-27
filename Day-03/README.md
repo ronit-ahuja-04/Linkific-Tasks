@@ -92,5 +92,15 @@ Day-03/
 
 ---
 
+## 📚 Technical Documentation & Reports
+Detailed technical guides and internship audit logs available in `docs/`:
+* [📘 Git Practice Log & Scratchpad](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-03/docs/GIT_PRACTICE_LOG.md)
+* [⚔️ Merge Conflict Case Study](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-03/docs/CONFLICT_WALKTHROUGH.md)
+* [📦 Package Managers, Semver & Lockfiles Guide](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-03/docs/NPM_NOTES.md)
+* [🔄 CommonJS vs. ES Modules Architecture](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-03/docs/MODULES.md)
+* [✅ Pull Request Code Review Checklist](file:///Users/ronitahuja/.gemini/antigravity-ide/scratch/Linkific-Tasks/Day-03/docs/REVIEW_CHECKLIST.md)
+
+---
+
 ## 📄 License
 MIT © 2026 Ronit Ahuja
