@@ -1,0 +1,65 @@
+[
+  {
+    "name": "algo-visualizer",
+    "stargazers_count": 142,
+    "forks_count": 28,
+    "language": "JavaScript",
+    "pushed_at": "2026-10-20T10:15:00Z",
+    "fork": false,
+    "archived": false
+  },
+  {
+    "name": "react-flow-kit",
+    "stargazers_count": 89,
+    "forks_count": 12,
+    "language": "TypeScript",
+    "pushed_at": "2026-10-24T18:00:00Z",
+    "fork": false,
+    "archived": false
+  },
+  {
+    "name": "python-cli-toolkit",
+    "stargazers_count": 55,
+    "forks_count": 7,
+    "language": "Python",
+    "pushed_at": "2026-10-15T09:30:00Z",
+    "fork": false,
+    "archived": false
+  },
+  {
+    "name": "vanilla-game-engine",
+    "stargazers_count": 210,
+    "forks_count": 45,
+    "language": "JavaScript",
+    "pushed_at": "2026-10-26T21:45:00Z",
+    "fork": false,
+    "archived": false
+  },
+  {
+    "name": "docs-site-generator",
+    "stargazers_count": 12,
+    "forks_count": 2,
+    "language": null,
+    "pushed_at": "2026-09-01T12:00:00Z",
+    "fork": false,
+    "archived": false
+  },
+  {
+    "name": "upstream-fork-repo",
+    "stargazers_count": 500,
+    "forks_count": 100,
+    "language": "Go",
+    "pushed_at": "2026-10-25T14:00:00Z",
+    "fork": true,
+    "archived": false
+  },
+  {
+    "name": "deprecated-utility",
+    "stargazers_count": 30,
+    "forks_count": 4,
+    "language": "JavaScript",
+    "pushed_at": "2024-01-01T00:00:00Z",
+    "fork": false,
+    "archived": true
+  }
+]
