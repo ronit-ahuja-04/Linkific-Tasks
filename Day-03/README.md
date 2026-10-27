@@ -26,7 +26,14 @@ npm install
 ```
 
 ### Basic Usage
-Run the CLI tool directly with any public GitHub handle:
+
+| Command | Options | Purpose |
+|---|---|---|
+| `npm start -- <username>` | Default | Generates public repository analysis |
+| `npm start -- <username> --all` | `--all` | Includes forks and archived repositories |
+| `npm run dev -- <username>` | `--all` | Runs CLI in active watch mode with nodemon |
+
+#### Quick Examples:
 * `npm start -- torvalds` - Generate report for Linus Torvalds
 * `npm start -- gaearon --all` - Generate report including forks and archived repos
 * `npm start -- ronit-ahuja-04` - View personal repository metrics
