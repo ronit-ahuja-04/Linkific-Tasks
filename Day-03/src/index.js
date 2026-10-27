@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { fetchRepos } from './github.js';
 import { formatApiError } from './errors.js';
+import { generateReport } from './report.js';
 
 /**
  * Parses CLI arguments without external dependencies.
@@ -38,10 +39,7 @@ async function main() {
 
   try {
     const repos = await fetchRepos(username, undefined, includeAll);
-    console.log(`\n========================================`);
-    console.log(`  GitHub Repository Report: ${username}`);
-    console.log(`  Total active repositories fetched: ${repos.length}`);
-    console.log(`========================================\n`);
+    console.log(generateReport(username, repos));
   } catch (error) {
     console.error(formatApiError(error, username));
     process.exit(1);
