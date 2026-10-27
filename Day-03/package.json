@@ -23,5 +23,8 @@
     "reports"
   ],
   "author": "Ronit Ahuja <ahuja.ronit.0510@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.21.0"
+  }
 }
