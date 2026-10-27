@@ -1,4 +1,6 @@
 import lodash from 'lodash';
+import { formatPushed } from './dates.js';
+
 const { groupBy, orderBy, sumBy } = lodash;
 
 /**
@@ -46,7 +48,7 @@ export function summarise(repos = []) {
 }
 
 /**
- * Formats a single repository line for terminal output.
+ * Formats a single repository line for terminal output with date information.
  *
  * @param {object} repo
  * @returns {string} Formatted line
@@ -54,8 +56,8 @@ export function summarise(repos = []) {
 export function formatRepoLine(repo) {
   const stars = `★ ${repo.stargazers_count || 0}`.padEnd(8);
   const forks = `⑂ ${repo.forks_count || 0}`.padEnd(8);
-  const pushed = repo.pushed_at ? repo.pushed_at.slice(0, 10) : 'unknown';
-  return `  • ${repo.name.padEnd(30)} ${stars} ${forks} (Last pushed: ${pushed})`;
+  const dateInfo = formatPushed(repo.pushed_at);
+  return `  • ${repo.name.padEnd(28)} ${stars} ${forks} (Updated: ${dateInfo.formatted})`;
 }
 
 /**
@@ -69,7 +71,6 @@ export function generateReport(username, repos = []) {
   const summary = summarise(repos);
   const grouped = groupByLanguage(repos);
 
-  // Sort language sections by repo count descending
   const sortedLanguages = orderBy(
     Object.keys(grouped),
     [(lang) => grouped[lang].length],
