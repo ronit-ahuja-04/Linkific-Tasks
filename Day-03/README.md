@@ -26,9 +26,10 @@ npm install
 ```
 
 ### Basic Usage
-```bash
-npm start -- <username>
-```
+Run the CLI tool directly with any public GitHub handle:
+* `npm start -- torvalds` - Generate report for Linus Torvalds
+* `npm start -- gaearon --all` - Generate report including forks and archived repos
+* `npm start -- ronit-ahuja-04` - View personal repository metrics
 
 ---
 
