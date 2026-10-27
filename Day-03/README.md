@@ -26,9 +26,11 @@ npm install
 ```
 
 ### Basic Usage
-```bash
-npm start -- <username>
-```
+| Command | Options | Purpose |
+|---|---|---|
+| `npm start -- <username>` | Default | Generates public repository analysis |
+| `npm start -- <username> --all` | `--all` | Includes forks and archived repositories |
+| `npm run dev -- <username>` | `--all` | Runs CLI in active watch mode with nodemon |
 
 ---
 
