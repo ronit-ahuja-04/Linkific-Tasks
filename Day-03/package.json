@@ -25,6 +25,7 @@
   "author": "Ronit Ahuja <ahuja.ronit.0510@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "axios": "^1.21.0"
+    "axios": "^1.21.0",
+    "lodash": "^4.18.1"
   }
 }
