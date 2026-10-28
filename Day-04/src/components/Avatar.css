@@ -13,7 +13,8 @@
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--border-color, #334155);
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 .avatar-fallback {
@@ -27,56 +28,57 @@
   justify-content: center;
   font-weight: 700;
   letter-spacing: 0.05em;
-  border: 2px solid var(--border-color, #334155);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 /* Sizing */
 .avatar-size-sm {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
 }
 .avatar-size-sm .avatar-fallback {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
 }
 
 .avatar-size-md {
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
 }
 .avatar-size-md .avatar-fallback {
   font-size: 0.95rem;
 }
 
 .avatar-size-lg {
-  width: 56px;
-  height: 56px;
+  width: 58px;
+  height: 58px;
 }
 .avatar-size-lg .avatar-fallback {
   font-size: 1.15rem;
 }
 
 .avatar-size-xl {
-  width: 72px;
-  height: 72px;
+  width: 76px;
+  height: 76px;
 }
 .avatar-size-xl .avatar-fallback {
-  font-size: 1.5rem;
+  font-size: 1.55rem;
 }
 
 /* Status Dot */
 .avatar-status {
   position: absolute;
-  bottom: 0;
-  right: 0;
-  width: 12px;
-  height: 12px;
+  bottom: 0px;
+  right: 0px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
-  border: 2px solid var(--bg-card, #1e293b);
+  border: 2.5px solid #0d121f;
 }
 
 .avatar-status-online {
   background-color: var(--success, #10b981);
-  box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8);
 }
 
 .avatar-status-offline {

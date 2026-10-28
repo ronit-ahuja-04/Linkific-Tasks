@@ -7,7 +7,6 @@ import ProductList from './components/ProductList';
 import BlogPostList from './components/BlogPostList';
 import JsxFeaturesDemo from './components/JsxFeaturesDemo';
 import PropTypesDemoCard from './components/PropTypesDemoCard';
-import FlashcardList from './components/FlashcardList';
 import Footer from './components/Footer';
 
 import usersData from './data/users';
@@ -19,11 +18,11 @@ import './App.css';
 /**
  * App (Root Component)
  *
- * Demonstrates:
+ * DevHub Developer Platform:
  * - High-level component tree composition and hierarchy
- * - 16+ distinct modular React components working harmoniously
+ * - 16 distinct modular React components working harmoniously
  * - Clean prop delegation, callbacks, state filtering, and slot composition
- * - Day 2 Flashcards Rebuild (imperative vs declarative comparison)
+ * - Unidirectional data flow and pure derived state
  */
 function App() {
   const [filterOnlineOnly, setFilterOnlineOnly] = useState(false);
@@ -33,12 +32,11 @@ function App() {
 
   // Navigation items for Navbar (complex array prop)
   const navLinks = [
-    { id: 'nav-community', label: 'Community', href: '#community' },
-    { id: 'nav-store', label: 'Store', href: '#store' },
-    { id: 'nav-articles', label: 'Articles', href: '#articles' },
-    { id: 'nav-jsx', label: 'JSX Demo', href: '#jsx-rules' },
-    { id: 'nav-proptypes', label: 'PropTypes', href: '#proptypes' },
-    { id: 'nav-flashcards', label: 'Day 2 Rebuild', href: '#flashcards' },
+    { id: 'nav-network', label: 'Network', href: '#network' },
+    { id: 'nav-tooling', label: 'Tooling', href: '#tooling' },
+    { id: 'nav-publications', label: 'Publications', href: '#publications' },
+    { id: 'nav-jsx-studio', label: 'JSX Studio', href: '#jsx-studio' },
+    { id: 'nav-contracts', label: 'Type Safety', href: '#type-safety' },
   ];
 
   // Filtered users demonstrating pure derived state without extra re-renders
@@ -66,7 +64,7 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* 1. Navbar primitive */}
+      {/* 1. Header & Navigation primitive */}
       <Navbar
         brand="DevHub"
         links={navLinks}
@@ -84,51 +82,73 @@ function App() {
       {/* Hero Header */}
       <header className="app-hero">
         <div className="hero-content">
-          <span className="hero-badge">React 19 &bull; Vite &bull; 16 Components &bull; Clean Architecture</span>
-          <h1 className="hero-title">Developer Hub Showcase</h1>
+          <span className="hero-badge">✦ NEXT-GENERATION DEVELOPER PLATFORM</span>
+          <h1 className="hero-title">Where World-Class Engineers Build & Ship</h1>
           <p className="hero-subtitle">
-            A comprehensive modular React application demonstrating components,
-            props flow, conditional rendering, list reconciliation, and JSX rules.
+            DevHub unifies specialized developer networking, curated production tooling,
+            deep architectural publications, and real-time interactive runtime sandboxes.
           </p>
           <div className="hero-actions">
             <Button
               variant="primary"
               size="md"
               onClick={() => {
-                const el = document.getElementById('community');
+                const el = document.getElementById('network');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Explore Community ({usersData.length})
+              Explore Network ({usersData.length})
             </Button>
             <Button
               variant="outline"
               size="md"
               onClick={() => {
-                const el = document.getElementById('flashcards');
+                const el = document.getElementById('tooling');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Day 2 Rebuild &amp; Standup Story
+              Browse Tooling
             </Button>
+          </div>
+
+          <div className="hero-metrics-strip">
+            <div className="metric-item">
+              <span className="metric-value">6+</span>
+              <span className="metric-label">Verified Architects</span>
+            </div>
+            <div className="metric-divider"></div>
+            <div className="metric-item">
+              <span className="metric-value">6</span>
+              <span className="metric-label">Curated Toolkits</span>
+            </div>
+            <div className="metric-divider"></div>
+            <div className="metric-item">
+              <span className="metric-value">4</span>
+              <span className="metric-label">Technical Publications</span>
+            </div>
+            <div className="metric-divider"></div>
+            <div className="metric-item">
+              <span className="metric-value">100%</span>
+              <span className="metric-label">Type-Safe Contracts</span>
+            </div>
           </div>
         </div>
       </header>
 
       {/* Main Content Sections */}
       <main className="app-main">
-        {/* Section 1: Community Members (UserCard & UserList) */}
-        <section id="community" className="app-section">
+        {/* Section 1: Engineering Network (UserCard & UserList) */}
+        <section id="network" className="app-section">
           <SectionHeader
-            title="Community Members"
-            subtitle="Demonstrating list rendering with stable keys (key={user.id}), simple props, and conditional status rendering."
+            title="Engineering Network"
+            subtitle="Discover and collaborate with verified staff engineers, distributed systems specialists, and core frontend architects."
             action={
               <Button
                 variant={filterOnlineOnly ? 'primary' : 'outline'}
                 size="sm"
                 onClick={() => setFilterOnlineOnly((prev) => !prev)}
               >
-                {filterOnlineOnly ? 'Showing Online Only' : 'Show All Members'}
+                {filterOnlineOnly ? 'Showing Active Now' : 'Filter: Active Now'}
               </Button>
             }
           />
@@ -139,18 +159,18 @@ function App() {
           />
         </section>
 
-        {/* Section 2: Developer Store & Assets (ProductCard, ProductList, EmptyState) */}
-        <section id="store" className="app-section">
+        {/* Section 2: Curated Developer Tooling (ProductCard, ProductList, EmptyState) */}
+        <section id="tooling" className="app-section">
           <SectionHeader
-            title="Developer Tools & Assets"
-            subtitle="Demonstrating complex object props, nested array tags, stock badges, and conditional EmptyState fallback."
+            title="Curated Developer Tooling"
+            subtitle="Production starter kits, architectural blueprints, enterprise hardware, and field-tested developer assets."
             action={
               <Button
                 variant={simulateEmptyProducts ? 'danger' : 'secondary'}
                 size="sm"
                 onClick={() => setSimulateEmptyProducts((prev) => !prev)}
               >
-                {simulateEmptyProducts ? 'Restore Product Catalog' : 'Simulate Empty Catalog'}
+                {simulateEmptyProducts ? 'Restore Catalog' : 'Simulate Out of Stock'}
               </Button>
             }
           />
@@ -181,11 +201,11 @@ function App() {
           />
         </section>
 
-        {/* Section 3: Technical Blog Posts (BlogPostCard & BlogPostList) */}
-        <section id="articles" className="app-section">
+        {/* Section 3: Engineering Publications (BlogPostCard & BlogPostList) */}
+        <section id="publications" className="app-section">
           <SectionHeader
-            title="Engineering Articles"
-            subtitle="Demonstrating complex nested object props (author, tags, metadata), conditional badges, and list mapping with unique keys."
+            title="Engineering Publications"
+            subtitle="In-depth technical papers, architectural decision records, and frontend performance analyses from staff contributors."
           />
 
           <BlogPostList
@@ -194,40 +214,30 @@ function App() {
           />
         </section>
 
-        {/* Section 4: JSX Syntax Masterclass (JsxFeaturesDemo) */}
-        <section id="jsx-rules" className="app-section">
+        {/* Section 4: Interactive JSX Compilation Studio (JsxFeaturesDemo) */}
+        <section id="jsx-studio" className="app-section">
           <SectionHeader
-            title="Interactive JSX Masterclass"
-            subtitle="Interactive playground demonstrating className, htmlFor, embedded JS expressions, fragments, comments, and the critical zero-count gotcha."
+            title="Interactive JSX Compilation Studio"
+            subtitle="Live exploration of JSX transpilation semantics, safe expression interpolation, fragment reconciliations, and runtime evaluation boundaries."
           />
 
           <JsxFeaturesDemo />
         </section>
 
-        {/* Section 5: PropTypes in React 19 (PropTypesDemoCard) */}
-        <section id="proptypes" className="app-section">
+        {/* Section 5: Schema & Contract Verification Console (PropTypesDemoCard) */}
+        <section id="type-safety" className="app-section">
           <SectionHeader
-            title="Runtime Prop Validation"
-            subtitle="Demonstrating PropTypes schema definition and why React 19 silently ignores propTypes, requiring explicit manual verification via checkPropTypes."
+            title="Schema & Contract Verification Console"
+            subtitle="Runtime prop contract auditing and development validation suite ensuring robust component API compliance."
           />
 
           <PropTypesDemoCard />
         </section>
-
-        {/* Section 6: Day 2 Rebuild (FlashcardList & FlashcardCard) */}
-        <section id="flashcards" className="app-section">
-          <SectionHeader
-            title="Day 2 Rebuild · JavaScript Flashcards"
-            subtitle="Rebuilding Day 2's DOM project into declarative React 19 components with a direct imperative vs declarative comparison for standup."
-          />
-
-          <FlashcardList />
-        </section>
       </main>
 
-      {/* 7. Semantic Footer */}
+      {/* Semantic Footer */}
       <Footer
-        text="DevHub · Modular React 19 architecture built with Vite for Linkific Day 4 React Basics."
+        text="DevHub Platform · High-velocity developer ecosystem built with React 19, Vite, and modular component architecture."
         year={new Date().getFullYear()}
       />
     </div>
