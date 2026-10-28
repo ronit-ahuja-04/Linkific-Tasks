@@ -6,6 +6,7 @@ import UserList from './components/UserList';
 import ProductList from './components/ProductList';
 import BlogPostList from './components/BlogPostList';
 import JsxFeaturesDemo from './components/JsxFeaturesDemo';
+import PropTypesDemoCard from './components/PropTypesDemoCard';
 import Footer from './components/Footer';
 
 import usersData from './data/users';
@@ -19,7 +20,7 @@ import './App.css';
  *
  * Demonstrates:
  * - High-level component tree composition and hierarchy
- * - 16 distinct modular React components working harmoniously
+ * - 16+ distinct modular React components working harmoniously
  * - Clean prop delegation, callbacks, state filtering, and slot composition
  */
 function App() {
@@ -34,6 +35,7 @@ function App() {
     { id: 'nav-store', label: 'Store', href: '#store' },
     { id: 'nav-articles', label: 'Articles', href: '#articles' },
     { id: 'nav-jsx', label: 'JSX Demo', href: '#jsx-rules' },
+    { id: 'nav-proptypes', label: 'PropTypes', href: '#proptypes' },
   ];
 
   // Filtered users demonstrating pure derived state without extra re-renders
@@ -100,11 +102,11 @@ function App() {
               variant="outline"
               size="md"
               onClick={() => {
-                const el = document.getElementById('articles');
+                const el = document.getElementById('proptypes');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              Technical Articles ({postsData.length})
+              PropTypes in React 19
             </Button>
           </div>
         </div>
@@ -198,9 +200,19 @@ function App() {
 
           <JsxFeaturesDemo />
         </section>
+
+        {/* Section 5: PropTypes in React 19 (PropTypesDemoCard) */}
+        <section id="proptypes" className="app-section">
+          <SectionHeader
+            title="Runtime Prop Validation"
+            subtitle="Demonstrating PropTypes schema definition and why React 19 silently ignores propTypes, requiring explicit manual verification via checkPropTypes."
+          />
+
+          <PropTypesDemoCard />
+        </section>
       </main>
 
-      {/* 5. Semantic Footer */}
+      {/* 6. Semantic Footer */}
       <Footer
         text="DevHub · Modular React 19 architecture built with Vite for Linkific Day 4 React Basics."
         year={new Date().getFullYear()}
