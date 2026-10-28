@@ -1,83 +1,78 @@
 import { useState } from 'react';
 import Card from './Card';
 import Button from './Button';
+import Badge from './Badge';
 import './JsxFeaturesDemo.css';
 
 /**
- * JsxFeaturesDemo component thoroughly covering all core JSX syntax rules:
- * 1. `className` instead of `class`
- * 2. `htmlFor` instead of `for`
- * 3. `{}` JavaScript expressions (math, variables, functions, ternary, style objects)
- * 4. React Fragments (<> ... </>) to return siblings without wrapper DOM nodes
- * 5. JSX Comments: {/* comment syntax *\/}
- * 6. Mandatory Self-Closing tags: <input />, <hr />, <img />, <br />
- * 7. Capitalized component naming convention
- * 8. JSX Gotcha: `{count && <Component />}` rendering literal `0` when count is 0
+ * JsxFeaturesDemo
+ * Interactive React compilation playground illustrating core JSX syntax principles
+ * and real-time element evaluation.
  */
 function JsxFeaturesDemo() {
   const [userName, setUserName] = useState('Ronit');
   const [count, setCount] = useState(0);
   const [showExplanation, setShowExplanation] = useState(true);
 
-  // Expression variables for demonstration
   const frameworkName = 'React 19';
   const releaseYear = 2026;
   const currentYear = new Date().getFullYear();
-  const formatGreeting = (name) => `Hello, ${name || 'developer'}!`;
+  const formatGreeting = (name) => `Welcome back, ${name || 'Engineer'}!`;
 
-  // Dynamic inline style object expression demonstration
   const highlightStyle = {
     color: '#38bdf8',
     fontWeight: 700,
     backgroundColor: 'rgba(56, 189, 248, 0.1)',
-    padding: '0.1rem 0.35rem',
+    border: '1px solid rgba(56, 189, 248, 0.25)',
+    padding: '0.15rem 0.45rem',
     borderRadius: '4px',
   };
 
   return (
     <Card className="jsx-demo-card" elevation="md">
       <div className="jsx-demo-intro">
-        <h3 className="jsx-demo-heading">JSX Fundamentals &amp; Syntax Rules</h3>
+        <Badge tone="primary" variant="subtle" dot>
+          Interactive Runtime
+        </Badge>
+        <h3 className="jsx-demo-heading">React 19 JSX Compilation Studio</h3>
         <p className="jsx-demo-description">
-          JSX is a syntax extension for JavaScript that compiles to React elements.
-          Below is an interactive proof of every foundational JSX syntax rule and common gotcha.
+          Experience how JSX transpiles into reactive virtual DOM elements.
+          Explore live attribute mapping, expression evaluation, fragment grouping, and evaluation edge cases.
         </p>
       </div>
 
       <div className="jsx-rules-grid">
-        {/* Rule 1: className instead of class */}
+        {/* Module 1: className */}
         <section className="jsx-rule-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag">Rule 1</span>
-            <h4><code>className</code> vs HTML <code>class</code></h4>
+            <span className="jsx-rule-tag">DOM Property</span>
+            <h4><code>className</code> Property Binding</h4>
           </div>
           <p className="jsx-rule-text">
-            Because <code>class</code> is a reserved keyword in JavaScript, React components use{' '}
-            <code>className</code> to assign CSS classes to DOM elements.
+            Because <code>class</code> is an ECMA keyword, JSX binds directly to the DOM property{' '}
+            <code>className</code> for zero-overhead class assignment.
           </p>
           <div className="jsx-rule-demo">
-            {/* JSX Comment: className is applied to the element below */}
             <div className="demo-box demo-box-active">
-              Applied: <code>className=&quot;demo-box demo-box-active&quot;</code>
+              Active Element: <code>className=&quot;demo-box demo-box-active&quot;</code>
             </div>
           </div>
         </section>
 
-        {/* Rule 2: htmlFor instead of for */}
+        {/* Module 2: htmlFor */}
         <section className="jsx-rule-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag">Rule 2</span>
-            <h4><code>htmlFor</code> for Label Attributes</h4>
+            <span className="jsx-rule-tag">Accessibility</span>
+            <h4><code>htmlFor</code> Input Association</h4>
           </div>
           <p className="jsx-rule-text">
-            Similarly, <code>for</code> is a reserved keyword (looping). In JSX, use{' '}
-            <code>htmlFor</code> to link a label to its corresponding input <code>id</code>.
+            Using <code>htmlFor</code> maps directly to the browser DOM <code>htmlFor</code> property,
+            ensuring full WCAG form accessibility.
           </p>
           <div className="jsx-rule-demo">
             <label htmlFor="jsx-demo-user-input" className="demo-input-label">
-              Enter your name (click label to focus input):
+              Developer Name (Click label to focus):
             </label>
-            {/* Rule 6: Self-closing tag <input /> */}
             <input
               id="jsx-demo-user-input"
               type="text"
@@ -89,15 +84,15 @@ function JsxFeaturesDemo() {
           </div>
         </section>
 
-        {/* Rule 3: {} JavaScript Expressions */}
+        {/* Module 3: {} Expressions */}
         <section className="jsx-rule-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag">Rule 3</span>
-            <h4><code>{'{ }'}</code> Embedded JS Expressions</h4>
+            <span className="jsx-rule-tag">Reactivity</span>
+            <h4><code>{'{ }'}</code> Embedded Expressions</h4>
           </div>
           <p className="jsx-rule-text">
-            Inside JSX, anything inside curly braces is evaluated as a pure JavaScript expression:
-            variables, arithmetic, function calls, and style objects.
+            Any valid JavaScript expression evaluates inside JSX: arithmetic calculations, pure function
+            returns, dynamic variables, and style descriptors.
           </p>
           <div className="jsx-rule-demo">
             <ul className="demo-list">
@@ -105,68 +100,65 @@ function JsxFeaturesDemo() {
                 <strong>Arithmetic:</strong> 25 &times; 4 + 2 = {25 * 4 + 2}
               </li>
               <li>
-                <strong>Function Call:</strong> {formatGreeting(userName)}
+                <strong>Dynamic Function:</strong> {formatGreeting(userName)}
               </li>
               <li>
-                <strong>Variable &amp; Math:</strong> {frameworkName} ({releaseYear} -{' '}
-                {releaseYear - currentYear === 0 ? 'Current Version' : 'Upcoming'})
+                <strong>Runtime State:</strong> {frameworkName} ({releaseYear} -{' '}
+                {releaseYear - currentYear === 0 ? 'Current' : 'LTS'})
               </li>
               <li>
                 <strong>Style Object:</strong>{' '}
-                <span style={highlightStyle}>Evaluated from style={`{highlightStyle}`}</span>
+                <span style={highlightStyle}>style={`{highlightStyle}`}</span>
               </li>
             </ul>
           </div>
         </section>
 
-        {/* Rule 4: Fragments (<> ... </>) */}
+        {/* Module 4: Fragments */}
         <section className="jsx-rule-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag">Rule 4</span>
-            <h4>React Fragments (<code>&lt;&gt; ... &lt;/&gt;</code>)</h4>
+            <span className="jsx-rule-tag">DOM Optimization</span>
+            <h4>Zero-DOM Fragments (<code>&lt;&gt; ... &lt;/&gt;</code>)</h4>
           </div>
           <p className="jsx-rule-text">
-            JSX requires components to return a single root element. React Fragments let you group
-            children without adding extra DOM nodes.
+            Fragments bundle multiple adjacent elements without injecting unwanted layout wrapper
+            <code>&lt;div&gt;</code> tags into the DOM tree.
           </p>
           <div className="jsx-rule-demo">
-            {/* Fragment grouping 2 siblings with no wrapper DOM element */}
             <>
-              <div className="demo-fragment-item">Fragment Sibling Alpha</div>
-              <div className="demo-fragment-item">Fragment Sibling Beta</div>
+              <div className="demo-fragment-item">Fragment Node Alpha</div>
+              <div className="demo-fragment-item">Fragment Node Beta</div>
             </>
           </div>
         </section>
 
-        {/* Rule 5: Self-Closing Tags */}
+        {/* Module 5: Self-Closing Tags */}
         <section className="jsx-rule-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag">Rule 5</span>
-            <h4>Strict Self-Closing Tags</h4>
+            <span className="jsx-rule-tag">XML Strictness</span>
+            <h4>Mandatory Self-Closing Tags</h4>
           </div>
           <p className="jsx-rule-text">
-            In JSX, void tags that have no children must explicitly self-close with{' '}
-            <code>/&gt;</code> (e.g., <code>&lt;img /&gt;</code>, <code>&lt;input /&gt;</code>,{' '}
-            <code>&lt;hr /&gt;</code>).
+            Void HTML elements must strictly self-close with <code>/&gt;</code> for reliable AST parsing
+            by the React compiler.
           </p>
           <div className="jsx-rule-demo">
-            <p>Upper section before horizontal rule</p>
-            {/* Self-closing <hr /> */}
+            <p className="demo-note">Top segment before divider</p>
             <hr className="demo-divider" />
-            <p>Lower section after self-closed <code>&lt;hr /&gt;</code></p>
+            <p className="demo-note">Bottom segment after self-closing <code>&lt;hr /&gt;</code></p>
           </div>
         </section>
 
-        {/* Rule 6: JSX Gotcha - The `count && <Element />` zero trap */}
+        {/* Module 6: Falsy Gotcha */}
         <section className="jsx-rule-item jsx-gotcha-item">
           <div className="jsx-rule-header">
-            <span className="jsx-rule-tag tag-warning">Critical Gotcha</span>
-            <h4>Conditional Rendering with <code>0</code></h4>
+            <Badge tone="warning" variant="solid">Evaluation Trap</Badge>
+            <h4>Conditional Zero Evaluation (<code>count && &lt;Badge /&gt;</code>)</h4>
           </div>
           <p className="jsx-rule-text">
-            In JavaScript, <code>0 &amp;&amp; &lt;div&gt;</code> evaluates to <strong>0</strong>,
-            not false! If count is <code>0</code>, React prints a literal <code>0</code> on screen.
-            Always use <code>count &gt; 0 &amp;&amp; ...</code> or <code>Boolean(count) &amp;&amp; ...</code>.
+            In JavaScript, <code>0 &amp;&amp; &lt;UI /&gt;</code> short-circuits to the number <strong>0</strong>,
+            causing React to render a raw <code>0</code> on screen. Always enforce boolean comparisons:
+            <code>count &gt; 0 &amp;&amp; ...</code>.
           </p>
           <div className="jsx-rule-demo">
             <div className="demo-counter-controls">
@@ -177,7 +169,10 @@ function JsxFeaturesDemo() {
               >
                 &minus; Decrement
               </Button>
-              <span className="demo-counter-value">Count: {count}</span>
+              <div className="demo-counter-badge">
+                <span className="counter-label">Active Count:</span>
+                <span className="counter-value">{count}</span>
+              </div>
               <Button
                 variant="primary"
                 size="sm"
@@ -189,18 +184,16 @@ function JsxFeaturesDemo() {
 
             <div className="demo-comparison-box">
               <div className="comparison-col comparison-bad">
-                <span className="comparison-label">❌ Buggy Pattern: <code>{'{count && <Badge />}'}</code></span>
+                <span className="comparison-label">❌ Buggy Syntax: <code>{'{count && <Badge />}'}</code></span>
                 <div className="comparison-result">
-                  {/* BUG DEMO: If count === 0, renders raw 0 */}
-                  {count && <span className="demo-alert-badge">Unread notifications!</span>}
+                  {count && <span className="demo-alert-badge">New Alert</span>}
                 </div>
               </div>
 
               <div className="comparison-col comparison-good">
-                <span className="comparison-label">✅ Safe Pattern: <code>{'{count > 0 && <Badge />}'}</code></span>
+                <span className="comparison-label">✅ Robust Syntax: <code>{'{count > 0 && <Badge />}'}</code></span>
                 <div className="comparison-result">
-                  {/* SAFE DEMO: When count === 0, renders nothing */}
-                  {count > 0 && <span className="demo-alert-badge">Unread notifications!</span>}
+                  {count > 0 && <span className="demo-alert-badge">New Alert</span>}
                 </div>
               </div>
             </div>
@@ -214,14 +207,13 @@ function JsxFeaturesDemo() {
           size="sm"
           onClick={() => setShowExplanation((prev) => !prev)}
         >
-          {showExplanation ? 'Hide JSX Summary' : 'Show JSX Summary'}
+          {showExplanation ? 'Hide Engine Insights' : 'Show Engine Insights'}
         </Button>
         {showExplanation && (
           <p className="jsx-summary-text">
-            💡 JSX is transformed by Vite into <code>React.createElement</code> or the modern JSX
-            runtime calls. React components must be capitalized (e.g.{' '}
-            <code>&lt;JsxFeaturesDemo /&gt;</code>) so JSX differentiates custom components from
-            native HTML tags.
+            💡 <strong>Compiler Architecture:</strong> Modern JSX is transpiled via the React 19 JSX runtime
+            into optimized element descriptors. Custom components must begin with a capital letter
+            to prevent conflicts with native HTML tags.
           </p>
         )}
       </div>
