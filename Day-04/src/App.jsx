@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Navbar from './components/Navbar';
 import Button from './components/Button';
+import SectionHeader from './components/SectionHeader';
 import UserList from './components/UserList';
 import ProductList from './components/ProductList';
 import BlogPostList from './components/BlogPostList';
@@ -18,9 +19,8 @@ import './App.css';
  *
  * Demonstrates:
  * - High-level component tree composition and hierarchy
- * - Passing array, object, and function callback props down to child components
- * - Managing active view state and interactive filter toggles
- * - Composing modular React components cleanly
+ * - 16 distinct modular React components working harmoniously
+ * - Clean prop delegation, callbacks, state filtering, and slot composition
  */
 function App() {
   const [filterOnlineOnly, setFilterOnlineOnly] = useState(false);
@@ -79,7 +79,7 @@ function App() {
       {/* Hero Header */}
       <header className="app-hero">
         <div className="hero-content">
-          <span className="hero-badge">React 19 &bull; Vite &bull; Component Architecture</span>
+          <span className="hero-badge">React 19 &bull; Vite &bull; 16 Components &bull; Clean Architecture</span>
           <h1 className="hero-title">Developer Hub Showcase</h1>
           <p className="hero-subtitle">
             A comprehensive modular React application demonstrating components,
@@ -114,15 +114,10 @@ function App() {
       <main className="app-main">
         {/* Section 1: Community Members (UserCard & UserList) */}
         <section id="community" className="app-section">
-          <div className="section-header-row">
-            <div>
-              <h2 className="section-title">Community Members</h2>
-              <p className="section-description">
-                Demonstrating list rendering with stable keys (<code>key={`{user.id}`}</code>),
-                simple props, and conditional status rendering.
-              </p>
-            </div>
-            <div className="section-controls">
+          <SectionHeader
+            title="Community Members"
+            subtitle="Demonstrating list rendering with stable keys (key={user.id}), simple props, and conditional status rendering."
+            action={
               <Button
                 variant={filterOnlineOnly ? 'primary' : 'outline'}
                 size="sm"
@@ -130,8 +125,8 @@ function App() {
               >
                 {filterOnlineOnly ? 'Showing Online Only' : 'Show All Members'}
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           <UserList
             users={displayedUsers}
@@ -141,15 +136,10 @@ function App() {
 
         {/* Section 2: Developer Store & Assets (ProductCard, ProductList, EmptyState) */}
         <section id="store" className="app-section">
-          <div className="section-header-row">
-            <div>
-              <h2 className="section-title">Developer Tools &amp; Assets</h2>
-              <p className="section-description">
-                Demonstrating complex object props, nested array tags, stock badges,
-                and conditional EmptyState fallback.
-              </p>
-            </div>
-            <div className="section-controls">
+          <SectionHeader
+            title="Developer Tools & Assets"
+            subtitle="Demonstrating complex object props, nested array tags, stock badges, and conditional EmptyState fallback."
+            action={
               <Button
                 variant={simulateEmptyProducts ? 'danger' : 'secondary'}
                 size="sm"
@@ -157,8 +147,8 @@ function App() {
               >
                 {simulateEmptyProducts ? 'Restore Product Catalog' : 'Simulate Empty Catalog'}
               </Button>
-            </div>
-          </div>
+            }
+          />
 
           {!simulateEmptyProducts && (
             <div className="category-filter-bar">
@@ -188,15 +178,10 @@ function App() {
 
         {/* Section 3: Technical Blog Posts (BlogPostCard & BlogPostList) */}
         <section id="articles" className="app-section">
-          <div className="section-header-row">
-            <div>
-              <h2 className="section-title">Engineering Articles</h2>
-              <p className="section-description">
-                Demonstrating complex nested object props (author, tags, metadata),
-                conditional badges, and list mapping with unique keys.
-              </p>
-            </div>
-          </div>
+          <SectionHeader
+            title="Engineering Articles"
+            subtitle="Demonstrating complex nested object props (author, tags, metadata), conditional badges, and list mapping with unique keys."
+          />
 
           <BlogPostList
             posts={postsData}
@@ -206,15 +191,10 @@ function App() {
 
         {/* Section 4: JSX Syntax Masterclass (JsxFeaturesDemo) */}
         <section id="jsx-rules" className="app-section">
-          <div className="section-header-row">
-            <div>
-              <h2 className="section-title">Interactive JSX Masterclass</h2>
-              <p className="section-description">
-                Interactive playground demonstrating className, htmlFor, embedded JS expressions,
-                fragments, comments, and the critical zero-count gotcha.
-              </p>
-            </div>
-          </div>
+          <SectionHeader
+            title="Interactive JSX Masterclass"
+            subtitle="Interactive playground demonstrating className, htmlFor, embedded JS expressions, fragments, comments, and the critical zero-count gotcha."
+          />
 
           <JsxFeaturesDemo />
         </section>

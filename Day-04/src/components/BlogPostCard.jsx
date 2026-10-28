@@ -1,13 +1,14 @@
 import Card from './Card';
 import Button from './Button';
+import Avatar from './Avatar';
+import Badge from './Badge';
 import './BlogPostCard.css';
 
 /**
  * BlogPostCard component demonstrating:
  * - Complex nested props: `post` object containing nested `author` object, arrays, and booleans
  * - List rendering for post tags
- * - Conditional rendering: featured badge and author avatars
- * - Composition: wrapping layout in generic `Card`
+ * - Component composition: using `Avatar`, `Badge`, `Button`, and `Card`
  */
 function BlogPostCard({ post, onReadMore }) {
   if (!post) return null;
@@ -37,7 +38,11 @@ function BlogPostCard({ post, onReadMore }) {
       {coverImage && (
         <div className="blog-cover-wrapper">
           <img src={coverImage} alt={title} className="blog-cover-img" loading="lazy" />
-          {featured && <span className="blog-featured-badge">Featured Article</span>}
+          {featured && (
+            <div className="blog-featured-badge-slot">
+              <Badge tone="primary" variant="solid">Featured</Badge>
+            </div>
+          )}
         </div>
       )}
 
@@ -64,13 +69,11 @@ function BlogPostCard({ post, onReadMore }) {
 
       <div className="blog-card-footer">
         <div className="blog-author-box">
-          {author.avatar ? (
-            <img src={author.avatar} alt={author.name} className="blog-author-avatar" />
-          ) : (
-            <div className="blog-author-avatar-fallback">
-              {author.name ? author.name[0] : 'A'}
-            </div>
-          )}
+          <Avatar
+            name={author.name}
+            src={author.avatar}
+            size="sm"
+          />
           <div className="blog-author-info">
             <span className="blog-author-name">{author.name}</span>
             <span className="blog-author-role">{author.role}</span>
