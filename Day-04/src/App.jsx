@@ -7,6 +7,7 @@ import ProductList from './components/ProductList';
 import BlogPostList from './components/BlogPostList';
 import JsxFeaturesDemo from './components/JsxFeaturesDemo';
 import PropTypesDemoCard from './components/PropTypesDemoCard';
+import FlashcardList from './components/FlashcardList';
 import Footer from './components/Footer';
 
 import usersData from './data/users';
@@ -22,6 +23,7 @@ import './App.css';
  * - High-level component tree composition and hierarchy
  * - 16+ distinct modular React components working harmoniously
  * - Clean prop delegation, callbacks, state filtering, and slot composition
+ * - Day 2 Flashcards Rebuild (imperative vs declarative comparison)
  */
 function App() {
   const [filterOnlineOnly, setFilterOnlineOnly] = useState(false);
@@ -36,6 +38,7 @@ function App() {
     { id: 'nav-articles', label: 'Articles', href: '#articles' },
     { id: 'nav-jsx', label: 'JSX Demo', href: '#jsx-rules' },
     { id: 'nav-proptypes', label: 'PropTypes', href: '#proptypes' },
+    { id: 'nav-flashcards', label: 'Day 2 Rebuild', href: '#flashcards' },
   ];
 
   // Filtered users demonstrating pure derived state without extra re-renders
@@ -102,11 +105,11 @@ function App() {
               variant="outline"
               size="md"
               onClick={() => {
-                const el = document.getElementById('proptypes');
+                const el = document.getElementById('flashcards');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              PropTypes in React 19
+              Day 2 Rebuild &amp; Standup Story
             </Button>
           </div>
         </div>
@@ -210,9 +213,19 @@ function App() {
 
           <PropTypesDemoCard />
         </section>
+
+        {/* Section 6: Day 2 Rebuild (FlashcardList & FlashcardCard) */}
+        <section id="flashcards" className="app-section">
+          <SectionHeader
+            title="Day 2 Rebuild · JavaScript Flashcards"
+            subtitle="Rebuilding Day 2's DOM project into declarative React 19 components with a direct imperative vs declarative comparison for standup."
+          />
+
+          <FlashcardList />
+        </section>
       </main>
 
-      {/* 6. Semantic Footer */}
+      {/* 7. Semantic Footer */}
       <Footer
         text="DevHub · Modular React 19 architecture built with Vite for Linkific Day 4 React Basics."
         year={new Date().getFullYear()}
