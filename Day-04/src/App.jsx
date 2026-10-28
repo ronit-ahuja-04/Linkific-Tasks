@@ -3,11 +3,13 @@ import Navbar from './components/Navbar';
 import Button from './components/Button';
 import UserList from './components/UserList';
 import ProductList from './components/ProductList';
+import BlogPostList from './components/BlogPostList';
 import JsxFeaturesDemo from './components/JsxFeaturesDemo';
 import Footer from './components/Footer';
 
 import usersData from './data/users';
 import productsData from './data/products';
+import postsData from './data/posts';
 
 import './App.css';
 
@@ -18,7 +20,7 @@ import './App.css';
  * - High-level component tree composition and hierarchy
  * - Passing array, object, and function callback props down to child components
  * - Managing active view state and interactive filter toggles
- * - Composing 11 foundational React components cleanly
+ * - Composing modular React components cleanly
  */
 function App() {
   const [filterOnlineOnly, setFilterOnlineOnly] = useState(false);
@@ -30,6 +32,7 @@ function App() {
   const navLinks = [
     { id: 'nav-community', label: 'Community', href: '#community' },
     { id: 'nav-store', label: 'Store', href: '#store' },
+    { id: 'nav-articles', label: 'Articles', href: '#articles' },
     { id: 'nav-jsx', label: 'JSX Demo', href: '#jsx-rules' },
   ];
 
@@ -97,11 +100,11 @@ function App() {
               variant="outline"
               size="md"
               onClick={() => {
-                const el = document.getElementById('jsx-rules');
+                const el = document.getElementById('articles');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              JSX Masterclass
+              Technical Articles ({postsData.length})
             </Button>
           </div>
         </div>
@@ -183,7 +186,25 @@ function App() {
           />
         </section>
 
-        {/* Section 3: JSX Syntax Masterclass (JsxFeaturesDemo) */}
+        {/* Section 3: Technical Blog Posts (BlogPostCard & BlogPostList) */}
+        <section id="articles" className="app-section">
+          <div className="section-header-row">
+            <div>
+              <h2 className="section-title">Engineering Articles</h2>
+              <p className="section-description">
+                Demonstrating complex nested object props (author, tags, metadata),
+                conditional badges, and list mapping with unique keys.
+              </p>
+            </div>
+          </div>
+
+          <BlogPostList
+            posts={postsData}
+            onReadMore={(post) => alert(`Reading article: "${post.title}" by ${post.author.name}`)}
+          />
+        </section>
+
+        {/* Section 4: JSX Syntax Masterclass (JsxFeaturesDemo) */}
         <section id="jsx-rules" className="app-section">
           <div className="section-header-row">
             <div>
@@ -199,7 +220,7 @@ function App() {
         </section>
       </main>
 
-      {/* 4. Semantic Footer */}
+      {/* 5. Semantic Footer */}
       <Footer
         text="DevHub · Modular React 19 architecture built with Vite for Linkific Day 4 React Basics."
         year={new Date().getFullYear()}
