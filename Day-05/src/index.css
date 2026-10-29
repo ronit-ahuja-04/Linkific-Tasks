@@ -2007,3 +2007,517 @@ button:disabled {
     margin-bottom: 12px;
   }
 }
+
+/* ==========================================================================
+   Swag Shop Station & Thermal Receipt Styles (Design Spec Sec 5)
+   ========================================================================== */
+
+.swag-catalog-receipt-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 32px;
+  align-items: start;
+}
+
+.swag-products-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.column-heading-wrap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  border-bottom: 1px solid var(--color-rule);
+  padding-bottom: 8px;
+}
+
+.catalog-heading {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sample-disclaimer {
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+}
+
+.products-ruled-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.product-ruled-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.product-info-block {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.product-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.product-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.product-category-tag {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 2px 6px;
+  background-color: var(--color-lanyard-subtle);
+  color: var(--color-lanyard);
+  border-radius: 3px;
+}
+
+.product-description {
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+  line-height: 1.4;
+}
+
+.product-pricing-action {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.product-price {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-ink);
+  text-align: right;
+  min-width: 80px;
+}
+
+.btn-add-swag {
+  border: 1px solid var(--color-rule);
+  padding: 6px 14px;
+  min-height: 38px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  background-color: transparent;
+  color: var(--color-ink);
+}
+
+.btn-add-swag:hover:not(:disabled) {
+  background-color: var(--color-lanyard);
+  border-color: var(--color-lanyard);
+  color: #FFFFFF;
+}
+
+.cart-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  background-color: var(--color-lanyard-subtle);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Thermal Receipt Paper Container (Design Spec Sec 5)
+   ========================================================================== */
+
+.swag-receipt-column {
+  position: sticky;
+  top: 88px;
+}
+
+.thermal-receipt-card {
+  background-color: #FCFBF7;
+  color: #1A1A1A;
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.15);
+  border-left: 1px solid #EAE6DF;
+  border-right: 1px solid #EAE6DF;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-body);
+}
+
+.receipt-perforation-edge {
+  height: 8px;
+  width: 100%;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FCFBF7,
+    #FCFBF7 4px,
+    transparent 4px,
+    transparent 8px
+  );
+}
+
+.receipt-perforation-edge.top {
+  border-bottom: 1px dashed #D5CFC5;
+}
+
+.receipt-perforation-edge.bottom {
+  border-top: 1px dashed #D5CFC5;
+}
+
+.receipt-inner {
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.receipt-header-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.receipt-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #1A1A1A;
+}
+
+.receipt-brand {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.receipt-subtitle {
+  font-size: 0.68rem;
+  letter-spacing: 0.75px;
+  color: #666666;
+  font-weight: 600;
+}
+
+.receipt-date-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.72rem;
+  color: #777777;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+}
+
+.receipt-divider {
+  border-top: 1px dashed #D5CFC5;
+  width: 100%;
+}
+
+.receipt-divider.double {
+  border-top: 3px double #C4BCB0;
+}
+
+.receipt-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 28px 12px;
+  text-align: center;
+}
+
+.receipt-empty-icon {
+  color: #A0988A;
+}
+
+.receipt-empty-text {
+  font-size: 0.85rem;
+  color: #777777;
+  max-width: 220px;
+}
+
+.receipt-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.receipt-line-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.receipt-item-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.receipt-item-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1A1A1A;
+  line-height: 1.3;
+}
+
+.btn-receipt-remove {
+  background: transparent;
+  color: #999999;
+  padding: 2px;
+  min-width: 20px;
+  min-height: 20px;
+}
+
+.btn-receipt-remove:hover {
+  color: var(--color-signal);
+}
+
+.receipt-item-pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.receipt-qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-qty-step {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border: 1px solid #D5CFC5;
+  border-radius: 2px;
+  background-color: #FFFFFF;
+  color: #333333;
+  padding: 0;
+}
+
+.btn-qty-step:hover:not(:disabled) {
+  background-color: #EDE8DE;
+}
+
+.receipt-qty-count {
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 16px;
+  text-align: center;
+}
+
+.receipt-unit-price {
+  font-size: 0.72rem;
+  color: #777777;
+  margin-left: 4px;
+}
+
+.receipt-line-total {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #1A1A1A;
+}
+
+/* Coupon Entry Section */
+.receipt-coupon-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coupon-entry-form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.coupon-input-wrap {
+  display: flex;
+  gap: 6px;
+}
+
+.coupon-input {
+  flex: 1;
+  min-height: 34px;
+  height: 34px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  border: 1px solid #D5CFC5 !important;
+  background-color: #FFFFFF !important;
+  color: #1A1A1A !important;
+  text-transform: uppercase;
+}
+
+.coupon-input.coupon-input-error {
+  border-color: var(--color-signal) !important;
+}
+
+.btn-apply-coupon {
+  background-color: #1A1A1A;
+  color: #FFFFFF;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0 12px;
+  min-height: 34px;
+  height: 34px;
+}
+
+.applied-coupon-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background-color: #EBF8F2;
+  border: 1px solid #BFEBD6;
+  border-radius: var(--radius-control);
+  color: #0F7A64;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.coupon-icon {
+  margin-right: 6px;
+}
+
+.btn-remove-coupon {
+  background: transparent;
+  padding: 2px;
+  min-width: 20px;
+  min-height: 20px;
+  color: #0F7A64;
+}
+
+.coupon-error-message {
+  font-size: 0.75rem;
+  color: var(--color-signal);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Totals Breakdown */
+.receipt-totals-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.receipt-total-row {
+  display: flex;
+  justify-content: space-between;
+  color: #555555;
+}
+
+.receipt-total-row.discount-row {
+  color: #0F7A64;
+  font-weight: 600;
+}
+
+.grand-total-row {
+  border-top: 1px dashed #D5CFC5;
+  padding-top: 8px;
+  margin-top: 4px;
+  color: #1A1A1A;
+}
+
+.grand-total-label {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.grand-total-value {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+/* Place Order Button */
+.receipt-action-wrap {
+  margin-top: 6px;
+}
+
+.btn-place-order {
+  width: 100%;
+  background-color: #1A1A1A;
+  color: #FFFFFF;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.btn-place-order:hover:not(:disabled) {
+  background-color: #333333;
+}
+
+.receipt-footer-barcode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.receipt-barcode-lines {
+  width: 140px;
+  height: 24px;
+  background: repeating-linear-gradient(
+    90deg,
+    #1A1A1A,
+    #1A1A1A 2px,
+    transparent 2px,
+    transparent 3px,
+    #1A1A1A 3px,
+    #1A1A1A 6px,
+    transparent 6px,
+    transparent 8px
+  );
+}
+
+.receipt-barcode-code {
+  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  color: #888888;
+}
+
+@media (max-width: 1023px) {
+  .swag-catalog-receipt-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .swag-receipt-column {
+    position: static;
+    margin-top: 16px;
+  }
+}
