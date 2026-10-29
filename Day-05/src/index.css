@@ -1,0 +1,815 @@
+@import '@fontsource/barlow-condensed/600.css';
+@import '@fontsource/barlow-condensed/700.css';
+@import '@fontsource/public-sans/400.css';
+@import '@fontsource/public-sans/500.css';
+@import '@fontsource/public-sans/600.css';
+
+:root {
+  /* Design Tokens - Light Theme Default */
+  --color-paper: #F2F4F0;
+  --color-ink: #15202B;
+  --color-ink-muted: rgba(21, 32, 43, 0.68);
+  --color-rule: #D5DAD2;
+  --color-lanyard: #2F5BFF;
+  --color-lanyard-hover: #1E46E0;
+  --color-lanyard-subtle: rgba(47, 91, 255, 0.08);
+  --color-tape: #FFC93C;
+  --color-tape-dark: #B8860B;
+  --color-signal: #C42B31;
+  --color-signal-subtle: rgba(196, 43, 49, 0.1);
+  --color-mint: #0F7A64;
+  --color-mint-subtle: rgba(15, 122, 100, 0.1);
+  --color-board: #101820;
+  --color-board-border: #1a2530;
+
+  --font-display: 'Barlow Condensed', -apple-system, sans-serif;
+  --font-body: 'Public Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+
+  --radius-control: 4px;
+  --radius-card: 16px;
+
+  --transition-theme: background-color 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.dark {
+  /* Design Tokens - Dark Theme */
+  --color-paper: #0F1720;
+  --color-ink: #E7ECEF;
+  --color-ink-muted: rgba(231, 236, 239, 0.65);
+  --color-rule: #26323F;
+  --color-lanyard: #8AA2FF;
+  --color-lanyard-hover: #A5B7FF;
+  --color-lanyard-subtle: rgba(138, 162, 255, 0.12);
+  --color-tape: #FFC93C;
+  --color-tape-dark: #FFC93C;
+  --color-signal: #FF6B70;
+  --color-signal-subtle: rgba(255, 107, 112, 0.15);
+  --color-mint: #3DD6B0;
+  --color-mint-subtle: rgba(61, 214, 176, 0.15);
+  --color-board: #0A1118;
+  --color-board-border: #26323F;
+}
+
+/* Base Reset & Box Sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  transition: var(--transition-theme);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Accessible Focus Ring (NFR-2 & Design Spec Sec 8) */
+:focus-visible {
+  outline: 2px solid var(--color-lanyard) !important;
+  outline-offset: 2px !important;
+}
+
+/* Reduced Motion Override (Design Spec Sec 6 & NFR-9) */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Form Controls Baseline */
+input, select, textarea, button {
+  font-family: inherit;
+  font-size: 1rem;
+  color: inherit;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  background-color: transparent;
+  border: 1px solid rgba(21, 32, 43, 0.55);
+  border-radius: var(--radius-control);
+  padding: 10px 14px;
+  min-height: 44px;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="tel"],
+.dark input[type="number"],
+.dark select,
+.dark textarea {
+  border-color: rgba(231, 236, 239, 0.55);
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--color-lanyard);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 500;
+  border-radius: var(--radius-control);
+  transition: background-color 150ms ease, opacity 150ms ease, transform 100ms ease;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
+}
+
+/* Tabular Numbers for Data & Counting */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Visually Hidden Screen Reader Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Keyframe Animations */
+@keyframes flapFlip {
+  0% {
+    transform: rotateX(0deg);
+  }
+  50% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
+  }
+}
+
+@keyframes settleFlap {
+  0% {
+    transform: translateY(-8px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideIn {
+  from {
+    transform: translateY(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-flap {
+  animation: flapFlip 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-settle {
+  animation: settleFlap 600ms ease-out;
+}
+
+/* ==========================================================================
+   HackHQ Layout & Component Architecture (Design Spec Sec 4 & 5)
+   ========================================================================== */
+
+.hackhq-app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  position: relative;
+}
+
+/* Header Styling */
+.hackhq-header {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--color-rule);
+  background-color: var(--color-paper);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  transition: var(--transition-theme);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-logo-badge {
+  width: 34px;
+  height: 34px;
+  background-color: var(--color-board);
+  color: var(--color-tape);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-board-border);
+}
+
+.brand-text {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.brand-title {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  line-height: 1;
+}
+
+.brand-subtitle {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+}
+
+.station-active-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  padding: 4px 10px;
+  background-color: var(--color-lanyard-subtle);
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.pill-dot {
+  width: 7px;
+  height: 7px;
+  background-color: var(--color-mint);
+  border-radius: 50%;
+  animation: settleFlap 1.2s infinite alternate;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* X-ray Header Button */
+.xray-toggle-btn {
+  background-color: transparent;
+  border: 1px solid var(--color-rule);
+  color: var(--color-ink);
+  padding: 6px 12px;
+  height: 38px;
+  min-height: 38px;
+  font-size: 0.875rem;
+}
+
+.xray-toggle-btn:hover {
+  background-color: var(--color-lanyard-subtle);
+  border-color: var(--color-lanyard);
+}
+
+.xray-toggle-btn.active {
+  background-color: var(--color-board);
+  color: var(--color-tape);
+  border-color: var(--color-board-border);
+}
+
+.status-indicator {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+
+.status-indicator.on {
+  background-color: var(--color-tape);
+  color: var(--color-board);
+}
+
+.status-indicator.off {
+  background-color: var(--color-rule);
+  color: var(--color-ink-muted);
+}
+
+/* Accessible Theme Switch */
+.theme-switch {
+  position: relative;
+  width: 72px;
+  height: 36px;
+  min-height: 36px;
+  border-radius: 18px;
+  background-color: var(--color-rule);
+  border: 1px solid rgba(21, 32, 43, 0.2);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dark .theme-switch {
+  border-color: rgba(231, 236, 239, 0.2);
+  background-color: #1a2530;
+}
+
+.switch-thumb {
+  width: 28px;
+  height: 28px;
+  background-color: var(--color-paper);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--color-ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.theme-switch.is-dark .switch-thumb {
+  transform: translateX(36px);
+  background-color: var(--color-lanyard);
+  color: #0A1118;
+}
+
+.theme-mode-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0 4px;
+}
+
+/* ==========================================================================
+   Main Shell Layout (Desktop Rail vs Mobile Bottom Bar)
+   ========================================================================== */
+
+.hackhq-body {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  position: relative;
+}
+
+/* Left Navigation Rail (Desktop) */
+.hackhq-nav {
+  width: 240px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-rule);
+  background-color: var(--color-paper);
+  padding: 20px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  color: var(--color-ink);
+  background-color: transparent;
+  text-align: left;
+  border: 1px solid transparent;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.nav-button:hover {
+  background-color: var(--color-lanyard-subtle);
+}
+
+.nav-button.active {
+  background-color: var(--color-board);
+  color: var(--color-tape);
+  border-color: var(--color-board-border);
+}
+
+.nav-button.active .nav-icon-box {
+  color: var(--color-tape);
+}
+
+.nav-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink-muted);
+}
+
+.nav-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.nav-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  background-color: rgba(0, 0, 0, 0.06);
+  border-radius: 3px;
+  color: var(--color-ink-muted);
+}
+
+.nav-button.active .nav-badge {
+  background-color: rgba(255, 201, 60, 0.15);
+  color: var(--color-tape);
+}
+
+/* Main Working Area */
+.hackhq-main {
+  flex: 1;
+  padding: 32px 40px;
+  max-width: 1080px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Station Content Container */
+.station-view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.station-header {
+  border-bottom: 1px solid var(--color-rule);
+  padding-bottom: 16px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.station-title-group {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.station-title {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.25px;
+}
+
+.station-subtitle {
+  font-size: 0.95rem;
+  color: var(--color-ink-muted);
+}
+
+/* ==========================================================================
+   State X-ray Side Panel (Design Spec Sec 5)
+   ========================================================================== */
+
+.hackhq-state-xray {
+  width: 380px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--color-rule);
+  background-color: var(--color-board);
+  color: #E7ECEF;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+
+.xray-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-board-border);
+}
+
+.xray-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xray-badge-icon {
+  color: var(--color-tape);
+}
+
+.xray-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-tape);
+  letter-spacing: 0.25px;
+}
+
+.xray-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.xray-btn {
+  padding: 4px 8px;
+  height: 28px;
+  min-height: 28px;
+  min-width: 28px;
+  background-color: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #E7ECEF;
+  border-radius: var(--radius-control);
+  font-size: 0.75rem;
+}
+
+.xray-btn:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.xray-btn-text {
+  font-size: 0.75rem;
+  margin-left: 4px;
+}
+
+.xray-description {
+  font-size: 0.8rem;
+  color: rgba(231, 236, 239, 0.65);
+  margin: 12px 0;
+  line-height: 1.4;
+}
+
+.xray-viewport {
+  flex: 1;
+  background-color: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--color-board-border);
+  border-radius: var(--radius-control);
+  padding: 12px;
+  overflow: auto;
+  font-size: 0.82rem;
+  max-height: calc(100vh - 200px);
+}
+
+.xray-code-line {
+  display: flex;
+  line-height: 1.5;
+}
+
+.xray-line-num {
+  width: 28px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.25);
+  user-select: none;
+  text-align: right;
+  padding-right: 12px;
+}
+
+.xray-line-content {
+  flex: 1;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Syntax Token Colors (Design Spec) */
+.xray-token-key {
+  color: var(--color-lanyard);
+  font-weight: 500;
+}
+
+.xray-token-string {
+  color: var(--color-mint);
+}
+
+.xray-token-number {
+  color: var(--color-tape);
+}
+
+.xray-token-bool {
+  color: var(--color-signal);
+  font-weight: 600;
+}
+
+.xray-token-null {
+  color: var(--color-signal);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Toasts System (Design Spec Sec 5)
+   ========================================================================== */
+
+.hackhq-toast-region {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.toast-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 420px;
+  width: calc(100vw - 48px);
+}
+
+.hackhq-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background-color: var(--color-board);
+  color: #E7ECEF;
+  border: 1px solid var(--color-board-border);
+  border-radius: var(--radius-control);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  animation: toastSlideIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  font-size: 0.9rem;
+}
+
+.toast-icon-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.toast-icon-mint { color: var(--color-mint); }
+.toast-icon-tape { color: var(--color-tape); }
+.toast-icon-signal { color: var(--color-signal); }
+.toast-icon-lanyard { color: var(--color-lanyard); }
+
+.toast-message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.toast-action-btn {
+  background-color: var(--color-lanyard);
+  color: #FFFFFF;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-control);
+  min-height: 32px;
+}
+
+.toast-action-btn:hover {
+  background-color: var(--color-lanyard-hover);
+}
+
+.toast-close-btn {
+  background: transparent;
+  color: rgba(231, 236, 239, 0.6);
+  padding: 4px;
+  min-height: 28px;
+  min-width: 28px;
+}
+
+.toast-close-btn:hover {
+  color: #FFFFFF;
+}
+
+/* ==========================================================================
+   Responsive Adaptations (375px, 768px, 1280px)
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+  .hackhq-body {
+    flex-direction: column;
+    padding-bottom: 70px; /* Offset for bottom bar */
+  }
+
+  .hackhq-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 64px;
+    padding: 6px 12px;
+    border-right: none;
+    border-top: 1px solid var(--color-rule);
+    z-index: 50;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  .nav-list {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 4px;
+    height: 100%;
+  }
+
+  .nav-button {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    height: 100%;
+  }
+
+  .nav-name {
+    font-size: 0.72rem;
+  }
+
+  .nav-badge {
+    display: none;
+  }
+
+  .hackhq-main {
+    padding: 20px 16px;
+  }
+
+  .hackhq-state-xray {
+    position: fixed;
+    top: 64px;
+    bottom: 64px;
+    right: 0;
+    width: 320px;
+    z-index: 45;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.25);
+  }
+
+  .hackhq-toast-region {
+    bottom: 80px;
+    left: 16px;
+    right: 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .brand-subtitle, .station-active-pill {
+    display: none;
+  }
+
+  .hackhq-state-xray {
+    left: 0;
+    width: 100%;
+    top: auto;
+    bottom: 64px;
+    height: 55vh;
+  }
+}
