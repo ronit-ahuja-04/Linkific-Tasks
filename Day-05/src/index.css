@@ -2521,3 +2521,279 @@ button:disabled {
     margin-top: 16px;
   }
 }
+
+/* ==========================================================================
+   State Lab Station Styles (Design Spec Sec 5)
+   ========================================================================== */
+
+.lab-tag-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-lanyard);
+  background-color: var(--color-lanyard-subtle);
+}
+
+.lab-experiment-card {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background-color: transparent;
+}
+
+.experiment-card-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.exp-num-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--color-lanyard);
+}
+
+.experiment-heading {
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.experiment-lead {
+  font-size: 0.9rem;
+  color: var(--color-ink-muted);
+  line-height: 1.45;
+}
+
+.lab-comparison-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.comparison-column {
+  border: 1px solid var(--color-rule);
+  border-radius: var(--radius-control);
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.column-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.25px;
+}
+
+.tone-wrong {
+  background-color: var(--color-signal-subtle);
+  color: var(--color-signal);
+  border: 1px solid var(--color-signal);
+}
+
+.tone-right {
+  background-color: var(--color-mint-subtle);
+  color: var(--color-mint);
+  border: 1px solid var(--color-mint);
+}
+
+.code-snippet-box {
+  background-color: var(--color-board);
+  color: #E7ECEF;
+  border: 1px solid var(--color-board-border);
+  border-radius: var(--radius-control);
+  padding: 10px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  overflow-x: auto;
+}
+
+.lab-action-row {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-lab-action {
+  width: 100%;
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.btn-lab-action.wrong {
+  background-color: transparent;
+  border: 1px solid var(--color-signal);
+  color: var(--color-signal);
+}
+
+.btn-lab-action.wrong:hover {
+  background-color: var(--color-signal-subtle);
+}
+
+.btn-lab-action.right {
+  background-color: var(--color-mint);
+  color: #FFFFFF;
+}
+
+.btn-lab-action.right:hover {
+  opacity: 0.9;
+}
+
+.demo-render-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px dashed var(--color-rule);
+  border-radius: var(--radius-control);
+  min-height: 100px;
+}
+
+.preview-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--color-ink-muted);
+}
+
+.chips-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lab-item-chip {
+  font-size: 0.78rem;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.lab-item-chip.stale {
+  background-color: rgba(0, 0, 0, 0.08);
+  color: var(--color-ink);
+}
+
+.dark .lab-item-chip.stale {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.lab-item-chip.fresh {
+  background-color: var(--color-mint-subtle);
+  color: var(--color-mint);
+}
+
+.counter-meter-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background-color: var(--color-board);
+  color: #E7ECEF;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--color-board-border);
+}
+
+.meter-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(231, 236, 239, 0.65);
+}
+
+.meter-number {
+  font-family: var(--font-display);
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--color-tape);
+}
+
+.explanation-callout {
+  padding: 10px 12px;
+  background-color: var(--color-paper);
+  border-left: 3px solid var(--color-rule);
+  font-size: 0.82rem;
+  color: var(--color-ink-muted);
+  line-height: 1.45;
+}
+
+.wrong-column .explanation-callout {
+  border-left-color: var(--color-signal);
+}
+
+.right-column .explanation-callout {
+  border-left-color: var(--color-mint);
+}
+
+.experiment-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--color-rule);
+  font-size: 0.85rem;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-ink-muted);
+}
+
+.btn-force-render {
+  border: 1px solid var(--color-rule);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.btn-force-render:hover {
+  background-color: var(--color-lanyard-subtle);
+  border-color: var(--color-lanyard);
+}
+
+.force-tip {
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+}
+
+.btn-reset-demo {
+  border: 1px solid var(--color-rule);
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.btn-reset-demo:hover {
+  background-color: var(--color-lanyard-subtle);
+}
+
+@media (max-width: 768px) {
+  .lab-comparison-grid {
+    grid-template-columns: 1fr;
+  }
+}
