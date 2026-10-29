@@ -49,35 +49,45 @@ export default function Header({
           </span>
         </button>
 
-        {/* Accessible Dark Mode Switch (TH-1, TH-2) */}
-        <div className="theme-switch-wrapper">
-          <span id="theme-switch-label" className="theme-label sr-only">
-            Dark theme toggle
-          </span>
+        {/* Premium Animated Theme Switch (TH-1, TH-2) */}
+        <div className="theme-toggle-group">
           <button
             type="button"
             role="switch"
             aria-checked={theme === 'dark'}
-            aria-labelledby="theme-switch-label"
+            aria-label={`Toggle dark mode, current mode is ${theme}`}
             onClick={onToggleTheme}
             onKeyDown={handleSwitchKeyDown}
-            className={`theme-switch ${theme === 'dark' ? 'is-dark' : 'is-light'}`}
+            className={`theme-toggle-pill ${theme === 'dark' ? 'is-dark' : 'is-light'}`}
             title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           >
-            <span className="switch-thumb">
-              {theme === 'dark' ? (
-                <Moon size={13} className="switch-icon" aria-hidden="true" />
-              ) : (
-                <Sun size={13} className="switch-icon" aria-hidden="true" />
-              )}
+            {/* Celestial stationary background icons */}
+            <span className="toggle-track-bg">
+              <span className="celestial-icon sun-track-icon" aria-hidden="true">
+                <Sun size={13} />
+              </span>
+              <span className="celestial-icon moon-track-icon" aria-hidden="true">
+                <Moon size={13} />
+              </span>
             </span>
-            <span className="theme-mode-text" aria-hidden="true">
-              {theme === 'dark' ? 'Dark' : 'Light'}
+
+            {/* Spring-animated sliding thumb with rotating icon */}
+            <span className="toggle-slider-thumb" aria-hidden="true">
+              <span className="slider-icon-core" key={theme}>
+                {theme === 'dark' ? (
+                  <Moon size={14} className="slider-icon moon-icon" />
+                ) : (
+                  <Sun size={14} className="slider-icon sun-icon" />
+                )}
+              </span>
             </span>
           </button>
+
+          <span className="theme-status-pill tabular-nums" aria-hidden="true">
+            {theme === 'dark' ? 'Dark' : 'Light'}
+          </span>
         </div>
       </div>
     </header>
   );
 }
-
