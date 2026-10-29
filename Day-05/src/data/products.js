@@ -46,3 +46,4 @@ export const SWAG_PRODUCTS = [
     category: 'Accessories',
   },
 ];
+

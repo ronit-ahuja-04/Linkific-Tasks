@@ -82,3 +82,4 @@ All calculation, validation, formatting, and transformation logic is extracted i
 2. `src/lib/checklist.js`: Filter predicates, completion calculations, array insertion with undo index restoration.
 3. `src/lib/validation.js`: Pure `validateTeam(values)` returning granular field error objects.
 4. `src/lib/cart.js`: Subtotal calculation, discount resolution, total computation, and INR currency formatting.
+

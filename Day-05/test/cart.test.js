@@ -130,3 +130,4 @@ describe('Swag Shop cart pure logic (src/lib/cart.js)', () => {
     });
   });
 });
+

@@ -62,3 +62,4 @@
   - `removeFromCart`: 1 test (immutable line deletion)
   - `validateCoupon`: 2 tests (case-insensitive `HACK10`, invalid codes)
   - `formatCurrencyINR`: 1 test (Intl formatting with commas and ₹)
+

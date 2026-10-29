@@ -146,3 +146,4 @@ export function validateCoupon(rawCode) {
 
   return { isValid: false, message: 'That code is not valid. Try HACK10.' };
 }
+

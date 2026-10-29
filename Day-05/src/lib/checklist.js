@@ -104,3 +104,4 @@ export function mergeStarterTasks(currentTasks, starterTasks) {
 
   return [...(currentTasks || []), ...newItems];
 }
+

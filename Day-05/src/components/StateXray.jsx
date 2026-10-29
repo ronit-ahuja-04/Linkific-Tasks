@@ -65,6 +65,7 @@ function highlightJSON(jsonString) {
 }
 
 export default function StateXray({
+  stationName,
   activeStation,
   stationNames,
   statePayload,
@@ -75,7 +76,11 @@ export default function StateXray({
 
   if (!isOpen) return null;
 
-  const stationTitle = stationNames[activeStation] || activeStation;
+  const stationTitle =
+    stationName ||
+    (stationNames && activeStation ? stationNames[activeStation] : null) ||
+    activeStation ||
+    'Active Station';
   const jsonOutput = JSON.stringify(statePayload, null, 2);
 
   const handleCopy = () => {
@@ -130,3 +135,4 @@ export default function StateXray({
     </aside>
   );
 }
+

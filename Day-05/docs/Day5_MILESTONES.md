@@ -71,3 +71,4 @@
 - [ ] Production build (`npm run build`) generates clean bundle.
 - [ ] `docs/FACTS.md` records verifiable facts matching the actual code.
 - [ ] Comprehensive `README.md` explaining state, props, immutability, and architecture.
+

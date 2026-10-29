@@ -21,3 +21,4 @@ export const STATION_NAMES = {
   swag: 'Swag shop',
   lab: 'State lab',
 };
+
