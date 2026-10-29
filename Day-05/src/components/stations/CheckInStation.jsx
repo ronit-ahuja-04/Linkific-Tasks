@@ -150,7 +150,7 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
                 title={count >= capacity ? 'Venue is at maximum capacity' : 'Add 1 person'}
               >
                 <Plus size={16} aria-hidden="true" />
-                <span>+1</span>
+                <span>1</span>
               </button>
 
               <button

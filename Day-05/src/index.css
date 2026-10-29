@@ -68,6 +68,9 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
@@ -78,7 +81,9 @@ html, body {
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
+  max-height: 100vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -104,6 +109,68 @@ input, select, textarea, button {
   font-family: inherit;
   font-size: 1rem;
   color: inherit;
+}
+
+/* Universal Button Styles (v0 Baseline Product) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Primary Hero Buttons (Gradient Purple/Indigo with Glow) */
+.btn-primary {
+  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%);
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
+  padding: 12px 24px;
+  min-height: 44px;
+}
+
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Secondary & Ghost Buttons */
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--color-ink);
+  border: 1px solid var(--color-rule);
+  padding: 8px 16px;
+  min-height: 40px;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: rgba(124, 58, 237, 0.08);
+  border-color: rgba(124, 58, 237, 0.3);
+}
+
+.dark .btn-secondary {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  color: #F1F5F9;
 }
 
 input[type="text"],
@@ -279,11 +346,13 @@ button:disabled {
 .hackhq-app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   background-color: var(--color-bg-base);
   color: var(--color-ink);
-  padding: 24px 32px 32px 32px;
-  gap: 20px;
+  padding: 16px 24px 20px 24px;
+  gap: 16px;
   background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(139, 92, 246, 0.1), transparent 70%);
   position: relative;
   transition: var(--transition-theme);
@@ -297,26 +366,26 @@ button:disabled {
 
 /* Floating Glass Header (Matches v0 Baseline Spec) */
 .hackhq-header {
-  height: 68px;
-  min-height: 68px;
+  height: 64px;
+  min-height: 64px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  padding: 0 20px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-  position: sticky;
-  top: 16px;
+  position: relative;
   z-index: 40;
   transition: var(--transition-theme);
 }
 
 .dark .hackhq-header {
-  background: rgba(15, 19, 32, 0.75);
+  background: rgba(14, 18, 30, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
@@ -466,6 +535,8 @@ button:disabled {
   display: flex;
   gap: 24px;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
   align-items: stretch;
   position: relative;
 }
@@ -474,6 +545,7 @@ button:disabled {
 .hackhq-nav {
   width: 250px;
   flex-shrink: 0;
+  height: 100%;
   border-radius: 24px;
   padding: 24px 14px;
   background: rgba(255, 255, 255, 0.85);
@@ -483,6 +555,7 @@ button:disabled {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .dark .hackhq-nav {
@@ -617,6 +690,10 @@ button:disabled {
 .hackhq-main {
   flex: 1;
   min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 12px;
+  padding-bottom: 40px;
 }
 
 /* Station Content Container */
@@ -1332,8 +1409,17 @@ button:disabled {
 }
 
 .btn-add-task {
-  padding: 0 18px;
+  height: 46px;
+  padding: 0 24px;
   white-space: nowrap;
+  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%) !important;
+  color: #FFFFFF !important;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .btn-starter-tasks {
@@ -1840,9 +1926,18 @@ button:disabled {
 
 .btn-submit-team {
   flex: 1;
-  padding: 12px 24px;
+  min-height: 48px;
+  padding: 12px 28px;
   font-size: 1.05rem;
   font-weight: 600;
+  background: linear-gradient(135deg, #7C3AED 0%, #6366F1 100%) !important;
+  color: #FFFFFF !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(124, 58, 237, 0.35);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 }
 
 /* ==========================================================================
