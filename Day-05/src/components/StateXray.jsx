@@ -1,4 +1,4 @@
-import { Terminal, X, Copy, Check } from 'lucide-react';
+import { X, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
 
 /**
@@ -57,7 +57,6 @@ function highlightJSON(jsonString) {
 
     return (
       <div key={lineIdx} className="xray-code-line">
-        <span className="xray-line-num" aria-hidden="true">{lineIdx + 1}</span>
         <span className="xray-line-content">{parts}</span>
       </div>
     );
@@ -97,8 +96,11 @@ export default function StateXray({
     >
       <div className="xray-header">
         <div className="xray-title-wrap">
-          <Terminal size={16} className="xray-badge-icon" aria-hidden="true" />
-          <h2 className="xray-title">State X-ray: {stationTitle}</h2>
+          <div className="xray-title-row">
+            <h2 className="xray-title">State X-ray</h2>
+            <span className="xray-amber-dot" aria-hidden="true" />
+          </div>
+          <span className="xray-subtitle">Live state for {stationTitle.toLowerCase()}</span>
         </div>
         <div className="xray-controls">
           <button
@@ -108,7 +110,7 @@ export default function StateXray({
             title="Copy state JSON"
             aria-label="Copy state JSON"
           >
-            {copied ? <Check size={14} className="text-mint" /> : <Copy size={14} />}
+            {copied ? <Check size={13} className="text-mint" /> : <Copy size={13} />}
             <span className="xray-btn-text">{copied ? 'Copied' : 'Copy'}</span>
           </button>
           <button
@@ -118,14 +120,12 @@ export default function StateXray({
             title="Close X-ray panel"
             aria-label="Close State X-ray"
           >
-            <X size={15} />
+            <X size={14} />
           </button>
         </div>
       </div>
 
-      <p className="xray-description">
-        Live telemetry inspector reflecting current local <code>useState</code> snapshot.
-      </p>
+      <div className="xray-divider" />
 
       <div className="xray-viewport">
         <pre className="xray-pre" tabIndex={0} aria-label="Live JSON state view">

@@ -185,25 +185,31 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
 
   return (
     <div className="station-view station-checklist">
+      <div className="station-breadcrumb">CONTROL ROOM / CHECKLIST</div>
+
+      <div className="station-header">
+        <div className="station-title-row">
+          <h1 className="station-title">Checklist</h1>
+          <span className="live-status-pill">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live</span>
+          </span>
+        </div>
+        <div className="station-header-actions">
+          <button
+            type="button"
+            className="btn btn-starter-tasks"
+            onClick={handleLoadStarters}
+            title="Append starter operational tasks"
+          >
+            <Sparkles size={16} aria-hidden="true" />
+            <span>Add starter tasks</span>
+          </button>
+        </div>
+      </div>
+
       <div className="station-layout">
         <div className="station-workspace">
-          <div className="station-header">
-            <div className="station-title-group">
-              <h1 className="station-title">Checklist</h1>
-              <span className="station-subtitle">Hackathon setup tasks</span>
-            </div>
-            <div className="station-header-actions">
-              <button
-                type="button"
-                className="btn btn-starter-tasks"
-                onClick={handleLoadStarters}
-                title="Append starter operational tasks"
-              >
-                <Sparkles size={16} aria-hidden="true" />
-                <span>Add starter tasks</span>
-              </button>
-            </div>
-          </div>
 
           {/* Progress Metric & Thin Bar (CL-5) */}
           <div className="checklist-progress-bar-wrap">

@@ -87,22 +87,26 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
 
   return (
     <div className="station-view station-lab">
+      <div className="station-breadcrumb">LEARNING LAYER / STATE LAB</div>
+
+      <div className="station-header">
+        <div className="station-title-row">
+          <h1 className="station-title">State lab</h1>
+          <span className="live-status-pill">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live</span>
+          </span>
+        </div>
+        <div className="station-header-actions">
+          <div className="lab-tag-pill">
+            <FlaskConical size={16} aria-hidden="true" />
+            <span>Learning Layer</span>
+          </div>
+        </div>
+      </div>
+
       <div className="station-layout lab-station-layout">
         <div className="station-workspace">
-          <div className="station-header">
-            <div className="station-title-group">
-              <h1 className="station-title">State lab</h1>
-              <span className="station-subtitle">
-                Interactive state mutation & batching experiments
-              </span>
-            </div>
-            <div className="station-header-actions">
-              <div className="lab-tag-pill">
-                <FlaskConical size={16} aria-hidden="true" />
-                <span>Learning Layer</span>
-              </div>
-            </div>
-          </div>
 
           {/* Experiment 1: Immutability & Reference Equality (LB-2) */}
           <section className="lab-experiment-card" aria-labelledby="exp1-heading">

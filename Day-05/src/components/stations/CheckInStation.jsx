@@ -1,5 +1,5 @@
 import { useState, useId } from 'react';
-import { Plus, Minus, Users, RotateCcw, ShieldAlert, CheckCircle } from 'lucide-react';
+import { Plus, RotateCcw, Ticket } from 'lucide-react';
 import SplitFlapBoard from './SplitFlapBoard.jsx';
 import StateXray from '../StateXray.jsx';
 import {
@@ -92,132 +92,95 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
 
   return (
     <div className="station-view station-checkin">
+      <div className="station-breadcrumb">CONTROL ROOM / CHECKIN</div>
+
+      <div className="station-header">
+        <div className="station-title-row">
+          <h1 className="station-title">Check-in</h1>
+          <span className="live-status-pill">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live</span>
+          </span>
+        </div>
+      </div>
+
       <div className="station-layout">
         <div className="station-workspace">
-          <div className="station-header">
-            <div className="station-title-group">
-              <h1 className="station-title">Check-in</h1>
-              <span className="station-subtitle">People inside the venue</span>
-            </div>
-            <div className="station-meta-badge">
-              <span className={`status-badge tone-${status.tone}`}>
-                {status.tone === 'alert' && <ShieldAlert size={14} aria-hidden="true" />}
-                {status.tone === 'normal' && <CheckCircle size={14} aria-hidden="true" />}
-                {status.label}
-              </span>
-            </div>
-          </div>
-
           {/* Screen Reader Polite Live Region (CI-7) */}
           <div className="sr-only" aria-live="polite" aria-atomic="true">
             {count} of {capacity} inside venue. {status.label}.
           </div>
 
-          <div className="checkin-board-card">
-            <div className="board-label">Venue Occupancy</div>
-            <SplitFlapBoard count={count} capacity={capacity} />
-          </div>
-
-          {/* Capacity Progress Bar with 80% & 100% Ticks (CI-4) */}
-          <div className="capacity-bar-section">
-            <div className="capacity-bar-header">
-              <span className="capacity-bar-title">Capacity Meter</span>
-              <span className="capacity-bar-stats tabular-nums">
-                {count} / {capacity} ({percentage}%)
-              </span>
+          {/* Unified Primary Card: People inside (Matches v0 Baseline Spec) */}
+          <div className="station-primary-card">
+            <div className="card-top-bar">
+              <div className="card-heading-group">
+                <h2 className="card-title">People inside</h2>
+                <p className="card-subtitle">Keep a live count of everyone in the venue.</p>
+              </div>
+              <div className="card-icon-badge" aria-hidden="true">
+                <Ticket size={20} />
+              </div>
             </div>
 
-            <div
-              className={`capacity-track tone-${status.tone}`}
-              role="progressbar"
-              aria-valuenow={count}
-              aria-valuemin={0}
-              aria-valuemax={capacity}
-              aria-label="Venue capacity occupancy percentage"
-            >
-              <div
-                className="capacity-fill"
-                style={{ width: `${percentage}%` }}
-              />
-              <div
-                className="capacity-tick tick-warning"
-                style={{ left: '80%' }}
-                title="80% Warning Threshold"
-                aria-hidden="true"
-              />
-              <div
-                className="capacity-tick tick-full"
-                style={{ left: '100%' }}
-                title="100% Full Capacity"
-                aria-hidden="true"
-              />
+            {/* Split-Flap Display */}
+            <div className="counter-board-wrap">
+              <SplitFlapBoard count={count} capacity={capacity} />
             </div>
 
-            <div className="capacity-scale-labels" aria-hidden="true">
-              <span>0% Empty</span>
-              <span className="tick-label-80">80% Warning</span>
-              <span>100% Max</span>
-            </div>
-          </div>
-
-          {/* Counter Controls Grid (CI-2) */}
-          <div className="counter-controls-panel">
-            <div className="controls-group primary-controls">
+            {/* Action Buttons Row */}
+            <div className="counter-buttons-row">
               <button
                 type="button"
-                className="btn btn-decrement"
+                className="btn btn-pill-action"
                 onClick={handleDecrement}
                 disabled={count === 0}
                 aria-label="Decrement count by 1"
                 title="Decrease people count by 1"
               >
-                <Minus size={18} aria-hidden="true" />
                 <span>-1</span>
               </button>
 
               <button
                 type="button"
-                className="btn btn-increment btn-primary"
+                className="btn btn-pill-action btn-hero-increment"
                 onClick={handleIncrement}
                 disabled={count >= capacity}
                 aria-label="Increment count by 1"
                 title={count >= capacity ? 'Venue is at maximum capacity' : 'Add 1 person'}
               >
-                <Plus size={18} aria-hidden="true" />
-                <span>+1 Check-in</span>
+                <Plus size={16} aria-hidden="true" />
+                <span>+1</span>
               </button>
 
               <button
                 type="button"
-                className="btn btn-group-add"
+                className="btn btn-pill-action"
                 onClick={handleGroupIncrement}
                 disabled={count >= capacity}
                 aria-label="Increment count by 5 for a group"
                 title="Add group (+5 people)"
               >
-                <Users size={18} aria-hidden="true" />
-                <span>+5 Group</span>
+                <span>+5 group</span>
               </button>
 
               <button
                 type="button"
-                className="btn btn-reset"
+                className="btn btn-pill-action"
                 onClick={handleReset}
                 disabled={count === 0}
                 aria-label="Reset count to 0"
                 title="Reset attendee counter to zero"
               >
-                <RotateCcw size={16} aria-hidden="true" />
+                <RotateCcw size={15} aria-hidden="true" />
                 <span>Reset</span>
               </button>
             </div>
 
-            {/* Controlled Capacity Input (CI-3) */}
-            <div className="capacity-input-row">
-              <label htmlFor={capacityInputId} className="capacity-input-label">
-                Venue Max Capacity:
-              </label>
-              <div className="capacity-input-wrap">
+            {/* Bottom Capacity & Meter Row */}
+            <div className="counter-meter-row">
+              <div className="capacity-input-group">
+                <label htmlFor={capacityInputId} className="capacity-label">Capacity</label>
                 <input
                   id={capacityInputId}
                   type="number"
@@ -228,16 +191,34 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
                   onBlur={handleCapacityBlur}
                   aria-invalid={!!capacityError}
                   aria-describedby={capacityError ? `${capacityInputId}-err` : undefined}
-                  className={`capacity-input tabular-nums ${capacityError ? 'input-error' : ''}`}
+                  className={`capacity-pill-input ${capacityError ? 'input-error' : ''}`}
                 />
-                <span className="capacity-unit-tag">people</span>
               </div>
-              {capacityError && (
-                <p id={`${capacityInputId}-err`} className="capacity-error-message" role="alert">
-                  {capacityError}
-                </p>
-              )}
+
+              <div
+                className={`capacity-pill-bar tone-${status.tone}`}
+                role="progressbar"
+                aria-valuenow={count}
+                aria-valuemin={0}
+                aria-valuemax={capacity}
+                aria-label="Venue capacity occupancy percentage"
+              >
+                <div
+                  className="capacity-pill-fill"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
+
+              <span className="capacity-status-text tabular-nums">
+                {status.label}
+              </span>
             </div>
+
+            {capacityError && (
+              <p id={`${capacityInputId}-err`} className="capacity-error-message" role="alert">
+                {capacityError}
+              </p>
+            )}
           </div>
         </div>
 

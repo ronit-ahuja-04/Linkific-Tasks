@@ -108,23 +108,29 @@ export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
 
   return (
     <div className="station-view station-swag">
+      <div className="station-breadcrumb">CONTROL ROOM / SWAG</div>
+
+      <div className="station-header">
+        <div className="station-title-row">
+          <h1 className="station-title">Swag shop</h1>
+          <span className="live-status-pill">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live</span>
+          </span>
+        </div>
+        {/* Item count in header (SW-9) */}
+        <div className="station-header-actions">
+          <div className="cart-badge-pill" aria-label={`Cart contains ${totalItems} items`}>
+            <ShoppingBag size={16} aria-hidden="true" />
+            <span className="cart-badge-text">
+              Cart: <strong className="tabular-nums">{totalItems}</strong> items
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div className="station-layout swag-station-layout">
         <div className="station-workspace">
-          <div className="station-header">
-            <div className="station-title-group">
-              <h1 className="station-title">Swag shop</h1>
-              <span className="station-subtitle">Pop-up merchandise counter</span>
-            </div>
-            {/* Item count in header (SW-9) */}
-            <div className="station-header-actions">
-              <div className="cart-badge-pill" aria-label={`Cart contains ${totalItems} items`}>
-                <ShoppingBag size={16} aria-hidden="true" />
-                <span className="cart-badge-text">
-                  Cart: <strong className="tabular-nums">{totalItems}</strong> items
-                </span>
-              </div>
-            </div>
-          </div>
 
           <div className="swag-catalog-receipt-grid">
             {/* Products Ruled Catalog (SW-1) */}

@@ -157,25 +157,31 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
 
   return (
     <div className="station-view station-teams">
+      <div className="station-breadcrumb">CONTROL ROOM / TEAMS</div>
+
+      <div className="station-header">
+        <div className="station-title-row">
+          <h1 className="station-title">Teams</h1>
+          <span className="live-status-pill">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live</span>
+          </span>
+        </div>
+        <div className="station-header-actions">
+          <button
+            type="button"
+            className="btn btn-secondary btn-sample-fill"
+            onClick={handleFillSample}
+            title="Populate form with valid sample team"
+          >
+            <Sparkles size={16} aria-hidden="true" />
+            <span>Fill sample team</span>
+          </button>
+        </div>
+      </div>
+
       <div className="station-layout teams-station-layout">
         <div className="station-workspace">
-          <div className="station-header">
-            <div className="station-title-group">
-              <h1 className="station-title">Teams</h1>
-              <span className="station-subtitle">Team registration & badge preview</span>
-            </div>
-            <div className="station-header-actions">
-              <button
-                type="button"
-                className="btn btn-secondary btn-sample-fill"
-                onClick={handleFillSample}
-                title="Populate form with valid sample team"
-              >
-                <Sparkles size={16} aria-hidden="true" />
-                <span>Fill sample team</span>
-              </button>
-            </div>
-          </div>
 
           <div className="teams-form-badge-grid">
             {/* Main Controlled Registration Form (TM-1 to TM-8) */}

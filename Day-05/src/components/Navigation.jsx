@@ -4,7 +4,7 @@ export default function Navigation({ activeStation, onSelectStation }) {
   return (
     <nav className="hackhq-nav" aria-label="Control room stations">
       <div className="nav-container">
-        <div className="nav-header sr-only">HackHQ Stations</div>
+        <div className="nav-section-label">STATIONS</div>
         <ul className="nav-list" role="tablist">
           {STATIONS.map((station) => {
             const Icon = station.icon;
@@ -26,14 +26,21 @@ export default function Navigation({ activeStation, onSelectStation }) {
                     <Icon size={18} />
                   </span>
                   <span className="nav-name">{station.name}</span>
-                  <span className="nav-badge" aria-hidden="true">
-                    {station.badge}
-                  </span>
+                  {isActive && <span className="nav-accent-bar" aria-hidden="true" />}
                 </button>
               </li>
             );
           })}
         </ul>
+
+        {/* Sidebar Footer Indicator */}
+        <div className="sidebar-footer-card">
+          <div className="sidebar-live-tag">
+            <span className="pulse-dot" aria-hidden="true" />
+            <span>Live workspace</span>
+          </div>
+          <span className="sidebar-date-text">Thursday · 29 Oct 2026</span>
+        </div>
       </div>
     </nav>
   );
