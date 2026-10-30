@@ -1,318 +1,181 @@
-# HackHQ · Hackathon Control Room & React 19 State Architecture
+# HackHQ Live — React Hooks Mastery (`useEffect` & Custom Hooks)
 
-> **Linkific Internship Training — Day 5: React State & Event Handling**  
-> **Author:** Ronit Ahuja  
-> **Date:** Thursday, 29 October 2026  
-> **Stack:** React 19, Vite 5, Native CSS Design Tokens, Fontsource Typography, Vitest  
-> **Live Stations:** Check-in (Counter), Checklist (Todo), Teams (Form & Validation), Swag Shop (Cart & Thermal Receipt), State Lab (Mutation & Batching Experiments), State X-ray (Live JSON Telemetry)
-
----
-
-## 📋 Table of Contents
-
-1. [Overview & Concept](#overview--concept)
-2. [Task Coverage Matrix & Reference Map](#task-coverage-matrix--reference-map)
-3. [Strict Scope Guardrails (Zero Banned Hooks)](#strict-scope-guardrails-zero-banned-hooks)
-4. [Component Inventory](#component-inventory)
-5. [The 5 Stations & The Learning Layer](#the-5-stations--the-learning-layer)
-   - [Station 1: Check-in (Split-Flap Counter & Capacity)](#station-1-check-in-split-flap-counter--capacity)
-   - [Station 2: Checklist (Whiteboard Task Manager & Undo)](#station-2-checklist-whiteboard-task-manager--undo)
-   - [Station 3: Teams (Registration Form & Live Lanyard Badge)](#station-3-teams-registration-form--live-lanyard-badge)
-   - [Station 4: Swag Shop (Pop-up Store & Thermal Receipt)](#station-4-swag-shop-pop-up-store--thermal-receipt)
-   - [Station 5: Dark Mode & Accessible Theme Switch](#station-5-dark-mode--accessible-theme-switch)
-   - [Learning Layer: State X-ray & State Lab](#learning-layer-state-x-ray--state-lab)
-6. [State Architecture & Immutability Patterns](#state-architecture--immutability-patterns)
-7. [Design Tokens & Venue Signage Vernacular](#design-tokens--venue-signage-vernacular)
-8. [Testing Suite & Quality Verification (58 Tests)](#testing-suite--quality-verification-58-tests)
-9. [Local Development & Build Instructions](#local-development--build-instructions)
-10. [Daily Tech Meet Standup Playbook (4-Minute Script)](#daily-tech-meet-standup-playbook-4-minute-script)
+**Day 6 Project:** Linkific Month 1 Training  
+**Author:** Ronit Ahuja  
+**Baseline Stack:** React 19, Vite, Tailwind CSS, Prettier, ESLint  
+**Scope Guardrails:** `useState`, `useEffect`, and `useId` only. No external hook or data libraries. Zero `eslint-disable` comments.
 
 ---
 
-## 🚀 Overview & Concept
+## 1. Overview & Architecture
 
-**HackHQ** unifies the five standalone projects of the Day 5 task into a cohesive, single-page hackathon organizer control room:
+HackHQ Live is an interactive hackathon mission-control dashboard demonstrating how React components synchronize with external browser and network systems using `useEffect` and handcrafted custom hooks.
 
-1. **Check-in**: Real-time attendee counter with physical split-flap departure board blades and capacity throttling.
-2. **Checklist**: Venue operational checklist with segmented filtering, inline editing, toast-based Undo, and completion confetti.
-3. **Teams**: Dynamic team registration form featuring nested contact state, 1–4 member rows, interest tagging, pure validation, and a live physical lanyard badge preview.
-4. **Swag Shop**: Pop-up merchandise counter with item quantity caps, coupon resolution, pure `reduce` totals, and an authentic thermal receipt.
-5. **Theme Switch**: Accessible dark mode switch reading OS system preference lazily.
-6. **State X-ray & State Lab**: Real-time syntax-highlighted JSON state inspector alongside interactive experiments proving reference equality in mutations and update queueing in batching.
-
----
-
-## 🗺️ Task Coverage Matrix & Reference Map
-
-Every single core requirement and pedagogical deliverable from the Day 5 specification is implemented with handcrafted, explainable code:
-
-| Day 5 Task Requirement              | Concrete Implementation                                                                           | Primary Source File(s)                                                                                                                 |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| **What state is**                   | Local component data driving re-renders across all stations                                       | [`CheckInStation.jsx`](src/components/stations/CheckInStation.jsx), [`App.jsx`](src/App.jsx)                                           |
-| **State vs Props**                  | `theme`, `xrayOn`, `activeStation` lifted to `App`; station datasets encapsulated                 | [`App.jsx`](src/App.jsx), [`Header.jsx`](src/components/Header.jsx)                                                                    |
-| **When to use state**               | Interactive mutable values; derived values (progress, subtotal, status) computed during render    | [`ChecklistStation.jsx`](src/components/stations/ChecklistStation.jsx), [`SwagStation.jsx`](src/components/stations/SwagStation.jsx)   |
-| **State is immutable**              | Every array update uses `map`, `filter`, spread; Lab mutation experiment                          | [`StateLabStation.jsx`](src/components/stations/StateLabStation.jsx), [`checklist.js`](src/lib/checklist.js)                           |
-| **Re-render on state change**       | Live DOM updates; State Lab demo proves missed re-renders on mutation                             | [`StateLabStation.jsx`](src/components/stations/StateLabStation.jsx)                                                                   |
-| **Import & use `useState`**         | Primitive, object, array, and functional initializers across stations                             | [`App.jsx`](src/App.jsx), [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx)                                               |
-| **Different data types**            | number (`count`), string (`filter`), boolean (`xrayOn`), object (`form`), array (`tasks`, `cart`) | [`CheckInStation.jsx`](src/components/stations/CheckInStation.jsx), [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx)     |
-| **Multi-variable vs Single Object** | Check-in uses separate `count`/`capacity`; Teams uses single `form` object                        | [`CheckInStation.jsx`](src/components/stations/CheckInStation.jsx), [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx)     |
-| **Functional state updates**        | `setX(prev => ...)` throughout all handlers; Lab batching demo (+3)                               | [`StateLabStation.jsx`](src/components/stations/StateLabStation.jsx), [`cart.js`](src/lib/cart.js)                                     |
-| **Event handling**                  | `onClick`, `onChange`, `onSubmit`, `onBlur`, `onKeyDown`                                          | [`ChecklistStation.jsx`](src/components/stations/ChecklistStation.jsx), [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx) |
-| **Event object patterns**           | `e.preventDefault()`, `e.target.value`, `e.target.checked`                                        | [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx), [`SwagStation.jsx`](src/components/stations/SwagStation.jsx)           |
-| **Passing arguments**               | `onClick={() => handleRemove(task.id)}`, `onClick={() => handleStep(id, -1)}`                     | [`ChecklistStation.jsx`](src/components/stations/ChecklistStation.jsx), [`SwagStation.jsx`](src/components/stations/SwagStation.jsx)   |
-| **Controlled components**           | Team name, contact inputs, capacity input, task input, coupon input                               | [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx), [`CheckInStation.jsx`](src/components/stations/CheckInStation.jsx)     |
-| **Array manipulations**             | Add (`[...prev, item]`), Remove (`filter`), Update (`map`), Swap (`swapTaskPosition`)             | [`checklist.js`](src/lib/checklist.js), [`cart.js`](src/lib/cart.js)                                                                   |
-| **Object manipulations**            | Nested contact update (`contact: { ...prev.contact, city }`), spread updates                      | [`TeamsStation.jsx`](src/components/stations/TeamsStation.jsx), [`validation.js`](src/lib/validation.js)                               |
-| **Split-flap flip animation**       | Remounting blades with `key={digit}` to replay CSS `@keyframes flapFlip`                          | [`SplitFlapBoard.jsx`](src/components/stations/SplitFlapBoard.jsx)                                                                     |
-| **Station Persistence**             | Inactive stations preserved via HTML `hidden` attribute (SH-1)                                    | [`App.jsx`](src/App.jsx)                                                                                                               |
-
----
-
-## 🛡️ Strict Scope Guardrails (Zero Banned Hooks)
-
-In strict adherence to the pedagogical guidelines for Day 5:
-
-- **Allowed Hooks**: `useState` (all data types, lazy initializers, functional updates) and `useId` (strictly for linking `<label>` and `<input>`).
-- **Zero Forbidden Hooks**: Grep verified `0` occurrences of `useEffect`, `useReducer`, `useContext`, `useRef`, `useMemo`, `useCallback`, `useLayoutEffect`.
-- **Zero Form / State Libraries**: Handcrafted state transitions without Redux, Zustand, Formik, react-hook-form, or Zod.
-- **Zero UI Kits**: Custom semantic layout and design tokens without shadcn/ui, Radix, MUI, or Chakra.
-- **Event-Driven Asynchrony**: Toast timeouts and confetti bursts execute directly inside event handlers.
-
----
-
-## 📦 Component Inventory
-
-```text
-src/
-├── App.jsx                       # Root coordinator: theme, activeStation, xrayOn, toasts
-├── index.css                     # Native design tokens, typography, keyframes, focus styles
-├── main.jsx                      # React 19 root bootstrap in StrictMode
-├── components/
-│   ├── Header.jsx                # Brand wordmark, active station pill, X-ray toggle, theme switch
-│   ├── Navigation.jsx            # Dual layout navigation (desktop left rail / mobile bottom bar)
-│   ├── ToastContainer.jsx        # Polite live notifications with auto-dismiss and Undo action
-│   ├── StateXray.jsx             # Live JSON telemetry inspector with syntax token highlights
-│   └── stations/
-│       ├── CheckInStation.jsx    # Counter (+1, -1, +5, reset), capacity control, progress bar
-│       ├── SplitFlapBoard.jsx    # 3-digit departure board with physical blade animations
-│       ├── ChecklistStation.jsx  # Whiteboard task manager, segmented filters, undo, confetti
-│       ├── TeamsStation.jsx      # Multi-field form, 1-4 member rows, interests, duplicate check
-│       ├── TeamBadgePreview.jsx  # Sticky physical event badge updating live on keystroke
-│       ├── SwagStation.jsx       # 6 products catalog, quantity caps, coupon code, thermal receipt
-│       └── StateLabStation.jsx   # Interactive mutation vs spread & batching +3 demonstrations
-├── lib/                          # Pure business logic (100% test coverage)
-│   ├── counter.js                # clampCount, getCapacityStatus, formatFlapDigits, parseCapacity
-│   ├── checklist.js              # filterTasks, calculateProgress, insertTaskAtIndex, swapPosition
-│   ├── validation.js             # validateTeam, isValidEmail, isValidPhone, isDuplicateTeamName
-│   └── cart.js                   # calculateSubtotal, calculateDiscount, calculateTotal, addToCart
-└── data/
-    ├── stations.js               # Station definitions and icons
-    ├── starterTasks.js           # 6 operational setup tasks for hack day
-    └── products.js               # 6 curated merchandise items with INR pricing
+```
+hackhq-live/
+├── docs/
+│   ├── FACTS.md                # Verified metrics, grep audits, and StrictMode facts
+│   └── STANDUP.md              # Rehearsed 4-minute standup speech for instructors
+├── src/
+│   ├── App.jsx                 # Dashboard shell integrating live stations and persistent state
+│   ├── main.jsx                # Application root with React StrictMode enabled
+│   ├── hooks/                  # Five handcrafted custom hooks
+│   │   ├── useFetch.js         # Declarative API fetching with AbortController cleanup
+│   │   ├── useDebounce.js      # Input buffering with clearTimeout cleanup
+│   │   ├── useStopwatch.js     # 100ms interval timer with clearInterval cleanup
+│   │   ├── useWindowSize.js    # Resize event subscription with removeEventListener cleanup
+│   │   └── useLocalStorage.js  # Web Storage persistence with lazy init and cross-tab sync
+│   ├── lib/
+│   │   ├── api.js              # Pure URL builder functions for DummyJSON API
+│   │   └── format.js           # Millisecond elapsed time formatter (mm:ss.t)
+│   └── components/
+│       ├── directory/          # Directory, SearchBox, UserRow, Skeleton, ErrorPanel, UserPosts
+│       ├── clock/              # HackClock, LapList
+│       ├── layout/             # ViewportBadge
+│       └── patterns/           # 9-Pattern Effect Showcase
 ```
 
----
-
-## 🏢 The 5 Stations & The Learning Layer
-
-### Station 1: Check-in (Split-Flap Counter & Capacity)
-
-- **Separate State Architecture**: Demonstrates holding independent state variables (`count` and `capacity`) vs single objects.
-- **Boundary Clamping**: Pure helper `clampCount` guarantees count never drops below 0 or exceeds capacity.
-- **Controlled Capacity**: Lowering capacity below the active count automatically throttles the count and notifies the user with a warning toast.
-- **Split-Flap Animation**: Fixed-width blade slots remount with `key={digit}` to re-trigger a 260ms 3D CSS flip animation without layout shift.
-- **Accessibility**: Screen readers receive polite live updates via `aria-live="polite"` (`"127 of 200 inside venue"`), while animated blades remain `aria-hidden="true"`.
-
-### Station 2: Checklist (Whiteboard Task Manager & Undo)
-
-- **Whiteboard Strip Design**: Ruled strips separated by 1px hairlines without boxed card wrappers.
-- **Controlled Add Task**: Validates 1–80 character length, trims whitespace, and rejects empty inputs with inline errors.
-- **Toast-Based Undo**: Deleting a task stores the task snapshot and its index, offering an interactive "Undo" action in the toast that restores it via array insertion spread:
-  ```js
-  setTasks((prev) => [...prev.slice(0, index), taskToRestore, ...prev.slice(index)]);
-  ```
-- **Segmented Filter**: Segmented tabs for "All", "Open", and "Done" with real-time count badges; filtered view is derived during render.
-- **Completion Confetti**: Triggered directly inside the checkbox toggle handler when the final task is completed (minimum 3 tasks), honoring `prefers-reduced-motion`.
-
-### Station 3: Teams (Registration Form & Live Lanyard Badge)
-
-- **Single Form Object State**: Manages complex form state in one object with nested contact fields (`contact: { email, phone, city }`).
-- **Dynamic Member Rows (1–4)**: Add member button is disabled at 4; remove button is disabled at 1. Each member's name and role are updated immutably using array `map`.
-- **Pure Validation Engine**: Pure `validateTeam(form, registeredTeams)` returns field-specific errors, touch state determines error visibility, and duplicate team names (case-insensitive) are rejected.
-- **Live Lanyard Badge**: A physical paper badge card with top lanyard cutout slot, track accent banner, and roster updating on every keystroke.
-
-### Station 4: Swag Shop (Pop-up Store & Thermal Receipt)
-
-- **Ruled Catalog**: 6 curated products displayed in a minimal wayfinding list with price right-aligned and stock limits (max 10 items per product).
-- **Thermal Receipt Layout**: Physical off-white receipt paper (`#FCFBF7`) with sawtooth zigzag perforated edges, dashed dividers, tabular numerals, and barcode graphics.
-- **Auto-Pruning Decrement**: Decrementing quantity below 1 automatically prunes the line item from the cart.
-- **Pure `reduce` Calculations**: Subtotal, coupon discount (`HACK10`), and grand total are computed purely during render. Zero totals stored in state.
-
-### Station 5: Dark Mode & Accessible Theme Switch
-
-- **Lazy Initialization**: Initializes theme state by querying system preferences without blocking first render:
-  ```js
-  const [theme, setTheme] = useState(() => {
-    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-  });
-  ```
-- **Accessible Switch**: Semantic `role="switch"` with `aria-checked` and full keyboard support (Space / Enter).
-- **Instant Token Adaptation**: 200ms theme transition across design tokens with reduced motion overrides.
-
-### Learning Layer: State X-ray & State Lab
-
-- **State X-ray**: Live sidebar/sheet inspector displaying the active station's state as formatted JSON with token-based syntax highlighting (keys in lanyard, numbers in tape, strings in mint, booleans in signal).
-- **State Lab (Experiment 1 — In-Place Mutation)**: Demonstrates why `.push()` followed by `setItems(items)` fails to re-render (same object reference), and shows how spread `[...items, newItem]` triggers immediate reconciliation. Includes a "Force Re-render" button that proves the mutated items were in memory all along.
-- **State Lab (Experiment 2 — State Batching)**: Proves state snapshots: calling `setCount(count + 1)` three times only increments by +1, whereas functional updaters `setCount(prev => prev + 1)` properly queue updates to increment by +3.
+> **Note on TanStack Query vs. Handcrafted Hooks:**  
+> In production React applications, data fetching is commonly handled by enterprise libraries such as TanStack Query or SWR, which offer automatic cache management, deduplication, and window-focus refetching. In this project, `useFetch` was built from scratch to master the lower-level mechanics of request lifecycles, race conditions, cleanup teardown, and `AbortController` cancellation.
 
 ---
 
-## 🎨 Design Tokens & Venue Signage Vernacular
+## 2. Core Concepts: `useEffect` Mental Models
 
-HackHQ embraces an authentic **Venue Signage** visual identity inspired by wayfinding displays, name badges on lanyards, and thermal receipts:
+### What is a Side Effect?
 
-| Token             | Light Theme | Dark Theme | Role & Purpose                              |
-| ----------------- | ----------- | ---------- | ------------------------------------------- |
-| `--color-paper`   | `#F2F4F0`   | `#0F1720`  | Cool venue page backdrop                    |
-| `--color-ink`     | `#15202B`   | `#E7ECEF`  | High-contrast signage typography            |
-| `--color-rule`    | `#D5DAD2`   | `#26323F`  | 1px hairlines and whiteboard dividers       |
-| `--color-lanyard` | `#2F5BFF`   | `#8AA2FF`  | Primary actions, links, active rings        |
-| `--color-tape`    | `#FFC93C`   | `#FFC93C`  | Gaffer-tape yellow flap digits & highlights |
-| `--color-signal`  | `#C42B31`   | `#FF6B70`  | Errors, capacity full, destructive actions  |
-| `--color-mint`    | `#0F7A64`   | `#3DD6B0`  | Completed tasks, coupon success             |
-| `--color-board`   | `#101820`   | `#0A1118`  | Split-flap display & State X-ray surface    |
+In React, rendering must remain a pure calculation: given the same props and state, JSX output should be identical with zero observable side effects during render. A **side effect** is any operation that reaches outside the pure rendering phase to interact with an external system—such as HTTP network calls, browser DOM manipulation, timers, subscriptions, or `localStorage`.
 
-- **Display Typography**: _Barlow Condensed_ (600, 700) self-hosted via `@fontsource/barlow-condensed`.
-- **Body Typography**: _Public Sans_ (400, 500, 600) self-hosted via `@fontsource/public-sans`.
-- **Focus Indicator**: 2px solid lanyard outline with 2px offset, fully visible on keyboard navigation.
+### When NOT to Use `useEffect`
 
----
+Following the _You Might Not Need an Effect_ guidelines:
 
-## 🧪 Testing Suite & Quality Verification (58 Tests)
+1. **Transforming data for render:** Calculated directly during rendering (e.g. filtering a list from search input).
+2. **Handling user interaction events:** Executed inside event handlers (`onClick`, `onSubmit`), not in effects.
+3. **Derived state:** Synchronous values computed from existing props or state should never be copied into redundant state variables via effects.
 
-All business logic is isolated into pure helper modules under `src/lib/` and verified with 58 Vitest tests:
+### The Dependency Array Matrix
 
-```bash
-$ npm test
+The dependency array tells React when to skip running the effect by checking dependencies with `Object.is`:
 
- RUN  v2.1.9 /Users/ronitahuja/Desktop/Linkific-Tasks/Day-05
+| Signature                    | When it Runs                              | Cleanup Timing                                     | Primary Use Case                                         |
+| ---------------------------- | ----------------------------------------- | -------------------------------------------------- | -------------------------------------------------------- |
+| `useEffect(fn, [])`          | Once after initial mount                  | Runs on unmount                                    | Subscribing to global events, mounting singletons        |
+| `useEffect(fn, [a, b])`      | On mount, and whenever `a` or `b` changes | Runs before re-executing effect, and on unmount    | Syncing with props/state, fetching parameterized queries |
+| `useEffect(fn)` _(no array)_ | After **every** render pass               | Runs before each subsequent render, and on unmount | Logging, profiling, imperative DOM sync                  |
 
- ✓ test/counter.test.js (17 tests)
-   - clampCount boundaries, negative numbers, capacity overflow
-   - calculateCapacityPercentage ratios and division-by-zero guards
-   - getCapacityStatus threshold states ("Plenty of room", "Nearly full", "Full")
-   - formatFlapDigits 3-digit zero padding and string extraction
-   - parseCapacityInput bounds (1 to 1000) and NaN fallback recovery
+### Why Cleanup Functions Prevent Memory Leaks & Bugs
 
- ✓ test/checklist.test.js (15 tests)
-   - createTask ID generation and trimmed text structure
-   - filterTasks status predicate matching (all, open, done)
-   - calculateProgress completion percentages and threshold detection (>= 3)
-   - insertTaskAtIndex exact index restoration for Undo delete
-   - swapTaskPosition immutable ordering transitions
-   - mergeStarterTasks duplicate prevention logic
+When a component unmounts or its dependencies update, outstanding operations must be safely dismantled:
 
- ✓ test/validation.test.js (12 tests)
-   - isValidEmail RFC standard pattern checks
-   - isValidPhone 10-digit format and optional blank checks
-   - isDuplicateTeamName case-insensitive collision detection
-   - validateTeam comprehensive schema verification across fields
-
- ✓ test/cart.test.js (14 tests)
-   - calculateSubtotal line price multiplication via reduce
-   - calculateDiscount & calculateTotal HACK10 coupon arithmetic
-   - calculateTotalItemCount item sum calculation
-   - addToCart line creation and 10-item cap enforcement
-   - updateCartQuantity step updates and automatic line pruning on 0
-   - removeFromCart immutable line deletion
-   - validateCoupon coupon code verification and error messages
-   - formatCurrencyINR Indian Rupee symbol and digit formatting
-
-Test Files  4 passed (4)
-Tests       58 passed (58)
-Duration    ~300ms
-```
+- **Timers:** Active `setInterval` or `setTimeout` calls continue ticking in the browser background if not cleared via `clearInterval` / `clearTimeout`.
+- **Event Listeners:** Global listeners attached to `window` or `document` leak memory and hold references to stale component scopes if not removed via `removeEventListener`.
+- **Network Requests:** In-flight HTTP requests can resolve after a component has unmounted or switched parameters. Aborting them via `AbortController.abort()` prevents updating state with stale or discarded data (eliminating race conditions).
 
 ---
 
-## 💻 Local Development & Build Instructions
+## 3. Handcrafted Custom Hook Inventory
 
-### Prerequisites
+All 5 custom hooks live in `src/hooks/` and are annotated with searchable `// CONCEPT:` tags:
 
-- Node.js `>= 20.0.0`
-- npm `>= 10.0.0`
+| Hook              | File                                               | Concept Tag                | Parameters          | Returns                                     | Cleanup Mechanism                                          |
+| ----------------- | -------------------------------------------------- | -------------------------- | ------------------- | ------------------------------------------- | ---------------------------------------------------------- |
+| `useFetch`        | [useFetch.js](src/hooks/useFetch.js)               | `CONCEPT: useFetch`        | `url: string`       | `{ data, loading, error, refetch }`         | `controller.abort()` cancels in-flight fetch               |
+| `useDebounce`     | [useDebounce.js](src/hooks/useDebounce.js)         | `CONCEPT: useDebounce`     | `value, delay=300`  | `debouncedValue`                            | `clearTimeout(timerId)` resets countdown                   |
+| `useStopwatch`    | [useStopwatch.js](src/hooks/useStopwatch.js)       | `CONCEPT: useStopwatch`    | _none_              | `{ elapsed, running, start, pause, reset }` | `clearInterval(intervalId)` prevents duplicate intervals   |
+| `useWindowSize`   | [useWindowSize.js](src/hooks/useWindowSize.js)     | `CONCEPT: useWindowSize`   | _none_              | `{ width, height }`                         | `removeEventListener('resize', fn)` using stable reference |
+| `useLocalStorage` | [useLocalStorage.js](src/hooks/useLocalStorage.js) | `CONCEPT: useLocalStorage` | `key, initialValue` | `[storedValue, setStoredValue]`             | `removeEventListener('storage', fn)` for cross-tab sync    |
 
-### 1. Install Dependencies
+---
+
+## 4. Feature Highlights
+
+### 1. Participant Directory & Posts Panel
+
+- Fetches attendee data declaratively from DummyJSON API (`https://dummyjson.com/users`).
+- Accessible loading skeletons with `aria-busy="true"`.
+- Error panel with accessible alert semantics (`role="alert"`) and a working **Retry** trigger.
+- **Simulate slow network** toggle (`delay=1000`) for easy standup demonstration.
+- Selecting any attendee fetches their posts from `/users/{id}/posts` using dependency-driven refetching. Rapid selection switches cancel earlier requests safely via `AbortController`.
+
+### 2. 300ms Debounced Search Box
+
+- Rate-limits typing keystrokes via `useDebounce`.
+- Derives a live "Searching..." indicator with `aria-live="polite"` directly from `query !== debouncedQuery`.
+- Empty queries reset the directory list without network overhead.
+
+### 3. Hackathon Clock & Viewport Diagnostics
+
+- Millisecond-precision stopwatch formatted as `mm:ss.t` with functional state updates (`prev => prev + 100`) preventing stale closures.
+- Verified StrictMode resilience: does not run at double-speed in development.
+- Lap logging with persistent storage.
+- Floating `ViewportBadge` displaying live window dimensions and render-derived responsive breakpoints (`mobile < 768px`, `tablet 768-1023px`, `desktop ≥ 1024px`).
+
+### 4. LocalStorage State Persistence
+
+- Drop-in tuple replacement (`[value, setValue]`) for theme, stopwatch laps, and checklist tasks.
+- Lazy state initialization ensures disk I/O only runs once on initial mount.
+- Protected by `try/catch` wrappers: corrupt JSON strings in DevTools fall back gracefully to default values without crashing (`LS-2`).
+- Synchronizes across browser tabs via the window `storage` event (`LS-3`).
+
+### 5. 9-Pattern Effect Reference Panel
+
+Interactive catalog demonstrating:
+
+- **EP-1:** Run once on mount (`[]`) with StrictMode double-run logging.
+- **EP-2:** Specific dependencies (`[count]`) synchronizing `document.title`.
+- **EP-3:** Every-render diagnostic logging (explaining why `setState` here causes infinite loops).
+- **EP-4:** Multiple effects separating independent concerns.
+- **EP-5 to EP-9:** Five distinct cleanup teardown mechanisms.
+
+---
+
+## 5. Verification & Testing
+
+Every metric has been audited against real repository files (see [docs/FACTS.md](docs/FACTS.md)):
 
 ```bash
-npm install
-```
+# 1. Verify zero forbidden hooks (expect empty output)
+grep -rnE "useReducer|useContext|useRef|useMemo|useCallback|useLayoutEffect" src
 
-### 2. Run Local Development Server
+# 2. Verify zero forbidden libraries in package.json (expect empty output)
+grep -nE "tanstack|swr|axios|redux|zustand" package.json
 
-```bash
-npm run dev
-```
+# 3. Verify zero eslint-disable comments (expect empty output)
+grep -rn "eslint-disable" src
 
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+# 4. Verify no async effect callbacks (expect empty output)
+grep -rnE "useEffect\(async" src
 
-### 3. Run Test Suite
+# 5. Verify timer and listener cleanup pairs in hooks
+grep -rnE "setInterval|setTimeout|addEventListener|new AbortController" src/hooks
+grep -rnE "clearInterval|clearTimeout|removeEventListener|\.abort\(\)" src/hooks
 
-```bash
-npm test
-```
-
-### 4. Run Code Linter
-
-```bash
+# 6. Run format check, lint, and build
+npm run format -- --check
 npm run lint
-```
-
-### 5. Production Build & Preview
-
-```bash
 npm run build
-npm run preview
 ```
 
 ---
 
-## 🎙️ Daily Tech Meet Standup Playbook (4-Minute Script)
+## 6. Running the Application Locally
 
-**Time Target:** 3 minutes 45 seconds  
-**Tone:** Confident, structured, direct, demonstrating deep understanding of React state mechanics.
+```bash
+# Clone the repository
+git clone https://github.com/ronit-ahuja-04/Linkific-Tasks.git
+cd Linkific-Tasks/Day-06/hackhq-live
 
-### 0:00 - 0:40 | The Hook & Architectural Overview
+# Install dependencies
+npm install --legacy-peer-deps
 
-> _"Good evening everyone. Today for Day 5, I built **HackHQ** — an organizer control room for the day of a hackathon._  
-> _Instead of building five disconnected tutorial widgets, I unified all five requirements into five operational stations: **Check-in** for attendee counting, **Checklist** for venue setup, **Teams** for registration, **Swag Shop** for merchandise, and an accessible **Theme Switch**._  
-> _On top of these sits a learning layer: a live **State X-ray** inspector and a **State Lab** that makes React's internal state mechanics and re-rendering visible to anyone watching."_
+# Run the development server
+npm run dev
 
-### 0:40 - 1:30 | Station Highlights (State Patterns in Action)
+# Run linting and formatting audits
+npm run lint
+npm run format -- --check
 
-> _"Let's look at the state architecture:_
->
-> 1. _In **Check-in**, count and capacity are separate state variables. Notice the split-flap board: each blade remounts with `key={digit}` to re-trigger a 3D flip keyframe. The capacity bar and status ('Plenty of room', 'Nearly full', 'Full') are derived during render — zero redundant state. Screen readers get polite live announcements while the blades stay `aria-hidden`._
-> 2. _In **Checklist**, tasks are an immutable array. When I delete a task, watch the toast: clicking 'Undo' restores the task at its exact original position using array slice and spread insertion. When I check off the final task, a celebratory confetti burst fires directly from the event handler._
-> 3. _In **Teams**, we demonstrate a single `form` object with nested contact fields, dynamic 1 to 4 member rows, and interest checkboxes. As I type, the physical lanyard badge updates live on every keystroke._
-> 4. _In **Swag Shop**, product limits cap items at 10. Decreasing quantity from 1 automatically prunes the line. Subtotals, the 10% `HACK10` coupon, and totals are computed with pure `reduce` and rendered onto an authentic thermal receipt."_
-
-### 1:30 - 2:40 | The Core Proof: The State Lab
-
-> _(Navigate to State Lab)_  
-> _"Now for the technical core of Day 5: **State Lab**._  
-> _In Experiment 1, we prove **Reference Equality**. When I click 'Push item', the handler mutates the array in-place with `.push()` and calls `setItems(items)`. Notice the screen does not update! Why? Because React compares state using `Object.is()`. Since the memory pointer didn't change, React skips re-rendering. Now watch: when I click 'Trigger unrelated re-render', the hidden mutated items suddenly appear! The right way creates a new array reference with spread `[...items, newBadge]`, which reconciles immediately._  
-> _In Experiment 2, we demonstrate **Automatic Batching and Snapshots**. When I click 'Add 3 (Direct)', it calls `setCount(count + 1)` three times, but the counter only increases by +1 because all three calls read the identical stale render snapshot. In contrast, 'Add 3 (Functional)' passes updater callbacks `prev => prev + 1` into React's pending queue, correctly incrementing by +3."_
-
-### 2:40 - 3:20 | Scope Integrity & Engineering Rigor
-
-> _"Behind this is strict engineering discipline:_
->
-> - _Every station is preserved across navigation using the HTML `hidden` attribute, so station state is never lost._
-> - _We strictly adhered to the Day 5 guardrails: only `useState` and `useId`. Zero `useEffect`, zero `useReducer`, zero external state or form libraries._
-> - _All calculations, clamping, and validation are in pure functions in `src/lib/`, covered by **58 Vitest unit tests** with 100% pass rate._
-> - _0 ESLint warnings, production bundle gzipped under 93 KB, and full keyboard navigation with visible focus rings."_
-
-### 3:20 - 3:45 | Closing
-
-> _"HackHQ fulfills every Day 5 deliverable while making state, immutability, and batching tangible and explainable. Happy to answer any questions or walk through any handler in the codebase. Thank you!"_
+# Build for production
+npm run build
+```
