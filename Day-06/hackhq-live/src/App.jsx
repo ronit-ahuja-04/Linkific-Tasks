@@ -6,6 +6,8 @@ import ToastContainer from './components/ToastContainer.jsx';
 import { Directory } from './components/directory/Directory.jsx';
 import { UserPosts } from './components/directory/UserPosts.jsx';
 import { HackClock } from './components/clock/HackClock.jsx';
+import { EffectPatterns } from './components/patterns/EffectPatterns.jsx';
+import { ViewportBadge } from './components/layout/ViewportBadge.jsx';
 import CheckInStation from './components/stations/CheckInStation.jsx';
 import ChecklistStation from './components/stations/ChecklistStation.jsx';
 import TeamsStation from './components/stations/TeamsStation.jsx';
@@ -121,6 +123,16 @@ export default function App() {
             </div>
           </section>
 
+          {/* Effect Patterns Station (Day 6 - M5) */}
+          <section
+            id="panel-patterns"
+            role="tabpanel"
+            aria-labelledby="tab-patterns"
+            hidden={activeStation !== 'patterns'}
+          >
+            <EffectPatterns />
+          </section>
+
           {/* Check-in Station (SH-1: hidden preserves state) */}
           <section
             id="panel-checkin"
@@ -174,6 +186,7 @@ export default function App() {
       </div>
 
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <ViewportBadge />
     </div>
   );
 }
