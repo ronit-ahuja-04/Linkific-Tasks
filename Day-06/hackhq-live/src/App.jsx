@@ -4,6 +4,7 @@ import Navigation from './components/Navigation.jsx';
 import ToastContainer from './components/ToastContainer.jsx';
 import { Directory } from './components/directory/Directory.jsx';
 import { UserPosts } from './components/directory/UserPosts.jsx';
+import { HackClock } from './components/clock/HackClock.jsx';
 import CheckInStation from './components/stations/CheckInStation.jsx';
 import ChecklistStation from './components/stations/ChecklistStation.jsx';
 import TeamsStation from './components/stations/TeamsStation.jsx';
@@ -28,6 +29,17 @@ export default function App() {
 
   // Selected participant ID for live user-posts refetching (UP-1)
   const [selectedUserId, setSelectedUserId] = useState(null);
+
+  // Stopwatch laps state (CK-2, swapped to useLocalStorage in M4)
+  const [laps, setLaps] = useState([]);
+
+  const addLap = (lap) => {
+    setLaps((prev) => [lap, ...prev]);
+  };
+
+  const clearLaps = () => {
+    setLaps([]);
+  };
 
   // State X-ray live inspector toggle (LB-1)
   const [xrayOn, setXrayOn] = useState(false);
@@ -96,6 +108,18 @@ export default function App() {
               <div className="lg:col-span-5">
                 <UserPosts userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
               </div>
+            </div>
+          </section>
+
+          {/* Hack Clock Station (Day 6 - M3) */}
+          <section
+            id="panel-clock"
+            role="tabpanel"
+            aria-labelledby="tab-clock"
+            hidden={activeStation !== 'clock'}
+          >
+            <div className="max-w-2xl mx-auto">
+              <HackClock laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />
             </div>
           </section>
 

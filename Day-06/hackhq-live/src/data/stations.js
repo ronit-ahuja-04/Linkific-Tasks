@@ -1,7 +1,8 @@
-import { Users, CheckSquare, ShieldCheck, ShoppingBag, Code2, Globe } from 'lucide-react';
+import { Users, CheckSquare, ShieldCheck, ShoppingBag, Code2, Globe, Clock } from 'lucide-react';
 
 export const STATIONS = [
   { id: 'directory', name: 'Directory', icon: Globe, badge: 'Live API' },
+  { id: 'clock', name: 'Hack Clock', icon: Clock, badge: 'Timer' },
   { id: 'checkin', name: 'Check-in', icon: Users, badge: 'Counter' },
   { id: 'checklist', name: 'Checklist', icon: CheckSquare, badge: 'Todo' },
   { id: 'teams', name: 'Teams', icon: ShieldCheck, badge: 'Form' },
@@ -11,6 +12,7 @@ export const STATIONS = [
 
 export const STATION_NAMES = {
   directory: 'Directory',
+  clock: 'Hack Clock',
   checkin: 'Check-in',
   checklist: 'Checklist',
   teams: 'Teams',
