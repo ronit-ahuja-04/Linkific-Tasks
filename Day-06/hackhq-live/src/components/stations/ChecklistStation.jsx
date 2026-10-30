@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import { useLocalStorage } from '../../hooks/useLocalStorage.js';
 import confetti from 'canvas-confetti';
 import {
   CheckSquare,
@@ -25,7 +26,8 @@ import {
 } from '../../lib/checklist.js';
 
 export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
-  const [tasks, setTasks] = useState([]);
+  // Tasks state persisted in localStorage (LS-1, drop-in tuple replacement)
+  const [tasks, setTasks] = useLocalStorage('hackhq_tasks', STARTER_TASKS);
   const [filter, setFilter] = useState('all');
   const [inputText, setInputText] = useState('');
   const [inputError, setInputError] = useState('');
