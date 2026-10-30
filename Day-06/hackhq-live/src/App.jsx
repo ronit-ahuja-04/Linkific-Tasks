@@ -2,6 +2,8 @@ import { useState } from 'react';
 import Header from './components/Header.jsx';
 import Navigation from './components/Navigation.jsx';
 import ToastContainer from './components/ToastContainer.jsx';
+import { Directory } from './components/directory/Directory.jsx';
+import { UserPosts } from './components/directory/UserPosts.jsx';
 import CheckInStation from './components/stations/CheckInStation.jsx';
 import ChecklistStation from './components/stations/ChecklistStation.jsx';
 import TeamsStation from './components/stations/TeamsStation.jsx';
@@ -21,8 +23,11 @@ export default function App() {
     return 'light';
   });
 
-  // Active station navigation state (SH-1)
-  const [activeStation, setActiveStation] = useState('checkin');
+  // Active station navigation state (SH-1) - defaults to 'directory' for Day 6
+  const [activeStation, setActiveStation] = useState('directory');
+
+  // Selected participant ID for live user-posts refetching (UP-1)
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // State X-ray live inspector toggle (LB-1)
   const [xrayOn, setXrayOn] = useState(false);
@@ -77,6 +82,23 @@ export default function App() {
         <Navigation activeStation={activeStation} onSelectStation={setActiveStation} />
 
         <main className="hackhq-main">
+          {/* Directory & Posts Station (Day 6 - M1) */}
+          <section
+            id="panel-directory"
+            role="tabpanel"
+            aria-labelledby="tab-directory"
+            hidden={activeStation !== 'directory'}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+              <div className="lg:col-span-7">
+                <Directory selectedUserId={selectedUserId} onSelectUser={setSelectedUserId} />
+              </div>
+              <div className="lg:col-span-5">
+                <UserPosts userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
+              </div>
+            </div>
+          </section>
+
           {/* Check-in Station (SH-1: hidden preserves state) */}
           <section
             id="panel-checkin"
