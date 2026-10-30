@@ -1,20 +1,27 @@
 import { useState, useId } from 'react';
 import { useFetch } from '../../hooks/useFetch.js';
+import { useDebounce } from '../../hooks/useDebounce.js';
 import { buildUsersUrl } from '../../lib/api.js';
 import { UserRow } from './UserRow.jsx';
 import { UserRowSkeleton } from './UserRowSkeleton.jsx';
 import { ErrorPanel } from './ErrorPanel.jsx';
+import { SearchBox } from './SearchBox.jsx';
 
 /**
  * Participants Directory component managing live user fetching,
- * slow-network simulation, skeleton states, and error handling.
+ * 300ms debounced search, slow-network simulation, skeleton states, and error handling.
  */
-export function Directory({ selectedUserId, onSelectUser, searchBoxSlot }) {
+export function Directory({ selectedUserId, onSelectUser }) {
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounce(query, 300);
+  const isSearching = query.trim() !== debouncedQuery.trim();
+
   const [slowNetwork, setSlowNetwork] = useState(false);
   const slowNetworkCheckboxId = useId();
 
-  // In M1: fetches first 10 users with optional delay parameter
+  // Requests search endpoint when query is present, otherwise standard page 1 list
   const requestUrl = buildUsersUrl({
+    query: debouncedQuery,
     limit: 10,
     skip: 0,
     delay: slowNetwork ? 1000 : 0,
@@ -57,8 +64,14 @@ export function Directory({ selectedUserId, onSelectUser, searchBoxSlot }) {
         </label>
       </div>
 
-      {/* Optional SearchBox Slot (Integrated in Milestone M2) */}
-      {searchBoxSlot}
+      {/* Debounced Search Box (SR-1, SR-2) */}
+      <SearchBox
+        query={query}
+        onChange={setQuery}
+        onClear={() => setQuery('')}
+        isSearching={isSearching}
+        debouncedQuery={debouncedQuery}
+      />
 
       {/* Directory Content Area */}
       <div>
@@ -68,17 +81,33 @@ export function Directory({ selectedUserId, onSelectUser, searchBoxSlot }) {
           <UserRowSkeleton count={5} />
         ) : users.length === 0 ? (
           <div className="py-12 text-center rounded-xl border border-dashed border-slate-800 bg-slate-900/20">
-            <p className="text-sm font-medium text-slate-300">No participants found</p>
-            <p className="text-xs text-slate-500 mt-1">
-              Try adjusting your query or click Retry to reload the directory.
+            <p className="text-sm font-medium text-slate-300">
+              {debouncedQuery
+                ? `No participants found matching "${debouncedQuery}"`
+                : 'No participants found'}
             </p>
-            <button
-              type="button"
-              onClick={refetch}
-              className="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
-            >
-              Reload Participants
-            </button>
+            <p className="text-xs text-slate-500 mt-1">
+              {debouncedQuery
+                ? 'Try searching with a different name or clear the search input.'
+                : 'Try adjusting your query or click Retry to reload the directory.'}
+            </p>
+            {debouncedQuery ? (
+              <button
+                type="button"
+                onClick={() => setQuery('')}
+                className="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
+              >
+                Clear Search
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={refetch}
+                className="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
+              >
+                Reload Participants
+              </button>
+            )}
           </div>
         ) : (
           <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
