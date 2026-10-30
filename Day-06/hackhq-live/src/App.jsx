@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocalStorage } from './hooks/useLocalStorage.js';
 import Header from './components/Header.jsx';
 import Navigation from './components/Navigation.jsx';
 import ToastContainer from './components/ToastContainer.jsx';
@@ -13,16 +14,13 @@ import StateLabStation from './components/stations/StateLabStation.jsx';
 import { STATION_NAMES } from './data/stations.js';
 
 export default function App() {
-  // Theme state with lazy initializer reading OS preference (TH-2)
-  const [theme, setTheme] = useState(() => {
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches
-    ) {
-      return 'dark';
-    }
-    return 'light';
-  });
+  // Theme state persisted via useLocalStorage (LS-1)
+  const [theme, setTheme] = useLocalStorage(
+    'hackhq_theme',
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light'
+  );
 
   // Active station navigation state (SH-1) - defaults to 'directory' for Day 6
   const [activeStation, setActiveStation] = useState('directory');
@@ -30,8 +28,8 @@ export default function App() {
   // Selected participant ID for live user-posts refetching (UP-1)
   const [selectedUserId, setSelectedUserId] = useState(null);
 
-  // Stopwatch laps state (CK-2, swapped to useLocalStorage in M4)
-  const [laps, setLaps] = useState([]);
+  // Stopwatch laps persisted via useLocalStorage (LS-1, CK-2)
+  const [laps, setLaps] = useLocalStorage('hackhq_laps', []);
 
   const addLap = (lap) => {
     setLaps((prev) => [lap, ...prev]);
