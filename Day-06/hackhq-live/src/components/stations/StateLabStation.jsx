@@ -27,19 +27,31 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
     const nextId = (wrongItems.length + 1).toString().padStart(3, '0');
     wrongItems.push(`Badge ${nextId} (Stale)`);
     setWrongItems(wrongItems); // React sees Object.is(prev, next) === true and skips re-render!
-    onNotify('Mutated array in-place with .push() — notice the screen did NOT update!', null, 'warning');
+    onNotify(
+      'Mutated array in-place with .push() — notice the screen did NOT update!',
+      null,
+      'warning'
+    );
   };
 
   const handleImmutableAdd = () => {
     // RIGHT WAY: create a new array reference with spread (LB-2)
     const nextId = (rightItems.length + 1).toString().padStart(3, '0');
     setRightItems((prev) => [...prev, `Badge ${nextId} (Live)`]);
-    onNotify('Created new array reference with spread — screen re-rendered immediately!', null, 'success');
+    onNotify(
+      'Created new array reference with spread — screen re-rendered immediately!',
+      null,
+      'success'
+    );
   };
 
   const handleForceRerender = () => {
     setUnrelatedTick((t) => t + 1);
-    onNotify('Forced a re-render from unrelated state — watch the hidden mutated items appear!', null, 'info');
+    onNotify(
+      'Forced a re-render from unrelated state — watch the hidden mutated items appear!',
+      null,
+      'info'
+    );
   };
 
   const handleResetMutationDemo = () => {
@@ -55,7 +67,11 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
     setDirectBatchCount(directBatchCount + 1);
     setDirectBatchCount(directBatchCount + 1);
     setDirectBatchCount(directBatchCount + 1);
-    onNotify('Executed 3 direct updates — count only increased by +1 due to stale snapshot capture!', null, 'warning');
+    onNotify(
+      'Executed 3 direct updates — count only increased by +1 due to stale snapshot capture!',
+      null,
+      'warning'
+    );
   };
 
   const handleAddThreeFunctional = () => {
@@ -63,7 +79,11 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
     setFunctionalBatchCount((prev) => prev + 1);
     setFunctionalBatchCount((prev) => prev + 1);
     setFunctionalBatchCount((prev) => prev + 1);
-    onNotify('Executed 3 functional updates — count increased by +3 as pending states queued!', null, 'success');
+    onNotify(
+      'Executed 3 functional updates — count increased by +3 as pending states queued!',
+      null,
+      'success'
+    );
   };
 
   const handleResetBatchDemo = () => {
@@ -107,7 +127,6 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
 
       <div className="station-layout lab-station-layout">
         <div className="station-workspace">
-
           {/* Experiment 1: Immutability & Reference Equality (LB-2) */}
           <section className="lab-experiment-card" aria-labelledby="exp1-heading">
             <div className="experiment-card-header">
@@ -117,7 +136,8 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
               </h2>
               <p className="experiment-lead">
                 React triggers re-renders by testing object reference equality with{' '}
-                <code>Object.is()</code>. Mutating state objects directly leads to stale, frozen UIs.
+                <code>Object.is()</code>. Mutating state objects directly leads to stale, frozen
+                UIs.
               </p>
             </div>
 
@@ -167,8 +187,8 @@ setItems(items);`}
 
                 <div className="explanation-callout">
                   <p>
-                    React compares references with <code>Object.is(prev, next)</code>.
-                    Because mutating in-place preserves the same memory pointer, React skips re-rendering.
+                    React compares references with <code>Object.is(prev, next)</code>. Because
+                    mutating in-place preserves the same memory pointer, React skips re-rendering.
                   </p>
                 </div>
               </div>
@@ -220,8 +240,8 @@ setItems(prev => [
 
                 <div className="explanation-callout">
                   <p>
-                    Creating a new array instance provides a brand-new object reference.
-                    React detects the difference immediately and schedules a component re-render.
+                    Creating a new array instance provides a brand-new object reference. React
+                    detects the difference immediately and schedules a component re-render.
                   </p>
                 </div>
               </div>
@@ -262,8 +282,8 @@ setItems(prev => [
                 State Batching: Value Snapshots vs Functional Updaters (+3 Demo)
               </h2>
               <p className="experiment-lead">
-                State in React acts like a snapshot for a given render. Calling an updater multiple times
-                with direct values captures the exact same baseline number.
+                State in React acts like a snapshot for a given render. Calling an updater multiple
+                times with direct values captures the exact same baseline number.
               </p>
             </div>
 
@@ -305,8 +325,9 @@ setCount(count + 1);`}
 
                 <div className="explanation-callout">
                   <p>
-                    Each call reads the same stale snapshot of <code>count</code> captured during render.
-                    All three updates overwrite each other with the exact same evaluated value.
+                    Each call reads the same stale snapshot of <code>count</code> captured during
+                    render. All three updates overwrite each other with the exact same evaluated
+                    value.
                   </p>
                 </div>
               </div>
@@ -348,8 +369,8 @@ setCount(prev => prev + 1);`}
 
                 <div className="explanation-callout">
                   <p>
-                    Functional updaters are queued in React&apos;s dispatcher.
-                    Each updater receives the fresh pending state calculated by the previous one.
+                    Functional updaters are queued in React&apos;s dispatcher. Each updater receives
+                    the fresh pending state calculated by the previous one.
                   </p>
                 </div>
               </div>

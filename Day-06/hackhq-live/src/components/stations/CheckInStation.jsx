@@ -180,7 +180,9 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
             {/* Bottom Capacity & Meter Row */}
             <div className="counter-meter-row">
               <div className="capacity-input-group">
-                <label htmlFor={capacityInputId} className="capacity-label">Capacity</label>
+                <label htmlFor={capacityInputId} className="capacity-label">
+                  Capacity
+                </label>
                 <input
                   id={capacityInputId}
                   type="number"
@@ -203,15 +205,10 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
                 aria-valuemax={capacity}
                 aria-label="Venue capacity occupancy percentage"
               >
-                <div
-                  className="capacity-pill-fill"
-                  style={{ width: `${percentage}%` }}
-                />
+                <div className="capacity-pill-fill" style={{ width: `${percentage}%` }} />
               </div>
 
-              <span className="capacity-status-text tabular-nums">
-                {status.label}
-              </span>
+              <span className="capacity-status-text tabular-nums">{status.label}</span>
             </div>
 
             {capacityError && (

@@ -133,4 +133,3 @@ describe('Checklist todo pure logic (src/lib/checklist.js)', () => {
     });
   });
 });
-

@@ -12,7 +12,10 @@ import { STATION_NAMES } from './data/stations.js';
 export default function App() {
   // Theme state with lazy initializer reading OS preference (TH-2)
   const [theme, setTheme] = useState(() => {
-    if (typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches) {
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia?.('(prefers-color-scheme: dark)').matches
+    ) {
       return 'dark';
     }
     return 'light';
@@ -71,10 +74,7 @@ export default function App() {
       />
 
       <div className="hackhq-body">
-        <Navigation
-          activeStation={activeStation}
-          onSelectStation={setActiveStation}
-        />
+        <Navigation activeStation={activeStation} onSelectStation={setActiveStation} />
 
         <main className="hackhq-main">
           {/* Check-in Station (SH-1: hidden preserves state) */}
@@ -84,11 +84,7 @@ export default function App() {
             aria-labelledby="tab-checkin"
             hidden={activeStation !== 'checkin'}
           >
-            <CheckInStation
-              xrayOn={xrayOn}
-              onToggleXray={toggleXray}
-              onNotify={notify}
-            />
+            <CheckInStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
           </section>
 
           {/* Checklist Station */}
@@ -98,11 +94,7 @@ export default function App() {
             aria-labelledby="tab-checklist"
             hidden={activeStation !== 'checklist'}
           >
-            <ChecklistStation
-              xrayOn={xrayOn}
-              onToggleXray={toggleXray}
-              onNotify={notify}
-            />
+            <ChecklistStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
           </section>
 
           {/* Teams Station */}
@@ -112,11 +104,7 @@ export default function App() {
             aria-labelledby="tab-teams"
             hidden={activeStation !== 'teams'}
           >
-            <TeamsStation
-              xrayOn={xrayOn}
-              onToggleXray={toggleXray}
-              onNotify={notify}
-            />
+            <TeamsStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
           </section>
 
           {/* Swag Shop Station */}
@@ -126,11 +114,7 @@ export default function App() {
             aria-labelledby="tab-swag"
             hidden={activeStation !== 'swag'}
           >
-            <SwagStation
-              xrayOn={xrayOn}
-              onToggleXray={toggleXray}
-              onNotify={notify}
-            />
+            <SwagStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
           </section>
 
           {/* State Lab Station */}
@@ -140,11 +124,7 @@ export default function App() {
             aria-labelledby="tab-lab"
             hidden={activeStation !== 'lab'}
           >
-            <StateLabStation
-              xrayOn={xrayOn}
-              onToggleXray={toggleXray}
-              onNotify={notify}
-            />
+            <StateLabStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
           </section>
         </main>
       </div>

@@ -90,7 +90,10 @@ describe('Swag Shop cart pure logic (src/lib/cart.js)', () => {
     });
 
     it('removes line item when decreasing from quantity 1 to 0 (SW-3)', () => {
-      const initial = [{ productId: 'p1', quantity: 1 }, { productId: 'p2', quantity: 3 }];
+      const initial = [
+        { productId: 'p1', quantity: 1 },
+        { productId: 'p2', quantity: 3 },
+      ];
       const updated = updateCartQuantity(initial, 'p1', -1);
       expect(updated).toHaveLength(1);
       expect(updated[0].productId).toBe('p2');
@@ -99,7 +102,10 @@ describe('Swag Shop cart pure logic (src/lib/cart.js)', () => {
 
   describe('removeFromCart', () => {
     it('removes target line item cleanly without mutating', () => {
-      const initial = [{ productId: 'p1', quantity: 2 }, { productId: 'p2', quantity: 1 }];
+      const initial = [
+        { productId: 'p1', quantity: 2 },
+        { productId: 'p2', quantity: 1 },
+      ];
       const updated = removeFromCart(initial, 'p1');
       expect(updated).toEqual([{ productId: 'p2', quantity: 1 }]);
       expect(initial).toHaveLength(2); // Immutability verified
@@ -130,4 +136,3 @@ describe('Swag Shop cart pure logic (src/lib/cart.js)', () => {
     });
   });
 });
-

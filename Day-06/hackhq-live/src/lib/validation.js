@@ -31,9 +31,7 @@ export function getInitialTeamForm() {
   return {
     teamName: '',
     track: 'ai-ml',
-    members: [
-      { id: 'm-1', name: '', role: 'Team Lead' },
-    ],
+    members: [{ id: 'm-1', name: '', role: 'Team Lead' }],
     contact: {
       email: '',
       phone: '',
@@ -86,9 +84,7 @@ export function isValidPhone(phone) {
 export function isDuplicateTeamName(name, registeredTeams = []) {
   if (!name || typeof name !== 'string') return false;
   const target = name.trim().toLowerCase();
-  return registeredTeams.some(
-    (t) => (t.teamName || '').trim().toLowerCase() === target
-  );
+  return registeredTeams.some((t) => (t.teamName || '').trim().toLowerCase() === target);
 }
 
 /**
@@ -167,4 +163,3 @@ export function validateTeam(values, registeredTeams = []) {
     errors,
   };
 }
-

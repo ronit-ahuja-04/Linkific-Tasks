@@ -29,4 +29,3 @@ export default function SplitFlapBoard({ count, capacity }) {
     </div>
   );
 }
-

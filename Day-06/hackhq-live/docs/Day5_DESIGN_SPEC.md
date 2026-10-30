@@ -23,16 +23,16 @@ Companion to `Day5_PRD.md`. Requirement IDs such as `CI-6` refer to the PRD. Fol
 
 ### Color
 
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `paper` | `#F2F4F0` | `#0F1720` | Page background |
-| `ink` | `#15202B` | `#E7ECEF` | Text and icons |
-| `rule` | `#D5DAD2` | `#26323F` | Hairlines and dividers |
-| `lanyard` | `#2F5BFF` | `#8AA2FF` | Primary actions, links, focus ring |
-| `tape` | `#FFC93C` | `#FFC93C` | Flap digits, warnings, highlights |
-| `signal` | `#C42B31` | `#FF6B70` | Errors, full capacity, destructive actions |
-| `mint` | `#0F7A64` | `#3DD6B0` | Done, success |
-| `board` | `#101820` | `#0A1118` | The flap board and the State X-ray (a dark surface in both themes, with a 1 px `rule` border in dark mode) |
+| Token     | Light     | Dark      | Use                                                                                                        |
+| --------- | --------- | --------- | ---------------------------------------------------------------------------------------------------------- |
+| `paper`   | `#F2F4F0` | `#0F1720` | Page background                                                                                            |
+| `ink`     | `#15202B` | `#E7ECEF` | Text and icons                                                                                             |
+| `rule`    | `#D5DAD2` | `#26323F` | Hairlines and dividers                                                                                     |
+| `lanyard` | `#2F5BFF` | `#8AA2FF` | Primary actions, links, focus ring                                                                         |
+| `tape`    | `#FFC93C` | `#FFC93C` | Flap digits, warnings, highlights                                                                          |
+| `signal`  | `#C42B31` | `#FF6B70` | Errors, full capacity, destructive actions                                                                 |
+| `mint`    | `#0F7A64` | `#3DD6B0` | Done, success                                                                                              |
+| `board`   | `#101820` | `#0A1118` | The flap board and the State X-ray (a dark surface in both themes, with a 1 px `rule` border in dark mode) |
 
 Contrast figures are my estimates, so check them with DevTools or an accessibility checker: lanyard on paper about 4.7:1, white text on lanyard about 5.2:1, signal on paper about 5.1:1, mint on paper about 4.8:1, tape on board about 11:1, dark-mode lanyard on dark paper about 7.5:1.
 
@@ -40,11 +40,11 @@ Input borders use `ink` at 55% opacity to reach 3:1. Hairlines are decorative an
 
 ### Typography
 
-| Role | Typeface | Weights |
-|---|---|---|
-| Display, station names, flap digits, wordmark | Barlow Condensed | 600, 700 |
-| Interface and body | Public Sans | 400, 500, 600 |
-| Code (State X-ray only) | System monospace | 400 |
+| Role                                          | Typeface         | Weights       |
+| --------------------------------------------- | ---------------- | ------------- |
+| Display, station names, flap digits, wordmark | Barlow Condensed | 600, 700      |
+| Interface and body                            | Public Sans      | 400, 500, 600 |
+| Code (State X-ray only)                       | System monospace | 400           |
 
 Self-host both fonts with the Fontsource packages (see `Day5_TECH_STACK_AND_ARCHITECTURE.md`), so there are no external font requests.
 
@@ -111,14 +111,14 @@ Breakpoints: below 768 px single column with a bottom bar; 768 to 1023 px single
 
 ## 6. Motion
 
-| Moment | Spec |
-|---|---|
-| **The one orchestrated moment** | On first load the three flap digits settle from 0 to the current value, staggered by about 80 ms, 600 ms total. Plays once. |
-| Flap flip | When a digit changes, a 260 ms `rotateX` flip. Replay it by remounting the digit with `key={digit}` so a CSS keyframe runs again. |
-| List changes | Adding or removing a task, cart line or toast animates height and opacity over 160 to 200 ms (Motion `AnimatePresence`). This answers the user's action. |
-| Confetti | One burst when every task is done. |
-| Theme change | 200 ms color transition. |
-| Reduced motion | Everything above is off or instant under `prefers-reduced-motion: reduce`. Wrap the app in `MotionConfig` with `reducedMotion="user"`, and use a CSS media query for keyframes. |
+| Moment                          | Spec                                                                                                                                                                            |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The one orchestrated moment** | On first load the three flap digits settle from 0 to the current value, staggered by about 80 ms, 600 ms total. Plays once.                                                     |
+| Flap flip                       | When a digit changes, a 260 ms `rotateX` flip. Replay it by remounting the digit with `key={digit}` so a CSS keyframe runs again.                                               |
+| List changes                    | Adding or removing a task, cart line or toast animates height and opacity over 160 to 200 ms (Motion `AnimatePresence`). This answers the user's action.                        |
+| Confetti                        | One burst when every task is done.                                                                                                                                              |
+| Theme change                    | 200 ms color transition.                                                                                                                                                        |
+| Reduced motion                  | Everything above is off or instant under `prefers-reduced-motion: reduce`. Wrap the app in `MotionConfig` with `reducedMotion="user"`, and use a CSS media query for keyframes. |
 
 Not allowed: fade-and-slide-up on every section, hover animations on every card, parallax, looping decorative animation, gradient washes.
 
@@ -126,13 +126,13 @@ Not allowed: fade-and-slide-up on every section, hover animations on every card,
 
 Plain, sentence case, active voice, and the same verb for the button and the confirmation.
 
-| Button | Confirmation |
-|---|---|
-| Add task | Task added |
-| Register team | Team registered |
-| Add to cart | Added to cart |
-| Place order | Order placed: 4 items, ₹1,846 |
-| Reset | Count reset |
+| Button        | Confirmation                  |
+| ------------- | ----------------------------- |
+| Add task      | Task added                    |
+| Register team | Team registered               |
+| Add to cart   | Added to cart                 |
+| Place order   | Order placed: 4 items, ₹1,846 |
+| Reset         | Count reset                   |
 
 - **Errors say what to do:** "Team name needs at least 3 characters." "Enter a 10-digit phone number or leave it blank." "That code is not valid. Try HACK10."
 - **Empty states invite action:** "No tasks yet. Add one above, or load the starter list." "Nothing in the cart. Add something from the list."

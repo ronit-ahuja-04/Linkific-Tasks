@@ -2,12 +2,10 @@ import { HACKATHON_TRACKS } from '../../lib/validation.js';
 import { Shield, MapPin } from 'lucide-react';
 
 export default function TeamBadgePreview({ form }) {
-  const currentTrack =
-    HACKATHON_TRACKS.find((t) => t.id === form.track) || HACKATHON_TRACKS[0];
+  const currentTrack = HACKATHON_TRACKS.find((t) => t.id === form.track) || HACKATHON_TRACKS[0];
 
   const hasContent =
-    form.teamName.trim().length > 0 ||
-    form.members.some((m) => m.name.trim().length > 0);
+    form.teamName.trim().length > 0 || form.members.some((m) => m.name.trim().length > 0);
 
   return (
     <div
@@ -18,10 +16,7 @@ export default function TeamBadgePreview({ form }) {
         <div className="badge-slot-punch" />
       </div>
 
-      <div
-        className="badge-track-banner"
-        style={{ backgroundColor: currentTrack.color }}
-      >
+      <div className="badge-track-banner" style={{ backgroundColor: currentTrack.color }}>
         <span className="badge-track-label">{currentTrack.name}</span>
         <span className="badge-year-tag">HackHQ 2026</span>
       </div>
@@ -29,9 +24,7 @@ export default function TeamBadgePreview({ form }) {
       <div className="badge-body">
         <div className="badge-team-name-wrap">
           <span className="badge-type-label">HACKATHON TEAM</span>
-          <h2 className="badge-team-name">
-            {form.teamName.trim() || 'Your Team Name'}
-          </h2>
+          <h2 className="badge-team-name">{form.teamName.trim() || 'Your Team Name'}</h2>
         </div>
 
         {form.contact?.city && (

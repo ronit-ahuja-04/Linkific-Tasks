@@ -91,9 +91,7 @@ export function addToCart(cart, productId) {
   }
 
   return safeCart.map((line) =>
-    line.productId === productId
-      ? { ...line, quantity: line.quantity + 1 }
-      : line
+    line.productId === productId ? { ...line, quantity: line.quantity + 1 } : line
   );
 }
 
@@ -146,4 +144,3 @@ export function validateCoupon(rawCode) {
 
   return { isValid: false, message: 'That code is not valid. Try HACK10.' };
 }
-

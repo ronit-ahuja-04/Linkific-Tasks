@@ -15,7 +15,8 @@ function highlightJSON(jsonString) {
   return jsonString.split('\n').map((line, lineIdx) => {
     // Match JSON components: keys, strings, numbers, booleans, null
     const parts = [];
-    const regex = /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
+    const regex =
+      /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g;
     let lastIndex = 0;
     let match;
 
@@ -135,4 +136,3 @@ export default function StateXray({
     </aside>
   );
 }
-

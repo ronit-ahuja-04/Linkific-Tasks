@@ -102,4 +102,3 @@ export function parseCapacityInput(rawValue, fallback = 200) {
 
   return { value: intVal, isValid: true };
 }
-

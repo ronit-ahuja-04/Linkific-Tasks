@@ -39,4 +39,3 @@ export const STARTER_TASKS = [
     createdAt: 1730160005000,
   },
 ];
-

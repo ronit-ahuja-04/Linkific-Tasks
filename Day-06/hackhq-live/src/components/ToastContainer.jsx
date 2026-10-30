@@ -15,11 +15,7 @@ export default function ToastContainer({ toasts, onDismiss }) {
           const type = toast.type || 'info';
 
           return (
-            <div
-              key={toast.id}
-              className={`hackhq-toast toast-${type}`}
-              role="status"
-            >
+            <div key={toast.id} className={`hackhq-toast toast-${type}`} role="status">
               <div className="toast-icon-wrap" aria-hidden="true">
                 {type === 'success' && <CheckCircle2 size={18} className="toast-icon-mint" />}
                 {type === 'warning' && <AlertCircle size={18} className="toast-icon-tape" />}
@@ -27,9 +23,7 @@ export default function ToastContainer({ toasts, onDismiss }) {
                 {type === 'info' && <Info size={18} className="toast-icon-lanyard" />}
               </div>
 
-              <div className="toast-message">
-                {toast.message}
-              </div>
+              <div className="toast-message">{toast.message}</div>
 
               {toast.action && (
                 <button
@@ -59,4 +53,3 @@ export default function ToastContainer({ toasts, onDismiss }) {
     </div>
   );
 }
-

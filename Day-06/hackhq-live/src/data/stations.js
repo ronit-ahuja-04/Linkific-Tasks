@@ -1,10 +1,4 @@
-import {
-  Users,
-  CheckSquare,
-  ShieldCheck,
-  ShoppingBag,
-  Code2,
-} from 'lucide-react';
+import { Users, CheckSquare, ShieldCheck, ShoppingBag, Code2 } from 'lucide-react';
 
 export const STATIONS = [
   { id: 'checkin', name: 'Check-in', icon: Users, badge: 'Counter' },
@@ -21,4 +15,3 @@ export const STATION_NAMES = {
   swag: 'Swag shop',
   lab: 'State lab',
 };
-

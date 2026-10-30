@@ -39,4 +39,3 @@ grep -rnE "use[A-Z]" src/lib/
   - `docs(day5): ...`
   - `chore(day5): ...`
 - **Integrity**: Never squash or create empty/fake commits. Every commit must reflect actual, working code.
-

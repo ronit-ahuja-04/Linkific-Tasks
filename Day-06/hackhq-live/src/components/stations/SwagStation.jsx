@@ -89,11 +89,7 @@ export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
 
     setCart([]);
     setAppliedCoupon(null);
-    onNotify(
-      `Order placed: ${orderItemCount} items, ${formattedTotal}`,
-      null,
-      'success'
-    );
+    onNotify(`Order placed: ${orderItemCount} items, ${formattedTotal}`, null, 'success');
   };
 
   const statePayload = {
@@ -131,7 +127,6 @@ export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
 
       <div className="station-layout swag-station-layout">
         <div className="station-workspace">
-
           <div className="swag-catalog-receipt-grid">
             {/* Products Ruled Catalog (SW-1) */}
             <div className="swag-products-column">
@@ -366,9 +361,7 @@ export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
 
                   <div className="receipt-footer-barcode" aria-hidden="true">
                     <div className="receipt-barcode-lines" />
-                    <span className="receipt-barcode-code">
-                      HACKHQ-POS-{totalItems * 42}
-                    </span>
+                    <span className="receipt-barcode-code">HACKHQ-POS-{totalItems * 42}</span>
                   </div>
                 </div>
 

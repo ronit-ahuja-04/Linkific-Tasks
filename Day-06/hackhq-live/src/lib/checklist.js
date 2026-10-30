@@ -62,11 +62,7 @@ export function insertTaskAtIndex(tasks, taskToRestore, targetIndex = 0) {
   if (!taskToRestore) return [...tasks];
   const safeList = Array.isArray(tasks) ? tasks : [];
   const idx = Math.max(0, Math.min(safeList.length, targetIndex));
-  return [
-    ...safeList.slice(0, idx),
-    taskToRestore,
-    ...safeList.slice(idx),
-  ];
+  return [...safeList.slice(0, idx), taskToRestore, ...safeList.slice(idx)];
 }
 
 /**
@@ -77,7 +73,13 @@ export function insertTaskAtIndex(tasks, taskToRestore, targetIndex = 0) {
  * @returns {Array}
  */
 export function swapTaskPosition(tasks, fromIndex, toIndex) {
-  if (!Array.isArray(tasks) || fromIndex < 0 || toIndex < 0 || fromIndex >= tasks.length || toIndex >= tasks.length) {
+  if (
+    !Array.isArray(tasks) ||
+    fromIndex < 0 ||
+    toIndex < 0 ||
+    fromIndex >= tasks.length ||
+    toIndex >= tasks.length
+  ) {
     return tasks;
   }
   const next = [...tasks];
@@ -104,4 +106,3 @@ export function mergeStarterTasks(currentTasks, starterTasks) {
 
   return [...(currentTasks || []), ...newItems];
 }
-

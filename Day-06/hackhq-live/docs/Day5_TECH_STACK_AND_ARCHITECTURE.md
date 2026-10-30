@@ -20,16 +20,16 @@ App (src/App.jsx) [Global UI State: theme, activeStation, xrayOn, toasts]
 
 ## 2. Technology Stack
 
-| Layer | Technology | Rationale |
-|---|---|---|
-| **Runtime & Framework** | React 19.0.0 (`react`, `react-dom`) | Standard Linkific internship framework |
-| **Build Tooling** | Vite 5.4.x with `@vitejs/plugin-react` | Instant HMR, rapid bundling, standard modern ESM build pipeline |
-| **Typography** | `@fontsource/barlow-condensed`, `@fontsource/public-sans` | Self-hosted wayfinding display and body fonts; 0 external CDN requests |
-| **Styling** | Native CSS Design Tokens (`src/index.css`) | Zero runtime overhead, native `:focus-visible`, fluid CSS grid/flexbox |
-| **Icons** | `lucide-react` | Clean, accessible venue-signage iconography with strict SVG sizing |
-| **Delight / Celebration** | `canvas-confetti` | Lightweight event-driven confetti burst on 100% checklist completion |
-| **Testing** | `vitest` | Fast unit test runner for 100% pure business logic in `src/lib/` |
-| **Code Quality** | ESLint 9 (`eslint-plugin-react`, `eslint-plugin-react-hooks`) | Zero lint errors, strict hooks verification |
+| Layer                     | Technology                                                    | Rationale                                                              |
+| ------------------------- | ------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Runtime & Framework**   | React 19.0.0 (`react`, `react-dom`)                           | Standard Linkific internship framework                                 |
+| **Build Tooling**         | Vite 5.4.x with `@vitejs/plugin-react`                        | Instant HMR, rapid bundling, standard modern ESM build pipeline        |
+| **Typography**            | `@fontsource/barlow-condensed`, `@fontsource/public-sans`     | Self-hosted wayfinding display and body fonts; 0 external CDN requests |
+| **Styling**               | Native CSS Design Tokens (`src/index.css`)                    | Zero runtime overhead, native `:focus-visible`, fluid CSS grid/flexbox |
+| **Icons**                 | `lucide-react`                                                | Clean, accessible venue-signage iconography with strict SVG sizing     |
+| **Delight / Celebration** | `canvas-confetti`                                             | Lightweight event-driven confetti burst on 100% checklist completion   |
+| **Testing**               | `vitest`                                                      | Fast unit test runner for 100% pure business logic in `src/lib/`       |
+| **Code Quality**          | ESLint 9 (`eslint-plugin-react`, `eslint-plugin-react-hooks`) | Zero lint errors, strict hooks verification                            |
 
 ## 3. Strict Scope & Guardrail Compliance
 
@@ -50,12 +50,14 @@ To satisfy the pedagogical goals of Day 5 (State and Event Handling), the follow
 ## 4. State vs Props Architecture
 
 ### Lifted Application State (`App.jsx`)
+
 1. `theme` (`'light' | 'dark'`): Toggled via accessible switch; initialized lazily from `window.matchMedia`.
 2. `activeStation` (`'checkin' | 'checklist' | 'teams' | 'swag' | 'lab'`): Drives current active view.
 3. `xrayOn` (`boolean`): Controls visibility of live state telemetry inspector.
 4. `toasts` (`Array<{ id, message, action, type }>`): Application notification queue.
 
 ### Station Local State (Encapsulated)
+
 - **Check-in**: Separate `count` (number) and `capacity` (number) variables.
 - **Checklist**: `tasks` (array of objects), `newTaskText` (string), `filter` (`'all' | 'open' | 'done'`), `editingId` (`string | null`), `editText` (string).
 - **Teams**: Single `form` object containing strings, arrays, and nested contact info; plus `touched` object, `registeredTeams` array, and submission status.
@@ -82,4 +84,3 @@ All calculation, validation, formatting, and transformation logic is extracted i
 2. `src/lib/checklist.js`: Filter predicates, completion calculations, array insertion with undo index restoration.
 3. `src/lib/validation.js`: Pure `validateTeam(values)` returning granular field error objects.
 4. `src/lib/cart.js`: Subtotal calculation, discount resolution, total computation, and INR currency formatting.
-

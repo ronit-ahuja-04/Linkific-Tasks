@@ -42,10 +42,7 @@ describe('Teams station validation pure logic (src/lib/validation.js)', () => {
   });
 
   describe('isDuplicateTeamName', () => {
-    const existing = [
-      { teamName: 'Byte Bandits' },
-      { teamName: 'Neural Net Ninjas' },
-    ];
+    const existing = [{ teamName: 'Byte Bandits' }, { teamName: 'Neural Net Ninjas' }];
 
     it('detects duplicate team names case-insensitively', () => {
       expect(isDuplicateTeamName('Byte Bandits', existing)).toBe(true);
@@ -117,4 +114,3 @@ describe('Teams station validation pure logic (src/lib/validation.js)', () => {
     });
   });
 });
-

@@ -1,11 +1,6 @@
 import { Zap, Activity, Moon, Sun } from 'lucide-react';
 
-export default function Header({
-  theme,
-  onToggleTheme,
-  xrayOn,
-  onToggleXray,
-}) {
+export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
   const handleSwitchKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();

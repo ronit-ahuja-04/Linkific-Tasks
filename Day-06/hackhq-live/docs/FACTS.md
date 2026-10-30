@@ -1,18 +1,18 @@
 # Verifiable System Facts & Audit Trail: HackHQ (Day 5)
 
-| Metric | Target | Actual Empirical Value | Verification Command |
-|---|---|---|---|
-| **P0 Requirements Passed** | 100% | 100% (SH, CI, CL, TM, SW, TH) | Manual test script & automated test suite |
-| **Banned Hooks Grep** | 0 occurrences | 0 occurrences | `grep -rnE "use(Effect\|Reducer\|Context\|Ref\|Memo\|Callback\|LayoutEffect)" src/` |
-| **Banned Libraries Grep** | 0 external libraries | 0 external libraries | `grep -rnE "redux\|zustand\|jotai\|mobx\|formik\|react-hook-form\|zod\|immer\|@radix-ui\|@mui" package.json` |
-| **Unit Tests Passing** | >= 20 tests | 58 passing tests | `npm test` |
-| **Test Suites** | 4 suites | 4 passed (`counter`, `checklist`, `validation`, `cart`) | `vitest run` |
-| **ESLint Warnings/Errors** | 0 errors, 0 warnings | 0 errors, 0 warnings | `npm run lint` |
-| **Production Bundle JS** | < 200 KB (gzipped) | 92.04 KB (gzipped) | `npm run build` |
-| **Production Bundle CSS** | < 50 KB (gzipped) | 8.44 KB (gzipped) | `npm run build` |
-| **Station Persistence** | Zero state loss on switch | Verified (`hidden` attribute used in `App.jsx`) | Manual verification & grep |
-| **Touch Target Dimensions** | >= 44x44px for primary controls | Verified in `src/index.css` | DevTools audit |
-| **Focus Indication** | Visible 2px lanyard ring | Verified `:focus-visible` in `src/index.css` | Keyboard Tab navigation |
+| Metric                      | Target                          | Actual Empirical Value                                  | Verification Command                                                                                         |
+| --------------------------- | ------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **P0 Requirements Passed**  | 100%                            | 100% (SH, CI, CL, TM, SW, TH)                           | Manual test script & automated test suite                                                                    |
+| **Banned Hooks Grep**       | 0 occurrences                   | 0 occurrences                                           | `grep -rnE "use(Effect\|Reducer\|Context\|Ref\|Memo\|Callback\|LayoutEffect)" src/`                          |
+| **Banned Libraries Grep**   | 0 external libraries            | 0 external libraries                                    | `grep -rnE "redux\|zustand\|jotai\|mobx\|formik\|react-hook-form\|zod\|immer\|@radix-ui\|@mui" package.json` |
+| **Unit Tests Passing**      | >= 20 tests                     | 58 passing tests                                        | `npm test`                                                                                                   |
+| **Test Suites**             | 4 suites                        | 4 passed (`counter`, `checklist`, `validation`, `cart`) | `vitest run`                                                                                                 |
+| **ESLint Warnings/Errors**  | 0 errors, 0 warnings            | 0 errors, 0 warnings                                    | `npm run lint`                                                                                               |
+| **Production Bundle JS**    | < 200 KB (gzipped)              | 92.04 KB (gzipped)                                      | `npm run build`                                                                                              |
+| **Production Bundle CSS**   | < 50 KB (gzipped)               | 8.44 KB (gzipped)                                       | `npm run build`                                                                                              |
+| **Station Persistence**     | Zero state loss on switch       | Verified (`hidden` attribute used in `App.jsx`)         | Manual verification & grep                                                                                   |
+| **Touch Target Dimensions** | >= 44x44px for primary controls | Verified in `src/index.css`                             | DevTools audit                                                                                               |
+| **Focus Indication**        | Visible 2px lanyard ring        | Verified `:focus-visible` in `src/index.css`            | Keyboard Tab navigation                                                                                      |
 
 ---
 
@@ -29,7 +29,7 @@
 9. `src/components/stations/TeamsStation.jsx`: Dynamic team registration form featuring nested contact info, member rows (1-4), and pure validation.
 10. `src/components/stations/TeamBadgePreview.jsx`: Physical lanyard badge preview reflecting keystroke state in real time.
 11. `src/components/stations/SwagStation.jsx`: Pop-up swag counter with 6 products catalog, line quantity controls, coupon engine, and thermal receipt.
-12. `src/components/stations/StateLabStation.jsx`: Side-by-side interactive laboratories demonstrating *In-Place Mutation vs Spread* and *Direct Value vs Functional Batching*.
+12. `src/components/stations/StateLabStation.jsx`: Side-by-side interactive laboratories demonstrating _In-Place Mutation vs Spread_ and _Direct Value vs Functional Batching_.
 
 ---
 
@@ -62,4 +62,3 @@
   - `removeFromCart`: 1 test (immutable line deletion)
   - `validateCoupon`: 2 tests (case-insensitive `HACK10`, invalid codes)
   - `formatCurrencyINR`: 1 test (Intl formatting with commas and ₹)
-

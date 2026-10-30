@@ -122,4 +122,3 @@ describe('Check-in counter pure logic (src/lib/counter.js)', () => {
     });
   });
 });
-

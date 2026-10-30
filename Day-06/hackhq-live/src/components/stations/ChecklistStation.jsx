@@ -68,9 +68,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
   // Toggle Task Handler with Confetti (CL-2, CL-9)
   const handleToggleTask = (id) => {
     setTasks((prev) => {
-      const nextTasks = prev.map((task) =>
-        task.id === id ? { ...task, done: !task.done } : task
-      );
+      const nextTasks = prev.map((task) => (task.id === id ? { ...task, done: !task.done } : task));
 
       // Check if completing this task finishes all tasks (minimum 3 tasks)
       const nextProgress = calculateProgress(nextTasks);
@@ -132,9 +130,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
     const trimmed = editText.trim();
     if (!trimmed) return;
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, text: trimmed.slice(0, 80) } : t))
-    );
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, text: trimmed.slice(0, 80) } : t)));
     setEditingId(null);
     setEditText('');
   };
@@ -210,16 +206,13 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
 
       <div className="station-layout">
         <div className="station-workspace">
-
           {/* Progress Metric & Thin Bar (CL-5) */}
           <div className="checklist-progress-bar-wrap">
             <div className="checklist-progress-meta">
               <span className="checklist-progress-count tabular-nums">
                 {progress.done} of {progress.total} done
               </span>
-              <span className="checklist-progress-pct tabular-nums">
-                {progress.percentage}%
-              </span>
+              <span className="checklist-progress-pct tabular-nums">{progress.percentage}%</span>
             </div>
             <div
               className="checklist-progress-track"
@@ -256,11 +249,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
                 aria-invalid={!!inputError}
                 aria-describedby={inputError ? `${inputId}-error` : undefined}
               />
-              <button
-                type="submit"
-                className="btn btn-primary btn-add-task"
-                title="Add task"
-              >
+              <button type="submit" className="btn btn-primary btn-add-task" title="Add task">
                 <Plus size={18} aria-hidden="true" />
                 <span>Add task</span>
               </button>
@@ -347,7 +336,11 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
                         aria-checked={task.done}
                         className="task-checkbox-btn"
                         onClick={() => handleToggleTask(task.id)}
-                        aria-label={task.done ? `Mark "${task.text}" as incomplete` : `Mark "${task.text}" as complete`}
+                        aria-label={
+                          task.done
+                            ? `Mark "${task.text}" as incomplete`
+                            : `Mark "${task.text}" as complete`
+                        }
                       >
                         {task.done ? (
                           <CheckSquare size={22} className="check-icon-done" />

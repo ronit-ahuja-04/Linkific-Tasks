@@ -1,13 +1,5 @@
 import { useState, useId } from 'react';
-import {
-  Plus,
-  Trash2,
-  Sparkles,
-  AlertCircle,
-  CheckCircle,
-  FileText,
-  Layers,
-} from 'lucide-react';
+import { Plus, Trash2, Sparkles, AlertCircle, CheckCircle, FileText, Layers } from 'lucide-react';
 import TeamBadgePreview from './TeamBadgePreview.jsx';
 import StateXray from '../StateXray.jsx';
 import {
@@ -87,9 +79,7 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
   const handleMemberChange = (idx, key, value) => {
     setForm((prev) => ({
       ...prev,
-      members: prev.members.map((member, i) =>
-        i === idx ? { ...member, [key]: value } : member
-      ),
+      members: prev.members.map((member, i) => (i === idx ? { ...member, [key]: value } : member)),
     }));
   };
 
@@ -182,7 +172,6 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
 
       <div className="station-layout teams-station-layout">
         <div className="station-workspace">
-
           <div className="teams-form-badge-grid">
             {/* Main Controlled Registration Form (TM-1 to TM-8) */}
             <form onSubmit={handleSubmit} className="teams-registration-form" noValidate>
@@ -248,7 +237,9 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                       onChange={(e) => handleContactChange('email', e.target.value)}
                       onBlur={() => handleBlur('contact.email')}
                       aria-invalid={showError('contact.email')}
-                      aria-describedby={showError('contact.email') ? `${baseId}-email-err` : undefined}
+                      aria-describedby={
+                        showError('contact.email') ? `${baseId}-email-err` : undefined
+                      }
                       className={`form-input ${showError('contact.email') ? 'input-error' : ''}`}
                     />
                     {showError('contact.email') && (
@@ -271,7 +262,9 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                       onChange={(e) => handleContactChange('phone', e.target.value)}
                       onBlur={() => handleBlur('contact.phone')}
                       aria-invalid={showError('contact.phone')}
-                      aria-describedby={showError('contact.phone') ? `${baseId}-phone-err` : undefined}
+                      aria-describedby={
+                        showError('contact.phone') ? `${baseId}-phone-err` : undefined
+                      }
                       className={`form-input ${showError('contact.phone') ? 'input-error' : ''}`}
                     />
                     {showError('contact.phone') && (
@@ -294,7 +287,9 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                       onChange={(e) => handleContactChange('city', e.target.value)}
                       onBlur={() => handleBlur('contact.city')}
                       aria-invalid={showError('contact.city')}
-                      aria-describedby={showError('contact.city') ? `${baseId}-city-err` : undefined}
+                      aria-describedby={
+                        showError('contact.city') ? `${baseId}-city-err` : undefined
+                      }
                       className={`form-input ${showError('contact.city') ? 'input-error' : ''}`}
                     />
                     {showError('contact.city') && (
@@ -310,15 +305,15 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
               {/* Dynamic Members Section (TM-2: 1 to 4 rows) */}
               <div className="members-fieldset">
                 <div className="members-header">
-                  <div className="members-legend">
-                    Team Members ({form.members.length}/4)
-                  </div>
+                  <div className="members-legend">Team Members ({form.members.length}/4)</div>
                   <button
                     type="button"
                     className="btn btn-add-member"
                     onClick={handleAddMember}
                     disabled={form.members.length >= 4}
-                    title={form.members.length >= 4 ? 'Maximum 4 members reached' : 'Add another member'}
+                    title={
+                      form.members.length >= 4 ? 'Maximum 4 members reached' : 'Add another member'
+                    }
                   >
                     <Plus size={16} aria-hidden="true" />
                     <span>Add Member</span>
@@ -345,9 +340,7 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                             type="text"
                             placeholder="Full Name"
                             value={member.name}
-                            onChange={(e) =>
-                              handleMemberChange(idx, 'name', e.target.value)
-                            }
+                            onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
                             onBlur={() => handleBlur(memberErrKey)}
                             aria-invalid={hasMemberErr}
                             className={`form-input ${hasMemberErr ? 'input-error' : ''}`}
@@ -361,9 +354,7 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                           <select
                             id={`${baseId}-mem-role-${idx}`}
                             value={member.role}
-                            onChange={(e) =>
-                              handleMemberChange(idx, 'role', e.target.value)
-                            }
+                            onChange={(e) => handleMemberChange(idx, 'role', e.target.value)}
                             className="form-select member-select"
                           >
                             {MEMBER_ROLES.map((role) => (
@@ -379,7 +370,11 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                           className="btn btn-remove-member"
                           onClick={() => handleRemoveMember(idx)}
                           disabled={form.members.length <= 1}
-                          title={form.members.length <= 1 ? 'At least 1 member is required' : 'Remove member'}
+                          title={
+                            form.members.length <= 1
+                              ? 'At least 1 member is required'
+                              : 'Remove member'
+                          }
                           aria-label={`Remove Member ${idx + 1}`}
                         >
                           <Trash2 size={16} />
@@ -433,7 +428,8 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                     className="agreement-native-chk"
                   />
                   <span>
-                    Our team agrees to the HackHQ Participant Code of Conduct and venue guidelines. <span className="label-required">*</span>
+                    Our team agrees to the HackHQ Participant Code of Conduct and venue guidelines.{' '}
+                    <span className="label-required">*</span>
                   </span>
                 </label>
                 {showError('agreed') && (
@@ -498,7 +494,10 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
                     </div>
                     <div className="reg-members-summary">
                       <strong>Members ({team.members.length}):</strong>{' '}
-                      {team.members.map((m) => m.name).filter(Boolean).join(', ')}
+                      {team.members
+                        .map((m) => m.name)
+                        .filter(Boolean)
+                        .join(', ')}
                     </div>
                   </div>
                 ))}
