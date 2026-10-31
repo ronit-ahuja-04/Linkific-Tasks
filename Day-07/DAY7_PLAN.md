@@ -58,6 +58,18 @@ Day 6 still has 5 uncommitted one-line deletions on `day6/readme` (`useDebounce.
 1. **Variant A** confirmed: build in `Day-07/hackhq-router`.
 2. **Station state:** only the **cart** is lifted and persisted. Other station resets on navigation are documented as expected routing behaviour.
 3. **Organizer login:** fake passcode (`hackhq`) stored in `useLocalStorage`, labelled "demo only, not real security."
+4. **Wow-factor upgrades:** approved, folded into M1–M3 (Section 1.7). Same strict scope: CSS + allowed hooks, no new libraries.
+
+### 1.7 Wow-Factor Upgrades
+Day 6 felt sluggish partly because all 8 stations stayed mounted (`hidden`), so every toast or theme change re-rendered all of them, including the clock and the effect demos. Routing alone fixes that: only the matched page is mounted. On top of that:
+
+| # | Feature | Milestone | How (in scope) | Routing Concept It Shows Off |
+|---|---|---|---|---|
+| W1 | **Page entrance animations** | M1 | CSS `@keyframes` on the page wrapper; route elements mount fresh, so the animation replays on every navigation. Disabled under `prefers-reduced-motion`. | Routes mount/unmount |
+| W2 | **"Signal Lost" 404** | M1 | Animated CSS static/scanline screen, big `404`, suggested `<Link>`s to popular routes | Catch-all `*` route |
+| W3 | **Live Route Badge** | M2 | `RouteBadge` pill in each page header showing the matched pattern + live params, e.g. `/swag/:productId → swag-tee`; pages pass their pattern, params come from `useParams` | Dynamic segments |
+| W4 | **Hero Product Page** | M2 | Large CSS-drawn product visual per category, sticky "Add to cart" bar, previous/next product `<Link>`s | `useParams`, URL-driven browsing |
+| W5 | **⌘K Command Palette** | M3 | `keydown` listener in `useEffect` (with cleanup); filtered list of every route + every product + every station; ↑/↓/Enter; `navigate(path)` on select | Programmatic navigation |
 
 ---
 
@@ -146,6 +158,7 @@ Day 6 still has 5 uncommitted one-line deletions on `day6/readme` (`useDebounce.
   * `src/data/stations.js`: add `path` to each station (`/directory`, `/clock`, `/patterns`, `/checklist`, `/teams`, `/swag`, `/about`, `/contact`)
   * `src/components/Navigation.jsx`: `<button role="tab">` → `<NavLink>` with `className={({ isActive }) => ...}`; remove tab ARIA roles (links are not tabs); `NavLink` adds `aria-current="page"` automatically
   * `src/App.jsx`: keeps theme, X-ray, toasts, laps state; renders the `<Routes>` tree; deletes `activeStation`
+  * `src/index.css`: **W1** page entrance animation, **W2** "Signal Lost" 404 styles
 * **Commands Run by Ronit:**
   ```bash
   git switch main && git pull
@@ -193,6 +206,8 @@ Day 6 still has 5 uncommitted one-line deletions on `day6/readme` (`useDebounce.
   * `src/components/directory/Directory.jsx`: `onSelectUser` → `navigate(userPath(id))`
   * `src/components/directory/UserPosts.jsx`: close → `navigate('/directory')`; `useFetch(buildUserPostsUrl(userId))` unchanged
   * `src/App.jsx`: `const [cart, setCart] = useLocalStorage('hackhq_cart', [])`; routes `swag` (index list + `:productId`) and `directory/:userId?`; delete `selectedUserId` state
+  * `src/components/layout/RouteBadge.jsx`: **W3** live pattern + params pill
+  * `src/pages/swag/ProductDetail.jsx`: **W4** hero layout, sticky cart bar, previous/next links
 * **Commands Run by Ronit:**
   ```bash
   git switch main && git pull
@@ -232,6 +247,7 @@ Day 6 still has 5 uncommitted one-line deletions on `day6/readme` (`useDebounce.
   * `src/components/layout/BackButton.jsx`: `onClick={() => navigate(-1)}`, used on `ProductDetail` and `UserPosts`
   * `src/pages/NavPatterns.jsx`: four cards like Day 6's EffectPatterns: **Push** (`navigate('/swag')`), **Replace** (`navigate('/swag', { replace: true })`), **Back/Forward** (`navigate(-1)` / `navigate(1)`), **Declarative redirect** (link to `/shop`). Each card explains what Back will do afterwards.
   * `src/App.jsx`: routes `contact`, `contact/sent`, `patterns/navigation`, and `shop` → `<Navigate to="/swag" replace />`
+  * `src/components/layout/CommandPalette.jsx`: **W5** ⌘K / Ctrl+K palette; `keydown` listener added and removed in `useEffect`; `navigate(path)` on Enter or click
 * **Commands Run by Ronit:**
   ```bash
   git switch main && git pull
@@ -542,7 +558,7 @@ Day 6 still has 5 uncommitted one-line deletions on `day6/readme` (`useDebounce.
 
 ## 9. Manual Test Script (Verification Checklist)
 
-Ronit runs these 12 checks before submission:
+Ronit runs these 13 checks before submission:
 1. **Deep Link:** Paste `http://localhost:5173/swag/swag-tee` into a new tab. The detail page renders directly.
 2. **Refresh:** On `/directory/3`, press `Cmd+R`. The same user's posts reload; you don't land on the default station.
 3. **Active Link:** Visit each sidebar link. Exactly one is highlighted. On `/swag/swag-tee`, "Swag shop" stays highlighted. On `/`, only Home is.
@@ -554,4 +570,5 @@ Ronit runs these 12 checks before submission:
 9. **Contact Submit:** Invalid form shows inline errors and stays put. A valid submit lands on `/contact/sent`, and Back skips `/contact`.
 10. **Redirect:** Visiting `/shop` lands on `/swag`; Back does not return to `/shop`.
 11. **Protected Route:** Logged out, `/organizer/lab` → `/login`. A wrong passcode shows an error; `hackhq` → `/organizer`. Logout → `/`, and `/organizer` redirects again.
-12. **Clean Console:** Walk every route with StrictMode on. Zero errors or warnings, and no lingering stopwatch interval after leaving `/clock`.
+12. **Wow Checks:** Every page animates in (and doesn't with "Reduce motion" on). ⌘K opens the palette; typing "tee" + Enter lands on the tee's detail page; Esc closes it. The route badge on `/swag/swag-tee` reads `/swag/:productId → swag-tee`. Previous/next links on product pages change the URL.
+13. **Clean Console:** Walk every route with StrictMode on. Zero errors or warnings, and no lingering stopwatch interval after leaving `/clock`.
