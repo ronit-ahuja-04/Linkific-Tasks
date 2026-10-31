@@ -1,33 +1,34 @@
+import { NavLink } from 'react-router-dom';
 import { STATIONS } from '../data/stations.js';
 
-export default function Navigation({ activeStation, onSelectStation }) {
+// CONCEPT: NavLink - knows whether its `to` matches the current URL and sets aria-current="page"
+export default function Navigation() {
   return (
     <nav className="hackhq-nav" aria-label="Control room stations">
       <div className="nav-container">
         <div className="nav-section-label">STATIONS</div>
-        <ul className="nav-list" role="tablist">
+        <ul className="nav-list">
           {STATIONS.map((station) => {
             const Icon = station.icon;
-            const isActive = activeStation === station.id;
 
             return (
-              <li key={station.id} className="nav-item" role="presentation">
-                <button
-                  type="button"
-                  role="tab"
-                  id={`tab-${station.id}`}
-                  aria-selected={isActive}
-                  aria-controls={`panel-${station.id}`}
-                  aria-current={isActive ? 'page' : undefined}
-                  className={`nav-button ${isActive ? 'active' : ''}`}
-                  onClick={() => onSelectStation(station.id)}
+              <li key={station.id} className="nav-item">
+                <NavLink
+                  to={station.path}
+                  // `end` stops "/" from matching every URL that starts with "/"
+                  end={station.path === '/'}
+                  className={({ isActive }) => `nav-button ${isActive ? 'active' : ''}`}
                 >
-                  <span className="nav-icon-box" aria-hidden="true">
-                    <Icon size={18} />
-                  </span>
-                  <span className="nav-name">{station.name}</span>
-                  {isActive && <span className="nav-accent-bar" aria-hidden="true" />}
-                </button>
+                  {({ isActive }) => (
+                    <>
+                      <span className="nav-icon-box" aria-hidden="true">
+                        <Icon size={18} />
+                      </span>
+                      <span className="nav-name">{station.name}</span>
+                      {isActive && <span className="nav-accent-bar" aria-hidden="true" />}
+                    </>
+                  )}
+                </NavLink>
               </li>
             );
           })}
@@ -39,7 +40,7 @@ export default function Navigation({ activeStation, onSelectStation }) {
             <span className="pulse-dot" aria-hidden="true" />
             <span>Live workspace</span>
           </div>
-          <span className="sidebar-date-text">Thursday · 29 Oct 2026</span>
+          <span className="sidebar-date-text">Saturday · 31 Oct 2026</span>
         </div>
       </div>
     </nav>
