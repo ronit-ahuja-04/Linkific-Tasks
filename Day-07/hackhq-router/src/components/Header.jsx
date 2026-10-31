@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { Zap, Activity, Moon, Sun } from 'lucide-react';
+import { Zap, Activity, Moon, Sun, Search } from 'lucide-react';
 
-export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
+export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray, onOpenPalette }) {
   const handleSwitchKeyDown = (e) => {
     if (e.key === ' ' || e.key === 'Enter') {
       e.preventDefault();
@@ -22,6 +22,19 @@ export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
       </Link>
 
       <div className="header-actions">
+        {/* W5: Command palette trigger (also ⌘K / Ctrl+K) */}
+        <button
+          type="button"
+          onClick={onOpenPalette}
+          className="cmdk-trigger"
+          aria-label="Open command palette"
+          aria-keyshortcuts="Meta+K Control+K"
+        >
+          <Search size={15} aria-hidden="true" />
+          <span className="cmdk-trigger-label">Jump to…</span>
+          <kbd className="cmdk-kbd">⌘K</kbd>
+        </button>
+
         {/* State X-ray Toggle Pill */}
         <button
           type="button"
