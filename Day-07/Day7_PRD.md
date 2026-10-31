@@ -1,15 +1,15 @@
 # PRD: HackHQ Router, real URLs for the hackathon control room (Day 7: React Router & Navigation)
 
-| Field          | Value                                                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Owner          | Ronit Ahuja                                                                                                                 |
-| Programme      | Linkific internship, Month 1 (training phase), Day 7                                                                        |
-| Date           | Saturday, 31 October 2026                                                                                                   |
-| Repo path      | `Linkific-Tasks/Day-07/hackhq-router`                                                                                       |
-| Builds on      | Day 6 `hackhq-live` (copied in M0, PR #29)                                                                                  |
-| Status         | **Shipped.** All milestones M0–M5 merged (PRs #29–#34). This PRD records the requirements and their verified status.        |
-| Presentation   | Daily Tech Meet, maximum 4 minutes. Submit on the dashboard **before** presenting.                                          |
-| Companion docs | `Day7_TECH_STACK_AND_ARCHITECTURE.md`, `Day7_DESIGN_SPEC.md`, `FACTS.md`, `../README.md`, `../../DAY7_PLAN.md` (milestones) |
+| Field          | Value                                                                                                                                |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Owner          | Ronit Ahuja                                                                                                                          |
+| Programme      | Linkific internship, Month 1 (training phase), Day 7                                                                                 |
+| Date           | Saturday, 31 October 2026                                                                                                            |
+| Repo path      | `Linkific-Tasks/Day-07/hackhq-router`                                                                                                |
+| Builds on      | Day 6 `hackhq-live` (copied in M0, PR #29)                                                                                           |
+| Status         | **Shipped.** All milestones M0–M5 merged (PRs #29–#34). This PRD records the requirements and their verified status.                 |
+| Presentation   | Daily Tech Meet, maximum 4 minutes. Submit on the dashboard **before** presenting.                                                   |
+| Companion docs | `Day7_TECH_STACK_AND_ARCHITECTURE.md`, `Day7_DESIGN_SPEC.md` (this folder); `hackhq-router/README.md`, `hackhq-router/docs/FACTS.md` |
 
 ---
 

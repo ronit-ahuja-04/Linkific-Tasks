@@ -11,7 +11,7 @@ Companion to `Day7_PRD.md`. Requirement IDs such as `NV-3` and wow items `W1`–
 
 ## 2. Relationship to earlier specs (honest drift note)
 
-`Day5_DESIGN_SPEC.md` described a "venue signage" look (cobalt, tape yellow, no shadows, no eyebrow labels, no monospace labels). During Day 6 the UI was restyled into a **violet/indigo glass control room** (gradient brand mark, frosted header and sidebar, rounded cards). Day 7 builds on that **Day 6 visual language as shipped**, not on the Day 5 spec. Several Day 5 "don'ts" are deliberately used on Day 7 because they now carry meaning:
+`Day5_DESIGN_SPEC.md` (in `Day-05/docs/`) described a "venue signage" look (cobalt, tape yellow, no shadows, no eyebrow labels, no monospace labels). During Day 6 the UI was restyled into a **violet/indigo glass control room** (gradient brand mark, frosted header and sidebar, rounded cards). Day 7 builds on that **Day 6 visual language as shipped**, not on the Day 5 spec. Several Day 5 "don'ts" are deliberately used on Day 7 because they now carry meaning:
 
 | Day 5 rule             | Day 7 use                                             | Why it earns its place                         |
 | ---------------------- | ----------------------------------------------------- | ---------------------------------------------- |
