@@ -101,11 +101,20 @@ export default function App() {
             aria-labelledby="tab-directory"
             hidden={activeStation !== 'directory'}
           >
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              <div className="lg:col-span-7">
-                <Directory selectedUserId={selectedUserId} onSelectUser={setSelectedUserId} />
+            <div className="station-view station-directory">
+              <div className="station-breadcrumb">CONTROL ROOM / DIRECTORY</div>
+              <div className="station-header">
+                <div className="station-title-row">
+                  <h1 className="station-title">Attendee Directory</h1>
+                  <span className="live-status-pill">
+                    <span className="pulse-dot" aria-hidden="true" />
+                    <span>Live API</span>
+                  </span>
+                </div>
               </div>
-              <div className="lg:col-span-5">
+
+              <div className="station-live-grid">
+                <Directory selectedUserId={selectedUserId} onSelectUser={setSelectedUserId} />
                 <UserPosts userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
               </div>
             </div>
@@ -118,7 +127,18 @@ export default function App() {
             aria-labelledby="tab-clock"
             hidden={activeStation !== 'clock'}
           >
-            <div className="max-w-2xl mx-auto">
+            <div className="station-view station-clock">
+              <div className="station-breadcrumb">CONTROL ROOM / HACK CLOCK</div>
+              <div className="station-header">
+                <div className="station-title-row">
+                  <h1 className="station-title">Hack Clock</h1>
+                  <span className="live-status-pill">
+                    <span className="pulse-dot" aria-hidden="true" />
+                    <span>Interval</span>
+                  </span>
+                </div>
+              </div>
+
               <HackClock laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />
             </div>
           </section>
@@ -130,7 +150,20 @@ export default function App() {
             aria-labelledby="tab-patterns"
             hidden={activeStation !== 'patterns'}
           >
-            <EffectPatterns />
+            <div className="station-view station-patterns">
+              <div className="station-breadcrumb">CONTROL ROOM / PATTERNS</div>
+              <div className="station-header">
+                <div className="station-title-row">
+                  <h1 className="station-title">Effect Patterns</h1>
+                  <span className="live-status-pill">
+                    <span className="pulse-dot" aria-hidden="true" />
+                    <span>9 Lifecycles</span>
+                  </span>
+                </div>
+              </div>
+
+              <EffectPatterns />
+            </div>
           </section>
 
           {/* Check-in Station (SH-1: hidden preserves state) */}

@@ -31,34 +31,22 @@ export function Directory({ selectedUserId, onSelectUser }) {
   const users = data?.users || [];
 
   return (
-    <section className="bg-slate-900/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl space-y-5">
-      {/* Directory Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/5">
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-slate-100 tracking-tight">
-              Participant Directory
-            </h2>
-            <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20">
-              Live API
-            </span>
-          </div>
-          <p className="text-xs text-slate-400 mt-1">
+    <div className="live-card">
+      <div className="live-card-header">
+        <div className="live-card-title-group">
+          <h2>Participant Directory</h2>
+          <p className="live-card-subtitle">
             Registered attendees fetched declaratively via DummyJSON API
           </p>
         </div>
 
         {/* Simulate Slow Network Control (PD-5) */}
-        <label
-          htmlFor={slowNetworkCheckboxId}
-          className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none px-3 py-1.5 rounded-lg bg-slate-800/60 border border-white/5 hover:border-slate-700 transition-colors"
-        >
+        <label htmlFor={slowNetworkCheckboxId} className="slow-network-label">
           <input
             id={slowNetworkCheckboxId}
             type="checkbox"
             checked={slowNetwork}
             onChange={(e) => setSlowNetwork(e.target.checked)}
-            className="rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-cyan-500/30"
           />
           <span>Simulate slow network (+1000ms)</span>
         </label>
@@ -80,22 +68,23 @@ export function Directory({ selectedUserId, onSelectUser }) {
         ) : loading ? (
           <UserRowSkeleton count={5} />
         ) : users.length === 0 ? (
-          <div className="py-12 text-center rounded-xl border border-dashed border-slate-800 bg-slate-900/20">
-            <p className="text-sm font-medium text-slate-300">
+          <div className="live-empty-box">
+            <div className="live-empty-title">
               {debouncedQuery
                 ? `No participants found matching "${debouncedQuery}"`
                 : 'No participants found'}
-            </p>
-            <p className="text-xs text-slate-500 mt-1">
+            </div>
+            <div className="live-empty-desc">
               {debouncedQuery
                 ? 'Try searching with a different name or clear the search input.'
                 : 'Try adjusting your query or click Retry to reload the directory.'}
-            </p>
+            </div>
             {debouncedQuery ? (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
+                className="btn btn-secondary"
+                style={{ marginTop: '12px' }}
               >
                 Clear Search
               </button>
@@ -103,14 +92,15 @@ export function Directory({ selectedUserId, onSelectUser }) {
               <button
                 type="button"
                 onClick={refetch}
-                className="mt-4 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-slate-800 text-slate-200 hover:bg-slate-700 transition-colors"
+                className="btn btn-secondary"
+                style={{ marginTop: '12px' }}
               >
                 Reload Participants
               </button>
             )}
           </div>
         ) : (
-          <div className="space-y-2.5 max-h-[480px] overflow-y-auto pr-1">
+          <div className="live-user-list">
             {users.map((user) => (
               <UserRow
                 key={user.id}
@@ -125,13 +115,16 @@ export function Directory({ selectedUserId, onSelectUser }) {
 
       {/* Footer Meta */}
       {data && !loading && !error && (
-        <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono pt-3 border-t border-white/5">
+        <div
+          className="live-search-status-row"
+          style={{ paddingTop: '8px', borderTop: '1px solid var(--color-rule)' }}
+        >
           <span>
             Showing {users.length} of {data.total || users.length} attendees
           </span>
-          <span>Endpoint: /users</span>
+          <span>Endpoint: /users{debouncedQuery ? '/search' : ''}</span>
         </div>
       )}
-    </section>
+    </div>
   );
 }

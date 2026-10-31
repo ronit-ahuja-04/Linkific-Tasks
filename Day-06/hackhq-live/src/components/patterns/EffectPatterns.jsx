@@ -19,8 +19,8 @@ function MountLoggerChild() {
   }, []);
 
   return (
-    <div className="p-2.5 rounded-lg bg-slate-900 border border-white/5 font-mono text-xs text-cyan-300">
-      Status: {log}
+    <div className="pattern-meta-status">
+      Status: <strong>{log}</strong>
     </div>
   );
 }
@@ -52,59 +52,53 @@ export function EffectPatterns() {
   const [ep4User, setEp4User] = useState('Admin');
   const [ep4Activity, setEp4Activity] = useState(0);
   useEffect(() => {
-    // Concern A: User identity synchronization
     console.log(`[EP-4] Concern A: User switched to ${ep4User}`);
   }, [ep4User]);
   useEffect(() => {
-    // Concern B: Activity metric synchronization
     console.log(`[EP-4] Concern B: Activity updated to ${ep4Activity}`);
   }, [ep4Activity]);
 
   return (
-    <section className="bg-slate-900/60 border border-white/10 rounded-2xl p-6 backdrop-blur-md shadow-xl space-y-6">
-      {/* Panel Header */}
-      <div className="pb-4 border-b border-white/5">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-bold text-slate-100 tracking-tight">
-            useEffect Lifecycle Patterns
-          </h2>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20">
-            9 Core Patterns
-          </span>
+    <div className="live-card">
+      <div className="live-card-header">
+        <div className="live-card-title-group">
+          <h2>useEffect Lifecycle Patterns</h2>
+          <p className="live-card-subtitle">
+            Interactive catalog showcasing dependency array variations, cleanup triggers, and
+            anti-pattern protections.
+          </p>
         </div>
-        <p className="text-xs text-slate-400 mt-1">
-          Interactive catalog showcasing dependency array variations, cleanup triggers, and
-          anti-pattern protections.
-        </p>
+        <span className="live-badge-pill">9 Core Patterns</span>
       </div>
 
-      {/* Grid of 9 Pattern Demos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="patterns-grid-container">
         {/* EP-1: Run once ([]) */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-semibold">
-                EP-1
-              </span>
-              <span className="text-[11px] font-mono text-slate-400">deps: []</span>
+            <div className="pattern-card-header">
+              <span className="pattern-tag">EP-1</span>
+              <span className="pattern-dep-tag">deps: []</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Run Once on Mount</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Executes once when mounted and tears down on unmount. React StrictMode simulates this
-              cycle twice in dev.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Run Once on Mount</h3>
+              <p className="pattern-card-desc">
+                Executes once after paint and tears down on unmount. React StrictMode simulates this
+                cycle twice in dev.
+              </p>
+            </div>
           </div>
-          <div className="space-y-2 pt-2 border-t border-white/5">
+          <div className="pattern-card-footer">
             {ep1Mounted ? (
               <MountLoggerChild />
             ) : (
-              <p className="text-xs text-slate-500 font-mono">Child unmounted</p>
+              <div className="pattern-meta-status" style={{ opacity: 0.6 }}>
+                Child unmounted
+              </div>
             )}
             <button
               type="button"
               onClick={() => setEp1Mounted((prev) => !prev)}
-              className="w-full py-1.5 px-3 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+              className="pattern-action-btn"
             >
               {ep1Mounted ? 'Unmount Child' : 'Mount Child'}
             </button>
@@ -112,26 +106,28 @@ export function EffectPatterns() {
         </div>
 
         {/* EP-2: Specific dependencies */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-semibold">
-                EP-2
-              </span>
-              <span className="text-[11px] font-mono text-slate-400">deps: [ep2Count]</span>
+            <div className="pattern-card-header">
+              <span className="pattern-tag">EP-2</span>
+              <span className="pattern-dep-tag">deps: [ep2Count]</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Specific Dependencies</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Executes only when dependent values change. Here, document.title updates synchronously
-              when count increments.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Specific Dependencies</h3>
+              <p className="pattern-card-desc">
+                Executes only when dependent values change. Here, document.title updates when count
+                increments.
+              </p>
+            </div>
           </div>
-          <div className="space-y-2 pt-2 border-t border-white/5">
-            <div className="text-xs font-mono text-cyan-300">Current Count: {ep2Count}</div>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status">
+              Current Count: <strong>{ep2Count}</strong>
+            </div>
             <button
               type="button"
               onClick={() => setEp2Count((c) => c + 1)}
-              className="w-full py-1.5 px-3 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+              className="pattern-action-btn"
             >
               Increment Count (+1)
             </button>
@@ -139,26 +135,33 @@ export function EffectPatterns() {
         </div>
 
         {/* EP-3: Every render */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{ background: 'rgba(245, 158, 11, 0.15)', color: 'var(--color-tape)' }}
+              >
                 EP-3
               </span>
-              <span className="text-[11px] font-mono text-slate-400">deps: none</span>
+              <span className="pattern-dep-tag">deps: none</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Every Render Pass</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Runs after every paint for diagnostics. Calling setState inside this effect would
-              cause an infinite loop!
-            </p>
+            <div className="pattern-card-body">
+              <h3>Every Render Pass</h3>
+              <p className="pattern-card-desc">
+                Runs after every paint for diagnostics. Calling setState inside this effect would
+                cause an infinite loop!
+              </p>
+            </div>
           </div>
-          <div className="space-y-2 pt-2 border-t border-white/5">
-            <div className="text-xs font-mono text-slate-400">Render triggers: {ep3Ticks}</div>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-ink-muted)' }}>
+              Render passes: <strong>{ep3Ticks}</strong>
+            </div>
             <button
               type="button"
               onClick={() => setEp3Ticks((t) => t + 1)}
-              className="w-full py-1.5 px-3 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+              className="pattern-action-btn"
             >
               Trigger Re-render
             </button>
@@ -166,137 +169,177 @@ export function EffectPatterns() {
         </div>
 
         {/* EP-4: Multiple effects */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-semibold">
-                EP-4
-              </span>
-              <span className="text-[11px] font-mono text-slate-400">Multiple effects</span>
+            <div className="pattern-card-header">
+              <span className="pattern-tag">EP-4</span>
+              <span className="pattern-dep-tag">Multiple effects</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Multiple Separate Effects</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Separates independent concerns into distinct effects rather than conflating them into
-              a single monolithic callback.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Multiple Separate Effects</h3>
+              <p className="pattern-card-desc">
+                Separates independent concerns into distinct effects rather than conflating them
+                into a single monolithic callback.
+              </p>
+            </div>
           </div>
-          <div className="flex gap-2 pt-2 border-t border-white/5">
-            <button
-              type="button"
-              onClick={() => setEp4User((u) => (u === 'Admin' ? 'Lead' : 'Admin'))}
-              className="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-            >
-              User: {ep4User}
-            </button>
-            <button
-              type="button"
-              onClick={() => setEp4Activity((a) => a + 1)}
-              className="flex-1 py-1.5 px-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
-            >
-              Act: {ep4Activity}
-            </button>
+          <div className="pattern-card-footer">
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setEp4User((u) => (u === 'Admin' ? 'Lead' : 'Admin'))}
+                className="pattern-action-btn"
+              >
+                User: {ep4User}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEp4Activity((a) => a + 1)}
+                className="pattern-action-btn"
+              >
+                Act: {ep4Activity}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* EP-5: Cleanup abort fetch */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-mint)' }}
+              >
                 EP-5
               </span>
-              <span className="text-[11px] font-mono text-slate-400">Cleanup: Abort</span>
+              <span className="pattern-dep-tag">Cleanup: Abort</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Abort HTTP Requests</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Invokes AbortController.abort() to cancel in-flight HTTP requests and eliminate race
-              conditions.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Abort HTTP Requests</h3>
+              <p className="pattern-card-desc">
+                Invokes AbortController.abort() to cancel in-flight HTTP requests and eliminate race
+                conditions.
+              </p>
+            </div>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <span className="text-xs font-mono text-cyan-400">Verified by: useFetch.js</span>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-mint)' }}>
+              Verified by: useFetch.js
+            </div>
           </div>
         </div>
 
         {/* EP-6: Cleanup timeout */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-mint)' }}
+              >
                 EP-6
               </span>
-              <span className="text-[11px] font-mono text-slate-400">Cleanup: Timeout</span>
+              <span className="pattern-dep-tag">Cleanup: Timeout</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Clear Timeout</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Calls clearTimeout on every new input stroke, buffering rapid typing events.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Clear Timeout</h3>
+              <p className="pattern-card-desc">
+                Calls clearTimeout on every new input stroke, buffering rapid typing events.
+              </p>
+            </div>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <span className="text-xs font-mono text-cyan-400">Verified by: useDebounce.js</span>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-mint)' }}>
+              Verified by: useDebounce.js
+            </div>
           </div>
         </div>
 
         {/* EP-7: Cleanup interval */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-mint)' }}
+              >
                 EP-7
               </span>
-              <span className="text-[11px] font-mono text-slate-400">Cleanup: Interval</span>
+              <span className="pattern-dep-tag">Cleanup: Interval</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Clear Interval</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Calls clearInterval on pause or unmount, preventing timer duplication under
-              StrictMode.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Clear Interval</h3>
+              <p className="pattern-card-desc">
+                Calls clearInterval on pause or unmount, preventing timer duplication under
+                StrictMode.
+              </p>
+            </div>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <span className="text-xs font-mono text-cyan-400">Verified by: useStopwatch.js</span>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-mint)' }}>
+              Verified by: useStopwatch.js
+            </div>
           </div>
         </div>
 
         {/* EP-8: Cleanup listener */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--color-mint)' }}
+              >
                 EP-8
               </span>
-              <span className="text-[11px] font-mono text-slate-400">Cleanup: Listener</span>
+              <span className="pattern-dep-tag">Cleanup: Listener</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Remove Event Listener</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Unregisters global event listeners with identical function references to eliminate
-              memory leaks.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Remove Event Listener</h3>
+              <p className="pattern-card-desc">
+                Unregisters global event listeners with identical function references to eliminate
+                memory leaks.
+              </p>
+            </div>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <span className="text-xs font-mono text-cyan-400">Verified by: useWindowSize.js</span>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-mint)' }}>
+              Verified by: useWindowSize.js
+            </div>
           </div>
         </div>
 
         {/* EP-9: Sync external system */}
-        <div className="p-4 rounded-xl border border-white/5 bg-slate-900/40 space-y-3 flex flex-col justify-between">
+        <div className="pattern-demo-card">
           <div>
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-semibold">
+            <div className="pattern-card-header">
+              <span
+                className="pattern-tag"
+                style={{
+                  background: 'rgba(139, 92, 246, 0.15)',
+                  color: 'var(--color-purple-hero)',
+                }}
+              >
                 EP-9
               </span>
-              <span className="text-[11px] font-mono text-slate-400">External Sync</span>
+              <span className="pattern-dep-tag">External Sync</span>
             </div>
-            <h3 className="text-sm font-semibold text-slate-200 mt-2">Sync External System</h3>
-            <p className="text-xs text-slate-400 mt-1">
-              Synchronizes in-memory React state with browser localStorage with error-safe
-              fallbacks.
-            </p>
+            <div className="pattern-card-body">
+              <h3>Sync External System</h3>
+              <p className="pattern-card-desc">
+                Synchronizes in-memory React state with browser localStorage with error-safe
+                fallbacks.
+              </p>
+            </div>
           </div>
-          <div className="pt-2 border-t border-white/5">
-            <span className="text-xs font-mono text-cyan-400">Verified by: useLocalStorage.js</span>
+          <div className="pattern-card-footer">
+            <div className="pattern-meta-status" style={{ color: 'var(--color-purple-hero)' }}>
+              Verified by: useLocalStorage.js
+            </div>
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

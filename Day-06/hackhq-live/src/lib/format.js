@@ -16,4 +16,3 @@ export function formatElapsed(ms = 0) {
 
   return `${mm}:${ss}.${tenths}`;
 }
-

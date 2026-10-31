@@ -42,4 +42,3 @@ export function useStopwatch() {
 
   return { elapsed, running, start, pause, reset };
 }
-
