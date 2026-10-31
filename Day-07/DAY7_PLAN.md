@@ -572,3 +572,17 @@ Ronit runs these 13 checks before submission:
 11. **Protected Route:** Logged out, `/organizer/lab` → `/login`. A wrong passcode shows an error; `hackhq` → `/organizer`. Logout → `/`, and `/organizer` redirects again.
 12. **Wow Checks:** Every page animates in (and doesn't with "Reduce motion" on). ⌘K opens the palette; typing "tee" + Enter lands on the tee's detail page; Esc closes it. The route badge on `/swag/swag-tee` reads `/swag/:productId → swag-tee`. Previous/next links on product pages change the URL.
 13. **Clean Console:** Walk every route with StrictMode on. Zero errors or warnings, and no lingering stopwatch interval after leaving `/clock`.
+
+---
+
+## 10. Execution Status (31 October 2026)
+
+| Milestone | PR | Status | Notes |
+| --- | --- | --- | --- |
+| M0 | #29, #30 | Done | `@vitejs/plugin-react` upgraded 4 → 6 (Day 6 had a Vite 8 peer conflict). The router-install commit missed #29 and shipped in #30. |
+| M1 | #30 | Done | W1 entrance animation and W2 "Signal lost" 404 included. |
+| M2 | #31 | Done | W3 route badge and W4 hero product page included. |
+| M3 | #32 | Done | Contact and NavPatterns shipped in one commit so every commit builds; W5 ⌘K palette added. |
+| M4 | #33 | Done | Found and fixed a logout bounce caused by `BrowserRouter` transitions (`useTransitions={false}`). |
+| M5 | day7/readme | Done | README, `docs/FACTS.md`, 10 screenshots, 53/53 browser checks. `docs/STANDUP.md` intentionally not committed (Day 6's was removed from `main`); the script was handed over directly. |
+| P1 | — | Not started | Optional. |
