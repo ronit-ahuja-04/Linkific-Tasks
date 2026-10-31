@@ -1,19 +1,18 @@
 import { useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
-import Header from './components/Header.jsx';
-import Navigation from './components/Navigation.jsx';
-import ToastContainer from './components/ToastContainer.jsx';
-import { Directory } from './components/directory/Directory.jsx';
-import { UserPosts } from './components/directory/UserPosts.jsx';
-import { HackClock } from './components/clock/HackClock.jsx';
-import { EffectPatterns } from './components/patterns/EffectPatterns.jsx';
-import { ViewportBadge } from './components/layout/ViewportBadge.jsx';
+import AppLayout from './components/layout/AppLayout.jsx';
 import CheckInStation from './components/stations/CheckInStation.jsx';
 import ChecklistStation from './components/stations/ChecklistStation.jsx';
 import TeamsStation from './components/stations/TeamsStation.jsx';
 import SwagStation from './components/stations/SwagStation.jsx';
 import StateLabStation from './components/stations/StateLabStation.jsx';
-import { STATION_NAMES } from './data/stations.js';
+import Home from './pages/Home.jsx';
+import About from './pages/About.jsx';
+import NotFound from './pages/NotFound.jsx';
+import DirectoryPage from './pages/stations/DirectoryPage.jsx';
+import ClockPage from './pages/stations/ClockPage.jsx';
+import PatternsPage from './pages/stations/PatternsPage.jsx';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -23,12 +22,6 @@ export default function App() {
       ? 'dark'
       : 'light'
   );
-
-  // Active station navigation state (SH-1) - defaults to 'directory' for Day 6
-  const [activeStation, setActiveStation] = useState('directory');
-
-  // Selected participant ID for live user-posts refetching (UP-1)
-  const [selectedUserId, setSelectedUserId] = useState(null);
 
   // Stopwatch laps persisted via useLocalStorage (LS-1, CK-2)
   const [laps, setLaps] = useLocalStorage('hackhq_laps', []);
@@ -79,147 +72,39 @@ export default function App() {
     }, 4500);
   };
 
+  // Props shared by the Day 5 stations
+  const stationProps = { xrayOn, onToggleXray: toggleXray, onNotify: notify };
+
+  // CONCEPT: Routes picks the single best-matching Route; only that page is mounted
   return (
-    <div className={`hackhq-app ${theme}`}>
-      <Header
-        activeStation={activeStation}
-        stationNames={STATION_NAMES}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-        xrayOn={xrayOn}
-        onToggleXray={toggleXray}
-      />
-
-      <div className="hackhq-body">
-        <Navigation activeStation={activeStation} onSelectStation={setActiveStation} />
-
-        <main className="hackhq-main">
-          {/* Directory & Posts Station (Day 6 - M1) */}
-          <section
-            id="panel-directory"
-            role="tabpanel"
-            aria-labelledby="tab-directory"
-            hidden={activeStation !== 'directory'}
-          >
-            <div className="station-view station-directory">
-              <div className="station-breadcrumb">CONTROL ROOM / DIRECTORY</div>
-              <div className="station-header">
-                <div className="station-title-row">
-                  <h1 className="station-title">Attendee Directory</h1>
-                  <span className="live-status-pill">
-                    <span className="pulse-dot" aria-hidden="true" />
-                    <span>Live API</span>
-                  </span>
-                </div>
-              </div>
-
-              <div className="station-live-grid">
-                <Directory selectedUserId={selectedUserId} onSelectUser={setSelectedUserId} />
-                <UserPosts userId={selectedUserId} onClose={() => setSelectedUserId(null)} />
-              </div>
-            </div>
-          </section>
-
-          {/* Hack Clock Station (Day 6 - M3) */}
-          <section
-            id="panel-clock"
-            role="tabpanel"
-            aria-labelledby="tab-clock"
-            hidden={activeStation !== 'clock'}
-          >
-            <div className="station-view station-clock">
-              <div className="station-breadcrumb">CONTROL ROOM / HACK CLOCK</div>
-              <div className="station-header">
-                <div className="station-title-row">
-                  <h1 className="station-title">Hack Clock</h1>
-                  <span className="live-status-pill">
-                    <span className="pulse-dot" aria-hidden="true" />
-                    <span>Interval</span>
-                  </span>
-                </div>
-              </div>
-
-              <HackClock laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />
-            </div>
-          </section>
-
-          {/* Effect Patterns Station (Day 6 - M5) */}
-          <section
-            id="panel-patterns"
-            role="tabpanel"
-            aria-labelledby="tab-patterns"
-            hidden={activeStation !== 'patterns'}
-          >
-            <div className="station-view station-patterns">
-              <div className="station-breadcrumb">CONTROL ROOM / PATTERNS</div>
-              <div className="station-header">
-                <div className="station-title-row">
-                  <h1 className="station-title">Effect Patterns</h1>
-                  <span className="live-status-pill">
-                    <span className="pulse-dot" aria-hidden="true" />
-                    <span>9 Lifecycles</span>
-                  </span>
-                </div>
-              </div>
-
-              <EffectPatterns />
-            </div>
-          </section>
-
-          {/* Check-in Station (SH-1: hidden preserves state) */}
-          <section
-            id="panel-checkin"
-            role="tabpanel"
-            aria-labelledby="tab-checkin"
-            hidden={activeStation !== 'checkin'}
-          >
-            <CheckInStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
-          </section>
-
-          {/* Checklist Station */}
-          <section
-            id="panel-checklist"
-            role="tabpanel"
-            aria-labelledby="tab-checklist"
-            hidden={activeStation !== 'checklist'}
-          >
-            <ChecklistStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
-          </section>
-
-          {/* Teams Station */}
-          <section
-            id="panel-teams"
-            role="tabpanel"
-            aria-labelledby="tab-teams"
-            hidden={activeStation !== 'teams'}
-          >
-            <TeamsStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
-          </section>
-
-          {/* Swag Shop Station */}
-          <section
-            id="panel-swag"
-            role="tabpanel"
-            aria-labelledby="tab-swag"
-            hidden={activeStation !== 'swag'}
-          >
-            <SwagStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
-          </section>
-
-          {/* State Lab Station */}
-          <section
-            id="panel-lab"
-            role="tabpanel"
-            aria-labelledby="tab-lab"
-            hidden={activeStation !== 'lab'}
-          >
-            <StateLabStation xrayOn={xrayOn} onToggleXray={toggleXray} onNotify={notify} />
-          </section>
-        </main>
-      </div>
-
-      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
-      <ViewportBadge />
-    </div>
+    <Routes>
+      <Route
+        element={
+          <AppLayout
+            theme={theme}
+            onToggleTheme={toggleTheme}
+            xrayOn={xrayOn}
+            onToggleXray={toggleXray}
+            toasts={toasts}
+            onDismissToast={dismissToast}
+          />
+        }
+      >
+        <Route index element={<Home />} />
+        <Route path="about" element={<About />} />
+        <Route path="directory" element={<DirectoryPage />} />
+        <Route
+          path="clock"
+          element={<ClockPage laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />}
+        />
+        <Route path="patterns" element={<PatternsPage />} />
+        <Route path="checkin" element={<CheckInStation {...stationProps} />} />
+        <Route path="checklist" element={<ChecklistStation {...stationProps} />} />
+        <Route path="teams" element={<TeamsStation {...stationProps} />} />
+        <Route path="swag" element={<SwagStation {...stationProps} />} />
+        <Route path="lab" element={<StateLabStation {...stationProps} />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   );
 }
