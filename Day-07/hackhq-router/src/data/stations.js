@@ -9,6 +9,7 @@ import {
   Layers,
   LayoutDashboard,
   Info,
+  Mail,
 } from 'lucide-react';
 
 /**
@@ -87,6 +88,14 @@ export const STATIONS = [
     icon: Code2,
     badge: 'X-ray / Lab',
     description: 'Mutation and batching experiments with a live state inspector.',
+  },
+  {
+    id: 'contact',
+    path: '/contact',
+    name: 'Contact',
+    icon: Mail,
+    badge: 'Form',
+    description: 'Message the organizers; submitting navigates with replace.',
   },
   {
     id: 'about',

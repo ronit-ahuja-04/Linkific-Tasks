@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader.jsx';
 import RouteBadge from '../../components/layout/RouteBadge.jsx';
+import BackButton from '../../components/layout/BackButton.jsx';
 import { findProduct, getAdjacentProducts, productPath } from '../../lib/routes.js';
 import {
   addToCart,
@@ -41,7 +42,10 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
     return (
       <div className="station-view product-view">
         <PageHeader breadcrumb={`SWAG / ${productId}`} title="Product not found">
-          <RouteBadge pattern="/swag/:productId" />
+          <div className="page-header-actions">
+            <BackButton fallback="/swag" />
+            <RouteBadge pattern="/swag/:productId" />
+          </div>
         </PageHeader>
         <div className="live-card">
           <div className="live-empty-box" role="alert">
@@ -75,7 +79,10 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
   return (
     <div className="station-view product-view">
       <PageHeader breadcrumb={`SWAG / ${product.id}`} title={product.category}>
-        <RouteBadge pattern="/swag/:productId" />
+        <div className="page-header-actions">
+          <BackButton fallback="/swag" />
+          <RouteBadge pattern="/swag/:productId" />
+        </div>
       </PageHeader>
 
       {/* key: same route, new product -> remount so the entrance animation replays */}

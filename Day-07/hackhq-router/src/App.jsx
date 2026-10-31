@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
 import AppLayout from './components/layout/AppLayout.jsx';
 import CheckInStation from './components/stations/CheckInStation.jsx';
@@ -14,6 +14,9 @@ import DirectoryPage from './pages/stations/DirectoryPage.jsx';
 import ClockPage from './pages/stations/ClockPage.jsx';
 import PatternsPage from './pages/stations/PatternsPage.jsx';
 import ProductDetail from './pages/swag/ProductDetail.jsx';
+import Contact from './pages/Contact.jsx';
+import ContactSent from './pages/ContactSent.jsx';
+import NavPatterns from './pages/NavPatterns.jsx';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -102,6 +105,7 @@ export default function App() {
           element={<ClockPage laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />}
         />
         <Route path="patterns" element={<PatternsPage />} />
+        <Route path="patterns/navigation" element={<NavPatterns />} />
         <Route path="checkin" element={<CheckInStation {...stationProps} />} />
         <Route path="checklist" element={<ChecklistStation {...stationProps} />} />
         <Route path="teams" element={<TeamsStation {...stationProps} />} />
@@ -113,6 +117,10 @@ export default function App() {
           />
         </Route>
         <Route path="lab" element={<StateLabStation {...stationProps} />} />
+        <Route path="contact" element={<Contact onNotify={notify} />} />
+        <Route path="contact/sent" element={<ContactSent />} />
+        {/* CONCEPT: Declarative redirect - legacy URL, replaced so it never stays in history */}
+        <Route path="shop" element={<Navigate to="/swag" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
