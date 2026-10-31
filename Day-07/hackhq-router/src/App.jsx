@@ -17,6 +17,9 @@ import ProductDetail from './pages/swag/ProductDetail.jsx';
 import Contact from './pages/Contact.jsx';
 import ContactSent from './pages/ContactSent.jsx';
 import NavPatterns from './pages/NavPatterns.jsx';
+import Login from './pages/Login.jsx';
+import OrganizerHome from './pages/organizer/OrganizerHome.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -37,6 +40,11 @@ export default function App() {
   const clearLaps = () => {
     setLaps([]);
   };
+
+  // Demo organizer flag (PR-2). Persisted so a refresh keeps you signed in.
+  const [isOrganizer, setIsOrganizer] = useLocalStorage('hackhq_organizer', false);
+  const login = () => setIsOrganizer(true);
+  const logout = () => setIsOrganizer(false);
 
   // Cart lifted here and persisted: /swag and /swag/:productId both read and update it
   const [cart, setCart] = useLocalStorage('hackhq_cart', []);
@@ -94,6 +102,8 @@ export default function App() {
             onToggleXray={toggleXray}
             toasts={toasts}
             onDismissToast={dismissToast}
+            isOrganizer={isOrganizer}
+            onLogout={logout}
           />
         }
       >
@@ -106,7 +116,6 @@ export default function App() {
         />
         <Route path="patterns" element={<PatternsPage />} />
         <Route path="patterns/navigation" element={<NavPatterns />} />
-        <Route path="checkin" element={<CheckInStation {...stationProps} />} />
         <Route path="checklist" element={<ChecklistStation {...stationProps} />} />
         <Route path="teams" element={<TeamsStation {...stationProps} />} />
         <Route path="swag">
@@ -116,11 +125,21 @@ export default function App() {
             element={<ProductDetail cart={cart} setCart={setCart} onNotify={notify} />}
           />
         </Route>
-        <Route path="lab" element={<StateLabStation {...stationProps} />} />
+        <Route path="login" element={<Login isOrganizer={isOrganizer} onLogin={login} />} />
+        {/* CONCEPT: Protected routes - one pathless guard wraps the whole /organizer area */}
+        <Route element={<ProtectedRoute isAllowed={isOrganizer} />}>
+          <Route path="organizer">
+            <Route index element={<OrganizerHome onLogout={logout} />} />
+            <Route path="checkin" element={<CheckInStation {...stationProps} />} />
+            <Route path="lab" element={<StateLabStation {...stationProps} />} />
+          </Route>
+        </Route>
         <Route path="contact" element={<Contact onNotify={notify} />} />
         <Route path="contact/sent" element={<ContactSent />} />
         {/* CONCEPT: Declarative redirect - legacy URL, replaced so it never stays in history */}
         <Route path="shop" element={<Navigate to="/swag" replace />} />
+        <Route path="checkin" element={<Navigate to="/organizer/checkin" replace />} />
+        <Route path="lab" element={<Navigate to="/organizer/lab" replace />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

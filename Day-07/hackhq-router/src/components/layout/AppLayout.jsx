@@ -17,6 +17,8 @@ export default function AppLayout({
   onToggleXray,
   toasts,
   onDismissToast,
+  isOrganizer,
+  onLogout,
 }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
 
@@ -41,6 +43,8 @@ export default function AppLayout({
         xrayOn={xrayOn}
         onToggleXray={onToggleXray}
         onOpenPalette={() => setPaletteOpen(true)}
+        isOrganizer={isOrganizer}
+        onLogout={onLogout}
       />
 
       <div className="hackhq-body">

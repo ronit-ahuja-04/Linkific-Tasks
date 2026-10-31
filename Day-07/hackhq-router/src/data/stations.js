@@ -1,15 +1,14 @@
 import {
-  Users,
   CheckSquare,
   ShieldCheck,
   ShoppingBag,
-  Code2,
   Globe,
   Clock,
   Layers,
   LayoutDashboard,
   Info,
   Mail,
+  Lock,
 } from 'lucide-react';
 
 /**
@@ -50,14 +49,6 @@ export const STATIONS = [
     description: 'Nine interactive useEffect lifecycle demos.',
   },
   {
-    id: 'checkin',
-    path: '/checkin',
-    name: 'Check-in',
-    icon: Users,
-    badge: 'Counter',
-    description: 'Split-flap headcount against venue capacity.',
-  },
-  {
     id: 'checklist',
     path: '/checklist',
     name: 'Checklist',
@@ -82,12 +73,12 @@ export const STATIONS = [
     description: 'Pop-up merch store with coupons and a thermal receipt.',
   },
   {
-    id: 'lab',
-    path: '/lab',
-    name: 'State lab',
-    icon: Code2,
-    badge: 'X-ray / Lab',
-    description: 'Mutation and batching experiments with a live state inspector.',
+    id: 'organizer',
+    path: '/organizer',
+    name: 'Organizer',
+    icon: Lock,
+    badge: 'Guarded',
+    description: 'Check-in and State lab, behind a protected route.',
   },
   {
     id: 'contact',

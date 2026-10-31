@@ -19,7 +19,7 @@ export default function Home() {
         </p>
         <dl className="home-hero-stats">
           <div>
-            <dt>Routes</dt>
+            <dt>Stations</dt>
             <dd className="tabular-nums">{STATIONS.length}</dd>
           </div>
           <div>

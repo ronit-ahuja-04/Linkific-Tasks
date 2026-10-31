@@ -25,6 +25,22 @@ export function buildCommands() {
       path: '/patterns/navigation',
       keywords: 'push replace back forward redirect useNavigate',
     },
+    {
+      id: 'page-organizer-checkin',
+      group: 'Pages',
+      label: 'Check-in (organizer)',
+      hint: '/organizer/checkin',
+      path: '/organizer/checkin',
+      keywords: 'headcount capacity counter guarded protected',
+    },
+    {
+      id: 'page-organizer-lab',
+      group: 'Pages',
+      label: 'State lab (organizer)',
+      hint: '/organizer/lab',
+      path: '/organizer/lab',
+      keywords: 'mutation batching xray guarded protected',
+    },
   ];
 
   const products = SWAG_PRODUCTS.map((product) => ({
