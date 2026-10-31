@@ -1,11 +1,12 @@
 # Tech Stack & Architecture: HackHQ Router (Day 7)
 
-| Field          | Value                                                            |
-| -------------- | ---------------------------------------------------------------- |
-| Owner          | Ronit Ahuja                                                      |
-| Date           | Saturday, 31 October 2026                                        |
-| Status         | Reflects the code merged on `main` after PR #34                  |
-| Companion docs | `Day7_PRD.md`, `Day7_DESIGN_SPEC.md`, `FACTS.md`, `../README.md` |
+| Field          | Value                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------ |
+| Owner          | Ronit Ahuja                                                                                                  |
+| Date           | Saturday, 31 October 2026                                                                                    |
+| Status         | Reflects the code merged on `main` after PR #34                                                              |
+| Companion docs | `Day7_PRD.md`, `Day7_DESIGN_SPEC.md` (this folder); `hackhq-router/README.md`, `hackhq-router/docs/FACTS.md` |
+| Code paths     | Relative to `hackhq-router/` (e.g. `src/App.jsx`)                                                            |
 
 ---
 

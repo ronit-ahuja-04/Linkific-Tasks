@@ -5,7 +5,7 @@
 **Stack:** React 19.3, React Router 7.18 (declarative mode), Vite 8, Vitest 4, native CSS tokens  
 **Scope Guardrails:** `useState`, `useEffect`, `useId` and the Day 6 custom hooks, plus only the router APIs named in the Day 7 task. No Context, no data-router APIs, no extra libraries, zero `eslint-disable` comments.
 
-**Docs:** [PRD](docs/Day7_PRD.md) · [Tech stack & architecture](docs/Day7_TECH_STACK_AND_ARCHITECTURE.md) · [Design spec](docs/Day7_DESIGN_SPEC.md) · [Verified facts](docs/FACTS.md) · [Milestone plan](../DAY7_PLAN.md)
+**Docs:** [PRD](../Day7_PRD.md) · [Tech stack & architecture](../Day7_TECH_STACK_AND_ARCHITECTURE.md) · [Design spec](../Day7_DESIGN_SPEC.md) · [Verified facts](docs/FACTS.md)
 
 ![Mission control home page](docs/screenshots/01-home.png)
 
