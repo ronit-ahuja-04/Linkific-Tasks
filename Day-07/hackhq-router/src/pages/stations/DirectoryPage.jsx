@@ -2,6 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { UserX } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader.jsx';
 import RouteBadge from '../../components/layout/RouteBadge.jsx';
+import BackButton from '../../components/layout/BackButton.jsx';
 import { Directory } from '../../components/directory/Directory.jsx';
 import { UserPosts } from '../../components/directory/UserPosts.jsx';
 import { parseUserId, userPath } from '../../lib/routes.js';
@@ -21,7 +22,10 @@ export default function DirectoryPage() {
   return (
     <div className="station-view station-directory">
       <PageHeader breadcrumb="DIRECTORY" title="Attendee Directory" pill="Live API">
-        <RouteBadge pattern="/directory/:userId?" />
+        <div className="page-header-actions">
+          {rawUserId !== undefined && <BackButton fallback="/directory" />}
+          <RouteBadge pattern="/directory/:userId?" />
+        </div>
       </PageHeader>
 
       <div className="station-live-grid">
