@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Zap, Activity, Moon, Sun } from 'lucide-react';
 
 export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
@@ -10,7 +11,7 @@ export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
 
   return (
     <header className="hackhq-header">
-      <div className="header-brand">
+      <Link to="/" className="header-brand" aria-label="HackHQ mission control home">
         <div className="brand-logo-badge" aria-hidden="true">
           <Zap size={20} className="brand-zap-icon" />
         </div>
@@ -18,7 +19,7 @@ export default function Header({ theme, onToggleTheme, xrayOn, onToggleXray }) {
           <span className="brand-title">HackHQ</span>
           <span className="brand-subtitle">DAY-OF CONTROL ROOM</span>
         </div>
-      </div>
+      </Link>
 
       <div className="header-actions">
         {/* State X-ray Toggle Pill */}
