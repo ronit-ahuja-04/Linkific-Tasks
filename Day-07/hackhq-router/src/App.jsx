@@ -13,6 +13,7 @@ import NotFound from './pages/NotFound.jsx';
 import DirectoryPage from './pages/stations/DirectoryPage.jsx';
 import ClockPage from './pages/stations/ClockPage.jsx';
 import PatternsPage from './pages/stations/PatternsPage.jsx';
+import ProductDetail from './pages/swag/ProductDetail.jsx';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -33,6 +34,9 @@ export default function App() {
   const clearLaps = () => {
     setLaps([]);
   };
+
+  // Cart lifted here and persisted: /swag and /swag/:productId both read and update it
+  const [cart, setCart] = useLocalStorage('hackhq_cart', []);
 
   // State X-ray live inspector toggle (LB-1)
   const [xrayOn, setXrayOn] = useState(false);
@@ -92,7 +96,7 @@ export default function App() {
       >
         <Route index element={<Home />} />
         <Route path="about" element={<About />} />
-        <Route path="directory" element={<DirectoryPage />} />
+        <Route path="directory/:userId?" element={<DirectoryPage />} />
         <Route
           path="clock"
           element={<ClockPage laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />}
@@ -101,7 +105,13 @@ export default function App() {
         <Route path="checkin" element={<CheckInStation {...stationProps} />} />
         <Route path="checklist" element={<ChecklistStation {...stationProps} />} />
         <Route path="teams" element={<TeamsStation {...stationProps} />} />
-        <Route path="swag" element={<SwagStation {...stationProps} />} />
+        <Route path="swag">
+          <Route index element={<SwagStation cart={cart} setCart={setCart} {...stationProps} />} />
+          <Route
+            path=":productId"
+            element={<ProductDetail cart={cart} setCart={setCart} onNotify={notify} />}
+          />
+        </Route>
         <Route path="lab" element={<StateLabStation {...stationProps} />} />
         <Route path="*" element={<NotFound />} />
       </Route>

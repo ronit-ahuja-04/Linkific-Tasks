@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import { Link } from 'react-router-dom';
 import {
   ShoppingBag,
   Plus,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import StateXray from '../StateXray.jsx';
 import { SWAG_PRODUCTS } from '../../data/products.js';
+import { productPath } from '../../lib/routes.js';
 import {
   calculateSubtotal,
   calculateDiscount,
@@ -25,9 +27,8 @@ import {
   MAX_QUANTITY_PER_ITEM,
 } from '../../lib/cart.js';
 
-export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
-  // Cart line items array state (SW-2)
-  const [cart, setCart] = useState([]);
+export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNotify }) {
+  // Cart line items (SW-2) now live in App so they survive list <-> detail navigation
 
   // Controlled coupon input state & applied coupon object (SW-6)
   const [couponInput, setCouponInput] = useState('');
@@ -145,7 +146,11 @@ export default function SwagStation({ xrayOn, onToggleXray, onNotify }) {
                     <li key={product.id} className="product-ruled-item">
                       <div className="product-info-block">
                         <div className="product-name-row">
-                          <h3 className="product-name">{product.name}</h3>
+                          <h3 className="product-name">
+                            <Link to={productPath(product.id)} className="product-name-link">
+                              {product.name}
+                            </Link>
+                          </h3>
                           <span className="product-category-tag">{product.category}</span>
                         </div>
                         <p className="product-description">{product.description}</p>
