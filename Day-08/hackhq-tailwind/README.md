@@ -103,4 +103,4 @@ npm run lint
 - `npm test`: 76 / 76
 - Pages checked in headless Chrome at 390 px, 820 px and 1440 px
 
-The Day 5 specs and `FACTS.md` in `docs/` are carried over from earlier days and describe the old look.
+The original product specs live with the earlier days: [Day 5](../../Day-05/docs/Day5_PRD.md) and [Day 7](../../Day-07/Day7_PRD.md).
