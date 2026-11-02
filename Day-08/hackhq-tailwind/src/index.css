@@ -1,0 +1,226 @@
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'tailwindcss';
+
+/* Dark mode is class-based: <html class="dark"> (set by AppLayout from the persisted theme). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * DESIGN TOKENS
+ * Semantic colours live in CSS variables that flip under .dark, then get exposed to Tailwind
+ * through `@theme inline`. Result: `bg-surface text-ink border-line` adapts to both themes with
+ * no `dark:` prefix. Use `dark:` only for one-off differences.
+ */
+:root {
+  --bg: #f5f5f1;
+  --surface: #ffffff;
+  --surface-2: #eeeee8;
+  --line: #deded6;
+  --ink: #0e0e11;
+  --muted: #5a5a64;
+  --brand: #c8f031;
+  --brand-hover: #b7e016;
+  --on-brand: #0e0e11;
+  --accent: #5636e8;
+  --accent-soft: rgb(86 54 232 / 0.1);
+  --good: #0b8a5d;
+  --good-soft: rgb(11 138 93 / 0.12);
+  --warn: #b45309;
+  --warn-soft: rgb(217 119 6 / 0.14);
+  --bad: #d12a2a;
+  --bad-soft: rgb(209 42 42 / 0.1);
+  --board: #0e0e11;
+  --on-board: #f4f4f5;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #09090c;
+  --surface: #131317;
+  --surface-2: #1b1b21;
+  --line: #2a2a33;
+  --ink: #f4f4f5;
+  --muted: #9b9ba8;
+  --brand: #d2ff3f;
+  --brand-hover: #e1ff7a;
+  --on-brand: #0e0e11;
+  --accent: #a98bff;
+  --accent-soft: rgb(169 139 255 / 0.14);
+  --good: #3fd69a;
+  --good-soft: rgb(63 214 154 / 0.14);
+  --warn: #fbbf24;
+  --warn-soft: rgb(251 191 36 / 0.14);
+  --bad: #ff6b6b;
+  --bad-soft: rgb(255 107 107 / 0.14);
+  --board: #050507;
+  --on-board: #f4f4f5;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-bad: var(--bad);
+  --color-bad-soft: var(--bad-soft);
+  --color-board: var(--board);
+  --color-on-board: var(--on-board);
+}
+
+@theme {
+  --font-display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-card: 1.25rem;
+  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+  --shadow-pop: 0 20px 50px -12px rgb(0 0 0 / 0.35);
+
+  --animate-rise: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-fade: fade 200ms ease-out both;
+  --animate-pop: pop 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+  --animate-toast: toast 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-flap: flap 260ms cubic-bezier(0.4, 0, 0.2, 1);
+  --animate-settle: settle 260ms ease-out both;
+  --animate-ping-slow: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-scan: scan 3s linear infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: scale(0.94);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes toast {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes flap {
+    0%,
+    100% {
+      transform: rotateX(0deg);
+    }
+    50% {
+      transform: rotateX(-90deg);
+    }
+  }
+  @keyframes settle {
+    from {
+      opacity: 0.5;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes ping-slow {
+    75%,
+    100% {
+      transform: scale(2.2);
+      opacity: 0;
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes scan {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(100%);
+    }
+  }
+}
+
+@layer base {
+  html {
+    background-color: var(--bg);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-bg font-sans text-ink antialiased;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+  }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+}
+
+/* Respect users who prefer less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
