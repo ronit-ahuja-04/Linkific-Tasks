@@ -48,7 +48,7 @@ Backend services, authentication against a real server, and any library the day'
 | 5   | React state and events                   | HackHQ control room: 5 stations, State Lab, State X-ray, 58 tests | [README](Day-05/README.md) · [PRD](Day-05/docs/Day5_PRD.md) · [Architecture](Day-05/docs/Day5_TECH_STACK_AND_ARCHITECTURE.md) |
 | 6   | `useEffect` and custom hooks             | HackHQ Live: debounced directory, hack clock, localStorage       | [README](Day-06/hackhq-live/README.md) · [Plan](Day-06/DAY6_PLAN.md)                                              |
 | 7   | React Router and navigation              | HackHQ Router: real URLs for every station, protected routes     | [README](Day-07/hackhq-router/README.md) · [PRD](Day-07/Day7_PRD.md) · [Architecture](Day-07/Day7_TECH_STACK_AND_ARCHITECTURE.md) · [Design spec](Day-07/Day7_DESIGN_SPEC.md) |
-| 8   | Tailwind CSS                             | HackHQ Tailwind: full restyle, design tokens, dark mode          | [README](Day-08/hackhq-tailwind/README.md)                                                                       |
+| 8   | Tailwind CSS                             | HackHQ Tailwind: full restyle, design tokens, dark mode          | [README](Day-08/hackhq-tailwind/README.md) · [PRD](Day-08/Day8_PRD.md)                                           |
 
 ---
 

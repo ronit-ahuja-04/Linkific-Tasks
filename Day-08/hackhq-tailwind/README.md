@@ -3,6 +3,7 @@
 **Day 8 Project:** Linkific Month 1 Training
 **Author:** Ronit Ahuja
 **Stack:** React 19, React Router 7, Vite 8, **Tailwind CSS 4** (`@tailwindcss/vite`), Vitest 4
+**PRD:** [Day8_PRD.md](../Day8_PRD.md)
 **Starting point:** the Day 7 app (`Day-07/hackhq-router`). Behaviour, routes and tests are unchanged. Only the interface was rebuilt.
 
 ![Home](docs/screenshots/01-home.png)
