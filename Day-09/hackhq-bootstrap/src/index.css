@@ -243,6 +243,7 @@ h4 {
   --bs-nav-pills-border-radius: 0.75rem;
   --bs-nav-pills-link-active-bg: var(--ink);
   --bs-nav-pills-link-active-color: var(--bg);
+  --bs-nav-link-font-size: 0.9375rem;
 }
 
 .offcanvas {

@@ -32,7 +32,7 @@ function NavList({ onNavigate, badges = {} }) {
                 <>
                   <span
                     className={cx('d-grid rounded-2', isActive ? 'bg-brand' : 'bg-body-secondary')}
-                    style={{ width: '2rem', height: '2rem', placeItems: 'center' }}
+                    style={{ width: '1.75rem', height: '1.75rem', placeItems: 'center' }}
                     aria-hidden="true"
                   >
                     <Icon size={16} />
@@ -73,7 +73,7 @@ export function Sidebar({ badges }) {
   return (
     <nav
       aria-label="Control room stations"
-      className="app-sidebar sticky-top d-flex flex-column overflow-y-auto py-4 pe-3"
+      className="app-sidebar sticky-top d-flex flex-column overflow-y-auto py-4 pe-2"
     >
       <Eyebrow className="mb-2 px-2">Stations</Eyebrow>
       <NavList badges={badges} />
