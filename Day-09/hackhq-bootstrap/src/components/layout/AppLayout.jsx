@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import Header from '../Header.jsx';
-import Navigation from '../Navigation.jsx';
+import { Container, Row, Col } from 'react-bootstrap';
+import { Sidebar, NavDrawer } from '../Navigation.jsx';
 import ToastContainer from '../ToastContainer.jsx';
 import { ViewportBadge } from './ViewportBadge.jsx';
 import CommandPalette from './CommandPalette.jsx';
@@ -24,9 +25,9 @@ export default function AppLayout({
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
 
-  // Tailwind's class-based dark mode reads `.dark` on <html>
+  // Bootstrap 5.3 colour modes read `data-bs-theme` on <html>
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.setAttribute('data-bs-theme', theme);
   }, [theme]);
 
   // Global ⌘K / Ctrl+K shortcut, subscribed once and removed on unmount
@@ -43,7 +44,7 @@ export default function AppLayout({
   }, []);
 
   return (
-    <div className="min-h-dvh bg-bg text-ink">
+    <div className="min-vh-100 d-flex flex-column">
       <Header
         theme={theme}
         onToggleTheme={onToggleTheme}
@@ -55,13 +56,19 @@ export default function AppLayout({
         onLogout={onLogout}
       />
 
-      <div className="mx-auto flex max-w-[90rem]">
-        <Navigation open={navOpen} onClose={() => setNavOpen(false)} />
+      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} />
 
-        <main className="min-w-0 flex-1 px-4 py-8 sm:px-8 lg:py-10">
-          <Outlet />
-        </main>
-      </div>
+      {/* CONCEPT: Grid - the sidebar takes 3 of 12 columns at lg, 2 at xl; main takes the rest. */}
+      <Container fluid className="app-shell flex-grow-1 px-sm-3">
+        <Row>
+          <Col lg={3} xl={2} className="d-none d-lg-block">
+            <Sidebar />
+          </Col>
+          <Col as="main" lg={9} xl={10} className="px-3 px-sm-4 py-4 py-lg-5">
+            <Outlet />
+          </Col>
+        </Row>
+      </Container>
 
       <Footer />
 

@@ -17,7 +17,7 @@
       try {
         var stored = JSON.parse(localStorage.getItem('hackhq_theme'));
         var dark = stored ? stored === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
-        document.documentElement.classList.toggle('dark', dark);
+        document.documentElement.setAttribute('data-bs-theme', dark ? 'dark' : 'light');
       } catch (e) {}
     </script>
     <title>HackHQ · Hackathon Control Room</title>

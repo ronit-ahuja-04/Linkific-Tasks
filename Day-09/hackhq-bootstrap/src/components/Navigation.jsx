@@ -1,97 +1,102 @@
 import { NavLink } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { Nav, Offcanvas } from 'react-bootstrap';
 import { STATIONS } from '../data/stations.js';
-import { PulseDot, cx } from './ui.jsx';
+import { Eyebrow, PulseDot, cx } from './ui.jsx';
 
 /**
  * CONCEPT: NavLink - knows whether its `to` matches the current URL and sets aria-current="page".
- * Desktop: a sticky sidebar. Below `lg`: an off-canvas drawer controlled by AppLayout.
+ * The same station list renders twice: as a sticky sidebar from `lg` up, and inside an
+ * Offcanvas drawer below `lg` that AppLayout opens from the header button.
  */
-export default function Navigation({ open, onClose }) {
+function NavList({ onNavigate }) {
   return (
-    <>
-      {/* Mobile backdrop */}
-      <div
-        className={cx(
-          'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm transition-opacity lg:hidden',
-          open ? 'opacity-100' : 'pointer-events-none opacity-0'
-        )}
-        onClick={onClose}
-        aria-hidden="true"
-      />
+    <Nav as="ul" variant="pills" className="flex-column gap-1 flex-nowrap">
+      {STATIONS.map((station) => {
+        const Icon = station.icon;
 
-      <nav
-        aria-label="Control room stations"
-        className={cx(
-          'fixed inset-y-0 left-0 z-50 flex w-72 flex-col gap-1 border-r border-line bg-surface p-4 transition-transform duration-300',
-          'lg:sticky lg:top-16 lg:z-10 lg:h-[calc(100dvh-4rem)] lg:w-64 lg:shrink-0 lg:translate-x-0 lg:bg-transparent',
-          open ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        <div className="mb-2 flex items-center justify-between px-2 lg:mb-1">
-          <p className="font-mono text-[0.68rem] font-medium tracking-[0.2em] text-muted">
-            STATIONS
-          </p>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-muted hover:bg-surface-2 lg:hidden"
-            aria-label="Close navigation"
-          >
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
+        return (
+          <li key={station.id} className="nav-item">
+            <NavLink
+              to={station.path}
+              // `end` stops "/" from matching every URL that starts with "/"
+              end={station.path === '/'}
+              onClick={onNavigate}
+              className={({ isActive }) =>
+                cx(
+                  'nav-link d-flex align-items-center gap-3 fw-medium',
+                  isActive ? 'active' : 'text-body-secondary'
+                )
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={cx('d-grid rounded-2', isActive ? 'bg-brand' : 'bg-body-secondary')}
+                    style={{ width: '2rem', height: '2rem', placeItems: 'center' }}
+                    aria-hidden="true"
+                  >
+                    <Icon size={16} />
+                  </span>
+                  <span className="text-truncate">{station.name}</span>
+                </>
+              )}
+            </NavLink>
+          </li>
+        );
+      })}
+    </Nav>
+  );
+}
 
-        <ul className="flex flex-1 flex-col gap-1 overflow-y-auto">
-          {STATIONS.map((station) => {
-            const Icon = station.icon;
+function LiveCard() {
+  return (
+    <div className="mt-3 rounded-4 border bg-body-tertiary p-3">
+      <p className="d-flex align-items-center gap-2 small fw-semibold mb-1">
+        <PulseDot />
+        Live workspace
+      </p>
+      <p className="mb-0 font-monospace text-body-secondary" style={{ fontSize: '0.68rem' }}>
+        Saturday · 31 Oct 2026
+      </p>
+    </div>
+  );
+}
 
-            return (
-              <li key={station.id}>
-                <NavLink
-                  to={station.path}
-                  // `end` stops "/" from matching every URL that starts with "/"
-                  end={station.path === '/'}
-                  onClick={onClose}
-                  className={({ isActive }) =>
-                    cx(
-                      'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition',
-                      isActive
-                        ? 'bg-ink text-bg shadow-sm'
-                        : 'text-muted hover:bg-surface-2 hover:text-ink'
-                    )
-                  }
-                >
-                  {({ isActive }) => (
-                    <>
-                      <span
-                        className={cx(
-                          'grid size-8 place-items-center rounded-lg transition',
-                          isActive
-                            ? 'bg-brand text-on-brand'
-                            : 'bg-surface-2 group-hover:bg-surface'
-                        )}
-                        aria-hidden="true"
-                      >
-                        <Icon size={16} />
-                      </span>
-                      <span className="truncate">{station.name}</span>
-                    </>
-                  )}
-                </NavLink>
-              </li>
-            );
-          })}
-        </ul>
+/** Desktop sidebar. AppLayout puts it in a column that only shows from `lg` up. */
+export function Sidebar() {
+  return (
+    <nav
+      aria-label="Control room stations"
+      className="app-sidebar sticky-top d-flex flex-column overflow-y-auto py-4 pe-3"
+    >
+      <Eyebrow className="mb-2 px-2">Stations</Eyebrow>
+      <NavList />
+      <LiveCard />
+    </nav>
+  );
+}
 
-        <div className="mt-2 rounded-2xl border border-line bg-surface-2/60 p-3.5">
-          <p className="flex items-center gap-2 text-xs font-semibold">
-            <PulseDot />
-            Live workspace
-          </p>
-          <p className="mt-1 font-mono text-[0.68rem] text-muted">Saturday · 31 Oct 2026</p>
-        </div>
-      </nav>
-    </>
+/** Mobile drawer: React Bootstrap's Offcanvas handles the backdrop, focus trap and Escape. */
+export function NavDrawer({ open, onClose }) {
+  return (
+    <Offcanvas
+      show={open}
+      onHide={onClose}
+      placement="start"
+      className="app-drawer d-lg-none"
+      aria-labelledby="nav-drawer-title"
+    >
+      <Offcanvas.Header closeButton closeLabel="Close navigation">
+        <Offcanvas.Title as="p" id="nav-drawer-title" className="small font-monospace ls-wider">
+          STATIONS
+        </Offcanvas.Title>
+      </Offcanvas.Header>
+      <Offcanvas.Body className="d-flex flex-column pt-0">
+        <nav aria-label="Control room stations">
+          <NavList onNavigate={onClose} />
+        </nav>
+        <LiveCard />
+      </Offcanvas.Body>
+    </Offcanvas>
   );
 }
