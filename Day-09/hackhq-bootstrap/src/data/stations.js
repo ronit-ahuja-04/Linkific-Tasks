@@ -11,6 +11,7 @@ import {
   Lock,
   Handshake,
   Megaphone,
+  CalendarDays,
 } from 'lucide-react';
 
 /**
@@ -33,6 +34,14 @@ export const STATIONS = [
     icon: Megaphone,
     badge: 'Feed',
     description: 'Organizer updates as cards, filtered by category, with an unread count.',
+  },
+  {
+    id: 'schedule',
+    path: '/schedule',
+    name: 'Schedule',
+    icon: CalendarDays,
+    badge: 'Agenda',
+    description: 'Three days of sessions in tabs, with a personal schedule and clash warnings.',
   },
   {
     id: 'directory',

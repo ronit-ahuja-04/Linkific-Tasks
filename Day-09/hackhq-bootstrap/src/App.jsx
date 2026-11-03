@@ -21,6 +21,7 @@ import NavPatterns from './pages/NavPatterns.jsx';
 import Login from './pages/Login.jsx';
 import OrganizerHome from './pages/organizer/OrganizerHome.jsx';
 import Announcements from './pages/Announcements.jsx';
+import Schedule from './pages/Schedule.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 import { SEED_ANNOUNCEMENTS } from './data/announcements.js';
 import {
@@ -32,6 +33,7 @@ import {
   editAnnouncement,
   removeAnnouncement,
 } from './lib/announcements.js';
+import { toggleSaved } from './lib/schedule.js';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -82,6 +84,10 @@ export default function App() {
   const editPost = (id, fields) =>
     setAnnouncementChanges((prev) => editAnnouncement(prev, id, fields));
   const removePost = (id) => setAnnouncementChanges((prev) => removeAnnouncement(prev, id));
+
+  // My schedule: only the ids of saved sessions are stored; the sessions themselves are seed data
+  const [savedSessionIds, setSavedSessionIds] = useLocalStorage('hackhq_schedule_saved', []);
+  const toggleSavedSession = (id) => setSavedSessionIds((prev) => toggleSaved(prev, id));
 
   // State X-ray live inspector toggle (LB-1)
   const [xrayOn, setXrayOn] = useState(false);
@@ -154,6 +160,16 @@ export default function App() {
               onAdd={addPost}
               onEdit={editPost}
               onRemove={removePost}
+              onNotify={notify}
+            />
+          }
+        />
+        <Route
+          path="schedule"
+          element={
+            <Schedule
+              savedIds={savedSessionIds}
+              onToggleSaved={toggleSavedSession}
               onNotify={notify}
             />
           }
