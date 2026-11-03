@@ -36,10 +36,7 @@ function Column({ wrong, title, code, children, note }) {
           <Icon size={18} aria-hidden="true" />
           <span>{title}</span>
         </div>
-        <div
-          className="overflow-x-auto rounded-3 p-3 font-monospace small"
-          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
-        >
+        <div className="overflow-x-auto rounded-3 p-3 font-monospace small panel-board">
           <pre className="mb-0">
             <code className="text-reset">{code}</code>
           </pre>

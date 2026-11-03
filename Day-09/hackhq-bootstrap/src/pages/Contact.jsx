@@ -172,7 +172,7 @@ export default function Contact({ onNotify }) {
                   >
                     <Icon size={16} />
                   </span>
-                  <div style={{ minWidth: 0 }}>
+                  <div className="min-w-0">
                     <p
                       className="mb-0 font-monospace text-uppercase opacity-75"
                       style={{ fontSize: '0.68rem' }}

@@ -127,10 +127,7 @@ export default function CheckInStation({ xrayOn, onToggleXray, onNotify }) {
             </div>
 
             {/* Split-Flap Display */}
-            <div
-              className="d-flex justify-content-center overflow-x-auto rounded-4 p-3 p-sm-4"
-              style={{ background: 'var(--board)', color: 'var(--on-board)' }}
-            >
+            <div className="d-flex justify-content-center overflow-x-auto rounded-4 p-3 p-sm-4 panel-board">
               <SplitFlapBoard count={count} capacity={capacity} />
             </div>
 

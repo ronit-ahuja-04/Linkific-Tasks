@@ -210,10 +210,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
 
       <div className="d-flex flex-column gap-4">
         {/* Progress Metric & Thin Bar (CL-5) */}
-        <section
-          className="rounded-4 p-3 p-sm-4 shadow-sm"
-          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
-        >
+        <section className="rounded-4 p-3 p-sm-4 shadow-sm panel-board">
           <div className="mb-3 d-flex align-items-end justify-content-between gap-3">
             <div>
               <Eyebrow className="mb-1 text-reset opacity-75">Setup progress</Eyebrow>
@@ -356,7 +353,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
                       )}
                     </button>
 
-                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                    <div className="flex-grow-1 min-w-0">
                       {isEditing ? (
                         <InputGroup size="sm">
                           <Form.Control

@@ -18,8 +18,7 @@ export default function Home() {
     <div className="d-flex flex-column gap-5">
       <section
         aria-labelledby="home-hero-title"
-        className="position-relative animate-rise overflow-hidden rounded-5 px-4 px-sm-5 py-5"
-        style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+        className="position-relative animate-rise overflow-hidden rounded-5 px-4 px-sm-5 py-5 panel-board"
       >
         {/* Decorative grid + glow */}
         <div

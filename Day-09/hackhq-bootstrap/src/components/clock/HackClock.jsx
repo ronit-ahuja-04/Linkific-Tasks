@@ -35,10 +35,7 @@ export function HackClock({ laps = [], onAddLap, onClearLaps }) {
         </div>
 
         {/* Big Digital Display */}
-        <div
-          className="rounded-4 px-3 py-5 text-center"
-          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
-        >
+        <div className="rounded-4 px-3 py-5 text-center panel-board">
           <div
             className="font-monospace fw-bold text-brand"
             style={{ fontSize: 'clamp(2.75rem, 11vw, 4.5rem)', fontVariantNumeric: 'tabular-nums' }}

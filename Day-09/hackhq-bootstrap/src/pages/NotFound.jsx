@@ -16,8 +16,8 @@ export default function NotFound() {
   return (
     <div className="mx-auto" style={{ maxWidth: '48rem' }}>
       <section
-        className="position-relative overflow-hidden rounded-4 px-4 py-5 text-center shadow"
-        style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+        className="position-relative overflow-hidden rounded-4 px-4 py-5 text-center shadow panel-board"
+
         aria-labelledby="notfound-title"
       >
         <div

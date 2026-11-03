@@ -77,6 +77,19 @@ export default function Schedule({ savedIds, onToggleSaved, onNotify }) {
     setParams(next, { replace: true });
   };
 
+  // CONCEPT: Keyboard support - React Bootstrap Tabs handle the arrow keys; Home and End jump to
+  // the first and last tab, as the WAI-ARIA tabs pattern recommends.
+  const tabKeys = [...DAYS, 'mine'];
+  const handleTabsKeyDown = (event) => {
+    if (event.target.getAttribute('role') !== 'tab') return;
+    if (event.key !== 'Home' && event.key !== 'End') return;
+
+    event.preventDefault();
+    const key = event.key === 'Home' ? tabKeys[0] : tabKeys[tabKeys.length - 1];
+    setActiveTab(key);
+    requestAnimationFrame(() => document.getElementById(`schedule-tabs-tab-${key}`)?.focus());
+  };
+
   const listProps = { savedIds, clashingIds, nowIds, nextIds, onToggleSaved: handleToggle };
 
   return (
@@ -140,51 +153,53 @@ export default function Schedule({ savedIds, onToggleSaved, onNotify }) {
       )}
 
       {/* CONCEPT: Tabs - one pane per day plus a "My schedule" pane; only the active pane is shown */}
-      <Tabs
-        id="schedule-tabs"
-        activeKey={activeTab}
-        onSelect={(key) => setActiveTab(key)}
-        className="mb-4 flex-nowrap overflow-x-auto overflow-y-hidden text-nowrap"
-      >
-        {DAYS.map((day) => {
-          const sessions = filterByTrack(BY_DAY[day], track);
-          return (
-            <Tab key={day} eventKey={day} title={formatDayLabel(day)}>
-              {sessions.length === 0 ? (
-                <Alert variant="secondary" className="text-center">
-                  No {track} sessions on this day.
-                </Alert>
-              ) : (
-                <SessionList sessions={sessions} {...listProps} />
-              )}
-            </Tab>
-          );
-        })}
-        <Tab
-          eventKey="mine"
-          title={
-            <span className="d-inline-flex align-items-center gap-2">
-              My schedule
-              <Badge tone={saved.length > 0 ? 'accent' : 'neutral'}>{saved.length}</Badge>
-            </span>
-          }
+      <div onKeyDown={handleTabsKeyDown}>
+        <Tabs
+          id="schedule-tabs"
+          activeKey={activeTab}
+          onSelect={(key) => setActiveTab(key)}
+          className="mb-4 flex-nowrap overflow-x-auto overflow-y-hidden text-nowrap"
         >
-          {saved.length === 0 ? (
-            <Alert variant="secondary" className="text-center">
-              Nothing saved yet. Open a session on any day and choose Add to my schedule.
-            </Alert>
-          ) : (
-            DAYS.filter((day) => savedByDay[day]).map((day) => (
-              <section key={day} className="mb-4" aria-labelledby={`mine-${day}`}>
-                <h2 id={`mine-${day}`} className="fs-5 fw-bold mb-3">
-                  {formatDayLabel(day)}
-                </h2>
-                <SessionList sessions={savedByDay[day]} {...listProps} />
-              </section>
-            ))
-          )}
-        </Tab>
-      </Tabs>
+          {DAYS.map((day) => {
+            const sessions = filterByTrack(BY_DAY[day], track);
+            return (
+              <Tab key={day} eventKey={day} title={formatDayLabel(day)}>
+                {sessions.length === 0 ? (
+                  <Alert variant="secondary" className="text-center">
+                    No {track} sessions on this day.
+                  </Alert>
+                ) : (
+                  <SessionList sessions={sessions} {...listProps} />
+                )}
+              </Tab>
+            );
+          })}
+          <Tab
+            eventKey="mine"
+            title={
+              <span className="d-inline-flex align-items-center gap-2">
+                My schedule
+                <Badge tone={saved.length > 0 ? 'accent' : 'neutral'}>{saved.length}</Badge>
+              </span>
+            }
+          >
+            {saved.length === 0 ? (
+              <Alert variant="secondary" className="text-center">
+                Nothing saved yet. Open a session on any day and choose Add to my schedule.
+              </Alert>
+            ) : (
+              DAYS.filter((day) => savedByDay[day]).map((day) => (
+                <section key={day} className="mb-4" aria-labelledby={`mine-${day}`}>
+                  <h2 id={`mine-${day}`} className="fs-5 fw-bold mb-3">
+                    {formatDayLabel(day)}
+                  </h2>
+                  <SessionList sessions={savedByDay[day]} {...listProps} />
+                </section>
+              ))
+            )}
+          </Tab>
+        </Tabs>
+      </div>
     </>
   );
 }
