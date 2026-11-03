@@ -3,7 +3,8 @@ import { Plus, Trash2, Sparkles, AlertCircle, CheckCircle, FileText, Layers } fr
 import TeamBadgePreview from './TeamBadgePreview.jsx';
 import StateXray from '../StateXray.jsx';
 import PageHeader from '../layout/PageHeader.jsx';
-import { Badge, Button, Card, Eyebrow, cx, errorClass, inputClass, labelClass } from '../ui.jsx';
+import { Form, Row, Col, Alert } from 'react-bootstrap';
+import { Badge, Button, Card, Eyebrow, cx } from '../ui.jsx';
 import {
   HACKATHON_TRACKS,
   AVAILABLE_INTERESTS,
@@ -160,332 +161,363 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
         </Button>
       </PageHeader>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="min-w-0 flex-1 space-y-8">
-          <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+      <div className="d-flex flex-column flex-lg-row align-items-lg-start gap-4">
+        <div className="flex-grow-1 min-w-0 d-flex flex-column gap-4">
+          <Row className="g-4 align-items-start">
             {/* Main Controlled Registration Form (TM-1 to TM-8) */}
-            <Card as="form" onSubmit={handleSubmit} className="space-y-6 p-5 sm:p-7" noValidate>
-              {/* Field 1: Team Name */}
-              <div>
-                <label htmlFor={`${baseId}-name`} className={labelClass}>
-                  Team Name <span className="text-bad">*</span>
-                </label>
-                <input
-                  id={`${baseId}-name`}
-                  type="text"
-                  maxLength={30}
-                  placeholder="e.g. Byte Bandits"
-                  value={form.teamName}
-                  onChange={(e) => handleFieldChange('teamName', e.target.value)}
-                  onBlur={() => handleBlur('teamName')}
-                  aria-invalid={showError('teamName')}
-                  aria-describedby={showError('teamName') ? `${baseId}-name-err` : undefined}
-                  className={inputClass}
-                />
-                {showError('teamName') && (
-                  <FieldError id={`${baseId}-name-err`}>{errors.teamName}</FieldError>
-                )}
-              </div>
-
-              {/* Field 2: Track Select */}
-              <div>
-                <label htmlFor={`${baseId}-track`} className={labelClass}>
-                  Hackathon Track <span className="text-bad">*</span>
-                </label>
-                <select
-                  id={`${baseId}-track`}
-                  value={form.track}
-                  onChange={(e) => handleFieldChange('track', e.target.value)}
-                  onBlur={() => handleBlur('track')}
-                  className={inputClass}
-                >
-                  {HACKATHON_TRACKS.map((t) => (
-                    <option key={t.id} value={t.id}>
-                      {t.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Nested Contact Object Fields */}
-              <div className="rounded-2xl border border-line bg-surface-2/50 p-4 sm:p-5">
-                <Eyebrow className="mb-4">Contact Information</Eyebrow>
-
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor={`${baseId}-email`} className={labelClass}>
-                      Contact Email <span className="text-bad">*</span>
-                    </label>
-                    <input
-                      id={`${baseId}-email`}
-                      type="email"
-                      placeholder="team-lead@example.com"
-                      value={form.contact.email}
-                      onChange={(e) => handleContactChange('email', e.target.value)}
-                      onBlur={() => handleBlur('contact.email')}
-                      aria-invalid={showError('contact.email')}
-                      aria-describedby={
-                        showError('contact.email') ? `${baseId}-email-err` : undefined
-                      }
-                      className={inputClass}
-                    />
-                    {showError('contact.email') && (
-                      <FieldError id={`${baseId}-email-err`}>{errors['contact.email']}</FieldError>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor={`${baseId}-phone`} className={labelClass}>
-                      Phone Number <span className="font-normal text-muted">(Optional)</span>
-                    </label>
-                    <input
-                      id={`${baseId}-phone`}
-                      type="tel"
-                      placeholder="10-digit number (e.g. 9876543210)"
-                      value={form.contact.phone}
-                      onChange={(e) => handleContactChange('phone', e.target.value)}
-                      onBlur={() => handleBlur('contact.phone')}
-                      aria-invalid={showError('contact.phone')}
-                      aria-describedby={
-                        showError('contact.phone') ? `${baseId}-phone-err` : undefined
-                      }
-                      className={inputClass}
-                    />
-                    {showError('contact.phone') && (
-                      <FieldError id={`${baseId}-phone-err`}>{errors['contact.phone']}</FieldError>
-                    )}
-                  </div>
-
-                  <div className="sm:col-span-2">
-                    <label htmlFor={`${baseId}-city`} className={labelClass}>
-                      City / Location <span className="text-bad">*</span>
-                    </label>
-                    <input
-                      id={`${baseId}-city`}
+            <Col xs={12} xl={8}>
+              <Card as="form" onSubmit={handleSubmit} className="p-3 p-sm-4" noValidate>
+                <div className="d-flex flex-column gap-4">
+                  {/* Field 1: Team Name */}
+                  <Form.Group>
+                    <Form.Label htmlFor={`${baseId}-name`} className="fw-medium">
+                      Team Name <span className="text-danger">*</span>
+                    </Form.Label>
+                    <Form.Control
+                      id={`${baseId}-name`}
                       type="text"
-                      placeholder="e.g. Bengaluru, IN"
-                      value={form.contact.city}
-                      onChange={(e) => handleContactChange('city', e.target.value)}
-                      onBlur={() => handleBlur('contact.city')}
-                      aria-invalid={showError('contact.city')}
-                      aria-describedby={
-                        showError('contact.city') ? `${baseId}-city-err` : undefined
-                      }
-                      className={inputClass}
+                      maxLength={30}
+                      placeholder="e.g. Byte Bandits"
+                      value={form.teamName}
+                      onChange={(e) => handleFieldChange('teamName', e.target.value)}
+                      onBlur={() => handleBlur('teamName')}
+                      isInvalid={showError('teamName')}
+                      aria-invalid={showError('teamName')}
+                      aria-describedby={showError('teamName') ? `${baseId}-name-err` : undefined}
                     />
-                    {showError('contact.city') && (
-                      <FieldError id={`${baseId}-city-err`}>{errors['contact.city']}</FieldError>
+                    {showError('teamName') && (
+                      <FieldError id={`${baseId}-name-err`}>{errors.teamName}</FieldError>
                     )}
+                  </Form.Group>
+
+                  {/* Field 2: Track Select */}
+                  <Form.Group>
+                    <Form.Label htmlFor={`${baseId}-track`} className="fw-medium">
+                      Hackathon Track <span className="text-danger">*</span>
+                    </Form.Label>
+                    <Form.Select
+                      id={`${baseId}-track`}
+                      value={form.track}
+                      onChange={(e) => handleFieldChange('track', e.target.value)}
+                      onBlur={() => handleBlur('track')}
+                    >
+                      {HACKATHON_TRACKS.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                  </Form.Group>
+
+                  {/* Nested Contact Object Fields */}
+                  <fieldset className="rounded-4 border bg-body-tertiary p-3">
+                    <Eyebrow className="mb-3">Contact Information</Eyebrow>
+
+                    <Row className="g-3">
+                      <Col xs={12} sm={6}>
+                        <Form.Group>
+                          <Form.Label htmlFor={`${baseId}-email`} className="fw-medium">
+                            Contact Email <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            id={`${baseId}-email`}
+                            type="email"
+                            placeholder="team-lead@example.com"
+                            value={form.contact.email}
+                            onChange={(e) => handleContactChange('email', e.target.value)}
+                            onBlur={() => handleBlur('contact.email')}
+                            isInvalid={showError('contact.email')}
+                            aria-invalid={showError('contact.email')}
+                            aria-describedby={
+                              showError('contact.email') ? `${baseId}-email-err` : undefined
+                            }
+                          />
+                          {showError('contact.email') && (
+                            <FieldError id={`${baseId}-email-err`}>
+                              {errors['contact.email']}
+                            </FieldError>
+                          )}
+                        </Form.Group>
+                      </Col>
+
+                      <Col xs={12} sm={6}>
+                        <Form.Group>
+                          <Form.Label htmlFor={`${baseId}-phone`} className="fw-medium">
+                            Phone Number{' '}
+                            <span className="fw-normal text-body-secondary">(Optional)</span>
+                          </Form.Label>
+                          <Form.Control
+                            id={`${baseId}-phone`}
+                            type="tel"
+                            placeholder="10-digit number (e.g. 9876543210)"
+                            value={form.contact.phone}
+                            onChange={(e) => handleContactChange('phone', e.target.value)}
+                            onBlur={() => handleBlur('contact.phone')}
+                            isInvalid={showError('contact.phone')}
+                            aria-invalid={showError('contact.phone')}
+                            aria-describedby={
+                              showError('contact.phone') ? `${baseId}-phone-err` : undefined
+                            }
+                          />
+                          {showError('contact.phone') && (
+                            <FieldError id={`${baseId}-phone-err`}>
+                              {errors['contact.phone']}
+                            </FieldError>
+                          )}
+                        </Form.Group>
+                      </Col>
+
+                      <Col xs={12}>
+                        <Form.Group>
+                          <Form.Label htmlFor={`${baseId}-city`} className="fw-medium">
+                            City / Location <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            id={`${baseId}-city`}
+                            type="text"
+                            placeholder="e.g. Bengaluru, IN"
+                            value={form.contact.city}
+                            onChange={(e) => handleContactChange('city', e.target.value)}
+                            onBlur={() => handleBlur('contact.city')}
+                            isInvalid={showError('contact.city')}
+                            aria-invalid={showError('contact.city')}
+                            aria-describedby={
+                              showError('contact.city') ? `${baseId}-city-err` : undefined
+                            }
+                          />
+                          {showError('contact.city') && (
+                            <FieldError id={`${baseId}-city-err`}>
+                              {errors['contact.city']}
+                            </FieldError>
+                          )}
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                  </fieldset>
+
+                  {/* Dynamic Members Section (TM-2: 1 to 4 rows) */}
+                  <div>
+                    <div className="mb-3 d-flex align-items-center justify-content-between gap-3">
+                      <Eyebrow>Team Members ({form.members.length}/4)</Eyebrow>
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleAddMember}
+                        disabled={form.members.length >= 4}
+                        title={
+                          form.members.length >= 4
+                            ? 'Maximum 4 members reached'
+                            : 'Add another member'
+                        }
+                      >
+                        <Plus size={16} aria-hidden="true" />
+                        <span>Add Member</span>
+                      </Button>
+                    </div>
+
+                    <div className="d-flex flex-column gap-3">
+                      {form.members.map((member, idx) => {
+                        const memberErrKey = `members.${idx}.name`;
+                        const hasMemberErr = showError(memberErrKey);
+
+                        return (
+                          <Row key={member.id || idx} className="g-2 align-items-start">
+                            <Col xs="auto">
+                              <div
+                                className="d-flex align-items-center justify-content-center rounded-3 bg-body-secondary font-monospace small text-body-secondary"
+                                style={{ width: '2.375rem', height: '2.375rem' }}
+                                aria-hidden="true"
+                              >
+                                #{idx + 1}
+                              </div>
+                            </Col>
+
+                            <Col>
+                              <Form.Label htmlFor={`${baseId}-mem-name-${idx}`} visuallyHidden>
+                                Member {idx + 1} Name
+                              </Form.Label>
+                              <Form.Control
+                                id={`${baseId}-mem-name-${idx}`}
+                                type="text"
+                                placeholder="Full Name"
+                                value={member.name}
+                                onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
+                                onBlur={() => handleBlur(memberErrKey)}
+                                isInvalid={hasMemberErr}
+                                aria-invalid={hasMemberErr}
+                              />
+                            </Col>
+
+                            <Col xs="auto" className="order-sm-last">
+                              <Button
+                                variant="danger"
+                                className="p-0"
+                                style={{ width: '2.375rem', height: '2.375rem' }}
+                                onClick={() => handleRemoveMember(idx)}
+                                disabled={form.members.length <= 1}
+                                title={
+                                  form.members.length <= 1
+                                    ? 'At least 1 member is required'
+                                    : 'Remove member'
+                                }
+                                aria-label={`Remove Member ${idx + 1}`}
+                              >
+                                <Trash2 size={16} />
+                              </Button>
+                            </Col>
+
+                            <Col xs={12} sm={4} className="order-last order-sm-0">
+                              <Form.Label htmlFor={`${baseId}-mem-role-${idx}`} visuallyHidden>
+                                Member {idx + 1} Role
+                              </Form.Label>
+                              <Form.Select
+                                id={`${baseId}-mem-role-${idx}`}
+                                value={member.role}
+                                onChange={(e) => handleMemberChange(idx, 'role', e.target.value)}
+                              >
+                                {MEMBER_ROLES.map((role) => (
+                                  <option key={role} value={role}>
+                                    {role}
+                                  </option>
+                                ))}
+                              </Form.Select>
+                            </Col>
+
+                            {hasMemberErr && (
+                              <Col xs={12}>
+                                <FieldError>{errors[memberErrKey]}</FieldError>
+                              </Col>
+                            )}
+                          </Row>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Interests Checkboxes (TM-3) */}
+                  <div>
+                    <span className="d-block mb-2 fw-medium">Tech Stack & Topic Interests</span>
+                    <Row className="row-cols-2 row-cols-sm-3 g-2">
+                      {AVAILABLE_INTERESTS.map((interest) => {
+                        const isChecked = form.interests.includes(interest);
+                        const chkId = `${baseId}-int-${interest
+                          .replace(/\s+/g, '-')
+                          .toLowerCase()}`;
+
+                        return (
+                          <Col key={interest}>
+                            <Form.Check
+                              id={chkId}
+                              type="checkbox"
+                              label={interest}
+                              checked={isChecked}
+                              onChange={() => handleToggleInterest(interest)}
+                              className={cx(
+                                'h-100 rounded-3 border py-2 pe-2 small',
+                                isChecked ? 'border-primary bg-primary-subtle' : 'bg-body'
+                              )}
+                              style={{ paddingLeft: '2.25rem' }}
+                            />
+                          </Col>
+                        );
+                      })}
+                    </Row>
+                  </div>
+
+                  {/* Agreement Checkbox (TM-4) */}
+                  <Form.Group>
+                    <Form.Check
+                      id={`${baseId}-agreed`}
+                      type="checkbox"
+                      checked={form.agreed}
+                      onChange={(e) => handleFieldChange('agreed', e.target.checked)}
+                      onBlur={() => handleBlur('agreed')}
+                      isInvalid={showError('agreed')}
+                      label={
+                        <>
+                          Our team agrees to the HackHQ Participant Code of Conduct and venue
+                          guidelines. <span className="text-danger">*</span>
+                        </>
+                      }
+                    />
+                    {showError('agreed') && <FieldError>{errors.agreed}</FieldError>}
+                  </Form.Group>
+
+                  {/* Submit Button */}
+                  <div className="d-grid d-sm-flex justify-content-sm-end border-top pt-4">
+                    <Button type="submit" variant="primary" size="lg">
+                      <CheckCircle size={18} aria-hidden="true" />
+                      <span>Register Team</span>
+                    </Button>
                   </div>
                 </div>
-              </div>
-
-              {/* Dynamic Members Section (TM-2: 1 to 4 rows) */}
-              <div>
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <Eyebrow>Team Members ({form.members.length}/4)</Eyebrow>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    onClick={handleAddMember}
-                    disabled={form.members.length >= 4}
-                    title={
-                      form.members.length >= 4 ? 'Maximum 4 members reached' : 'Add another member'
-                    }
-                  >
-                    <Plus size={16} aria-hidden="true" />
-                    <span>Add Member</span>
-                  </Button>
-                </div>
-
-                <div className="space-y-3">
-                  {form.members.map((member, idx) => {
-                    const memberErrKey = `members.${idx}.name`;
-                    const hasMemberErr = showError(memberErrKey);
-
-                    return (
-                      <div
-                        key={member.id || idx}
-                        className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 sm:grid-cols-[auto_minmax(0,1fr)_minmax(0,12rem)_auto] sm:gap-3"
-                      >
-                        <div
-                          className="flex size-9 items-center justify-center rounded-lg bg-surface-2 font-mono text-xs text-muted"
-                          aria-hidden="true"
-                        >
-                          #{idx + 1}
-                        </div>
-
-                        <div>
-                          <label htmlFor={`${baseId}-mem-name-${idx}`} className="sr-only">
-                            Member {idx + 1} Name
-                          </label>
-                          <input
-                            id={`${baseId}-mem-name-${idx}`}
-                            type="text"
-                            placeholder="Full Name"
-                            value={member.name}
-                            onChange={(e) => handleMemberChange(idx, 'name', e.target.value)}
-                            onBlur={() => handleBlur(memberErrKey)}
-                            aria-invalid={hasMemberErr}
-                            className={inputClass}
-                          />
-                        </div>
-
-                        <div className="order-last col-span-3 sm:order-none sm:col-span-1">
-                          <label htmlFor={`${baseId}-mem-role-${idx}`} className="sr-only">
-                            Member {idx + 1} Role
-                          </label>
-                          <select
-                            id={`${baseId}-mem-role-${idx}`}
-                            value={member.role}
-                            onChange={(e) => handleMemberChange(idx, 'role', e.target.value)}
-                            className={inputClass}
-                          >
-                            {MEMBER_ROLES.map((role) => (
-                              <option key={role} value={role}>
-                                {role}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        <Button
-                          variant="danger"
-                          className="size-9 !p-0"
-                          onClick={() => handleRemoveMember(idx)}
-                          disabled={form.members.length <= 1}
-                          title={
-                            form.members.length <= 1
-                              ? 'At least 1 member is required'
-                              : 'Remove member'
-                          }
-                          aria-label={`Remove Member ${idx + 1}`}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-
-                        {hasMemberErr && (
-                          <FieldError className="col-span-full">{errors[memberErrKey]}</FieldError>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Interests Checkboxes (TM-3) */}
-              <div>
-                <span className={labelClass}>Tech Stack & Topic Interests</span>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                  {AVAILABLE_INTERESTS.map((interest) => {
-                    const isChecked = form.interests.includes(interest);
-                    const chkId = `${baseId}-int-${interest.replace(/\s+/g, '-').toLowerCase()}`;
-
-                    return (
-                      <label
-                        key={interest}
-                        htmlFor={chkId}
-                        className="flex cursor-pointer items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2 text-sm text-ink transition hover:bg-surface-2 has-[:checked]:border-accent has-[:checked]:bg-accent-soft has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-accent-soft"
-                      >
-                        <input
-                          id={chkId}
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={() => handleToggleInterest(interest)}
-                          className="size-4 shrink-0 accent-[var(--color-accent)]"
-                        />
-                        <span>{interest}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Agreement Checkbox (TM-4) */}
-              <div>
-                <label
-                  htmlFor={`${baseId}-agreed`}
-                  className="flex cursor-pointer items-start gap-3 text-sm text-ink"
-                >
-                  <input
-                    id={`${baseId}-agreed`}
-                    type="checkbox"
-                    checked={form.agreed}
-                    onChange={(e) => handleFieldChange('agreed', e.target.checked)}
-                    onBlur={() => handleBlur('agreed')}
-                    className="mt-0.5 size-4 shrink-0 accent-[var(--color-accent)]"
-                  />
-                  <span>
-                    Our team agrees to the HackHQ Participant Code of Conduct and venue guidelines.{' '}
-                    <span className="text-bad">*</span>
-                  </span>
-                </label>
-                {showError('agreed') && <FieldError>{errors.agreed}</FieldError>}
-              </div>
-
-              {/* Submit Button */}
-              <div className="flex justify-end border-t border-line pt-5">
-                <Button type="submit" variant="primary" size="lg" className="w-full sm:w-auto">
-                  <CheckCircle size={18} aria-hidden="true" />
-                  <span>Register Team</span>
-                </Button>
-              </div>
-            </Card>
+              </Card>
+            </Col>
 
             {/* Live Name Badge Preview (TM-9) */}
-            <div className="xl:sticky xl:top-6">
-              <Eyebrow className="mb-3">Live Badge Preview</Eyebrow>
-              <TeamBadgePreview form={form} />
-            </div>
-          </div>
+            <Col xs={12} xl={4}>
+              <div className="sticky-xl-top" style={{ top: '1rem' }}>
+                <Eyebrow className="mb-3">Live Badge Preview</Eyebrow>
+                <TeamBadgePreview form={form} />
+              </div>
+            </Col>
+          </Row>
 
           {/* Registered Teams Table / List (TM-7) */}
           <section>
-            <div className="mb-4 flex items-center gap-2">
-              <Layers size={18} className="text-accent" aria-hidden="true" />
-              <h2 className="text-xl font-bold">Registered Teams ({registeredTeams.length})</h2>
+            <div className="mb-3 d-flex align-items-center gap-2">
+              <Layers size={18} className="text-primary" aria-hidden="true" />
+              <h2 className="fs-4 fw-bold mb-0">Registered Teams ({registeredTeams.length})</h2>
             </div>
 
             {registeredTeams.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 rounded-card border border-dashed border-line px-6 py-10 text-center text-sm text-muted">
+              <Alert
+                variant="secondary"
+                className="d-flex flex-column align-items-center gap-2 py-4 text-center mb-0"
+                style={{ borderStyle: 'dashed' }}
+              >
                 <FileText size={24} aria-hidden="true" />
-                <p>No teams registered yet. Submit the form above to register your squad.</p>
-              </div>
+                <p className="mb-0">
+                  No teams registered yet. Submit the form above to register your squad.
+                </p>
+              </Alert>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <Row className="row-cols-1 row-cols-md-2 g-3">
                 {registeredTeams.map((team) => (
-                  <Card key={team.id} className="animate-pop p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="min-w-0 break-words text-lg font-bold">{team.teamName}</h3>
-                      <Button
-                        variant="danger"
-                        size="sm"
-                        className="shrink-0"
-                        onClick={() => handleRemoveTeam(team.id)}
-                        title="Remove registered team"
-                        aria-label={`Remove team ${team.teamName}`}
-                      >
-                        <Trash2 size={15} />
-                      </Button>
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <Badge tone="accent">
-                        {HACKATHON_TRACKS.find((t) => t.id === team.track)?.name}
-                      </Badge>
-                      <Badge>{team.contact.city}</Badge>
-                    </div>
-                    <div className="mt-3 text-sm text-muted">
-                      <strong className="font-semibold text-ink">
-                        Members ({team.members.length}):
-                      </strong>{' '}
-                      {team.members
-                        .map((m) => m.name)
-                        .filter(Boolean)
-                        .join(', ')}
-                    </div>
-                  </Card>
+                  <Col key={team.id}>
+                    <Card className="animate-pop h-100 p-3">
+                      <div className="d-flex align-items-start justify-content-between gap-3">
+                        <h3 className="fs-5 fw-bold mb-0 text-break">{team.teamName}</h3>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="flex-shrink-0"
+                          onClick={() => handleRemoveTeam(team.id)}
+                          title="Remove registered team"
+                          aria-label={`Remove team ${team.teamName}`}
+                        >
+                          <Trash2 size={15} />
+                        </Button>
+                      </div>
+                      <div className="mt-3 d-flex flex-wrap gap-2">
+                        <Badge tone="accent">
+                          {HACKATHON_TRACKS.find((t) => t.id === team.track)?.name}
+                        </Badge>
+                        <Badge>{team.contact.city}</Badge>
+                      </div>
+                      <div className="mt-3 small text-body-secondary">
+                        <strong className="fw-semibold text-body">
+                          Members ({team.members.length}):
+                        </strong>{' '}
+                        {team.members
+                          .map((m) => m.name)
+                          .filter(Boolean)
+                          .join(', ')}
+                      </div>
+                    </Card>
+                  </Col>
                 ))}
-              </div>
+              </Row>
             )}
           </section>
         </div>
@@ -503,9 +535,14 @@ export default function TeamsStation({ xrayOn, onToggleXray, onNotify }) {
 
 function FieldError({ id, className, children }) {
   return (
-    <p id={id} className={cx(errorClass, 'flex items-center gap-1.5', className)} role="alert">
+    <Form.Control.Feedback
+      type="invalid"
+      id={id}
+      role="alert"
+      className={cx('d-flex align-items-center gap-2 fw-medium', className)}
+    >
       <AlertCircle size={14} aria-hidden="true" />
       <span>{children}</span>
-    </p>
+    </Form.Control.Feedback>
   );
 }

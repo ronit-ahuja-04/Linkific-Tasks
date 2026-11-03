@@ -80,8 +80,8 @@ export default function Header({
           aria-keyshortcuts="Meta+K Control+K"
         >
           <Search size={15} aria-hidden="true" />
-          <span className="d-none d-sm-inline flex-grow-1 text-start">Jump to…</span>
-          <Kbd className="d-none d-sm-inline">⌘K</Kbd>
+          <span className="d-none d-lg-inline flex-grow-1 text-start">Jump to…</span>
+          <Kbd className="d-none d-lg-inline">⌘K</Kbd>
         </Button>
 
         {/* Organizer session (M4): log in link or log out button */}
@@ -104,7 +104,7 @@ export default function Header({
           variant={xrayOn ? 'outline-primary' : 'outline-secondary'}
           active={xrayOn}
           onClick={onToggleXray}
-          className={cx(PILL, 'd-none d-md-inline-flex')}
+          className={cx(PILL, 'd-none d-md-inline-flex text-nowrap')}
           aria-pressed={xrayOn}
           title="Toggle live State X-ray inspector"
         >

@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { Card, Col, Row } from 'react-bootstrap';
 import { ArrowRight, Code2, LogOut, Users } from 'lucide-react';
 import PageHeader from '../../components/layout/PageHeader.jsx';
 import { Badge, Button } from '../../components/ui.jsx';
@@ -36,49 +37,48 @@ export default function OrganizerHome({ onLogout }) {
         </Button>
       </PageHeader>
 
-      <p className="mb-8 max-w-2xl text-muted [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:font-mono [&_code]:text-xs [&_code]:text-ink">
+      <p className="mb-4 text-body-secondary" style={{ maxWidth: '42rem' }}>
         You got here through <code>&lt;ProtectedRoute isAllowed={'{isOrganizer}'} /&gt;</code>, a
         pathless layout route wrapping every <code>/organizer/*</code> page. Log out and try opening{' '}
         <code>/organizer/lab</code> directly: you will land on <code>/login</code>.
       </p>
 
-      <ul className="grid gap-4 sm:grid-cols-2">
+      <Row as="ul" className="list-unstyled g-3 p-0" xs={1} md={2}>
         {ORGANIZER_TOOLS.map((tool, index) => {
           const Icon = tool.icon;
           return (
-            <li
+            <Col
+              as="li"
               key={tool.path}
               className="animate-rise"
               style={{ animationDelay: `${index * 70}ms` }}
             >
-              <Link
+              <Card
+                as={Link}
                 to={tool.path}
-                className="group relative flex h-full flex-col gap-2 rounded-card border border-line bg-surface p-6 shadow-card transition hover:-translate-y-0.5 hover:border-ink hover:shadow-pop"
+                className="h-100 p-4 shadow-sm text-body text-decoration-none position-relative"
               >
                 <span
-                  className="mb-2 flex size-11 items-center justify-center rounded-xl bg-brand text-on-brand"
+                  className="mb-3 d-flex align-items-center justify-content-center rounded-3 bg-brand"
+                  style={{ width: 44, height: 44 }}
                   aria-hidden="true"
                 >
                   <Icon size={20} />
                 </span>
-                <Badge tone="accent" className="absolute right-5 top-5">
+                <Badge tone="accent" className="position-absolute top-0 end-0 m-3">
                   Guarded
                 </Badge>
-                <span className="font-display text-xl font-bold tracking-tight">{tool.name}</span>
-                <span className="text-sm text-muted">{tool.description}</span>
-                <span className="mt-3 flex items-center justify-between font-mono text-xs text-muted">
+                <span className="fs-5 fw-bold">{tool.name}</span>
+                <span className="small text-body-secondary mt-1">{tool.description}</span>
+                <span className="mt-3 d-flex align-items-center justify-content-between small font-monospace text-body-secondary">
                   <code>{tool.path}</code>
-                  <ArrowRight
-                    size={16}
-                    aria-hidden="true"
-                    className="transition group-hover:translate-x-1 group-hover:text-ink"
-                  />
+                  <ArrowRight size={16} aria-hidden="true" />
                 </span>
-              </Link>
-            </li>
+              </Card>
+            </Col>
           );
         })}
-      </ul>
+      </Row>
     </div>
   );
 }

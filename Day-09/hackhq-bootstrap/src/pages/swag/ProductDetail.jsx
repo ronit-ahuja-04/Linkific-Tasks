@@ -14,7 +14,8 @@ import {
 import PageHeader from '../../components/layout/PageHeader.jsx';
 import RouteBadge from '../../components/layout/RouteBadge.jsx';
 import BackButton from '../../components/layout/BackButton.jsx';
-import { Badge, cx, buttonClass, Card } from '../../components/ui.jsx';
+import { ListGroup, Row, Col } from 'react-bootstrap';
+import { Badge, buttonClass, Card } from '../../components/ui.jsx';
 import { findProduct, getAdjacentProducts, productPath } from '../../lib/routes.js';
 import {
   addToCart,
@@ -24,17 +25,17 @@ import {
 } from '../../lib/cart.js';
 
 const CATEGORY_VISUALS = {
-  Stickers: { icon: Sticker, tone: 'from-violet-600 to-indigo-500 shadow-violet-600/40' },
-  Apparel: { icon: Shirt, tone: 'from-indigo-600 to-sky-500 shadow-indigo-600/40' },
-  Drinkware: { icon: CupSoda, tone: 'from-teal-600 to-emerald-500 shadow-teal-600/40' },
-  Hardware: { icon: Keyboard, tone: 'from-amber-600 to-rose-500 shadow-amber-600/40' },
-  Accessories: { icon: Mouse, tone: 'from-pink-600 to-violet-600 shadow-pink-600/40' },
+  Stickers: { icon: Sticker, gradient: 'linear-gradient(135deg, #7c3aed, #6366f1)' },
+  Apparel: { icon: Shirt, gradient: 'linear-gradient(135deg, #4f46e5, #0ea5e9)' },
+  Drinkware: { icon: CupSoda, gradient: 'linear-gradient(135deg, #0d9488, #10b981)' },
+  Hardware: { icon: Keyboard, gradient: 'linear-gradient(135deg, #d97706, #f43f5e)' },
+  Accessories: { icon: Mouse, gradient: 'linear-gradient(135deg, #db2777, #7c3aed)' },
 };
 
 const PAGER_LINK =
-  'group flex flex-1 items-center gap-3 rounded-2xl border border-line bg-surface p-4 text-sm font-semibold text-ink transition hover:border-accent hover:bg-surface-2';
+  'd-flex flex-fill align-items-center gap-3 rounded-4 border bg-body p-3 small fw-semibold text-body text-decoration-none';
 const PAGER_LABEL =
-  'mb-0.5 block font-mono text-[0.68rem] font-medium uppercase tracking-wider text-muted';
+  'd-block mb-1 font-monospace fw-medium text-uppercase ls-wide text-body-secondary';
 
 /**
  * CONCEPT: Dynamic segment - "/swag/:productId" renders this page for every product.
@@ -48,18 +49,19 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
     return (
       <div>
         <PageHeader breadcrumb={`SWAG / ${productId}`} title="Product not found">
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="d-flex flex-wrap align-items-center gap-3">
             <BackButton fallback="/swag" />
             <RouteBadge pattern="/swag/:productId" />
           </div>
         </PageHeader>
         <Card>
-          <div className="flex flex-col items-center gap-3 px-6 py-14 text-center" role="alert">
-            <PackageSearch size={36} className="text-muted" aria-hidden="true" />
-            <div className="font-display text-lg font-bold tracking-tight">
-              Nothing on the shelf called “{productId}”
-            </div>
-            <div className="max-w-md text-sm text-muted">
+          <div
+            className="d-flex flex-column align-items-center gap-3 px-3 py-5 text-center"
+            role="alert"
+          >
+            <PackageSearch size={36} className="text-body-secondary" aria-hidden="true" />
+            <div className="fs-5 fw-bold">Nothing on the shelf called “{productId}”</div>
+            <div className="small text-body-secondary" style={{ maxWidth: '28rem' }}>
               The route matched, but no product has this id. That is a data miss, not a 404.
             </div>
             <Link to="/swag" className={buttonClass({ className: 'mt-2' })}>
@@ -87,99 +89,112 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
   return (
     <div>
       <PageHeader breadcrumb={`SWAG / ${product.id}`} title={product.category}>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="d-flex flex-wrap align-items-center gap-3">
           <BackButton fallback="/swag" />
           <RouteBadge pattern="/swag/:productId" />
         </div>
       </PageHeader>
 
       {/* key: same route, new product -> remount so the entrance animation replays */}
-      <section
+      <Row
+        as="section"
         key={product.id}
-        className="grid animate-rise gap-6 md:grid-cols-2 md:gap-10"
+        className="animate-rise g-4"
         aria-labelledby="product-title"
       >
-        <div
-          className={cx(
-            'relative flex aspect-square items-center justify-center overflow-hidden rounded-card bg-gradient-to-br text-white shadow-2xl md:aspect-[4/5]',
-            visual.tone
-          )}
-          aria-hidden="true"
-        >
-          <div className="absolute size-[70%] rounded-full border border-white/25" />
-          <div className="absolute size-[95%] rounded-full border border-white/15" />
-          <div className="relative animate-float drop-shadow-lg">
-            <Icon size={96} strokeWidth={1.4} />
+        <Col xs={12} md={6}>
+          <div
+            className="position-relative d-flex align-items-center justify-content-center overflow-hidden rounded-4 text-white shadow ratio ratio-1x1"
+            style={{ background: visual.gradient }}
+            aria-hidden="true"
+          >
+            <div className="d-flex align-items-center justify-content-center">
+              <div
+                className="position-absolute rounded-circle border border-white border-opacity-25"
+                style={{ width: '70%', height: '70%' }}
+              />
+              <div
+                className="position-absolute rounded-circle border border-white border-opacity-10"
+                style={{ width: '95%', height: '95%' }}
+              />
+              <div className="position-relative animate-float">
+                <Icon size={96} strokeWidth={1.4} />
+              </div>
+              <span className="position-absolute bottom-0 end-0 m-3 rounded-pill bg-black bg-opacity-25 px-3 py-1 font-monospace small ls-wide">
+                {String(index + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
+              </span>
+            </div>
           </div>
-          <span className="absolute bottom-4 right-4 rounded-full bg-black/25 px-3 py-1 font-mono text-xs tabular-nums tracking-wider">
-            {String(index + 1).padStart(2, '0')} / {String(count).padStart(2, '0')}
-          </span>
-        </div>
+        </Col>
 
-        <div className="flex flex-col justify-center gap-4">
-          <Badge tone="accent" className="self-start">
-            {product.category}
-          </Badge>
-          <h2 id="product-title" className="text-3xl font-bold tracking-tight sm:text-4xl">
+        <Col xs={12} md={6} className="d-flex flex-column justify-content-center gap-3">
+          <div>
+            <Badge tone="accent">{product.category}</Badge>
+          </div>
+          <h2 id="product-title" className="display-6 fw-bold mb-0">
             {product.name}
           </h2>
-          <p className="max-w-prose text-base leading-relaxed text-muted">{product.description}</p>
-          <p className="font-display text-4xl font-bold tracking-tight tabular-nums">
+          <p className="fs-6 text-body-secondary mb-0">{product.description}</p>
+          <p className="display-5 fw-bold font-monospace mb-0">
             {formatCurrencyINR(product.price)}
           </p>
 
-          <dl className="mt-2 divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
-            <div className="flex items-center justify-between gap-4 px-4 py-3">
-              <dt className="font-mono text-xs uppercase tracking-wider text-muted">SKU</dt>
-              <dd className="text-sm font-medium text-ink">
-                <code className="font-mono text-xs">{product.id}</code>
+          <ListGroup as="dl" className="mt-2 mb-0 rounded-4">
+            <ListGroup.Item className="d-flex align-items-center justify-content-between gap-3">
+              <dt className="font-monospace small fw-normal text-uppercase ls-wide text-body-secondary">
+                SKU
+              </dt>
+              <dd className="mb-0 small fw-medium">
+                <code>{product.id}</code>
               </dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 px-4 py-3">
-              <dt className="font-mono text-xs uppercase tracking-wider text-muted">
+            </ListGroup.Item>
+            <ListGroup.Item className="d-flex align-items-center justify-content-between gap-3">
+              <dt className="font-monospace small fw-normal text-uppercase ls-wide text-body-secondary">
                 In your cart
               </dt>
-              <dd className="text-sm font-medium text-ink">
-                <span className="tabular-nums">{quantityInCart}</span>
+              <dd className="mb-0 small fw-medium">
+                <span className="font-monospace">{quantityInCart}</span>
               </dd>
-            </div>
-            <div className="flex items-center justify-between gap-4 px-4 py-3">
-              <dt className="font-mono text-xs uppercase tracking-wider text-muted">Pickup</dt>
-              <dd className="text-sm font-medium text-ink">Swag desk, Hall B</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
+            </ListGroup.Item>
+            <ListGroup.Item className="d-flex align-items-center justify-content-between gap-3">
+              <dt className="font-monospace small fw-normal text-uppercase ls-wide text-body-secondary">
+                Pickup
+              </dt>
+              <dd className="mb-0 small fw-medium">Swag desk, Hall B</dd>
+            </ListGroup.Item>
+          </ListGroup>
+        </Col>
+      </Row>
 
-      <nav className="mt-8 flex flex-col gap-3 sm:flex-row" aria-label="Browse products">
+      <nav className="mt-4 d-flex flex-column flex-sm-row gap-3" aria-label="Browse products">
         <Link to={productPath(previous.id)} className={PAGER_LINK}>
-          <ChevronLeft
-            size={18}
-            className="text-muted transition group-hover:-translate-x-0.5 group-hover:text-accent"
-            aria-hidden="true"
-          />
+          <ChevronLeft size={18} className="text-body-secondary" aria-hidden="true" />
           <span>
             <small className={PAGER_LABEL}>Previous</small>
             {previous.name}
           </span>
         </Link>
-        <Link to={productPath(next.id)} className={cx(PAGER_LINK, 'justify-between text-right')}>
+        <Link
+          to={productPath(next.id)}
+          className={`${PAGER_LINK} justify-content-between text-end`}
+        >
           <span>
             <small className={PAGER_LABEL}>Next</small>
             {next.name}
           </span>
-          <ChevronRight
-            size={18}
-            className="text-muted transition group-hover:translate-x-0.5 group-hover:text-accent"
-            aria-hidden="true"
-          />
+          <ChevronRight size={18} className="text-body-secondary" aria-hidden="true" />
         </Link>
       </nav>
 
-      <div className="sticky bottom-3 z-20 mt-8 flex items-center gap-3 rounded-2xl border border-line bg-surface/90 p-3 shadow-pop backdrop-blur">
-        <div className="mr-auto flex min-w-0 flex-col text-sm">
-          <strong className="truncate font-semibold">{product.name}</strong>
-          <span className="tabular-nums text-muted">{formatCurrencyINR(product.price)}</span>
+      <div
+        className="sticky-bottom mt-4 d-flex align-items-center gap-3 rounded-4 border bg-body p-3 shadow"
+        style={{ bottom: '0.75rem' }}
+      >
+        <div className="me-auto d-flex flex-column small" style={{ minWidth: 0 }}>
+          <strong className="text-truncate fw-semibold">{product.name}</strong>
+          <span className="font-monospace text-body-secondary">
+            {formatCurrencyINR(product.price)}
+          </span>
         </div>
         <Link
           to="/swag"
@@ -187,7 +202,7 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
           aria-label={`Cart: ${totalItems} items`}
         >
           <ShoppingBag size={16} aria-hidden="true" />
-          <span className="tabular-nums">{totalItems}</span>
+          <span className="font-monospace">{totalItems}</span>
         </Link>
         <button
           type="button"

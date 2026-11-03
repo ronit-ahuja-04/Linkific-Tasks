@@ -4,27 +4,34 @@ import { Card, buttonClass } from '../components/ui.jsx';
 
 export default function ContactSent() {
   return (
-    <div className="flex min-h-[60vh] items-center justify-center py-4">
+    <div
+      className="d-flex align-items-center justify-content-center py-3"
+      style={{ minHeight: '60vh' }}
+    >
       <Card
         as="section"
-        className="w-full max-w-lg animate-rise p-8 text-center sm:p-10"
+        className="w-100 animate-rise p-4 p-sm-5 text-center"
+        style={{ maxWidth: '32rem' }}
         aria-labelledby="contact-sent-title"
       >
         <span
-          className="mx-auto mb-5 flex size-20 animate-pop items-center justify-center rounded-full bg-good-soft text-good"
+          className="mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle animate-pop bg-success-subtle text-success"
+          style={{ width: '5rem', height: '5rem' }}
           aria-hidden="true"
         >
           <CheckCircle2 size={44} />
         </span>
-        <h1 id="contact-sent-title" className="text-3xl font-bold tracking-tight">
+        <h1 id="contact-sent-title" className="fs-2 fw-bold">
           Message received
         </h1>
-        <p className="mx-auto mt-3 max-w-md text-muted [&_code]:break-words [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:font-mono [&_code]:text-xs">
+        <p className="mx-auto mt-2 mb-0 text-body-secondary" style={{ maxWidth: '28rem' }}>
           The form was submitted with{' '}
-          <code>navigate(&apos;/contact/sent&apos;, {'{ replace: true }'})</code>. Press your
-          browser&apos;s Back button: it skips the form you already sent.
+          <code className="text-break">
+            navigate(&apos;/contact/sent&apos;, {'{ replace: true }'})
+          </code>
+          . Press your browser&apos;s Back button: it skips the form you already sent.
         </p>
-        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+        <div className="mt-4 d-flex flex-column flex-sm-row justify-content-center gap-3">
           <Link to="/" className={buttonClass({ variant: 'primary' })}>
             Back to mission control
           </Link>

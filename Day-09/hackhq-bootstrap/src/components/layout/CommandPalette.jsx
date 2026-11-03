@@ -1,8 +1,9 @@
-import { useState, useId } from 'react';
+import { Fragment, useState, useId } from 'react';
+import { ListGroup, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { CornerDownLeft, FileText, Search, ShoppingBag } from 'lucide-react';
 import { buildCommands, filterCommands } from '../../lib/commands.js';
-import { Kbd, cx } from '../ui.jsx';
+import { Kbd } from '../ui.jsx';
 
 const COMMANDS = buildCommands();
 const GROUP_ICONS = { Pages: FileText, Products: ShoppingBag };
@@ -51,108 +52,110 @@ export default function CommandPalette({ onClose }) {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex animate-fade items-start justify-center bg-black/55 p-4 pt-[12vh] backdrop-blur-sm"
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
+    <Modal
+      show
+      onHide={onClose}
+      size="lg"
+      autoFocus
+      aria-label="Jump to a page"
+      dialogClassName="mt-5"
+      contentClassName="overflow-hidden rounded-4 shadow"
     >
-      <div
-        className="w-full max-w-xl animate-pop overflow-hidden rounded-2xl border border-line bg-surface shadow-pop"
-        role="dialog"
-        aria-modal="true"
-        aria-label="Jump to a page"
-      >
-        <div className="flex items-center gap-3 border-b border-line px-4">
-          <Search size={18} aria-hidden="true" className="shrink-0 text-muted" />
-          <input
-            autoFocus
-            type="text"
-            className="h-14 flex-1 bg-transparent text-base outline-none placeholder:text-muted"
-            placeholder="Jump to a page or product…"
-            value={query}
-            onChange={(event) => {
-              setQuery(event.target.value);
-              setActiveIndex(0);
-            }}
-            onKeyDown={handleKeyDown}
-            role="combobox"
-            aria-expanded="true"
-            aria-controls={listId}
-            aria-activedescendant={results[safeIndex] ? optionId(safeIndex) : undefined}
-            aria-autocomplete="list"
-          />
-          <Kbd>Esc</Kbd>
-        </div>
-
-        {results.length === 0 ? (
-          <p className="px-4 py-10 text-center text-sm text-muted">
-            No page or product matches “{query}”.
-          </p>
-        ) : (
-          <ul
-            id={listId}
-            className="max-h-80 overflow-y-auto p-2"
-            role="listbox"
-            aria-label="Results"
-          >
-            {results.map((command, index) => {
-              const Icon = GROUP_ICONS[command.group];
-              const showGroup = index === 0 || results[index - 1].group !== command.group;
-              const isActive = index === safeIndex;
-
-              return (
-                <li key={command.id} role="presentation">
-                  {showGroup && (
-                    <div
-                      className="px-3 pt-3 pb-1.5 font-mono text-[0.65rem] tracking-[0.2em] text-muted uppercase"
-                      aria-hidden="true"
-                    >
-                      {command.group}
-                    </div>
-                  )}
-                  <div
-                    id={optionId(index)}
-                    role="option"
-                    aria-selected={isActive}
-                    className={cx(
-                      'flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm',
-                      isActive ? 'bg-ink text-bg' : 'text-ink'
-                    )}
-                    onMouseMove={() => setActiveIndex(index)}
-                    onClick={() => go(command)}
-                  >
-                    <Icon
-                      size={16}
-                      aria-hidden="true"
-                      className={isActive ? 'text-brand' : 'text-muted'}
-                    />
-                    <span className="flex-1 truncate font-medium">{command.label}</span>
-                    <code className="font-mono text-xs opacity-60">{command.hint}</code>
-                    {isActive && (
-                      <CornerDownLeft size={14} aria-hidden="true" className="text-brand" />
-                    )}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-
-        <div
-          className="flex items-center gap-4 border-t border-line bg-surface-2/60 px-4 py-2.5 text-xs text-muted"
-          aria-hidden="true"
-        >
-          <span className="flex items-center gap-1">
-            <Kbd>↑</Kbd>
-            <Kbd>↓</Kbd> move
-          </span>
-          <span className="flex items-center gap-1">
-            <Kbd>↵</Kbd> go
-          </span>
-          <span className="ml-auto font-mono">navigate(path)</span>
-        </div>
+      <div className="d-flex align-items-center gap-3 border-bottom px-3">
+        <Search size={18} aria-hidden="true" className="flex-shrink-0 text-body-secondary" />
+        <input
+          autoFocus
+          type="text"
+          className="form-control form-control-lg border-0 shadow-none bg-transparent px-0"
+          placeholder="Jump to a page or product…"
+          value={query}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            setActiveIndex(0);
+          }}
+          onKeyDown={handleKeyDown}
+          role="combobox"
+          aria-expanded="true"
+          aria-controls={listId}
+          aria-activedescendant={results[safeIndex] ? optionId(safeIndex) : undefined}
+          aria-autocomplete="list"
+        />
+        <Kbd>Esc</Kbd>
       </div>
-    </div>
+
+      {results.length === 0 ? (
+        <p className="px-3 py-5 mb-0 text-center small text-body-secondary">
+          No page or product matches “{query}”.
+        </p>
+      ) : (
+        <ListGroup
+          id={listId}
+          variant="flush"
+          className="overflow-y-auto p-2 gap-1"
+          style={{ maxHeight: '20rem' }}
+          role="listbox"
+          aria-label="Results"
+        >
+          {results.map((command, index) => {
+            const Icon = GROUP_ICONS[command.group];
+            const showGroup = index === 0 || results[index - 1].group !== command.group;
+            const isActive = index === safeIndex;
+
+            return (
+              <Fragment key={command.id}>
+                {showGroup && (
+                  <div
+                    className="px-3 pt-3 pb-1 font-monospace small text-uppercase ls-wider text-body-secondary"
+                    aria-hidden="true"
+                  >
+                    {command.group}
+                  </div>
+                )}
+                <ListGroup.Item
+                  as="div"
+                  action
+                  id={optionId(index)}
+                  role="option"
+                  aria-selected={isActive}
+                  className="d-flex align-items-center gap-3 rounded-3 border-0"
+                  style={
+                    isActive
+                      ? { backgroundColor: 'var(--ink)', color: 'var(--surface)' }
+                      : undefined
+                  }
+                  onMouseMove={() => setActiveIndex(index)}
+                  onClick={() => go(command)}
+                >
+                  <Icon
+                    size={16}
+                    aria-hidden="true"
+                    className={isActive ? 'text-brand' : 'text-body-secondary'}
+                  />
+                  <span className="flex-grow-1 text-truncate fw-medium">{command.label}</span>
+                  <code className="small opacity-75 d-none d-sm-inline">{command.hint}</code>
+                  {isActive && (
+                    <CornerDownLeft size={14} aria-hidden="true" className="text-brand" />
+                  )}
+                </ListGroup.Item>
+              </Fragment>
+            );
+          })}
+        </ListGroup>
+      )}
+
+      <div
+        className="d-flex align-items-center gap-3 border-top bg-body-tertiary px-3 py-2 small text-body-secondary"
+        aria-hidden="true"
+      >
+        <span className="d-flex align-items-center gap-1">
+          <Kbd>↑</Kbd>
+          <Kbd>↓</Kbd> move
+        </span>
+        <span className="d-flex align-items-center gap-1">
+          <Kbd>↵</Kbd> go
+        </span>
+        <span className="ms-auto font-monospace">navigate(path)</span>
+      </div>
+    </Modal>
   );
 }
