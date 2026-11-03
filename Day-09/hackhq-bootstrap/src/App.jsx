@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useLocalStorage } from './hooks/useLocalStorage.js';
 import AppLayout from './components/layout/AppLayout.jsx';
@@ -20,7 +20,18 @@ import ContactSent from './pages/ContactSent.jsx';
 import NavPatterns from './pages/NavPatterns.jsx';
 import Login from './pages/Login.jsx';
 import OrganizerHome from './pages/organizer/OrganizerHome.jsx';
+import Announcements from './pages/Announcements.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import { SEED_ANNOUNCEMENTS } from './data/announcements.js';
+import {
+  EMPTY_CHANGES,
+  addAnnouncement,
+  applyChanges,
+  countUnread,
+  createAnnouncement,
+  editAnnouncement,
+  removeAnnouncement,
+} from './lib/announcements.js';
 
 export default function App() {
   // Theme state persisted via useLocalStorage (LS-1)
@@ -49,6 +60,28 @@ export default function App() {
 
   // Cart lifted here and persisted: /swag and /swag/:productId both read and update it
   const [cart, setCart] = useLocalStorage('hackhq_cart', []);
+
+  // Announcements: the seed list never changes; organizer edits are stored as a separate
+  // { added, edited, removed } object and merged by id. `seenAt` drives the unread badge.
+  const [announcementChanges, setAnnouncementChanges] = useLocalStorage(
+    'hackhq_announcements',
+    EMPTY_CHANGES
+  );
+  const [announcementsSeenAt, setAnnouncementsSeenAt] = useLocalStorage(
+    'hackhq_announcements_seen',
+    null
+  );
+  const announcements = applyChanges(SEED_ANNOUNCEMENTS, announcementChanges);
+  const unreadAnnouncements = countUnread(announcements, announcementsSeenAt);
+  const markAnnouncementsSeen = useCallback(
+    () => setAnnouncementsSeenAt(Date.now()),
+    [setAnnouncementsSeenAt]
+  );
+  const addPost = (draft) =>
+    setAnnouncementChanges((prev) => addAnnouncement(prev, createAnnouncement(draft)));
+  const editPost = (id, fields) =>
+    setAnnouncementChanges((prev) => editAnnouncement(prev, id, fields));
+  const removePost = (id) => setAnnouncementChanges((prev) => removeAnnouncement(prev, id));
 
   // State X-ray live inspector toggle (LB-1)
   const [xrayOn, setXrayOn] = useState(false);
@@ -105,10 +138,26 @@ export default function App() {
             onDismissToast={dismissToast}
             isOrganizer={isOrganizer}
             onLogout={logout}
+            unreadAnnouncements={unreadAnnouncements}
           />
         }
       >
         <Route index element={<Home />} />
+        <Route
+          path="announcements"
+          element={
+            <Announcements
+              announcements={announcements}
+              seenAt={announcementsSeenAt}
+              isOrganizer={isOrganizer}
+              onMarkSeen={markAnnouncementsSeen}
+              onAdd={addPost}
+              onEdit={editPost}
+              onRemove={removePost}
+              onNotify={notify}
+            />
+          }
+        />
         <Route path="about" element={<About />} />
         <Route path="directory/:userId?" element={<DirectoryPage />} />
         <Route

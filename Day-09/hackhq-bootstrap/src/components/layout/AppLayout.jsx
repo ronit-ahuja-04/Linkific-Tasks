@@ -21,6 +21,7 @@ export default function AppLayout({
   onDismissToast,
   isOrganizer,
   onLogout,
+  unreadAnnouncements = 0,
 }) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
@@ -43,6 +44,8 @@ export default function AppLayout({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const badges = { announcements: unreadAnnouncements };
+
   return (
     <div className="min-vh-100 d-flex flex-column">
       <Header
@@ -56,15 +59,15 @@ export default function AppLayout({
         onLogout={onLogout}
       />
 
-      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} />
+      <NavDrawer open={navOpen} onClose={() => setNavOpen(false)} badges={badges} />
 
       {/* CONCEPT: Grid - the sidebar takes 3 of 12 columns at lg, 2 at xl; main takes the rest. */}
       <Container fluid className="app-shell flex-grow-1 px-sm-3">
         <Row>
-          <Col lg={3} xl={2} className="d-none d-lg-block">
-            <Sidebar />
+          <Col lg={3} xl={3} xxl={2} className="d-none d-lg-block">
+            <Sidebar badges={badges} />
           </Col>
-          <Col as="main" lg={9} xl={10} className="px-3 px-sm-4 py-4 py-lg-5">
+          <Col as="main" lg={9} xl={9} xxl={10} className="px-3 px-sm-4 py-4 py-lg-5">
             <Outlet />
           </Col>
         </Row>

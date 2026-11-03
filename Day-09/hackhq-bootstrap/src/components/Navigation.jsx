@@ -1,14 +1,14 @@
 import { NavLink } from 'react-router-dom';
 import { Nav, Offcanvas } from 'react-bootstrap';
 import { STATIONS } from '../data/stations.js';
-import { Eyebrow, PulseDot, cx } from './ui.jsx';
+import { Badge, Eyebrow, PulseDot, cx } from './ui.jsx';
 
 /**
  * CONCEPT: NavLink - knows whether its `to` matches the current URL and sets aria-current="page".
  * The same station list renders twice: as a sticky sidebar from `lg` up, and inside an
  * Offcanvas drawer below `lg` that AppLayout opens from the header button.
  */
-function NavList({ onNavigate }) {
+function NavList({ onNavigate, badges = {} }) {
   return (
     <Nav as="ul" variant="pills" className="flex-column gap-1 flex-nowrap">
       {STATIONS.map((station) => {
@@ -23,7 +23,7 @@ function NavList({ onNavigate }) {
               onClick={onNavigate}
               className={({ isActive }) =>
                 cx(
-                  'nav-link d-flex align-items-center gap-3 fw-medium',
+                  'nav-link d-flex align-items-center gap-2 px-2 fw-medium',
                   isActive ? 'active' : 'text-body-secondary'
                 )
               }
@@ -38,6 +38,12 @@ function NavList({ onNavigate }) {
                     <Icon size={16} />
                   </span>
                   <span className="text-truncate">{station.name}</span>
+                  {badges[station.id] > 0 && (
+                    <Badge tone="accent" className="ms-auto">
+                      {badges[station.id]}
+                      <span className="visually-hidden"> unread</span>
+                    </Badge>
+                  )}
                 </>
               )}
             </NavLink>
@@ -63,21 +69,21 @@ function LiveCard() {
 }
 
 /** Desktop sidebar. AppLayout puts it in a column that only shows from `lg` up. */
-export function Sidebar() {
+export function Sidebar({ badges }) {
   return (
     <nav
       aria-label="Control room stations"
       className="app-sidebar sticky-top d-flex flex-column overflow-y-auto py-4 pe-3"
     >
       <Eyebrow className="mb-2 px-2">Stations</Eyebrow>
-      <NavList />
+      <NavList badges={badges} />
       <LiveCard />
     </nav>
   );
 }
 
 /** Mobile drawer: React Bootstrap's Offcanvas handles the backdrop, focus trap and Escape. */
-export function NavDrawer({ open, onClose }) {
+export function NavDrawer({ open, onClose, badges }) {
   return (
     <Offcanvas
       show={open}
@@ -93,7 +99,7 @@ export function NavDrawer({ open, onClose }) {
       </Offcanvas.Header>
       <Offcanvas.Body className="d-flex flex-column pt-0">
         <nav aria-label="Control room stations">
-          <NavList onNavigate={onClose} />
+          <NavList onNavigate={onClose} badges={badges} />
         </nav>
         <LiveCard />
       </Offcanvas.Body>
