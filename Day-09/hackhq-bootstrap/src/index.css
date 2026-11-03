@@ -233,6 +233,12 @@ h4 {
   --bs-card-border-radius: 1.25rem;
 }
 
+.list-group {
+  --bs-list-group-active-bg: var(--ink);
+  --bs-list-group-active-border-color: var(--ink);
+  --bs-list-group-active-color: var(--bg);
+}
+
 .nav-pills {
   --bs-nav-pills-border-radius: 0.75rem;
   --bs-nav-pills-link-active-bg: var(--ink);
@@ -288,7 +294,7 @@ h4 {
   min-width: 2.5rem;
 }
 
-@media (min-width: 576px) {
+@media (min-width: 992px) {
   .palette-trigger {
     min-width: 13rem;
   }

@@ -8,10 +8,13 @@ import {
   Tag,
   Receipt,
   AlertCircle,
+  Eye,
   X,
   CreditCard,
 } from 'lucide-react';
-import { Badge, Eyebrow, PulseDot, buttonClass, cx } from '../ui.jsx';
+import { Row, Col, Card as BsCard, ListGroup, Form, InputGroup, Alert } from 'react-bootstrap';
+import { Badge, Button, Eyebrow, PulseDot, buttonClass } from '../ui.jsx';
+import ContentModal from '../ContentModal.jsx';
 import StateXray from '../StateXray.jsx';
 import { SWAG_PRODUCTS } from '../../data/products.js';
 import { productPath } from '../../lib/routes.js';
@@ -28,14 +31,6 @@ import {
   MAX_QUANTITY_PER_ITEM,
 } from '../../lib/cart.js';
 
-const PERF_TOP =
-  'h-2 bg-[linear-gradient(135deg,transparent_75%,#faf8f1_75%),linear-gradient(225deg,transparent_75%,#faf8f1_75%)] bg-[length:12px_12px] bg-repeat-x';
-const PERF_BOTTOM =
-  'h-2 bg-[linear-gradient(45deg,transparent_75%,#faf8f1_75%),linear-gradient(315deg,transparent_75%,#faf8f1_75%)] bg-[length:12px_12px] bg-repeat-x';
-const DIVIDER = 'my-3 border-t border-dashed border-neutral-400';
-const QTY_BTN =
-  'inline-flex size-6 items-center justify-center rounded-md border border-neutral-300 bg-white text-neutral-700 transition hover:bg-neutral-100 disabled:pointer-events-none disabled:opacity-40';
-
 export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNotify }) {
   // Cart line items (SW-2) now live in App so they survive list <-> detail navigation
 
@@ -45,6 +40,9 @@ export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNot
   const [couponError, setCouponError] = useState('');
 
   const couponInputId = useId();
+
+  // Product shown in the Quick view modal (null = closed)
+  const [quickView, setQuickView] = useState(null);
 
   // Pure derived calculations during render (SW-5, zero totals stored in state)
   const totalItems = calculateTotalItemCount(cart);
@@ -112,15 +110,21 @@ export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNot
     cart,
   };
 
+  const quickViewQty = quickView
+    ? cart.find((l) => l.productId === quickView.id)?.quantity || 0
+    : 0;
+  const quickViewMaxed = quickViewQty >= MAX_QUANTITY_PER_ITEM;
+
   return (
     <div>
-      <header className="mb-8 animate-rise">
+      <header className="mb-4 animate-rise">
         <Eyebrow className="mb-3">
-          Control room <span className="text-line">/</span> <span className="text-ink">SWAG</span>
+          Control room <span className="text-body-tertiary">/</span>{' '}
+          <span className="text-body">SWAG</span>
         </Eyebrow>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold sm:text-4xl">Swag shop</h1>
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <div className="d-flex flex-wrap align-items-center gap-3">
+            <h1 className="display-6 fw-bold mb-0">Swag shop</h1>
             <Badge tone="good">
               <PulseDot />
               <span>Live</span>
@@ -128,65 +132,69 @@ export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNot
           </div>
           {/* Item count in header (SW-9) */}
           <div
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2 text-sm"
+            className="d-inline-flex align-items-center gap-2 rounded-pill border bg-body px-3 py-2 small"
             aria-label={`Cart contains ${totalItems} items`}
           >
             <ShoppingBag size={16} aria-hidden="true" />
             <span>
-              Cart: <strong className="tabular-nums">{totalItems}</strong> items
+              Cart: <strong className="font-monospace">{totalItems}</strong> items
             </span>
           </div>
         </div>
       </header>
 
-      <div className="flex flex-col gap-6">
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_400px]">
-          {/* Products Ruled Catalog (SW-1) */}
-          <div>
-            <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-              <h2 className="text-xl font-bold sm:text-2xl">Merchandise Catalog</h2>
-              <span className="font-mono text-xs uppercase tracking-wider text-muted">
-                Sample prices for hackathon demo
-              </span>
-            </div>
+      <Row className="g-4 align-items-start">
+        {/* Products catalog (SW-1) */}
+        <Col xs={12} lg={7} xl={8}>
+          <div className="mb-3 d-flex flex-wrap align-items-end justify-content-between gap-2">
+            <h2 className="fs-4 fw-bold mb-0">Merchandise Catalog</h2>
+            <span className="font-monospace small text-uppercase ls-wide text-body-secondary">
+              Sample prices for hackathon demo
+            </span>
+          </div>
 
-            <ul
-              className="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface shadow-card"
-              aria-label="Available merchandise"
-            >
-              {SWAG_PRODUCTS.map((product) => {
-                const cartLine = cart.find((l) => l.productId === product.id);
-                const currentQty = cartLine?.quantity || 0;
-                const isMaxReached = currentQty >= MAX_QUANTITY_PER_ITEM;
+          <Row
+            as="ul"
+            className="list-unstyled g-3 row-cols-1 row-cols-sm-2 row-cols-xl-3 mb-0"
+            aria-label="Available merchandise"
+          >
+            {SWAG_PRODUCTS.map((product) => {
+              const cartLine = cart.find((l) => l.productId === product.id);
+              const currentQty = cartLine?.quantity || 0;
+              const isMaxReached = currentQty >= MAX_QUANTITY_PER_ITEM;
 
-                return (
-                  <li
-                    key={product.id}
-                    className="flex flex-col gap-4 p-5 transition hover:bg-surface-2 sm:flex-row sm:items-center sm:justify-between"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold">
-                          <Link
-                            to={productPath(product.id)}
-                            className="underline-offset-4 hover:text-accent hover:underline focus-visible:underline"
-                          >
-                            {product.name}
-                          </Link>
-                        </h3>
+              return (
+                <Col as="li" key={product.id}>
+                  <BsCard className="h-100 shadow-sm">
+                    <BsCard.Body className="d-flex flex-column gap-2">
+                      <div>
                         <Badge tone="accent">{product.category}</Badge>
                       </div>
-                      <p className="mt-1 text-sm text-muted">{product.description}</p>
-                    </div>
-
-                    <div className="flex shrink-0 items-center justify-between gap-4 sm:justify-end">
-                      <div className="font-display text-lg font-bold tabular-nums">
+                      <BsCard.Title as="h3" className="fs-6 fw-semibold mb-0">
+                        <Link to={productPath(product.id)} className="text-body">
+                          {product.name}
+                        </Link>
+                      </BsCard.Title>
+                      <BsCard.Text className="small text-body-secondary flex-grow-1 mb-0">
+                        {product.description}
+                      </BsCard.Text>
+                      <div className="fs-5 fw-bold font-monospace">
                         {formatCurrencyINR(product.price)}
                       </div>
-
-                      <button
-                        type="button"
-                        className={buttonClass({ variant: 'secondary', size: 'sm' })}
+                    </BsCard.Body>
+                    <BsCard.Footer className="d-flex gap-2 bg-transparent">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setQuickView(product)}
+                        aria-label={`Quick view ${product.name}`}
+                      >
+                        <Eye size={16} aria-hidden="true" />
+                        <span>Quick view</span>
+                      </Button>
+                      <Button
+                        size="sm"
+                        className="ms-auto"
                         onClick={() => handleAddToCart(product.id)}
                         disabled={isMaxReached}
                         title={isMaxReached ? 'Maximum 10 per item reached' : 'Add to cart'}
@@ -194,228 +202,198 @@ export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNot
                       >
                         <Plus size={16} aria-hidden="true" />
                         <span>{isMaxReached ? 'Max 10' : 'Add'}</span>
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+                      </Button>
+                    </BsCard.Footer>
+                  </BsCard>
+                </Col>
+              );
+            })}
+          </Row>
+        </Col>
 
-          {/* Thermal Receipt Shopping Cart (SW-8) */}
-          <div className="mx-auto w-full max-w-md lg:sticky lg:top-6 lg:max-w-none">
-            <div
-              className="animate-settle font-mono text-neutral-800 drop-shadow-xl"
-              aria-label="Thermal Shopping Receipt"
-            >
-              {/* Perforated Sawtooth Top Edge */}
-              <div className={PERF_TOP} aria-hidden="true" />
+        {/* Shopping cart (SW-8) */}
+        <Col xs={12} lg={5} xl={4}>
+          <BsCard
+            className="shadow-sm sticky-lg-top animate-settle"
+            style={{ top: '1rem' }}
+            aria-label="Shopping cart"
+          >
+            <BsCard.Header className="d-flex align-items-center gap-2 fw-bold">
+              <Receipt size={18} aria-hidden="true" />
+              <span>HACKHQ STORE</span>
+              <span className="ms-auto small font-monospace fw-normal text-body-secondary">
+                ORD #{Date.now().toString().slice(-6)} · {new Date().toLocaleDateString('en-GB')}
+              </span>
+            </BsCard.Header>
 
-              <div className="bg-[#faf8f1] px-5 py-5 text-xs">
-                {/* Receipt Header */}
-                <div className="flex flex-col items-center gap-1 text-center">
-                  <div className="flex items-center gap-2">
-                    <Receipt size={20} aria-hidden="true" />
-                    <span className="font-display text-lg font-bold tracking-widest">
-                      HACKHQ STORE
-                    </span>
-                  </div>
-                  <span className="text-[0.68rem] tracking-[0.2em] text-neutral-500">
-                    OFFICIAL SWAG COUNTER
-                  </span>
-                  <div className="mt-2 flex w-full justify-between text-[0.68rem] tabular-nums text-neutral-500">
-                    <span>ORD #{Date.now().toString().slice(-6)}</span>
-                    <span>{new Date().toLocaleDateString('en-GB')}</span>
-                  </div>
-                </div>
+            {/* Line Items */}
+            {cart.length === 0 ? (
+              <BsCard.Body className="d-flex flex-column align-items-center gap-2 py-5 text-center text-body-secondary">
+                <ShoppingBag size={28} aria-hidden="true" />
+                <p className="mb-0">Nothing in the cart. Add something from the list.</p>
+              </BsCard.Body>
+            ) : (
+              <ListGroup variant="flush" aria-label="Cart items">
+                {cart.map((line) => {
+                  const product = SWAG_PRODUCTS.find((p) => p.id === line.productId);
+                  if (!product) return null;
 
-                <div className={DIVIDER} />
+                  const lineTotal = product.price * line.quantity;
 
-                {/* Line Items */}
-                {cart.length === 0 ? (
-                  <div className="flex flex-col items-center gap-2 py-6 text-center text-neutral-500">
-                    <ShoppingBag size={28} aria-hidden="true" />
-                    <p>Nothing in the cart. Add something from the list.</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-3" aria-label="Cart items">
-                    {cart.map((line) => {
-                      const product = SWAG_PRODUCTS.find((p) => p.id === line.productId);
-                      if (!product) return null;
-
-                      const lineTotal = product.price * line.quantity;
-
-                      return (
-                        <div key={line.productId} className="flex animate-fade flex-col gap-1.5">
-                          <div className="flex items-start justify-between gap-2">
-                            <span className="text-sm font-semibold uppercase">{product.name}</span>
-                            <button
-                              type="button"
-                              className="rounded-md p-1 text-neutral-400 transition hover:bg-red-100 hover:text-red-600"
-                              onClick={() => handleRemoveLine(line.productId)}
-                              title="Remove line item"
-                              aria-label={`Remove ${product.name}`}
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-1.5">
-                              <button
-                                type="button"
-                                className={QTY_BTN}
-                                onClick={() => handleUpdateQuantity(line.productId, -1)}
-                                title="Decrease quantity"
-                                aria-label={`Decrease ${product.name} quantity`}
-                              >
-                                <Minus size={12} />
-                              </button>
-                              <span className="min-w-5 text-center font-semibold tabular-nums">
-                                {line.quantity}
-                              </span>
-                              <button
-                                type="button"
-                                className={QTY_BTN}
-                                onClick={() => handleUpdateQuantity(line.productId, 1)}
-                                disabled={line.quantity >= MAX_QUANTITY_PER_ITEM}
-                                title="Increase quantity"
-                                aria-label={`Increase ${product.name} quantity`}
-                              >
-                                <Plus size={12} />
-                              </button>
-                              <span className="ml-1 text-neutral-500 tabular-nums">
-                                @ {formatCurrencyINR(product.price)}
-                              </span>
-                            </div>
-
-                            <span className="font-semibold tabular-nums">
-                              {formatCurrencyINR(lineTotal)}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                <div className={DIVIDER} />
-
-                {/* Coupon Entry Field (SW-6) */}
-                <div>
-                  {appliedCoupon ? (
-                    <div className="flex items-center gap-2 rounded-lg border border-dashed border-emerald-600 bg-emerald-50 px-3 py-2 text-emerald-800">
-                      <Tag size={14} aria-hidden="true" />
-                      <span className="flex-1 font-semibold">
-                        {appliedCoupon.code} (-{appliedCoupon.discountPct}%)
-                      </span>
-                      <button
-                        type="button"
-                        className="rounded-md p-1 transition hover:bg-emerald-200"
-                        onClick={handleRemoveCoupon}
-                        title="Remove coupon discount"
-                        aria-label="Remove coupon"
-                      >
-                        <X size={13} />
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={handleApplyCoupon}>
-                      <label htmlFor={couponInputId} className="sr-only">
-                        Coupon Code
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          id={couponInputId}
-                          type="text"
-                          placeholder="Coupon (e.g. HACK10)"
-                          value={couponInput}
-                          onChange={(e) => {
-                            setCouponInput(e.target.value);
-                            if (couponError) setCouponError('');
-                          }}
-                          aria-invalid={couponError ? 'true' : undefined}
-                          className={cx(
-                            'min-w-0 flex-1 rounded-lg border bg-white px-3 py-2 text-xs uppercase text-neutral-900 placeholder:normal-case placeholder:text-neutral-400',
-                            'focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-300',
-                            couponError
-                              ? 'border-red-500 ring-2 ring-red-100'
-                              : 'border-neutral-300'
-                          )}
-                        />
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-neutral-700 disabled:pointer-events-none disabled:opacity-40"
-                          disabled={!couponInput.trim()}
+                  return (
+                    <ListGroup.Item key={line.productId} className="animate-fade">
+                      <div className="d-flex align-items-start justify-content-between gap-2">
+                        <span className="fw-semibold">{product.name}</span>
+                        <Button
+                          variant="danger"
+                          size="sm"
+                          className="py-0 px-1 border-0"
+                          onClick={() => handleRemoveLine(line.productId)}
+                          title="Remove line item"
+                          aria-label={`Remove ${product.name}`}
                         >
-                          Apply
-                        </button>
+                          <Trash2 size={13} />
+                        </Button>
                       </div>
-                      {couponError && (
-                        <p
-                          className="mt-1.5 flex items-center gap-1.5 text-[0.7rem] font-medium text-red-700"
-                          role="alert"
-                        >
-                          <AlertCircle size={12} aria-hidden="true" />
-                          <span>{couponError}</span>
-                        </p>
-                      )}
-                    </form>
-                  )}
-                </div>
+                      <div className="mt-2 d-flex flex-wrap align-items-center justify-content-between gap-2">
+                        <div className="d-flex align-items-center gap-2">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="px-2 py-1"
+                            onClick={() => handleUpdateQuantity(line.productId, -1)}
+                            title="Decrease quantity"
+                            aria-label={`Decrease ${product.name} quantity`}
+                          >
+                            <Minus size={12} />
+                          </Button>
+                          <span
+                            className="fw-semibold font-monospace text-center"
+                            style={{ minWidth: '1.5rem' }}
+                          >
+                            {line.quantity}
+                          </span>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            className="px-2 py-1"
+                            onClick={() => handleUpdateQuantity(line.productId, 1)}
+                            disabled={line.quantity >= MAX_QUANTITY_PER_ITEM}
+                            title="Increase quantity"
+                            aria-label={`Increase ${product.name} quantity`}
+                          >
+                            <Plus size={12} />
+                          </Button>
+                          <span className="small text-body-secondary font-monospace">
+                            @ {formatCurrencyINR(product.price)}
+                          </span>
+                        </div>
+                        <span className="fw-semibold font-monospace">
+                          {formatCurrencyINR(lineTotal)}
+                        </span>
+                      </div>
+                    </ListGroup.Item>
+                  );
+                })}
+              </ListGroup>
+            )}
 
-                <div className="my-3 border-t-4 border-double border-neutral-400" />
-
-                {/* Summary Totals Breakdown (SW-5) */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="flex justify-between">
-                    <span>Subtotal ({totalItems} items)</span>
-                    <span className="tabular-nums">{formatCurrencyINR(subtotal)}</span>
-                  </div>
-
-                  {discount > 0 && (
-                    <div className="flex justify-between font-semibold text-emerald-700">
-                      <span>Discount ({appliedCoupon?.code})</span>
-                      <span className="tabular-nums">-{formatCurrencyINR(discount)}</span>
-                    </div>
-                  )}
-
-                  <div className="mt-1 flex items-baseline justify-between border-t border-neutral-800 pt-2">
-                    <span className="text-sm font-bold tracking-wider">TOTAL AMOUNT</span>
-                    <span className="font-display text-xl font-bold tabular-nums">
-                      {formatCurrencyINR(total)}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Place Order CTA (SW-8) */}
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    className={buttonClass({ size: 'lg', className: 'w-full' })}
-                    onClick={handlePlaceOrder}
-                    disabled={cart.length === 0}
-                    title={cart.length === 0 ? 'Add items to place order' : 'Submit order'}
-                  >
-                    <CreditCard size={18} aria-hidden="true" />
-                    <span>Place Order</span>
-                  </button>
-                </div>
-
-                <div className="mt-5 flex flex-col items-center gap-1" aria-hidden="true">
-                  <div className="h-10 w-full bg-[repeating-linear-gradient(90deg,#1f2937_0,#1f2937_2px,transparent_2px,transparent_4px,#1f2937_4px,#1f2937_5px,transparent_5px,transparent_8px)]" />
-                  <span className="text-[0.65rem] tracking-[0.25em] text-neutral-500">
-                    HACKHQ-POS-{totalItems * 42}
+            <BsCard.Body className="border-top">
+              {/* Coupon Entry Field (SW-6) */}
+              {appliedCoupon ? (
+                <Alert variant="success" className="d-flex align-items-center gap-2 py-2 px-3 mb-0">
+                  <Tag size={14} aria-hidden="true" />
+                  <span className="flex-grow-1 fw-semibold">
+                    {appliedCoupon.code} (-{appliedCoupon.discountPct}%)
                   </span>
-                </div>
-              </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="p-1"
+                    onClick={handleRemoveCoupon}
+                    title="Remove coupon discount"
+                    aria-label="Remove coupon"
+                  >
+                    <X size={13} />
+                  </Button>
+                </Alert>
+              ) : (
+                <Form onSubmit={handleApplyCoupon} noValidate>
+                  <Form.Label htmlFor={couponInputId} visuallyHidden>
+                    Coupon Code
+                  </Form.Label>
+                  <InputGroup hasValidation>
+                    <Form.Control
+                      id={couponInputId}
+                      type="text"
+                      placeholder="Coupon (e.g. HACK10)"
+                      value={couponInput}
+                      onChange={(e) => {
+                        setCouponInput(e.target.value);
+                        if (couponError) setCouponError('');
+                      }}
+                      isInvalid={Boolean(couponError)}
+                      aria-invalid={couponError ? 'true' : undefined}
+                      className="text-uppercase"
+                    />
+                    <Button type="submit" variant="dark" disabled={!couponInput.trim()}>
+                      Apply
+                    </Button>
+                    {couponError && (
+                      <Form.Control.Feedback type="invalid" role="alert">
+                        <AlertCircle size={12} aria-hidden="true" /> <span>{couponError}</span>
+                      </Form.Control.Feedback>
+                    )}
+                  </InputGroup>
+                </Form>
+              )}
+            </BsCard.Body>
 
-              {/* Perforated Sawtooth Bottom Edge */}
-              <div className={PERF_BOTTOM} aria-hidden="true" />
-            </div>
-          </div>
-        </div>
+            {/* Summary Totals Breakdown (SW-5) */}
+            <ListGroup variant="flush">
+              <ListGroup.Item className="d-flex justify-content-between">
+                <span>Subtotal ({totalItems} items)</span>
+                <span className="font-monospace">{formatCurrencyINR(subtotal)}</span>
+              </ListGroup.Item>
+              {discount > 0 && (
+                <ListGroup.Item
+                  variant="success"
+                  className="d-flex justify-content-between fw-semibold"
+                >
+                  <span>Discount ({appliedCoupon?.code})</span>
+                  <span className="font-monospace">-{formatCurrencyINR(discount)}</span>
+                </ListGroup.Item>
+              )}
+              <ListGroup.Item className="d-flex align-items-baseline justify-content-between">
+                <span className="fw-bold ls-wide">TOTAL AMOUNT</span>
+                <span className="fs-4 fw-bold font-monospace">{formatCurrencyINR(total)}</span>
+              </ListGroup.Item>
+            </ListGroup>
 
+            {/* Place Order CTA (SW-8) */}
+            <BsCard.Body>
+              <Button
+                size="lg"
+                className="w-100"
+                onClick={handlePlaceOrder}
+                disabled={cart.length === 0}
+                title={cart.length === 0 ? 'Add items to place order' : 'Submit order'}
+              >
+                <CreditCard size={18} aria-hidden="true" />
+                <span>Place Order</span>
+              </Button>
+              <p
+                className="mt-3 mb-0 text-center small font-monospace text-body-secondary ls-wider"
+                aria-hidden="true"
+              >
+                HACKHQ-POS-{totalItems * 42}
+              </p>
+            </BsCard.Body>
+          </BsCard>
+        </Col>
+      </Row>
+
+      <div className="mt-4">
         <StateXray
           isOpen={xrayOn}
           stationName="Swag shop"
@@ -423,6 +401,43 @@ export default function SwagStation({ cart, setCart, xrayOn, onToggleXray, onNot
           onClose={onToggleXray}
         />
       </div>
+
+      {/* CONCEPT: one modal, content chosen by the quickView state */}
+      <ContentModal
+        show={quickView !== null}
+        onHide={() => setQuickView(null)}
+        title={quickView?.name}
+        footer={
+          quickView && (
+            <>
+              <Link
+                to={productPath(quickView.id)}
+                className={buttonClass({ variant: 'secondary' })}
+                onClick={() => setQuickView(null)}
+              >
+                Full product page
+              </Link>
+              <Button onClick={() => handleAddToCart(quickView.id)} disabled={quickViewMaxed}>
+                <Plus size={16} aria-hidden="true" />
+                <span>{quickViewMaxed ? 'Max 10 reached' : 'Add to cart'}</span>
+              </Button>
+            </>
+          )
+        }
+      >
+        {quickView && (
+          <div className="d-flex flex-column gap-3">
+            <div>
+              <Badge tone="accent">{quickView.category}</Badge>
+            </div>
+            <p className="mb-0 text-body-secondary">{quickView.description}</p>
+            <p className="fs-3 fw-bold font-monospace mb-0">{formatCurrencyINR(quickView.price)}</p>
+            <p className="small text-body-secondary mb-0">
+              In your cart: <strong>{quickViewQty}</strong>
+            </p>
+          </div>
+        )}
+      </ContentModal>
     </div>
   );
 }

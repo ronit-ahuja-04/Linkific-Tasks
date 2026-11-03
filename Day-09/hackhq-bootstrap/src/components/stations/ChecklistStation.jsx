@@ -14,9 +14,18 @@ import {
   Sparkles,
   ListFilter,
 } from 'lucide-react';
+import {
+  Badge as BsBadge,
+  Button as BsButton,
+  ButtonGroup,
+  Form,
+  InputGroup,
+  ListGroup,
+  ProgressBar,
+} from 'react-bootstrap';
 import StateXray from '../StateXray.jsx';
 import PageHeader from '../layout/PageHeader.jsx';
-import { Button, Card, Eyebrow, cx, errorClass, inputClass } from '../ui.jsx';
+import { Button, Card, Eyebrow, cx } from '../ui.jsx';
 import { STARTER_TASKS } from '../../data/starterTasks.js';
 import {
   createTask,
@@ -183,18 +192,7 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
     tasks,
   };
 
-  const tabClass = (active) =>
-    cx(
-      'inline-flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-sm font-semibold transition',
-      active ? 'bg-ink text-bg shadow-sm' : 'text-muted hover:bg-surface hover:text-ink'
-    );
-  const tabCountClass = (active) =>
-    cx(
-      'rounded-full px-1.5 font-mono text-[0.68rem] tabular-nums',
-      active ? 'bg-bg/20 text-bg' : 'bg-surface text-muted'
-    );
-  const iconBtn =
-    'inline-flex size-8 items-center justify-center rounded-lg text-muted transition hover:bg-surface-2 hover:text-ink focus-visible:outline-2 focus-visible:outline-accent disabled:pointer-events-none disabled:opacity-30';
+  const iconBtn = 'p-1 lh-1 text-body-secondary';
 
   return (
     <div className="animate-rise">
@@ -210,248 +208,254 @@ export default function ChecklistStation({ xrayOn, onToggleXray, onNotify }) {
         </Button>
       </PageHeader>
 
-      <div className="flex flex-col gap-6">
-        <div className="flex min-w-0 flex-col gap-5">
-          {/* Progress Metric & Thin Bar (CL-5) */}
-          <section className="rounded-card bg-board p-5 text-on-board shadow-card sm:p-6">
-            <div className="mb-3 flex items-end justify-between gap-3">
-              <div>
-                <Eyebrow className="mb-1 text-on-board/60">Setup progress</Eyebrow>
-                <span className="font-display text-xl font-bold tabular-nums sm:text-2xl">
-                  {progress.done} of {progress.total} done
-                </span>
-              </div>
-              <span className="font-display text-4xl font-bold tracking-tight text-brand tabular-nums sm:text-5xl">
-                {progress.percentage}%
+      <div className="d-flex flex-column gap-4">
+        {/* Progress Metric & Thin Bar (CL-5) */}
+        <section
+          className="rounded-4 p-3 p-sm-4 shadow-sm"
+          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+        >
+          <div className="mb-3 d-flex align-items-end justify-content-between gap-3">
+            <div>
+              <Eyebrow className="mb-1 text-reset opacity-75">Setup progress</Eyebrow>
+              <span className="fs-4 fw-bold">
+                {progress.done} of {progress.total} done
               </span>
             </div>
-            <div
-              className="h-2 overflow-hidden rounded-full bg-on-board/15"
-              role="progressbar"
-              aria-valuenow={progress.done}
-              aria-valuemin={0}
-              aria-valuemax={progress.total}
-              aria-label="Checklist completion progress"
-            >
-              <div
-                className="h-full rounded-full bg-brand transition-[width] duration-500 ease-out"
-                style={{ width: `${progress.percentage}%` }}
-              />
-            </div>
-          </section>
-
-          {/* Add Task Controlled Form (CL-1) */}
-          <form onSubmit={handleAddTask}>
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <label htmlFor={inputId} className="sr-only">
-                Add setup task
-              </label>
-              <input
-                id={inputId}
-                type="text"
-                maxLength={80}
-                placeholder="Add a new setup task (e.g., Verify sponsor power strips)..."
-                value={inputText}
-                onChange={(e) => {
-                  setInputText(e.target.value);
-                  if (inputError) setInputError('');
-                }}
-                className={cx(inputClass, 'flex-1 py-3')}
-                aria-invalid={!!inputError}
-                aria-describedby={inputError ? `${inputId}-error` : undefined}
-              />
-              <Button type="submit" title="Add task" className="sm:px-5">
-                <Plus size={18} aria-hidden="true" />
-                <span>Add task</span>
-              </Button>
-            </div>
-            {inputError && (
-              <p id={`${inputId}-error`} className={errorClass} role="alert">
-                {inputError}
-              </p>
-            )}
-          </form>
-
-          {/* Segmented Filter Control & Actions (CL-4, CL-6) */}
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div
-              className="inline-flex gap-1 rounded-xl border border-line bg-surface-2 p-1"
-              role="tablist"
-              aria-label="Filter tasks"
-            >
-              {[
-                ['all', 'All', tasks.length],
-                ['open', 'Open', openCount],
-                ['done', 'Done', doneCount],
-              ].map(([key, label, count]) => (
-                <button
-                  key={key}
-                  type="button"
-                  role="tab"
-                  aria-selected={filter === key}
-                  className={tabClass(filter === key)}
-                  onClick={() => setFilter(key)}
-                >
-                  <span>{label}</span>
-                  <span className={tabCountClass(filter === key)}>{count}</span>
-                </button>
-              ))}
-            </div>
-
-            {doneCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClearCompleted}
-                title="Remove completed tasks"
-              >
-                Clear completed ({doneCount})
-              </Button>
-            )}
+            <span className="display-5 fw-bold text-brand lh-1">{progress.percentage}%</span>
           </div>
+          <ProgressBar
+            now={progress.percentage}
+            label={`${progress.percentage}%`}
+            visuallyHidden
+            aria-label="Checklist completion progress"
+            style={{ height: 8 }}
+            className="bg-secondary bg-opacity-25"
+            variant="brand"
+          />
+        </section>
 
-          {/* Ruled Strip Whiteboard Task List (CL-2, CL-3, CL-10, CL-11) */}
-          <Card className="overflow-hidden">
-            {visibleTasks.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 px-6 py-14 text-center">
-                <span className="grid size-12 place-items-center rounded-full bg-surface-2 text-muted">
-                  <ListFilter size={24} aria-hidden="true" />
-                </span>
-                <p className="max-w-sm text-sm text-muted">
-                  {tasks.length === 0
-                    ? 'No setup tasks yet. Add one above, or load the starter list.'
-                    : 'No matching tasks found for this filter.'}
-                </p>
-              </div>
-            ) : (
-              <ul className="divide-y divide-line" aria-label="Setup tasks">
-                {visibleTasks.map((task) => {
-                  const originalIndex = tasks.findIndex((t) => t.id === task.id);
-                  const isEditing = editingId === task.id;
-
-                  return (
-                    <li
-                      key={task.id}
-                      className={cx(
-                        'group flex items-center gap-3 px-4 py-3 transition hover:bg-surface-2/60 sm:px-5',
-                        task.done && 'bg-surface-2/40'
-                      )}
-                    >
-                      <button
-                        type="button"
-                        role="checkbox"
-                        aria-checked={task.done}
-                        className="shrink-0 rounded-md p-0.5 transition active:scale-90 focus-visible:outline-2 focus-visible:outline-accent"
-                        onClick={() => handleToggleTask(task.id)}
-                        aria-label={
-                          task.done
-                            ? `Mark "${task.text}" as incomplete`
-                            : `Mark "${task.text}" as complete`
-                        }
-                      >
-                        {task.done ? (
-                          <CheckSquare size={22} className="animate-pop text-good" />
-                        ) : (
-                          <Square size={22} className="text-muted hover:text-ink" />
-                        )}
-                      </button>
-
-                      <div className="min-w-0 flex-1">
-                        {isEditing ? (
-                          <div className="flex items-center gap-1.5">
-                            <input
-                              type="text"
-                              value={editText}
-                              onChange={(e) => setEditText(e.target.value)}
-                              onKeyDown={(e) => handleEditKeyDown(e, task.id)}
-                              autoFocus
-                              maxLength={80}
-                              className={cx(inputClass, 'min-w-0 flex-1 py-1.5')}
-                              aria-label="Edit task description"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => saveEditing(task.id)}
-                              className={cx(iconBtn, 'bg-good-soft text-good hover:bg-good-soft')}
-                              title="Save changes (Enter)"
-                            >
-                              <Check size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={cancelEditing}
-                              className={iconBtn}
-                              title="Cancel editing (Esc)"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        ) : (
-                          <span
-                            className={cx(
-                              'block break-words text-sm font-medium transition sm:text-base',
-                              task.done ? 'text-muted line-through' : 'text-ink'
-                            )}
-                            onDoubleClick={() => startEditing(task)}
-                            title="Double-click to edit"
-                          >
-                            {task.text}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="flex shrink-0 items-center gap-0.5 sm:opacity-60 sm:transition sm:group-focus-within:opacity-100 sm:group-hover:opacity-100">
-                        {!isEditing && (
-                          <button
-                            type="button"
-                            className={iconBtn}
-                            onClick={() => startEditing(task)}
-                            title="Edit task text"
-                            aria-label={`Edit "${task.text}"`}
-                          >
-                            <Edit2 size={15} />
-                          </button>
-                        )}
-
-                        <button
-                          type="button"
-                          className={iconBtn}
-                          onClick={() => handleMoveUp(originalIndex)}
-                          disabled={originalIndex === 0}
-                          title="Move task up"
-                          aria-label={`Move "${task.text}" up`}
-                        >
-                          <ArrowUp size={15} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className={iconBtn}
-                          onClick={() => handleMoveDown(originalIndex)}
-                          disabled={originalIndex === tasks.length - 1}
-                          title="Move task down"
-                          aria-label={`Move "${task.text}" down`}
-                        >
-                          <ArrowDown size={15} />
-                        </button>
-
-                        <button
-                          type="button"
-                          className={cx(iconBtn, 'hover:bg-bad-soft hover:text-bad')}
-                          onClick={() => handleDeleteTask(task.id)}
-                          title="Delete task"
-                          aria-label={`Delete "${task.text}"`}
-                        >
-                          <Trash2 size={15} />
-                        </button>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
+        {/* Add Task Controlled Form (CL-1) */}
+        <Form onSubmit={handleAddTask} noValidate>
+          <Form.Label htmlFor={inputId} visuallyHidden>
+            Add setup task
+          </Form.Label>
+          <InputGroup hasValidation>
+            <Form.Control
+              id={inputId}
+              type="text"
+              maxLength={80}
+              placeholder="Add a new setup task (e.g., Verify sponsor power strips)..."
+              value={inputText}
+              onChange={(e) => {
+                setInputText(e.target.value);
+                if (inputError) setInputError('');
+              }}
+              className="py-2"
+              isInvalid={!!inputError}
+              aria-invalid={!!inputError}
+              aria-describedby={inputError ? `${inputId}-error` : undefined}
+            />
+            <Button type="submit" title="Add task" className="px-3 px-sm-4">
+              <Plus size={18} aria-hidden="true" />
+              <span>Add task</span>
+            </Button>
+            {inputError && (
+              <Form.Control.Feedback type="invalid" id={`${inputId}-error`} role="alert">
+                {inputError}
+              </Form.Control.Feedback>
             )}
-          </Card>
+          </InputGroup>
+        </Form>
+
+        {/* Segmented Filter Control & Actions (CL-4, CL-6) */}
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-3">
+          <ButtonGroup role="tablist" aria-label="Filter tasks">
+            {[
+              ['all', 'All', tasks.length],
+              ['open', 'Open', openCount],
+              ['done', 'Done', doneCount],
+            ].map(([key, label, count]) => (
+              <BsButton
+                key={key}
+                type="button"
+                role="tab"
+                variant="outline-secondary"
+                active={filter === key}
+                aria-selected={filter === key}
+                className="d-inline-flex align-items-center gap-2 fw-semibold"
+                onClick={() => setFilter(key)}
+              >
+                <span>{label}</span>
+                <BsBadge pill bg="secondary" className="font-monospace">
+                  {count}
+                </BsBadge>
+              </BsButton>
+            ))}
+          </ButtonGroup>
+
+          {doneCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClearCompleted}
+              title="Remove completed tasks"
+            >
+              Clear completed ({doneCount})
+            </Button>
+          )}
         </div>
+
+        {/* Ruled Strip Whiteboard Task List (CL-2, CL-3, CL-10, CL-11) */}
+        <Card className="overflow-hidden p-0">
+          {visibleTasks.length === 0 ? (
+            <div className="d-flex flex-column align-items-center gap-3 px-4 py-5 text-center">
+              <span
+                className="d-grid place-items-center rounded-circle bg-body-secondary text-body-secondary"
+                style={{ width: 48, height: 48 }}
+              >
+                <ListFilter size={24} aria-hidden="true" />
+              </span>
+              <p className="mb-0 small text-body-secondary" style={{ maxWidth: '24rem' }}>
+                {tasks.length === 0
+                  ? 'No setup tasks yet. Add one above, or load the starter list.'
+                  : 'No matching tasks found for this filter.'}
+              </p>
+            </div>
+          ) : (
+            <ListGroup as="ul" variant="flush" aria-label="Setup tasks">
+              {visibleTasks.map((task) => {
+                const originalIndex = tasks.findIndex((t) => t.id === task.id);
+                const isEditing = editingId === task.id;
+
+                return (
+                  <ListGroup.Item
+                    as="li"
+                    key={task.id}
+                    action={false}
+                    className={cx(
+                      'd-flex align-items-center gap-2 gap-sm-3 px-3 py-2',
+                      task.done && 'bg-body-tertiary'
+                    )}
+                  >
+                    <button
+                      type="button"
+                      role="checkbox"
+                      aria-checked={task.done}
+                      className="btn btn-link flex-shrink-0 p-0 lh-1"
+                      onClick={() => handleToggleTask(task.id)}
+                      aria-label={
+                        task.done
+                          ? `Mark "${task.text}" as incomplete`
+                          : `Mark "${task.text}" as complete`
+                      }
+                    >
+                      {task.done ? (
+                        <CheckSquare size={22} className="animate-pop text-success" />
+                      ) : (
+                        <Square size={22} className="text-body-secondary" />
+                      )}
+                    </button>
+
+                    <div className="flex-grow-1" style={{ minWidth: 0 }}>
+                      {isEditing ? (
+                        <InputGroup size="sm">
+                          <Form.Control
+                            type="text"
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            onKeyDown={(e) => handleEditKeyDown(e, task.id)}
+                            autoFocus
+                            maxLength={80}
+                            aria-label="Edit task description"
+                          />
+                          <BsButton
+                            type="button"
+                            variant="outline-success"
+                            onClick={() => saveEditing(task.id)}
+                            title="Save changes (Enter)"
+                          >
+                            <Check size={16} />
+                          </BsButton>
+                          <BsButton
+                            type="button"
+                            variant="outline-secondary"
+                            onClick={cancelEditing}
+                            title="Cancel editing (Esc)"
+                          >
+                            <X size={16} />
+                          </BsButton>
+                        </InputGroup>
+                      ) : (
+                        <span
+                          className={cx(
+                            'd-block fw-medium text-break',
+                            task.done
+                              ? 'text-body-secondary text-decoration-line-through'
+                              : 'text-body'
+                          )}
+                          onDoubleClick={() => startEditing(task)}
+                          title="Double-click to edit"
+                        >
+                          {task.text}
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="d-flex flex-shrink-0 align-items-center">
+                      {!isEditing && (
+                        <BsButton
+                          type="button"
+                          variant="link"
+                          className={iconBtn}
+                          onClick={() => startEditing(task)}
+                          title="Edit task text"
+                          aria-label={`Edit "${task.text}"`}
+                        >
+                          <Edit2 size={15} />
+                        </BsButton>
+                      )}
+
+                      <BsButton
+                        type="button"
+                        variant="link"
+                        className={iconBtn}
+                        onClick={() => handleMoveUp(originalIndex)}
+                        disabled={originalIndex === 0}
+                        title="Move task up"
+                        aria-label={`Move "${task.text}" up`}
+                      >
+                        <ArrowUp size={15} />
+                      </BsButton>
+
+                      <BsButton
+                        type="button"
+                        variant="link"
+                        className={iconBtn}
+                        onClick={() => handleMoveDown(originalIndex)}
+                        disabled={originalIndex === tasks.length - 1}
+                        title="Move task down"
+                        aria-label={`Move "${task.text}" down`}
+                      >
+                        <ArrowDown size={15} />
+                      </BsButton>
+
+                      <BsButton
+                        type="button"
+                        variant="link"
+                        className="p-1 lh-1 text-danger"
+                        onClick={() => handleDeleteTask(task.id)}
+                        title="Delete task"
+                        aria-label={`Delete "${task.text}"`}
+                      >
+                        <Trash2 size={15} />
+                      </BsButton>
+                    </div>
+                  </ListGroup.Item>
+                );
+              })}
+            </ListGroup>
+          )}
+        </Card>
 
         <StateXray
           isOpen={xrayOn}

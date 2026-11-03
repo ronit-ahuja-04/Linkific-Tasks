@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
+import { Card as BsCard, Col, Row } from 'react-bootstrap';
 import { Badge, Button, Card } from '../ui.jsx';
 
-const STATUS = 'font-mono text-xs text-muted [&_strong]:text-ink';
-const DEMO_CARD =
-  'flex flex-col justify-between rounded-2xl border border-line bg-surface-2/50 p-5 transition hover:border-accent/40 hover:bg-surface-2';
+const STATUS = 'font-monospace small text-body-secondary';
 
 /**
  * Child component for EP-1 to demonstrate mount and unmount lifecycles.
@@ -25,7 +24,7 @@ function MountLoggerChild() {
 
   return (
     <div className={STATUS}>
-      Status: <strong>{log}</strong>
+      Status: <strong className="text-body">{log}</strong>
     </div>
   );
 }
@@ -64,11 +63,11 @@ export function EffectPatterns() {
   }, [ep4Activity]);
 
   return (
-    <Card className="flex flex-col gap-6 p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <Card className="gap-4">
+      <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">useEffect Lifecycle Patterns</h2>
-          <p className="mt-1 max-w-2xl text-sm text-muted">
+          <h2 className="fs-4 fw-bold mb-0">useEffect Lifecycle Patterns</h2>
+          <p className="mt-1 mb-0 small text-body-secondary" style={{ maxWidth: '42rem' }}>
             Interactive catalog showcasing dependency array variations, cleanup triggers, and
             anti-pattern protections.
           </p>
@@ -76,214 +75,232 @@ export function EffectPatterns() {
         <Badge tone="accent">9 Core Patterns</Badge>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      <Row xs={1} md={2} xl={3} className="g-3">
         {/* EP-1: Run once ([]) */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="brand">EP-1</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">deps: []</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="brand">EP-1</Badge>
+                <span className="font-monospace small text-body-secondary">deps: []</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Run Once on Mount</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Executes once after paint and tears down on unmount. React StrictMode simulates
+                  this cycle twice in dev.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Run Once on Mount</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Executes once after paint and tears down on unmount. React StrictMode simulates this
-                cycle twice in dev.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              {ep1Mounted ? (
+                <MountLoggerChild />
+              ) : (
+                <div className={STATUS + ' opacity-50'}>Child unmounted</div>
+              )}
+              <Button variant="secondary" size="sm" onClick={() => setEp1Mounted((prev) => !prev)}>
+                {ep1Mounted ? 'Unmount Child' : 'Mount Child'}
+              </Button>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            {ep1Mounted ? (
-              <MountLoggerChild />
-            ) : (
-              <div className={STATUS + ' opacity-60'}>Child unmounted</div>
-            )}
-            <Button variant="secondary" size="sm" onClick={() => setEp1Mounted((prev) => !prev)}>
-              {ep1Mounted ? 'Unmount Child' : 'Mount Child'}
-            </Button>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-2: Specific dependencies */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="brand">EP-2</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">deps: [ep2Count]</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="brand">EP-2</Badge>
+                <span className="font-monospace small text-body-secondary">deps: [ep2Count]</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Specific Dependencies</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Executes only when dependent values change. Here, document.title updates when
+                  count increments.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Specific Dependencies</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Executes only when dependent values change. Here, document.title updates when count
-                increments.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS}>
+                Current Count: <strong className="text-body">{ep2Count}</strong>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => setEp2Count((c) => c + 1)}>
+                Increment Count (+1)
+              </Button>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS}>
-              Current Count: <strong>{ep2Count}</strong>
-            </div>
-            <Button variant="secondary" size="sm" onClick={() => setEp2Count((c) => c + 1)}>
-              Increment Count (+1)
-            </Button>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-3: Every render */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="warn">EP-3</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">deps: none</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="warn">EP-3</Badge>
+                <span className="font-monospace small text-body-secondary">deps: none</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Every Render Pass</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Runs after every paint for diagnostics. Calling setState inside this effect would
+                  cause an infinite loop!
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Every Render Pass</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Runs after every paint for diagnostics. Calling setState inside this effect would
-                cause an infinite loop!
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS}>
+                Render passes: <strong className="text-body">{ep3Ticks}</strong>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => setEp3Ticks((t) => t + 1)}>
+                Trigger Re-render
+              </Button>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS}>
-              Render passes: <strong>{ep3Ticks}</strong>
-            </div>
-            <Button variant="secondary" size="sm" onClick={() => setEp3Ticks((t) => t + 1)}>
-              Trigger Re-render
-            </Button>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-4: Multiple effects */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="brand">EP-4</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">Multiple effects</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="brand">EP-4</Badge>
+                <span className="font-monospace small text-body-secondary">Multiple effects</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Multiple Separate Effects</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Separates independent concerns into distinct effects rather than conflating them
+                  into a single monolithic callback.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Multiple Separate Effects</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Separates independent concerns into distinct effects rather than conflating them
-                into a single monolithic callback.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className="d-flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setEp4User((u) => (u === 'Admin' ? 'Lead' : 'Admin'))}
+                >
+                  User: {ep4User}
+                </Button>
+                <Button variant="secondary" size="sm" onClick={() => setEp4Activity((a) => a + 1)}>
+                  Act: {ep4Activity}
+                </Button>
+              </div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className="flex flex-wrap gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setEp4User((u) => (u === 'Admin' ? 'Lead' : 'Admin'))}
-              >
-                User: {ep4User}
-              </Button>
-              <Button variant="secondary" size="sm" onClick={() => setEp4Activity((a) => a + 1)}>
-                Act: {ep4Activity}
-              </Button>
-            </div>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-5: Cleanup abort fetch */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="good">EP-5</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">Cleanup: Abort</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="good">EP-5</Badge>
+                <span className="font-monospace small text-body-secondary">Cleanup: Abort</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Abort HTTP Requests</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Invokes AbortController.abort() to cancel in-flight HTTP requests and eliminate
+                  race conditions.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Abort HTTP Requests</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Invokes AbortController.abort() to cancel in-flight HTTP requests and eliminate race
-                conditions.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS + ' text-success'}>Verified by: useFetch.js</div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS + ' !text-good'}>Verified by: useFetch.js</div>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-6: Cleanup timeout */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="good">EP-6</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">Cleanup: Timeout</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="good">EP-6</Badge>
+                <span className="font-monospace small text-body-secondary">Cleanup: Timeout</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Clear Timeout</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Calls clearTimeout on every new input stroke, buffering rapid typing events.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Clear Timeout</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Calls clearTimeout on every new input stroke, buffering rapid typing events.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS + ' text-success'}>Verified by: useDebounce.js</div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS + ' !text-good'}>Verified by: useDebounce.js</div>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-7: Cleanup interval */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="good">EP-7</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">Cleanup: Interval</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="good">EP-7</Badge>
+                <span className="font-monospace small text-body-secondary">Cleanup: Interval</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Clear Interval</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Calls clearInterval on pause or unmount, preventing timer duplication under
+                  StrictMode.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Clear Interval</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Calls clearInterval on pause or unmount, preventing timer duplication under
-                StrictMode.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS + ' text-success'}>Verified by: useStopwatch.js</div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS + ' !text-good'}>Verified by: useStopwatch.js</div>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-8: Cleanup listener */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="good">EP-8</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">Cleanup: Listener</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="good">EP-8</Badge>
+                <span className="font-monospace small text-body-secondary">Cleanup: Listener</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Remove Event Listener</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Unregisters global event listeners with identical function references to eliminate
+                  memory leaks.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Remove Event Listener</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Unregisters global event listeners with identical function references to eliminate
-                memory leaks.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS + ' text-success'}>Verified by: useWindowSize.js</div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS + ' !text-good'}>Verified by: useWindowSize.js</div>
-          </div>
-        </div>
+          </BsCard>
+        </Col>
 
         {/* EP-9: Sync external system */}
-        <div className={DEMO_CARD}>
-          <div>
-            <div className="flex items-center justify-between gap-2">
-              <Badge tone="accent">EP-9</Badge>
-              <span className="font-mono text-[0.68rem] text-muted">External Sync</span>
+        <Col>
+          <BsCard className="h-100 justify-content-between bg-body-tertiary p-3">
+            <div>
+              <div className="d-flex align-items-center justify-content-between gap-2">
+                <Badge tone="accent">EP-9</Badge>
+                <span className="font-monospace small text-body-secondary">External Sync</span>
+              </div>
+              <div className="mt-3">
+                <h3 className="fs-6 fw-semibold mb-0">Sync External System</h3>
+                <p className="mt-2 mb-0 small text-body-secondary">
+                  Synchronizes in-memory React state with browser localStorage with error-safe
+                  fallbacks.
+                </p>
+              </div>
             </div>
-            <div className="mt-4">
-              <h3 className="font-display text-base font-semibold">Sync External System</h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                Synchronizes in-memory React state with browser localStorage with error-safe
-                fallbacks.
-              </p>
+            <div className="mt-4 d-flex flex-column gap-3 border-top pt-3">
+              <div className={STATUS + ' text-primary'}>Verified by: useLocalStorage.js</div>
             </div>
-          </div>
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-4">
-            <div className={STATUS + ' !text-accent'}>Verified by: useLocalStorage.js</div>
-          </div>
-        </div>
-      </div>
+          </BsCard>
+        </Col>
+      </Row>
     </Card>
   );
 }

@@ -1,4 +1,5 @@
-import { cx } from '../ui.jsx';
+import { ListGroup } from 'react-bootstrap';
+import { Badge, cx } from '../ui.jsx';
 
 /**
  * Single participant list row rendering avatar, full name, email, and age.
@@ -8,39 +9,33 @@ export function UserRow({ user, isSelected, onSelect }) {
   const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
-    <button
+    <ListGroup.Item
+      action
+      active={isSelected}
+      as="button"
       type="button"
       onClick={() => onSelect(user.id)}
-      className={cx(
-        'group flex w-full items-center gap-3 rounded-xl border p-3 text-left transition',
-        isSelected
-          ? 'border-accent bg-accent-soft'
-          : 'border-line bg-surface hover:border-accent/50 hover:bg-surface-2'
-      )}
+      className="d-flex align-items-center gap-3 p-3 text-start"
     >
       <img
         src={user.image}
         alt={fullName}
-        className="size-11 shrink-0 rounded-full border border-line bg-surface-2 object-cover"
+        className="flex-shrink-0 rounded-circle border bg-body-secondary object-fit-cover"
+        style={{ width: 44, height: 44 }}
         loading="lazy"
       />
-      <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="truncate text-sm font-semibold">{fullName}</span>
-          <span className="rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[0.65rem] text-muted">
-            {user.age} yrs
-          </span>
+      <div className="min-w-0 flex-grow-1" style={{ minWidth: 0 }}>
+        <div className="d-flex flex-wrap align-items-center gap-2">
+          <span className="fw-semibold text-truncate">{fullName}</span>
+          <Badge tone="neutral">{user.age} yrs</Badge>
         </div>
-        <div className="truncate text-xs text-muted">{user.email}</div>
+        <div className={cx('small text-truncate', !isSelected && 'text-body-secondary')}>
+          {user.email}
+        </div>
       </div>
-      <div
-        className={cx(
-          'hidden shrink-0 font-mono text-[0.68rem] uppercase tracking-wider sm:block',
-          isSelected ? 'text-accent' : 'text-muted group-hover:text-ink'
-        )}
-      >
+      <div className="d-none d-sm-block flex-shrink-0 font-monospace small text-uppercase ls-wide">
         {isSelected ? 'Selected ✓' : 'View posts →'}
       </div>
-    </button>
+    </ListGroup.Item>
   );
 }

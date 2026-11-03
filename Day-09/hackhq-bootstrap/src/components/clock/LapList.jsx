@@ -1,3 +1,4 @@
+import { Card, ListGroup } from 'react-bootstrap';
 import { Button } from '../ui.jsx';
 import { formatElapsed } from '../../lib/format.js';
 
@@ -8,8 +9,11 @@ import { formatElapsed } from '../../lib/format.js';
 export function LapList({ laps = [], onClear }) {
   if (laps.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-line bg-surface-2 p-6 text-center">
-        <div className="text-sm text-muted">
+      <div
+        className="rounded-4 border border-2 bg-body-tertiary p-4 text-center"
+        style={{ borderStyle: 'dashed' }}
+      >
+        <div className="small text-body-secondary">
           No laps recorded yet. Click &quot;Record Lap&quot; while the clock is running.
         </div>
       </div>
@@ -17,25 +21,27 @@ export function LapList({ laps = [], onClear }) {
   }
 
   return (
-    <div className="rounded-2xl border border-line">
-      <div className="flex items-center justify-between gap-3 border-b border-line px-4 py-3 font-mono text-xs tracking-wider text-muted uppercase">
+    <Card className="rounded-4 overflow-hidden">
+      <Card.Header className="d-flex align-items-center justify-content-between gap-3 small font-monospace text-uppercase ls-wide text-body-secondary">
         <span>Recorded Laps ({laps.length})</span>
         <Button variant="danger" size="sm" onClick={onClear}>
           Clear Laps ✕
         </Button>
-      </div>
+      </Card.Header>
 
-      <div className="max-h-64 divide-y divide-line overflow-y-auto">
+      <ListGroup variant="flush" className="overflow-y-auto" style={{ maxHeight: '16rem' }}>
         {laps.map((lap, idx) => (
-          <div
+          <ListGroup.Item
             key={lap.id || idx}
-            className="flex items-center justify-between px-4 py-2.5 font-mono text-sm"
+            className="d-flex align-items-center justify-content-between font-monospace small"
           >
-            <span className="text-muted">Lap {String(laps.length - idx).padStart(2, '0')}</span>
-            <span className="font-bold tabular-nums text-ink">{formatElapsed(lap.ms)}</span>
-          </div>
+            <span className="text-body-secondary">
+              Lap {String(laps.length - idx).padStart(2, '0')}
+            </span>
+            <span className="fw-bold">{formatElapsed(lap.ms)}</span>
+          </ListGroup.Item>
         ))}
-      </div>
-    </div>
+      </ListGroup>
+    </Card>
   );
 }

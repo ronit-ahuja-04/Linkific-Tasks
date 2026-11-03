@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import { Check, Minus } from 'lucide-react';
 import PageHeader from '../components/layout/PageHeader.jsx';
-import { Badge, buttonClass, cx } from '../components/ui.jsx';
+import { Card as BsCard, Col, ListGroup, Row, Table } from 'react-bootstrap';
+import { Badge, buttonClass } from '../components/ui.jsx';
 
 const TIERS = [
   {
@@ -59,15 +60,15 @@ const money = (value) => `$${value.toLocaleString('en-US')}`;
 function Perk({ value }) {
   if (typeof value === 'number') {
     return value > 0 ? (
-      <span className="font-semibold tabular-nums">{value}</span>
+      <span className="fw-semibold">{value}</span>
     ) : (
-      <Minus size={16} aria-label="Not included" className="text-muted/60" />
+      <Minus size={16} aria-label="Not included" className="text-body-tertiary" />
     );
   }
   return value ? (
-    <Check size={18} aria-label="Included" className="text-good" strokeWidth={3} />
+    <Check size={18} aria-label="Included" className="text-success" strokeWidth={3} />
   ) : (
-    <Minus size={16} aria-label="Not included" className="text-muted/60" />
+    <Minus size={16} aria-label="Not included" className="text-body-tertiary" />
   );
 }
 
@@ -80,39 +81,50 @@ export default function Sponsors() {
       </PageHeader>
 
       {/* Tier cards */}
-      <ul className="grid gap-5 md:grid-cols-3">
+      <Row as="ul" className="list-unstyled row-cols-1 row-cols-md-3 g-4 mb-0 pt-2">
         {TIERS.map((tier, index) => (
-          <li key={tier.id} className="animate-rise" style={{ animationDelay: `${index * 70}ms` }}>
-            <article
-              className={cx(
-                'relative flex h-full flex-col rounded-card border p-6 shadow-card',
-                tier.featured
-                  ? 'border-transparent bg-board text-on-board md:-translate-y-3'
-                  : 'border-line bg-surface'
-              )}
+          <Col
+            as="li"
+            key={tier.id}
+            className="animate-rise"
+            style={{ animationDelay: `${index * 70}ms` }}
+          >
+            <BsCard
+              as="article"
+              className={`h-100 p-4 shadow-sm position-relative${tier.featured ? ' text-bg-dark border-0' : ''}`}
+              style={
+                tier.featured ? { background: 'var(--board)', color: 'var(--on-board)' } : undefined
+              }
             >
               {tier.featured && (
-                <Badge tone="brand" className="absolute -top-3 left-6">
+                <Badge
+                  tone="brand"
+                  className="position-absolute start-0 ms-4"
+                  style={{ top: '-0.75rem' }}
+                >
                   Most popular
                 </Badge>
               )}
-              <h2 className="text-xl font-bold">{tier.name}</h2>
-              <p className={cx('mt-1 text-sm', tier.featured ? 'text-on-board/70' : 'text-muted')}>
+              <h2 className="fs-4 fw-bold">{tier.name}</h2>
+              <p className={`mb-0 small ${tier.featured ? 'opacity-75' : 'text-body-secondary'}`}>
                 {tier.blurb}
               </p>
-              <p className="mt-6 flex items-baseline gap-1">
-                <span className="font-display text-5xl font-bold tracking-tight tabular-nums">
-                  {money(tier.price)}
+              <p className="mt-4 mb-0 d-flex align-items-baseline gap-1">
+                <span className="display-5 fw-bold">{money(tier.price)}</span>
+                <span className={tier.featured ? 'opacity-75' : 'text-body-secondary'}>
+                  / event
                 </span>
-                <span className={tier.featured ? 'text-on-board/60' : 'text-muted'}>/ event</span>
               </p>
 
-              <ul className="mt-6 flex-1 space-y-3 text-sm">
+              <ListGroup variant="flush" className="mt-4 flex-grow-1 small">
                 {FEATURES.filter((f) => tier.perks[f.key]).map((feature) => (
-                  <li key={feature.key} className="flex items-center gap-2.5">
+                  <ListGroup.Item
+                    key={feature.key}
+                    className="d-flex align-items-center gap-2 bg-transparent text-reset px-0"
+                  >
                     <Check
                       size={16}
-                      className="shrink-0 text-good"
+                      className="flex-shrink-0 text-success"
                       strokeWidth={3}
                       aria-hidden="true"
                     />
@@ -120,62 +132,61 @@ export default function Sponsors() {
                       {typeof tier.perks[feature.key] === 'number' && `${tier.perks[feature.key]} `}
                       {feature.label}
                     </span>
-                  </li>
+                  </ListGroup.Item>
                 ))}
-              </ul>
+              </ListGroup>
 
               <Link
                 to="/contact"
                 className={buttonClass({
                   variant: tier.featured ? 'primary' : 'dark',
-                  className: 'mt-8 w-full',
+                  className: 'mt-4 w-100',
                 })}
               >
                 Choose {tier.name}
               </Link>
-            </article>
-          </li>
+            </BsCard>
+          </Col>
         ))}
-      </ul>
+      </Row>
 
       {/* Comparison table */}
-      <section className="mt-14" aria-labelledby="compare-title">
-        <h2 id="compare-title" className="mb-4 text-xl font-bold sm:text-2xl">
+      <section className="mt-5 pt-3" aria-labelledby="compare-title">
+        <h2 id="compare-title" className="fs-3 fw-bold mb-3">
           Compare every perk
         </h2>
-        <div className="overflow-x-auto rounded-card border border-line bg-surface shadow-card">
-          <table className="w-full min-w-[34rem] text-left text-sm">
-            <caption className="sr-only">Sponsorship tiers and what each includes</caption>
-            <thead>
-              <tr className="border-b border-line bg-surface-2/60">
-                <th scope="col" className="px-5 py-3.5 font-medium text-muted">
-                  Perk
+        {/* CONCEPT: Table responsive - wraps the table in a horizontal scroller on small screens */}
+        <Table responsive hover className="align-middle mb-0 border rounded-3 shadow-sm bg-body">
+          <caption className="visually-hidden">Sponsorship tiers and what each includes</caption>
+          <thead>
+            <tr>
+              <th scope="col" className="px-4 py-3 fw-medium text-body-secondary">
+                Perk
+              </th>
+              {TIERS.map((tier) => (
+                <th key={tier.id} scope="col" className="px-4 py-3 text-center fw-bold">
+                  {tier.name}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {FEATURES.map((feature) => (
+              <tr key={feature.key}>
+                <th scope="row" className="px-4 py-3 fw-medium">
+                  {feature.label}
                 </th>
                 {TIERS.map((tier) => (
-                  <th key={tier.id} scope="col" className="px-5 py-3.5 text-center font-bold">
-                    {tier.name}
-                  </th>
+                  <td key={tier.id} className="px-4 py-3">
+                    <span className="d-flex justify-content-center">
+                      <Perk value={tier.perks[feature.key]} />
+                    </span>
+                  </td>
                 ))}
               </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {FEATURES.map((feature) => (
-                <tr key={feature.key} className="hover:bg-surface-2/40">
-                  <th scope="row" className="px-5 py-3.5 font-medium">
-                    {feature.label}
-                  </th>
-                  {TIERS.map((tier) => (
-                    <td key={tier.id} className="px-5 py-3.5">
-                      <span className="flex justify-center">
-                        <Perk value={tier.perks[feature.key]} />
-                      </span>
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </Table>
       </section>
     </div>
   );

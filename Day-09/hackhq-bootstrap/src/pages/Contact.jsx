@@ -1,17 +1,9 @@
 import { useState, useId } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AlertCircle, Clock, Mail, MapPin, Send } from 'lucide-react';
+import { Col, Form, Row } from 'react-bootstrap';
 import PageHeader from '../components/layout/PageHeader.jsx';
-import {
-  Card,
-  Eyebrow,
-  buttonClass,
-  errorClass,
-  inputClass,
-  labelClass,
-  hintClass,
-  cx,
-} from '../components/ui.jsx';
+import { Card, Eyebrow, buttonClass } from '../components/ui.jsx';
 import {
   CONTACT_TOPICS,
   MESSAGE_MIN_LENGTH,
@@ -61,124 +53,140 @@ export default function Contact({ onNotify }) {
     value: form[field],
     onChange: (event) => handleChange(field, event.target.value),
     onBlur: () => handleBlur(field),
+    isInvalid: showError(field),
     'aria-invalid': showError(field),
     'aria-describedby': showError(field) ? `${baseId}-${field}-err` : undefined,
   });
 
-  const fieldError = (field) =>
-    showError(field) && (
-      <p
-        id={`${baseId}-${field}-err`}
-        className={cx(errorClass, 'flex items-center gap-1.5')}
-        role="alert"
-      >
-        <AlertCircle size={14} aria-hidden="true" />
-        <span>{errors[field]}</span>
-      </p>
-    );
+  // CONCEPT: Form.Control.Feedback - Bootstrap only reveals it after an .is-invalid sibling
+  const fieldError = (field) => (
+    <Form.Control.Feedback type="invalid" id={`${baseId}-${field}-err`} role="alert">
+      <AlertCircle size={14} aria-hidden="true" className="me-1" />
+      <span>{errors[field]}</span>
+    </Form.Control.Feedback>
+  );
 
   return (
     <div>
       <PageHeader breadcrumb="CONTACT" title="Contact the organizers" pill="Form" />
 
-      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
-        <Card as="form" className="space-y-5 p-6 sm:p-8" onSubmit={handleSubmit} noValidate>
-          <div className="grid gap-5 sm:grid-cols-2">
-            <div>
-              <label htmlFor={`${baseId}-name`} className={labelClass}>
-                Name <span className="text-bad">*</span>
-              </label>
-              <input
-                type="text"
-                autoComplete="name"
-                placeholder="Ada Lovelace"
-                className={inputClass}
-                {...fieldProps('name')}
+      <Row className="g-4 align-items-start">
+        <Col lg={8} xl={9}>
+          <Card as="form" className="p-4 p-sm-5" onSubmit={handleSubmit} noValidate>
+            <Row className="g-3 mb-3">
+              <Col sm={6}>
+                <Form.Group>
+                  <Form.Label htmlFor={`${baseId}-name`} className="fw-medium">
+                    Name <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    autoComplete="name"
+                    placeholder="Ada Lovelace"
+                    {...fieldProps('name')}
+                  />
+                  {fieldError('name')}
+                </Form.Group>
+              </Col>
+
+              <Col sm={6}>
+                <Form.Group>
+                  <Form.Label htmlFor={`${baseId}-email`} className="fw-medium">
+                    Email <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    type="email"
+                    autoComplete="email"
+                    placeholder="ada@example.com"
+                    {...fieldProps('email')}
+                  />
+                  {fieldError('email')}
+                </Form.Group>
+              </Col>
+            </Row>
+
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor={`${baseId}-topic`} className="fw-medium">
+                Topic
+              </Form.Label>
+              <Form.Select {...fieldProps('topic')}>
+                {CONTACT_TOPICS.map((topic) => (
+                  <option key={topic.id} value={topic.id}>
+                    {topic.label}
+                  </option>
+                ))}
+              </Form.Select>
+              {fieldError('topic')}
+            </Form.Group>
+
+            <Form.Group className="mb-4">
+              <Form.Label htmlFor={`${baseId}-message`} className="fw-medium">
+                Message <span className="text-danger">*</span>
+              </Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={5}
+                placeholder="How can we help?"
+                {...fieldProps('message')}
               />
-              {fieldError('name')}
-            </div>
+              <Form.Text className="d-block">
+                {form.message.trim().length} / {MESSAGE_MIN_LENGTH}+ characters
+              </Form.Text>
+              {fieldError('message')}
+            </Form.Group>
 
             <div>
-              <label htmlFor={`${baseId}-email`} className={labelClass}>
-                Email <span className="text-bad">*</span>
-              </label>
-              <input
-                type="email"
-                autoComplete="email"
-                placeholder="ada@example.com"
-                className={inputClass}
-                {...fieldProps('email')}
-              />
-              {fieldError('email')}
+              <button
+                type="submit"
+                className={buttonClass({
+                  variant: 'primary',
+                  size: 'lg',
+                  className: 'w-100',
+                })}
+              >
+                <Send size={16} aria-hidden="true" />
+                <span>Send message</span>
+              </button>
             </div>
-          </div>
+          </Card>
+        </Col>
 
-          <div>
-            <label htmlFor={`${baseId}-topic`} className={labelClass}>
-              Topic
-            </label>
-            <select className={inputClass} {...fieldProps('topic')}>
-              {CONTACT_TOPICS.map((topic) => (
-                <option key={topic.id} value={topic.id}>
-                  {topic.label}
-                </option>
-              ))}
-            </select>
-            {fieldError('topic')}
-          </div>
-
-          <div>
-            <label htmlFor={`${baseId}-message`} className={labelClass}>
-              Message <span className="text-bad">*</span>
-            </label>
-            <textarea
-              rows={5}
-              placeholder="How can we help?"
-              className={cx(inputClass, 'resize-y')}
-              {...fieldProps('message')}
-            />
-            <span className={cx(hintClass, 'block tabular-nums')}>
-              {form.message.trim().length} / {MESSAGE_MIN_LENGTH}+ characters
-            </span>
-            {fieldError('message')}
-          </div>
-
-          <button
-            type="submit"
-            className={buttonClass({
-              variant: 'primary',
-              size: 'lg',
-              className: 'w-full sm:w-auto',
-            })}
+        <Col lg={4} xl={3}>
+          <aside
+            className="rounded-4 p-4 shadow"
+            style={{ background: 'var(--board)', color: 'var(--on-board)', top: '6rem' }}
           >
-            <Send size={16} aria-hidden="true" />
-            <span>Send message</span>
-          </button>
-        </Card>
-
-        <aside className="rounded-card bg-board p-6 text-on-board shadow-pop lg:sticky lg:top-24">
-          <Eyebrow className="text-brand">Reach us directly</Eyebrow>
-          <h2 className="mt-2 text-xl font-bold tracking-tight">Prefer a human?</h2>
-          <ul className="mt-6 space-y-5">
-            {INFO.map(({ icon: Icon, label, value }) => (
-              <li key={label} className="flex gap-3">
-                <span
-                  className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-brand"
-                  aria-hidden="true"
-                >
-                  <Icon size={16} />
-                </span>
-                <div className="min-w-0">
-                  <p className="font-mono text-[0.68rem] uppercase tracking-wider text-on-board/60">
-                    {label}
-                  </p>
-                  <p className="break-words text-sm">{value}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </aside>
-      </div>
+            <Eyebrow className="text-brand">Reach us directly</Eyebrow>
+            <h2 className="mt-2 fs-4 fw-bold">Prefer a human?</h2>
+            <ul className="list-unstyled mt-4 mb-0 d-flex flex-column gap-4">
+              {INFO.map(({ icon: Icon, label, value }) => (
+                <li key={label} className="d-flex gap-3">
+                  <span
+                    className="d-flex flex-shrink-0 align-items-center justify-content-center rounded-3 text-brand"
+                    style={{
+                      width: '2.25rem',
+                      height: '2.25rem',
+                      background: 'rgba(255,255,255,0.1)',
+                    }}
+                    aria-hidden="true"
+                  >
+                    <Icon size={16} />
+                  </span>
+                  <div style={{ minWidth: 0 }}>
+                    <p
+                      className="mb-0 font-monospace text-uppercase opacity-75"
+                      style={{ fontSize: '0.68rem' }}
+                    >
+                      {label}
+                    </p>
+                    <p className="mb-0 small text-break">{value}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        </Col>
+      </Row>
     </div>
   );
 }

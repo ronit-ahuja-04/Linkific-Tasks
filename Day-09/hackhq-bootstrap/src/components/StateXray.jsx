@@ -1,8 +1,8 @@
 import { X, Copy, Check } from 'lucide-react';
 import { useState } from 'react';
+import { Button } from 'react-bootstrap';
 
-const XRAY_BTN =
-  'inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 text-on-board/80 transition hover:bg-white/10 hover:text-on-board';
+const XRAY_BTN = 'd-inline-flex align-items-center gap-1 text-light';
 
 /**
  * Format and highlight JSON tokens using design spec color tokens:
@@ -34,16 +34,16 @@ function highlightJSON(jsonString) {
 
       if (/^"/.test(str)) {
         if (/:$/.test(str)) {
-          cls = 'font-medium text-violet-300';
+          cls = 'fw-medium text-info';
         } else {
-          cls = 'text-emerald-400';
+          cls = 'text-success';
         }
       } else if (/true|false/.test(str)) {
-        cls = 'font-semibold text-rose-400';
+        cls = 'fw-semibold text-danger';
       } else if (/null/.test(str)) {
-        cls = 'italic text-rose-400';
+        cls = 'fst-italic text-danger';
       } else {
-        cls = 'text-amber-300';
+        cls = 'text-warning';
       }
 
       parts.push(
@@ -60,8 +60,8 @@ function highlightJSON(jsonString) {
     }
 
     return (
-      <div key={lineIdx} className="block">
-        <span className="whitespace-pre">{parts}</span>
+      <div key={lineIdx}>
+        <span style={{ whiteSpace: 'pre' }}>{parts}</span>
       </div>
     );
   });
@@ -94,50 +94,64 @@ export default function StateXray({
 
   return (
     <aside
-      className="w-full shrink-0 overflow-hidden rounded-card border border-white/10 bg-board p-5 font-mono text-on-board shadow-pop animate-pop lg:w-[360px]"
+      className="position-fixed bottom-0 end-0 m-3 p-3 rounded-4 border border-secondary shadow-lg font-monospace animate-pop overflow-hidden"
+      style={{
+        width: 'min(360px, calc(100vw - 1.5rem))',
+        zIndex: 1040,
+        background: 'var(--board)',
+        color: 'var(--on-board)',
+      }}
       role="complementary"
       aria-label={`Live State X-ray telemetry for ${stationTitle}`}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <h2 className="font-display text-base font-semibold tracking-tight text-on-board">
-              State X-ray
-            </h2>
-            <span className="size-2 animate-ping-slow rounded-full bg-brand" aria-hidden="true" />
+      <div className="d-flex align-items-start justify-content-between gap-3">
+        <div style={{ minWidth: 0 }}>
+          <div className="d-flex align-items-center gap-2">
+            <h2 className="fs-6 fw-semibold mb-0">State X-ray</h2>
+            <span
+              className="d-inline-block rounded-circle bg-brand"
+              style={{ width: 8, height: 8 }}
+              aria-hidden="true"
+            />
           </div>
-          <span className="mt-1 block truncate text-[0.68rem] tracking-wider text-on-board/60 uppercase">
+          <span className="mt-1 d-block text-truncate small text-uppercase ls-wide opacity-75">
             Live state for {stationTitle.toLowerCase()}
           </span>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
+        <div className="d-flex flex-shrink-0 align-items-center gap-1">
+          <Button
+            variant="outline-light"
+            size="sm"
             className={XRAY_BTN}
             onClick={handleCopy}
             title="Copy state JSON"
             aria-label="Copy state JSON"
           >
             {copied ? <Check size={13} className="text-brand" /> : <Copy size={13} />}
-            <span className="text-xs">{copied ? 'Copied' : 'Copy'}</span>
-          </button>
-          <button
-            type="button"
+            <span className="small">{copied ? 'Copied' : 'Copy'}</span>
+          </Button>
+          <Button
+            variant="outline-light"
+            size="sm"
             className={XRAY_BTN}
             onClick={onClose}
             title="Close X-ray panel"
             aria-label="Close State X-ray"
           >
             <X size={14} />
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="my-4 h-px bg-white/10" />
+      <hr className="my-3 border-secondary opacity-50" />
 
-      <div className="max-h-80 overflow-auto rounded-xl bg-black/30 p-3 lg:max-h-[60vh]">
+      <div
+        className="overflow-auto rounded-3 p-3"
+        style={{ maxHeight: '50vh', background: 'rgba(0,0,0,.3)' }}
+      >
         <pre
-          className="m-0 text-[0.8rem] leading-relaxed text-on-board/90 focus-visible:outline-2 focus-visible:outline-brand"
+          className="m-0 small"
+          style={{ color: 'inherit' }}
           tabIndex={0}
           aria-label="Live JSON state view"
         >

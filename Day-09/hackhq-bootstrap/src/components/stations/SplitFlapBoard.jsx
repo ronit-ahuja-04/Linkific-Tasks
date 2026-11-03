@@ -8,31 +8,52 @@ export default function SplitFlapBoard({ count, capacity }) {
   const digits = formatFlapDigits(count);
 
   return (
-    <div className="flex flex-wrap items-center gap-5" aria-hidden="true">
-      <div className="inline-flex items-center gap-2 sm:gap-2.5 animate-settle">
+    <div className="d-flex flex-wrap align-items-center gap-4" aria-hidden="true">
+      <div className="d-inline-flex align-items-center gap-2 animate-settle">
         {digits.map((digit, index) => (
           <div
             key={`digit-slot-${index}`}
-            className="h-[88px] w-16 [perspective:600px] sm:h-[110px] sm:w-[82px]"
+            style={{
+              height: 'clamp(88px, 16vw, 110px)',
+              width: 'clamp(60px, 11vw, 82px)',
+              perspective: 600,
+            }}
           >
             {/* The blade remounts with key={digit} to re-trigger the CSS keyframe animation */}
             <div
               key={`blade-${digit}`}
-              className="relative flex size-full animate-flap items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-board shadow-pop"
+              className="position-relative d-flex w-100 h-100 animate-flap align-items-center justify-content-center overflow-hidden rounded-3 border border-secondary shadow"
+              style={{ background: 'var(--board)' }}
             >
-              <span className="font-display text-[3.75rem] leading-none font-bold text-brand tabular-nums select-none sm:text-[4.85rem]">
+              <span
+                className="fw-bold text-brand user-select-none"
+                style={{
+                  fontSize: 'clamp(3.5rem, 9vw, 4.85rem)',
+                  lineHeight: 1,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {digit}
               </span>
-              <div className="absolute inset-x-0 top-1/2 h-0.5 bg-black shadow-[0_1px_0_rgba(255,255,255,0.1)]" />
-              <div className="absolute top-1/2 left-0 -mt-[5px] h-2.5 w-1 rounded-[1px] bg-black" />
-              <div className="absolute top-1/2 right-0 -mt-[5px] h-2.5 w-1 rounded-[1px] bg-black" />
+              <div
+                className="position-absolute start-0 end-0 bg-black"
+                style={{ top: '50%', height: 2 }}
+              />
+              <div
+                className="position-absolute start-0 bg-black"
+                style={{ top: 'calc(50% - 5px)', height: 10, width: 4 }}
+              />
+              <div
+                className="position-absolute end-0 bg-black"
+                style={{ top: 'calc(50% - 5px)', height: 10, width: 4 }}
+              />
             </div>
           </div>
         ))}
       </div>
-      <div className="flex items-baseline gap-2 font-display">
-        <span className="text-xl font-semibold text-muted">of</span>
-        <span className="text-4xl leading-none font-bold tabular-nums">{capacity}</span>
+      <div className="d-flex align-items-baseline gap-2">
+        <span className="fs-4 fw-semibold text-body-secondary">of</span>
+        <span className="display-5 fw-bold lh-1">{capacity}</span>
       </div>
     </div>
   );

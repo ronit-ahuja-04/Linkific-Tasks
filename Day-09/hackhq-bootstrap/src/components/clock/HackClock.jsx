@@ -1,3 +1,4 @@
+import { Col, Row } from 'react-bootstrap';
 import { useStopwatch } from '../../hooks/useStopwatch.js';
 import { formatElapsed } from '../../lib/format.js';
 import { Badge, Button, Card } from '../ui.jsx';
@@ -19,12 +20,12 @@ export function HackClock({ laps = [], onAddLap, onClearLaps }) {
   };
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <Card className="flex flex-col gap-6 p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
+    <div className="mx-auto" style={{ maxWidth: '48rem' }}>
+      <Card className="d-flex flex-column gap-4 p-3 p-sm-4">
+        <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
           <div>
-            <h2 className="text-xl font-bold">Hackathon Clock</h2>
-            <p className="mt-1 text-sm text-muted">
+            <h2 className="fs-4 fw-bold mb-0">Hackathon Clock</h2>
+            <p className="mt-1 mb-0 small text-body-secondary">
               Millisecond-precision timer with StrictMode-resilient interval cleanup
             </p>
           </div>
@@ -34,41 +35,47 @@ export function HackClock({ laps = [], onAddLap, onClearLaps }) {
         </div>
 
         {/* Big Digital Display */}
-        <div className="rounded-2xl bg-board px-4 py-8 text-center text-on-board sm:py-10">
-          <div className="font-mono text-5xl font-bold tracking-tight text-brand tabular-nums sm:text-7xl">
+        <div
+          className="rounded-4 px-3 py-5 text-center"
+          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+        >
+          <div
+            className="font-monospace fw-bold text-brand"
+            style={{ fontSize: 'clamp(2.75rem, 11vw, 4.5rem)', fontVariantNumeric: 'tabular-nums' }}
+          >
             {formatElapsed(elapsed)}
           </div>
-          <div className="mt-3 font-mono text-[0.68rem] tracking-wider text-on-board/60 uppercase">
+          <div className="mt-3 font-monospace small text-uppercase ls-wide opacity-75">
             Interval: 100ms • Functional Updates • StrictMode Safe
           </div>
         </div>
 
         {/* Action Controls */}
-        <div className="grid gap-3 sm:grid-cols-3">
-          {running ? (
-            <Button variant="dark" size="lg" onClick={pause}>
-              Pause ⏸
-            </Button>
-          ) : (
-            <Button variant="primary" size="lg" onClick={start}>
-              {elapsed > 0 ? 'Resume ▶' : 'Start Clock ▶'}
-            </Button>
-          )}
+        <Row className="g-3">
+          <Col xs={12} sm={6} className="d-grid">
+            {running ? (
+              <Button variant="dark" size="lg" onClick={pause}>
+                Pause ⏸
+              </Button>
+            ) : (
+              <Button variant="primary" size="lg" onClick={start}>
+                {elapsed > 0 ? 'Resume ▶' : 'Start Clock ▶'}
+              </Button>
+            )}
+          </Col>
 
-          <Button variant="secondary" size="lg" onClick={handleLap} disabled={!running}>
-            Record Lap ⏱
-          </Button>
+          <Col xs={12} sm={6} className="d-grid">
+            <Button variant="secondary" size="lg" onClick={handleLap} disabled={!running}>
+              Record Lap ⏱
+            </Button>
+          </Col>
 
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={reset}
-            disabled={elapsed === 0 && !running}
-            className="sm:col-span-3"
-          >
-            Reset ↺
-          </Button>
-        </div>
+          <Col xs={12} className="d-grid">
+            <Button variant="ghost" size="lg" onClick={reset} disabled={elapsed === 0 && !running}>
+              Reset ↺
+            </Button>
+          </Col>
+        </Row>
 
         {/* Laps List */}
         <LapList laps={laps} onClear={onClearLaps} />

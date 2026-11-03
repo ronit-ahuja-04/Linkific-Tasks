@@ -23,32 +23,32 @@ export default function DirectoryPage() {
   return (
     <div>
       <PageHeader breadcrumb="DIRECTORY" title="Attendee Directory" pill="Live API">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="d-flex flex-wrap align-items-center gap-2">
           {rawUserId !== undefined && <BackButton fallback="/directory" />}
           <RouteBadge pattern="/directory/:userId?" />
         </div>
       </PageHeader>
 
-      <div className="grid items-start gap-6 lg:grid-cols-2">
+      <div className="d-flex flex-column gap-4">
         <Directory selectedUserId={userId} onSelectUser={(id) => navigate(userPath(id))} />
 
         {isInvalidId ? (
-          <Card className="p-5 sm:p-6">
+          <Card>
             <div
-              className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line bg-surface-2 p-8 text-center"
+              className="d-flex flex-column align-items-center gap-2 rounded-4 border border-dashed bg-body-tertiary p-4 p-sm-5 text-center"
               role="alert"
             >
-              <UserX size={32} aria-hidden="true" className="text-bad" />
-              <div className="font-display text-base font-semibold">Unknown participant</div>
-              <div className="text-sm text-muted">
-                <code className="rounded bg-surface px-1.5 py-0.5 font-mono text-xs text-ink">
+              <UserX size={32} aria-hidden="true" className="text-danger" />
+              <div className="fw-semibold">Unknown participant</div>
+              <div className="small text-body-secondary">
+                <code className="rounded bg-body px-2 py-1 font-monospace small text-body">
                   {rawUserId}
                 </code>{' '}
                 is not a valid participant id.
               </div>
               <Link
                 to="/directory"
-                className={buttonClass({ variant: 'secondary', className: 'mt-3' })}
+                className={buttonClass({ variant: 'secondary', className: 'mt-2' })}
               >
                 Back to directory
               </Link>

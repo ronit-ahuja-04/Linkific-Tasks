@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Card as BsCard, Col, Row } from 'react-bootstrap';
 import { ArrowRight, ArrowUpRight, Radio } from 'lucide-react';
 import { STATIONS } from '../data/stations.js';
 import { Badge, buttonClass } from '../components/ui.jsx';
@@ -14,41 +15,67 @@ const STATS = [
 // CONCEPT: Index route - what the layout shows at its own URL ("/")
 export default function Home() {
   return (
-    <div className="space-y-12">
+    <div className="d-flex flex-column gap-5">
       <section
         aria-labelledby="home-hero-title"
-        className="relative animate-rise overflow-hidden rounded-[2rem] bg-board px-6 py-12 text-on-board sm:px-12 sm:py-20"
+        className="position-relative animate-rise overflow-hidden rounded-5 px-4 px-sm-5 py-5"
+        style={{ background: 'var(--board)', color: 'var(--on-board)' }}
       >
         {/* Decorative grid + glow */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 opacity-[0.07] [background-image:linear-gradient(to_right,white_1px,transparent_1px),linear-gradient(to_bottom,white_1px,transparent_1px)] [background-size:44px_44px]"
+          className="position-absolute top-0 start-0 w-100 h-100"
+          style={{
+            opacity: 0.07,
+            backgroundImage:
+              'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
+            backgroundSize: '44px 44px',
+          }}
         />
         <div
           aria-hidden="true"
-          className="absolute -top-24 -right-24 size-96 animate-float rounded-full bg-brand/25 blur-3xl"
+          className="position-absolute animate-float rounded-circle"
+          style={{
+            top: '-6rem',
+            right: '-6rem',
+            width: '24rem',
+            height: '24rem',
+            background: 'var(--brand)',
+            opacity: 0.25,
+            filter: 'blur(64px)',
+          }}
         />
         <div
           aria-hidden="true"
-          className="absolute -bottom-32 left-1/3 size-80 rounded-full bg-accent/30 blur-3xl"
+          className="position-absolute rounded-circle"
+          style={{
+            bottom: '-8rem',
+            left: '33%',
+            width: '20rem',
+            height: '20rem',
+            background: 'var(--accent)',
+            opacity: 0.3,
+            filter: 'blur(64px)',
+          }}
         />
 
-        <div className="relative max-w-3xl">
-          <Badge tone="brand" className="mb-6">
+        <div className="position-relative py-sm-4" style={{ maxWidth: '48rem' }}>
+          <Badge tone="brand" className="mb-4">
             <Radio size={12} aria-hidden="true" />
-            Day 8 · Tailwind redesign
+            Day 9 · Bootstrap redesign
           </Badge>
           <h1
             id="home-hero-title"
-            className="text-5xl leading-[0.95] font-bold tracking-tighter sm:text-7xl"
+            className="display-3 fw-bold mb-0"
+            style={{ lineHeight: 0.98, letterSpacing: '-0.04em' }}
           >
             Run the whole hackathon from <span className="text-brand">one control room.</span>
           </h1>
-          <p className="mt-6 max-w-xl text-lg text-on-board/70">
+          <p className="mt-4 mb-0 fs-5 opacity-75" style={{ maxWidth: '36rem' }}>
             Check-ins, teams, swag, a stopwatch for demo day. Every station has its own address, now
             wrapped in a faster, sharper interface.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-4 d-flex flex-wrap gap-3">
             <Link to="/directory" className={buttonClass({ size: 'lg' })}>
               Open the directory
               <ArrowRight size={18} aria-hidden="true" />
@@ -58,76 +85,78 @@ export default function Home() {
               className={buttonClass({
                 variant: 'ghost',
                 size: 'lg',
-                className:
-                  'border border-white/20 text-on-board hover:bg-white/10 hover:text-on-board',
+                className: 'border border-light border-opacity-25 text-white',
               })}
             >
               Become a sponsor
             </Link>
           </div>
 
-          <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-white/10 pt-6">
+          {/* CONCEPT: row-cols-3 - three equal stat columns at every width */}
+          <dl
+            className="row row-cols-3 g-4 mt-4 mb-0 pt-4 border-top border-light border-opacity-10"
+            style={{ maxWidth: '32rem' }}
+          >
             {STATS.map((stat) => (
-              <div key={stat.label}>
-                <dd className="font-display text-3xl font-bold tabular-nums sm:text-4xl">
-                  {stat.value}
-                </dd>
-                <dt className="mt-1 text-xs text-on-board/60">{stat.label}</dt>
-              </div>
+              <Col key={stat.label}>
+                <dd className="fw-bold mb-0 fs-2 font-monospace">{stat.value}</dd>
+                <dt className="mt-1 fw-normal small opacity-75">{stat.label}</dt>
+              </Col>
             ))}
           </dl>
         </div>
       </section>
 
       <section aria-labelledby="stations-title">
-        <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="mb-4 d-flex align-items-end justify-content-between gap-3">
           <div>
-            <p className="mb-1.5 font-mono text-xs tracking-[0.18em] text-muted uppercase">
+            <p className="mb-1 small font-monospace text-uppercase ls-wider text-body-secondary">
               Every station
             </p>
-            <h2 id="stations-title" className="text-2xl font-bold sm:text-3xl">
+            <h2 id="stations-title" className="fs-2 fw-bold mb-0">
               Pick a station
             </h2>
           </div>
         </div>
 
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <Row as="ul" className="list-unstyled row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-0">
           {DESTINATIONS.map((station, index) => {
             const Icon = station.icon;
             return (
-              <li
+              <Col
+                as="li"
                 key={station.id}
                 className="animate-rise"
                 style={{ animationDelay: `${index * 45}ms` }}
               >
-                <Link
+                <BsCard
+                  as={Link}
                   to={station.path}
-                  className="group flex h-full flex-col rounded-card border border-line bg-surface p-5 shadow-card transition hover:-translate-y-1 hover:border-ink"
+                  className="h-100 p-4 shadow-sm text-body text-decoration-none"
                 >
-                  <div className="mb-5 flex items-start justify-between">
+                  <div className="mb-4 d-flex align-items-start justify-content-between">
                     <span
-                      className="grid size-11 place-items-center rounded-xl bg-surface-2 transition group-hover:bg-brand group-hover:text-on-brand"
+                      className="d-inline-flex align-items-center justify-content-center rounded-3 bg-body-secondary"
+                      style={{ width: '2.75rem', height: '2.75rem' }}
                       aria-hidden="true"
                     >
                       <Icon size={20} />
                     </span>
                     <Badge>{station.badge}</Badge>
                   </div>
-                  <h3 className="text-lg font-bold">{station.name}</h3>
-                  <p className="mt-1.5 flex-1 text-sm text-muted">{station.description}</p>
-                  <div className="mt-5 flex items-center justify-between border-t border-line pt-4">
-                    <code className="font-mono text-xs text-muted">{station.path}</code>
-                    <ArrowUpRight
-                      size={16}
-                      aria-hidden="true"
-                      className="text-muted transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-ink"
-                    />
+                  <h3 className="fs-5 fw-bold">{station.name}</h3>
+                  <p className="mb-0 flex-grow-1 small text-body-secondary">
+                    {station.description}
+                  </p>
+                  <div className="mt-4 d-flex align-items-center justify-content-between border-top pt-3">
+                    <code className="small text-body-secondary">{station.path}</code>
+                    <ArrowUpRight size={16} aria-hidden="true" className="text-body-secondary" />
                   </div>
-                </Link>
-              </li>
+                </BsCard>
+              </Col>
             );
           })}
-        </ul>
+        </Row>
       </section>
     </div>
   );

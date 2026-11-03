@@ -1,4 +1,5 @@
 import { useState, useId } from 'react';
+import { Form, ListGroup } from 'react-bootstrap';
 import { useFetch } from '../../hooks/useFetch.js';
 import { useDebounce } from '../../hooks/useDebounce.js';
 import { buildUsersUrl } from '../../lib/api.js';
@@ -32,29 +33,24 @@ export function Directory({ selectedUserId, onSelectUser }) {
   const users = data?.users || [];
 
   return (
-    <Card className="flex flex-col gap-5 p-5 sm:p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <Card className="d-flex flex-column gap-4">
+      <div className="d-flex flex-wrap align-items-start justify-content-between gap-3">
         <div>
-          <h2 className="text-xl font-bold">Participant Directory</h2>
-          <p className="mt-1 text-sm text-muted">
+          <h2 className="fs-4 fw-bold mb-1">Participant Directory</h2>
+          <p className="mb-0 small text-body-secondary">
             Registered attendees fetched declaratively via DummyJSON API
           </p>
         </div>
 
         {/* Simulate Slow Network Control (PD-5) */}
-        <label
-          htmlFor={slowNetworkCheckboxId}
-          className="flex cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-xs text-muted select-none hover:text-ink"
-        >
-          <input
-            id={slowNetworkCheckboxId}
-            type="checkbox"
-            className="size-4 accent-accent"
-            checked={slowNetwork}
-            onChange={(e) => setSlowNetwork(e.target.checked)}
-          />
-          <span>Simulate slow network (+1000ms)</span>
-        </label>
+        <Form.Check
+          id={slowNetworkCheckboxId}
+          type="checkbox"
+          className="border rounded-3 bg-body-tertiary px-3 py-2 ps-5 small text-body-secondary user-select-none mb-0"
+          label="Simulate slow network (+1000ms)"
+          checked={slowNetwork}
+          onChange={(e) => setSlowNetwork(e.target.checked)}
+        />
       </div>
 
       {/* Debounced Search Box (SR-1, SR-2) */}
@@ -73,29 +69,29 @@ export function Directory({ selectedUserId, onSelectUser }) {
         ) : loading ? (
           <UserRowSkeleton count={5} />
         ) : users.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 rounded-2xl border border-dashed border-line bg-surface-2 p-8 text-center">
-            <div className="font-display text-base font-semibold">
+          <div className="d-flex flex-column align-items-center gap-2 rounded-4 border border-dashed bg-body-tertiary p-4 p-sm-5 text-center">
+            <div className="fw-semibold">
               {debouncedQuery
                 ? `No participants found matching "${debouncedQuery}"`
                 : 'No participants found'}
             </div>
-            <div className="text-sm text-muted">
+            <div className="small text-body-secondary">
               {debouncedQuery
                 ? 'Try searching with a different name or clear the search input.'
                 : 'Try adjusting your query or click Retry to reload the directory.'}
             </div>
             {debouncedQuery ? (
-              <Button variant="secondary" onClick={() => setQuery('')} className="mt-3">
+              <Button variant="secondary" onClick={() => setQuery('')} className="mt-2">
                 Clear Search
               </Button>
             ) : (
-              <Button variant="secondary" onClick={refetch} className="mt-3">
+              <Button variant="secondary" onClick={refetch} className="mt-2">
                 Reload Participants
               </Button>
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <ListGroup className="gap-2">
             {users.map((user) => (
               <UserRow
                 key={user.id}
@@ -104,13 +100,13 @@ export function Directory({ selectedUserId, onSelectUser }) {
                 onSelect={onSelectUser}
               />
             ))}
-          </div>
+          </ListGroup>
         )}
       </div>
 
       {/* Footer Meta */}
       {data && !loading && !error && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3 font-mono text-[0.68rem] uppercase tracking-wider text-muted">
+        <div className="d-flex flex-wrap align-items-center justify-content-between gap-2 border-top pt-3 font-monospace small text-uppercase ls-wide text-body-secondary">
           <span>
             Showing {users.length} of {data.total || users.length} attendees
           </span>

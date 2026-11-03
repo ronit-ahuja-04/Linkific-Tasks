@@ -9,6 +9,7 @@ import {
   Zap,
   Code2,
 } from 'lucide-react';
+import { Col, Row } from 'react-bootstrap';
 import StateXray from '../StateXray.jsx';
 import PageHeader from '../layout/PageHeader.jsx';
 import { Badge, Button, Card, cx } from '../ui.jsx';
@@ -17,49 +18,51 @@ import { Badge, Button, Card, cx } from '../ui.jsx';
 function Column({ wrong, title, code, children, note }) {
   const Icon = wrong ? XCircle : CheckCircle;
   return (
-    <div
-      className={cx(
-        'flex flex-col gap-4 rounded-2xl border p-4 sm:p-5',
-        wrong ? 'border-bad/30 bg-bad-soft/40' : 'border-good/30 bg-good-soft/40'
-      )}
-    >
+    <Col md={6}>
       <div
-        className={cx('flex items-center gap-2 font-semibold', wrong ? 'text-bad' : 'text-good')}
+        className={cx(
+          'h-100 d-flex flex-column gap-3 rounded-4 border p-3 p-sm-4',
+          wrong
+            ? 'border-danger-subtle bg-danger-subtle'
+            : 'border-success-subtle bg-success-subtle'
+        )}
       >
-        <Icon size={18} aria-hidden="true" />
-        <span>{title}</span>
+        <div
+          className={cx(
+            'd-flex align-items-center gap-2 fw-semibold',
+            wrong ? 'text-danger-emphasis' : 'text-success-emphasis'
+          )}
+        >
+          <Icon size={18} aria-hidden="true" />
+          <span>{title}</span>
+        </div>
+        <div
+          className="overflow-x-auto rounded-3 p-3 font-monospace small"
+          style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+        >
+          <pre className="mb-0">
+            <code className="text-reset">{code}</code>
+          </pre>
+        </div>
+        {children}
+        <p className="mb-0 small text-body-secondary">{note}</p>
       </div>
-      <div className="overflow-x-auto rounded-xl bg-board p-4 font-mono text-xs leading-relaxed text-on-board">
-        <pre>
-          <code>{code}</code>
-        </pre>
-      </div>
-      {children}
-      <p className="text-sm leading-relaxed text-muted [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:font-mono [&_code]:text-xs [&_code]:text-ink">
-        {note}
-      </p>
-    </div>
+    </Col>
   );
 }
 
 function Preview({ items, stale }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-3">
-      <div className="mb-2 flex items-center justify-between text-sm text-muted">
+    <div className="rounded-3 border bg-body p-3">
+      <div className="mb-2 d-flex align-items-center justify-content-between small text-body-secondary">
         <span>Rendered in DOM:</span>
-        <strong className="tabular-nums text-ink">{items.length} items</strong>
+        <strong className="text-body">{items.length} items</strong>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="d-flex flex-wrap gap-2">
         {items.map((item, idx) => (
-          <span
-            key={idx}
-            className={cx(
-              'animate-pop rounded-full px-2.5 py-1 font-mono text-xs',
-              stale ? 'bg-bad-soft text-bad' : 'bg-good-soft text-good'
-            )}
-          >
+          <Badge key={idx} tone={stale ? 'bad' : 'good'} className="animate-pop text-lowercase">
             {item}
-          </span>
+          </Badge>
         ))}
       </div>
     </div>
@@ -68,31 +71,31 @@ function Preview({ items, stale }) {
 
 function Meter({ value }) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-line bg-surface p-3">
-      <span className="font-mono text-xs uppercase tracking-wider text-muted">
+    <div className="d-flex align-items-center justify-content-between rounded-3 border bg-body p-3">
+      <span className="font-monospace small text-uppercase ls-wide text-body-secondary">
         Value in Rendered State
       </span>
-      <span className="font-display text-3xl font-bold tabular-nums">{value}</span>
+      <span className="fs-2 fw-bold">{value}</span>
     </div>
   );
 }
 
 function LabCard({ num, id, title, lead, footer, children }) {
   return (
-    <Card as="section" aria-labelledby={id} className="animate-rise p-5 sm:p-7">
-      <div className="mb-6">
+    <Card as="section" aria-labelledby={id} className="animate-rise">
+      <div className="mb-4">
         <Badge tone="accent" className="mb-3">
           {num}
         </Badge>
-        <h2 id={id} className="text-xl font-bold sm:text-2xl">
+        <h2 id={id} className="fs-4 fw-bold">
           {title}
         </h2>
-        <p className="mt-2 max-w-3xl text-muted [&_code]:rounded [&_code]:bg-surface-2 [&_code]:px-1 [&_code]:font-mono [&_code]:text-sm [&_code]:text-ink">
+        <p className="mt-2 mb-0 text-body-secondary" style={{ maxWidth: '48rem' }}>
           {lead}
         </p>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">{children}</div>
-      <div className="mt-6 flex flex-col gap-3 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
+      <Row className="g-3">{children}</Row>
+      <div className="mt-4 d-flex flex-column flex-sm-row gap-3 align-items-sm-center justify-content-sm-between border-top pt-4">
         {footer}
       </div>
     </Card>
@@ -202,8 +205,8 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
         </Badge>
       </PageHeader>
 
-      <div className="flex flex-col gap-6 lg:flex-row lg:items-start">
-        <div className="flex min-w-0 flex-1 flex-col gap-6">
+      <div className="d-flex flex-column gap-4">
+        <div className="d-flex flex-column gap-4">
           {/* Experiment 1: Immutability & Reference Equality (LB-2) */}
           <LabCard
             num="EXPERIMENT 01"
@@ -218,7 +221,7 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
             }
             footer={
               <>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                <div className="d-flex flex-column flex-sm-row gap-2 gap-sm-3 align-items-sm-center">
                   <Button
                     variant="dark"
                     size="sm"
@@ -228,14 +231,14 @@ export default function StateLabStation({ xrayOn, onToggleXray, onNotify }) {
                     <RefreshCw size={15} aria-hidden="true" />
                     <span>Trigger unrelated re-render (Tick: {unrelatedTick})</span>
                   </Button>
-                  <span className="text-xs text-muted">
+                  <span className="small text-body-secondary">
                     (Notice how the mutated items suddenly appear when another state updates!)
                   </span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="self-start border border-line sm:self-auto"
+                  className="align-self-start align-self-sm-auto border"
                   onClick={handleResetMutationDemo}
                   title="Reset experiment data"
                 >
@@ -260,7 +263,7 @@ setItems(items);`}
             >
               <Button
                 variant="danger"
-                className="self-start"
+                className="align-self-start"
                 onClick={handleMutateDirectly}
                 title="Push directly into array and setState(sameArray)"
               >
@@ -281,7 +284,7 @@ setItems(prev => [
             >
               <Button
                 variant="primary"
-                className="self-start"
+                className="align-self-start"
                 onClick={handleImmutableAdd}
                 title="Add item via array spread copy"
               >
@@ -300,14 +303,14 @@ setItems(prev => [
             lead="State in React acts like a snapshot for a given render. Calling an updater multiple times with direct values captures the exact same baseline number."
             footer={
               <>
-                <div className="flex items-center gap-2 text-sm text-muted">
-                  <Code2 size={16} className="text-accent" aria-hidden="true" />
+                <div className="d-flex align-items-center gap-2 small text-body-secondary">
+                  <Code2 size={16} className="text-primary" aria-hidden="true" />
                   <span>Notice the +1 vs +3 divergence when clicked!</span>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="self-start border border-line sm:self-auto"
+                  className="align-self-start align-self-sm-auto border"
                   onClick={handleResetBatchDemo}
                   title="Reset batching counters"
                 >
@@ -334,7 +337,7 @@ setCount(count + 1);`}
             >
               <Button
                 variant="danger"
-                className="self-start"
+                className="align-self-start"
                 onClick={handleAddThreeDirect}
                 title="Execute 3 direct state updates"
               >
@@ -354,7 +357,7 @@ setCount(prev => prev + 1);`}
             >
               <Button
                 variant="primary"
-                className="self-start"
+                className="align-self-start"
                 onClick={handleAddThreeFunctional}
                 title="Execute 3 functional state updates"
               >

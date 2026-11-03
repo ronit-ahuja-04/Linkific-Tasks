@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Col, ListGroup, Row } from 'react-bootstrap';
 import PageHeader from '../components/layout/PageHeader.jsx';
 import { Card, buttonClass, cx } from '../components/ui.jsx';
 
@@ -18,67 +19,76 @@ const TIMELINE = [
 
 const compareCol = (tone) =>
   cx(
-    'flex flex-col items-start gap-3 rounded-2xl border p-5 [&_code]:rounded [&_code]:bg-surface [&_code]:px-1 [&_code]:font-mono [&_code]:text-xs',
-    tone === 'good' ? 'border-good/30 bg-good-soft' : 'border-bad/30 bg-bad-soft'
+    'h-100 d-flex flex-column align-items-start gap-3 rounded-4 border p-4',
+    tone === 'good'
+      ? 'bg-success-subtle border-success-subtle'
+      : 'bg-danger-subtle border-danger-subtle'
   );
 
 export default function About() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto" style={{ maxWidth: '56rem' }}>
       <PageHeader breadcrumb="ABOUT" title="About HackHQ" pill="Static route" />
 
-      <Card as="section" className="p-6 sm:p-8">
-        <h2 className="mb-3 text-xl font-bold tracking-tight">The event</h2>
-        <p className="max-w-2xl text-muted">
+      <Card as="section" className="p-4 p-sm-5">
+        <h2 className="fs-4 fw-bold mb-3">The event</h2>
+        <p className="mb-0 text-body-secondary" style={{ maxWidth: '42rem' }}>
           HackHQ is the day-of control room for a 24-hour hackathon: who has checked in, which teams
           are registered, what swag is left, and how long until demos.
         </p>
       </Card>
 
-      <ol className="my-6 grid gap-4 sm:grid-cols-3">
+      {/* CONCEPT: ListGroup as="ol" numbered - a list-group is just styled list markup */}
+      <Row as="ol" className="list-unstyled row-cols-1 row-cols-sm-3 g-3 my-3 p-0">
         {TIMELINE.map((step) => (
-          <li
-            key={step.day}
-            className="flex flex-col gap-1.5 rounded-card border border-line bg-surface p-5 shadow-card"
-          >
-            <span className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-accent">
-              {step.day}
-            </span>
-            <strong className="font-display text-lg tracking-tight">{step.title}</strong>
-            <span className="text-sm text-muted">{step.text}</span>
-          </li>
+          <Col as="li" key={step.day}>
+            <ListGroup.Item
+              as="div"
+              className="h-100 d-flex flex-column gap-1 rounded-3 border p-4 shadow-sm"
+            >
+              <span className="small font-monospace fw-medium text-uppercase ls-wider text-primary">
+                {step.day}
+              </span>
+              <strong className="fs-5">{step.title}</strong>
+              <span className="small text-body-secondary">{step.text}</span>
+            </ListGroup.Item>
+          </Col>
         ))}
-      </ol>
+      </Row>
 
       {/* CONCEPT: Link vs anchor - same destination, very different cost */}
-      <Card as="section" className="p-6 sm:p-8" aria-labelledby="link-vs-a">
-        <h2 id="link-vs-a" className="mb-3 text-xl font-bold tracking-tight">
+      <Card as="section" className="p-4 p-sm-5" aria-labelledby="link-vs-a">
+        <h2 id="link-vs-a" className="fs-4 fw-bold mb-3">
           {'<Link>'} vs {'<a>'}
         </h2>
-        <p className="max-w-2xl text-muted">
+        <p className="mb-0 text-body-secondary" style={{ maxWidth: '42rem' }}>
           Both go to Mission control. Open DevTools → Network, toggle State X-ray on, then try each
           one.
         </p>
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className={compareCol('good')}>
-            <Link to="/" className={buttonClass({ variant: 'primary' })}>
-              {'<Link to="/">'}
-            </Link>
-            <p className="text-sm text-muted">
-              Calls <code>history.pushState</code>. No document request; X-ray and toasts survive.
-            </p>
-          </div>
-          <div className={compareCol('bad')}>
-            {/* Deliberate full reload for the demo; every other internal link uses <Link> */}
-            <a href="/" className={buttonClass({ variant: 'secondary' })}>
-              {'<a href="/">'}
-            </a>
-            <p className="text-sm text-muted">
-              Browser requests a new document. The whole app reboots; only localStorage (theme,
-              laps) survives.
-            </p>
-          </div>
-        </div>
+        <Row className="g-3 mt-2">
+          <Col md={6}>
+            <div className={compareCol('good')}>
+              <Link to="/" className={buttonClass({ variant: 'primary' })}>
+                {'<Link to="/">'}
+              </Link>
+              <p className="mb-0 small text-body-secondary">
+                Calls <code>history.pushState</code>. No document request; X-ray and toasts survive.
+              </p>
+            </div>
+          </Col>
+          <Col md={6}>
+            <div className={compareCol('bad')}>
+              {/* Deliberate full reload for the demo; every other internal link uses <Link> */}
+              <a href="/" className={buttonClass({ variant: 'secondary' })}>
+                {'<a href="/">'}
+              </a>
+              <p className="mb-0 small text-body-secondary">
+                Browser requests a new document. The whole app reboots; only localStorage (theme,
+                laps) survives.
+              </p>
+            </div>
+          </Col>
+        </Row>
       </Card>
     </div>
   );
