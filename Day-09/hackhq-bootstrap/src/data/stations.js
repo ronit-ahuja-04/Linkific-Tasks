@@ -10,6 +10,7 @@ import {
   Mail,
   Lock,
   Handshake,
+  Megaphone,
 } from 'lucide-react';
 
 /**
@@ -24,6 +25,14 @@ export const STATIONS = [
     icon: LayoutDashboard,
     badge: 'Index',
     description: 'Overview of every station in the control room.',
+  },
+  {
+    id: 'announcements',
+    path: '/announcements',
+    name: 'Announcements',
+    icon: Megaphone,
+    badge: 'Feed',
+    description: 'Organizer updates as cards, filtered by category, with an unread count.',
   },
   {
     id: 'directory',
