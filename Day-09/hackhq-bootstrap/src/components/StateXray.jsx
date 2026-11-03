@@ -105,7 +105,7 @@ export default function StateXray({
       aria-label={`Live State X-ray telemetry for ${stationTitle}`}
     >
       <div className="d-flex align-items-start justify-content-between gap-3">
-        <div style={{ minWidth: 0 }}>
+        <div className="min-w-0">
           <div className="d-flex align-items-center gap-2">
             <h2 className="fs-6 fw-semibold mb-0">State X-ray</h2>
             <span

@@ -19,12 +19,6 @@
   --on-brand: #0e0e11;
   --accent: #5636e8;
   --accent-soft: rgb(86 54 232 / 0.1);
-  --good: #0b8a5d;
-  --good-soft: rgb(11 138 93 / 0.12);
-  --warn: #b45309;
-  --warn-soft: rgb(217 119 6 / 0.14);
-  --bad: #d12a2a;
-  --bad-soft: rgb(209 42 42 / 0.1);
   --board: #0e0e11;
   --on-board: #f4f4f5;
   color-scheme: light;
@@ -60,12 +54,6 @@
   --on-brand: #0e0e11;
   --accent: #a98bff;
   --accent-soft: rgb(169 139 255 / 0.14);
-  --good: #3fd69a;
-  --good-soft: rgb(63 214 154 / 0.14);
-  --warn: #fbbf24;
-  --warn-soft: rgb(251 191 36 / 0.14);
-  --bad: #ff6b6b;
-  --bad-soft: rgb(255 107 107 / 0.14);
   --board: #050507;
   --on-board: #f4f4f5;
   color-scheme: dark;
@@ -248,6 +236,15 @@ h4 {
 
 .offcanvas {
   --bs-offcanvas-bg: var(--bg);
+}
+
+.panel-board {
+  background: var(--board);
+  color: var(--on-board);
+}
+
+.min-w-0 {
+  min-width: 0;
 }
 
 .bg-brand {

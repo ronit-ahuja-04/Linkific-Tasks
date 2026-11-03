@@ -190,7 +190,7 @@ export default function ProductDetail({ cart, setCart, onNotify }) {
         className="sticky-bottom mt-4 d-flex align-items-center gap-3 rounded-4 border bg-body p-3 shadow"
         style={{ bottom: '0.75rem' }}
       >
-        <div className="me-auto d-flex flex-column small" style={{ minWidth: 0 }}>
+        <div className="me-auto d-flex flex-column small min-w-0">
           <strong className="text-truncate fw-semibold">{product.name}</strong>
           <span className="font-monospace text-body-secondary">
             {formatCurrencyINR(product.price)}

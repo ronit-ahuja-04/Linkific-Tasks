@@ -61,8 +61,8 @@ export function FeaturedPost({ post, isNew, isOrganizer, ...controls }) {
   return (
     <Card
       as="article"
-      className="border-0 p-4 p-lg-5 text-bg-dark animate-rise"
-      style={{ background: 'var(--board)', color: 'var(--on-board)' }}
+      className="border-0 p-4 p-lg-5 text-bg-dark animate-rise panel-board"
+
       aria-labelledby={`post-${post.id}`}
     >
       <PostMeta post={post} isNew={isNew} />

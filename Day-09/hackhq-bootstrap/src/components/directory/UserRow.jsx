@@ -24,7 +24,7 @@ export function UserRow({ user, isSelected, onSelect }) {
         style={{ width: 44, height: 44 }}
         loading="lazy"
       />
-      <div className="min-w-0 flex-grow-1" style={{ minWidth: 0 }}>
+      <div className="min-w-0 flex-grow-1 min-w-0">
         <div className="d-flex flex-wrap align-items-center gap-2">
           <span className="fw-semibold text-truncate">{fullName}</span>
           <Badge tone="neutral">{user.age} yrs</Badge>

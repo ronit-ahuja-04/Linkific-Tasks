@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HackHQ · Bootstrap CDN demo</title>
+
+    <!--
+      INSTALL OPTION 1: CDN links. No npm, no build step: open this file in a browser.
+      The integrity hash makes the browser refuse the file if the CDN ever serves different bytes.
+      Pin the exact version (5.3.8) so the page never changes underneath you.
+    -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+
+    <style>
+      /* The only custom CSS: the brand colour, as a Bootstrap-style button */
+      .btn-brand {
+        --bs-btn-color: #0e0e11;
+        --bs-btn-bg: #c8f031;
+        --bs-btn-border-color: #c8f031;
+        --bs-btn-hover-color: #0e0e11;
+        --bs-btn-hover-bg: #b7e016;
+        --bs-btn-hover-border-color: #b7e016;
+        --bs-btn-active-bg: #b7e016;
+        --bs-btn-active-border-color: #b7e016;
+        --bs-btn-font-weight: 600;
+      }
+      .text-brand {
+        color: #c8f031;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar: the toggler works through data-bs-* attributes, so no JavaScript is written -->
+    <nav class="navbar navbar-expand-md border-bottom sticky-top bg-body">
+      <div class="container">
+        <a class="navbar-brand fw-bold" href="#">HackHQ</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav"
+          aria-controls="nav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item"><a class="nav-link active" href="#hero">Hero</a></li>
+            <li class="nav-item"><a class="nav-link" href="#stations">Stations</a></li>
+            <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+          </ul>
+          <button id="theme" class="btn btn-outline-secondary btn-sm" type="button">
+            Toggle dark mode
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container py-4 py-lg-5">
+      <!-- Hero: a dark panel built from utilities (padding, rounding, flex) -->
+      <section
+        id="hero"
+        class="text-bg-dark rounded-4 p-4 p-sm-5 mb-5"
+        aria-labelledby="hero-title"
+      >
+        <span class="badge rounded-pill text-bg-light font-monospace mb-3"
+          >Day 9 · CDN install</span
+        >
+        <h1 id="hero-title" class="display-4 fw-bold">
+          Run the whole hackathon from <span class="text-brand">one control room.</span>
+        </h1>
+        <p class="lead opacity-75 col-lg-8">
+          This page uses only Bootstrap from a CDN and one small style block. No bundler, no React.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-brand btn-lg" href="#stations">See the stations</a>
+          <button
+            class="btn btn-outline-light btn-lg"
+            type="button"
+            data-bs-toggle="modal"
+            data-bs-target="#about-modal"
+          >
+            What is this?
+          </button>
+        </div>
+      </section>
+
+      <!-- Grid: 1 column on phones, 2 from md, 3 from xl -->
+      <section id="stations" class="mb-5" aria-labelledby="stations-title">
+        <h2 id="stations-title" class="h3 fw-bold mb-3">Stations</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <span class="badge text-bg-secondary mb-2">Live API</span>
+                <h3 class="h5 card-title">Directory</h3>
+                <p class="card-text text-body-secondary">Search attendees and read their posts.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <span class="badge text-bg-secondary mb-2">Feed</span>
+                <h3 class="h5 card-title">Announcements</h3>
+                <p class="card-text text-body-secondary">
+                  Organizer updates as cards, by category.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card h-100 shadow-sm">
+              <div class="card-body">
+                <span class="badge text-bg-secondary mb-2">Agenda</span>
+                <h3 class="h5 card-title">Schedule</h3>
+                <p class="card-text text-body-secondary">Three days of sessions, saved your way.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Accordion: also driven by data attributes -->
+      <section id="faq" aria-labelledby="faq-title">
+        <h2 id="faq-title" class="h3 fw-bold mb-3">FAQ</h2>
+        <div class="accordion" id="faq-accordion">
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq-1"
+                aria-expanded="true"
+                aria-controls="faq-1"
+              >
+                Why a CDN?
+              </button>
+            </h3>
+            <div
+              id="faq-1"
+              class="accordion-collapse collapse show"
+              data-bs-parent="#faq-accordion"
+            >
+              <div class="accordion-body">
+                Fastest way to try Bootstrap: two tags and you are styled. Good for prototypes and
+                static pages.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h3 class="accordion-header">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#faq-2"
+                aria-expanded="false"
+                aria-controls="faq-2"
+              >
+                Why not a CDN in the React app?
+              </button>
+            </h3>
+            <div id="faq-2" class="accordion-collapse collapse" data-bs-parent="#faq-accordion">
+              <div class="accordion-body">
+                The app imports the npm package so Vite bundles and versions it, and it uses React
+                Bootstrap, because Bootstrap's own JavaScript would fight React over the DOM.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal: opened by the data-bs-toggle button in the hero -->
+    <div
+      class="modal fade"
+      id="about-modal"
+      tabindex="-1"
+      aria-labelledby="about-title"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="about-title">About this page</h2>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            Every component here (navbar, grid, cards, accordion, modal, badges) comes from the CDN
+            stylesheet and bundle. Compare it with the React app, which uses the same classes
+            through React Bootstrap components.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- The JS bundle includes Popper; it powers the collapse, accordion and modal above -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      // The one line of our own JavaScript: Bootstrap 5.3 colour modes are a single attribute
+      document.getElementById('theme').addEventListener('click', function () {
+        var root = document.documentElement;
+        root.setAttribute(
+          'data-bs-theme',
+          root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark'
+        );
+      });
+    </script>
+  </body>
+</html>
