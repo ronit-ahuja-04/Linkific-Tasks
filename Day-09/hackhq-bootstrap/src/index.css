@@ -6,7 +6,8 @@
  * Plain CSS variables carried over from Day 8. Later milestones map them onto
  * Bootstrap's own variables and data-bs-theme.
  */
-:root {
+:root,
+[data-bs-theme='light'] {
   --bg: #f5f5f1;
   --surface: #ffffff;
   --surface-2: #eeeee8;
@@ -27,9 +28,27 @@
   --board: #0e0e11;
   --on-board: #f4f4f5;
   color-scheme: light;
+
+  /* Bootstrap variables mapped onto the brand tokens */
+  --bs-body-font-family: 'Inter Variable', system-ui, sans-serif;
+  --bs-body-bg: var(--bg);
+  --bs-body-bg-rgb: 245, 245, 241;
+  --bs-body-color: var(--ink);
+  --bs-body-color-rgb: 14, 14, 17;
+  --bs-secondary-color: var(--muted);
+  --bs-secondary-bg: var(--surface-2);
+  --bs-tertiary-bg: var(--surface-2);
+  --bs-border-color: var(--line);
+  --bs-primary: var(--accent);
+  --bs-primary-rgb: 86, 54, 232;
+  --bs-primary-bg-subtle: var(--accent-soft);
+  --bs-primary-text-emphasis: var(--accent);
+  --bs-link-color: var(--accent);
+  --bs-link-color-rgb: 86, 54, 232;
+  --bs-link-hover-color: var(--accent);
 }
 
-.dark {
+[data-bs-theme='dark'] {
   --bg: #09090c;
   --surface: #131317;
   --surface-2: #1b1b21;
@@ -50,6 +69,22 @@
   --board: #050507;
   --on-board: #f4f4f5;
   color-scheme: dark;
+
+  --bs-body-bg: var(--bg);
+  --bs-body-bg-rgb: 9, 9, 12;
+  --bs-body-color: var(--ink);
+  --bs-body-color-rgb: 244, 244, 245;
+  --bs-secondary-color: var(--muted);
+  --bs-secondary-bg: var(--surface-2);
+  --bs-tertiary-bg: var(--surface-2);
+  --bs-border-color: var(--line);
+  --bs-primary: var(--accent);
+  --bs-primary-rgb: 169, 139, 255;
+  --bs-primary-bg-subtle: var(--accent-soft);
+  --bs-primary-text-emphasis: var(--accent);
+  --bs-link-color: var(--accent);
+  --bs-link-color-rgb: 169, 139, 255;
+  --bs-link-hover-color: var(--accent);
 }
 
 @keyframes rise {
@@ -135,13 +170,13 @@
 }
 
 html {
-  background-color: var(--bg);
   -webkit-font-smoothing: antialiased;
 }
 
-/* M1 placeholder: Bootstrap owns the base styles from M2 on. Brand tokens stay until then. */
 body {
-  font-family: 'Inter Variable', system-ui, sans-serif;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
 }
 
 h1,
@@ -155,6 +190,163 @@ h4 {
 ::selection {
   background: var(--brand);
   color: var(--on-brand);
+}
+
+/* Bootstrap component tweaks, set through Bootstrap's own variables */
+.btn {
+  --bs-btn-border-radius: 0.75rem;
+  --bs-btn-font-weight: 600;
+}
+
+.btn-brand {
+  --bs-btn-color: var(--on-brand);
+  --bs-btn-bg: var(--brand);
+  --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-color: var(--on-brand);
+  --bs-btn-hover-bg: var(--brand-hover);
+  --bs-btn-hover-border-color: var(--brand-hover);
+  --bs-btn-active-color: var(--on-brand);
+  --bs-btn-active-bg: var(--brand-hover);
+  --bs-btn-active-border-color: var(--brand-hover);
+  --bs-btn-disabled-color: var(--on-brand);
+  --bs-btn-disabled-bg: var(--brand);
+  --bs-btn-disabled-border-color: var(--brand);
+  --bs-btn-focus-shadow-rgb: 200, 240, 49;
+}
+
+.btn-ink {
+  --bs-btn-color: var(--bg);
+  --bs-btn-bg: var(--ink);
+  --bs-btn-border-color: var(--ink);
+  --bs-btn-hover-color: var(--bg);
+  --bs-btn-hover-bg: var(--ink);
+  --bs-btn-hover-border-color: var(--ink);
+  --bs-btn-active-color: var(--bg);
+  --bs-btn-active-bg: var(--ink);
+  --bs-btn-active-border-color: var(--ink);
+  --bs-btn-focus-shadow-rgb: 128, 128, 128;
+}
+
+.card {
+  --bs-card-bg: var(--surface);
+  --bs-card-border-color: var(--line);
+  --bs-card-border-radius: 1.25rem;
+}
+
+.nav-pills {
+  --bs-nav-pills-border-radius: 0.75rem;
+  --bs-nav-pills-link-active-bg: var(--ink);
+  --bs-nav-pills-link-active-color: var(--bg);
+}
+
+.offcanvas {
+  --bs-offcanvas-bg: var(--bg);
+}
+
+.bg-brand {
+  background-color: var(--brand);
+  color: var(--on-brand);
+}
+
+.text-brand {
+  color: var(--brand);
+}
+
+.ls-wide {
+  letter-spacing: 0.08em;
+}
+
+.ls-wider {
+  letter-spacing: 0.18em;
+}
+
+/* App shell */
+.app-header {
+  height: 4rem;
+  background-color: rgba(var(--bs-body-bg-rgb), 0.8);
+  backdrop-filter: blur(16px);
+}
+
+.app-header .btn {
+  height: 2.5rem;
+}
+
+.app-shell {
+  max-width: 90rem;
+}
+
+.app-sidebar {
+  top: 4rem;
+  height: calc(100dvh - 4rem);
+}
+
+.app-drawer {
+  --bs-offcanvas-width: 18rem;
+}
+
+.palette-trigger {
+  min-width: 2.5rem;
+}
+
+@media (min-width: 576px) {
+  .palette-trigger {
+    min-width: 13rem;
+  }
+}
+
+.viewport-badge {
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 1030;
+}
+
+@media (min-width: 992px) {
+  .viewport-badge {
+    left: 17rem;
+  }
+}
+
+.pulse-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.pulse-ring {
+  animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.6;
+}
+
+/* Animations used by pages and components */
+.animate-rise {
+  animation: rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.animate-fade {
+  animation: fade 200ms ease-out both;
+}
+
+.animate-pop {
+  animation: pop 220ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+.animate-toast {
+  animation: toast 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.animate-flap {
+  animation: flap 260ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.animate-settle {
+  animation: settle 260ms ease-out both;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-scan {
+  animation: scan 3s linear infinite;
 }
 
 /* Respect users who prefer less motion */

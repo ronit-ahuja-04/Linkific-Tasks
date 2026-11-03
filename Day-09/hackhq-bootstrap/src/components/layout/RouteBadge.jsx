@@ -12,7 +12,7 @@ export default function RouteBadge({ pattern }) {
 
   return (
     <div
-      className="inline-flex max-w-full flex-wrap items-center gap-2 rounded-xl bg-board px-3 py-2 font-mono text-xs text-on-board"
+      className="text-bg-dark d-inline-flex flex-wrap align-items-center gap-2 rounded-3 px-3 py-2 font-monospace small mw-100"
       aria-label={`Matched route ${pattern}`}
     >
       <RouteIcon size={14} aria-hidden="true" className="text-brand" />
@@ -20,7 +20,7 @@ export default function RouteBadge({ pattern }) {
       <span className="opacity-50" aria-hidden="true">
         →
       </span>
-      <code className="break-all opacity-90">
+      <code className="text-break text-white opacity-75">
         {entries.length === 0
           ? '{ }'
           : `{ ${entries.map(([key, value]) => `${key}: ${JSON.stringify(value)}`).join(', ')} }`}

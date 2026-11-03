@@ -1,4 +1,4 @@
-import { Badge, PulseDot } from '../ui.jsx';
+import { Badge, Eyebrow, PulseDot } from '../ui.jsx';
 
 /**
  * Shared breadcrumb + title + status pill used by every page.
@@ -6,13 +6,13 @@ import { Badge, PulseDot } from '../ui.jsx';
  */
 export default function PageHeader({ breadcrumb, title, pill, children }) {
   return (
-    <header className="mb-8 animate-rise">
-      <p className="mb-3 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">
-        Control room <span className="text-line">/</span>{' '}
-        <span className="text-ink">{breadcrumb}</span>
-      </p>
-      <div className="flex flex-wrap items-center gap-3">
-        <h1 className="text-3xl font-bold sm:text-4xl">{title}</h1>
+    <header className="mb-4 mb-lg-5 animate-rise">
+      <Eyebrow className="mb-3">
+        Control room <span className="text-body-tertiary">/</span>{' '}
+        <span className="text-body">{breadcrumb}</span>
+      </Eyebrow>
+      <div className="d-flex flex-wrap align-items-center gap-3">
+        <h1 className="display-6 fw-bold mb-0">{title}</h1>
         {pill && (
           <Badge tone="good">
             <PulseDot />
@@ -20,7 +20,11 @@ export default function PageHeader({ breadcrumb, title, pill, children }) {
           </Badge>
         )}
       </div>
-      {children && <div className="mt-3 max-w-2xl text-muted">{children}</div>}
+      {children && (
+        <div className="mt-3 text-body-secondary" style={{ maxWidth: '42rem' }}>
+          {children}
+        </div>
+      )}
     </header>
   );
 }

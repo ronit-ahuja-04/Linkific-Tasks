@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { Container, Row, Col } from 'react-bootstrap';
 import { Zap } from 'lucide-react';
 
 const LINKS = [
@@ -9,34 +10,52 @@ const LINKS = [
   { to: '/about', label: 'About' },
 ];
 
+/**
+ * CONCEPT: Responsive order and offset - below `md` the links come first (order 1) and the brand
+ * second; from `md` up the brand is first and the links sit in the right half after a 1-column gap.
+ */
 export default function Footer() {
   return (
-    <footer className="border-t border-line">
-      <div className="mx-auto flex max-w-[90rem] flex-col gap-6 px-4 py-8 sm:px-8 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-3">
-          <span
-            className="grid size-8 place-items-center rounded-lg bg-brand text-on-brand"
-            aria-hidden="true"
+    <footer className="border-top mt-auto">
+      <Container fluid className="app-shell px-3 px-sm-4 py-4">
+        <Row className="align-items-center gy-3">
+          <Col
+            xs={{ span: 12, order: 2 }}
+            md={{ span: 6, order: 1 }}
+            xl={5}
+            className="d-flex align-items-center gap-3"
           >
-            <Zap size={16} strokeWidth={2.5} />
-          </span>
-          <p className="text-sm text-muted">
-            <span className="font-display font-bold text-ink">HackHQ</span> · built with React
-            Router and Tailwind CSS
-          </p>
-        </div>
-        <nav aria-label="Footer">
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted">
-            {LINKS.map((link) => (
-              <li key={link.to}>
-                <Link to={link.to} className="transition hover:text-ink">
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
+            <span
+              className="bg-brand d-grid rounded-2"
+              style={{ width: '2rem', height: '2rem', placeItems: 'center' }}
+              aria-hidden="true"
+            >
+              <Zap size={16} strokeWidth={2.5} />
+            </span>
+            <p className="small text-body-secondary mb-0">
+              <span className="fw-bold text-body">HackHQ</span> · built with React Router and
+              Bootstrap
+            </p>
+          </Col>
+          <Col
+            as="nav"
+            aria-label="Footer"
+            xs={{ span: 12, order: 1 }}
+            md={{ span: 5, offset: 1, order: 2 }}
+            xl={{ span: 6, offset: 1 }}
+          >
+            <ul className="list-unstyled d-flex flex-wrap column-gap-4 row-gap-2 small mb-0">
+              {LINKS.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="link-secondary link-underline-opacity-0">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Col>
+        </Row>
+      </Container>
     </footer>
   );
 }

@@ -1,35 +1,39 @@
 import { useWindowSize } from '../../hooks/useWindowSize.js';
 import { cx } from '../ui.jsx';
 
-const TONES = {
-  mobile: 'bg-warn-soft text-warn',
-  tablet: 'bg-accent-soft text-accent',
-  desktop: 'bg-good-soft text-good',
-};
+// Bootstrap's six grid breakpoints, widest first, with the colour used for each group
+const BREAKPOINTS = [
+  { name: 'xxl', min: 1400, tone: 'bg-success-subtle text-success-emphasis' },
+  { name: 'xl', min: 1200, tone: 'bg-success-subtle text-success-emphasis' },
+  { name: 'lg', min: 992, tone: 'bg-success-subtle text-success-emphasis' },
+  { name: 'md', min: 768, tone: 'bg-primary-subtle text-primary-emphasis' },
+  { name: 'sm', min: 576, tone: 'bg-warning-subtle text-warning-emphasis' },
+  { name: 'xs', min: 0, tone: 'bg-warning-subtle text-warning-emphasis' },
+];
 
 /**
  * Viewport dimensions badge displaying live screen width, height,
- * and derived responsive breakpoint.
+ * and the Bootstrap grid breakpoint currently in effect.
  * Complies with requirement VP-1.
  */
 export function ViewportBadge() {
   const { width, height } = useWindowSize();
 
-  const breakpoint = width < 768 ? 'mobile' : width < 1024 ? 'tablet' : 'desktop';
-
-  const label =
-    width < 768 ? 'Mobile (<768px)' : width < 1024 ? 'Tablet (768-1023px)' : 'Desktop (≥1024px)';
+  const breakpoint = BREAKPOINTS.find((bp) => width >= bp.min);
 
   return (
     <aside
       aria-label="Responsive viewport diagnostics"
-      className="fixed bottom-3 left-3 z-30 lg:left-[17rem] hidden items-center gap-2 rounded-full border border-line bg-surface/90 px-3 py-1.5 font-mono text-[0.68rem] text-muted shadow-card backdrop-blur sm:flex"
+      className="viewport-badge position-fixed d-none d-sm-flex align-items-center gap-2 rounded-pill border bg-body px-3 py-1 font-monospace text-body-secondary shadow-sm"
+      style={{ fontSize: '0.68rem' }}
     >
       <span>Viewport</span>
-      <span className="tabular-nums text-ink">
+      <span className="text-body">
         {width} × {height}
       </span>
-      <span className={cx('rounded-full px-2 py-0.5 font-medium', TONES[breakpoint])}>{label}</span>
+      <span className={cx('rounded-pill px-2 py-1 fw-medium', breakpoint.tone)}>
+        {breakpoint.name} (≥{breakpoint.min}px)
+      </span>
     </aside>
   );
 }

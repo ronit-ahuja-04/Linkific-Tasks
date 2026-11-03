@@ -1,9 +1,9 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { Navbar, Button } from 'react-bootstrap';
 import { Zap, Activity, Moon, Sun, Search, LogIn, LogOut, Menu } from 'lucide-react';
 import { Kbd, cx } from './ui.jsx';
 
-const PILL =
-  'inline-flex h-10 items-center gap-2 rounded-xl border border-line bg-surface px-3 text-sm font-medium text-ink transition hover:bg-surface-2';
+const PILL = 'd-inline-flex align-items-center justify-content-center gap-2';
 
 export default function Header({
   theme,
@@ -30,92 +30,104 @@ export default function Header({
   };
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 items-center gap-3 border-b border-line bg-bg/80 px-4 backdrop-blur-xl sm:px-6">
-      <button
-        type="button"
+    <Navbar
+      as="header"
+      sticky="top"
+      expand="lg"
+      className="app-header flex-nowrap gap-2 border-bottom px-3 px-sm-4 py-0"
+    >
+      <Button
+        variant="outline-secondary"
         onClick={onOpenNav}
-        className={cx(PILL, 'w-10 justify-center px-0 lg:hidden')}
+        className={cx(PILL, 'd-lg-none px-0')}
+        style={{ width: '2.5rem' }}
         aria-label="Open navigation"
       >
         <Menu size={18} aria-hidden="true" />
-      </button>
+      </Button>
 
-      <Link to="/" className="flex items-center gap-2.5" aria-label="HackHQ mission control home">
+      <Navbar.Brand
+        as={Link}
+        to="/"
+        className="d-flex align-items-center gap-2 me-0"
+        aria-label="HackHQ mission control home"
+      >
         <span
-          className="grid size-9 place-items-center rounded-xl bg-brand text-on-brand shadow-sm"
+          className="bg-brand d-grid place-items-center rounded-3 shadow-sm"
+          style={{ width: '2.25rem', height: '2.25rem', placeItems: 'center' }}
           aria-hidden="true"
         >
           <Zap size={18} strokeWidth={2.5} />
         </span>
-        <span className="leading-none">
-          <span className="block font-display text-lg font-bold tracking-tight">HackHQ</span>
-          <span className="hidden font-mono text-[0.6rem] tracking-[0.2em] text-muted sm:block">
+        <span className="lh-1">
+          <span className="d-block fs-5 fw-bold">HackHQ</span>
+          <span
+            className="d-none d-sm-block font-monospace text-body-secondary ls-wider"
+            style={{ fontSize: '0.6rem' }}
+          >
             DAY-OF CONTROL ROOM
           </span>
         </span>
-      </Link>
+      </Navbar.Brand>
 
-      <div className="ml-auto flex items-center gap-2">
+      <div className="ms-auto d-flex align-items-center gap-2">
         {/* W5: Command palette trigger (also ⌘K / Ctrl+K) */}
-        <button
-          type="button"
+        <Button
+          variant="outline-secondary"
           onClick={onOpenPalette}
-          className={cx(PILL, 'text-muted sm:min-w-52')}
+          className={cx(PILL, 'palette-trigger text-body-secondary')}
           aria-label="Open command palette"
           aria-keyshortcuts="Meta+K Control+K"
         >
           <Search size={15} aria-hidden="true" />
-          <span className="hidden flex-1 text-left sm:inline">Jump to…</span>
-          <Kbd className="hidden sm:inline">⌘K</Kbd>
-        </button>
+          <span className="d-none d-sm-inline flex-grow-1 text-start">Jump to…</span>
+          <Kbd className="d-none d-sm-inline">⌘K</Kbd>
+        </Button>
 
         {/* Organizer session (M4): log in link or log out button */}
         {isOrganizer ? (
-          <button
-            type="button"
-            className={cx(PILL, 'border-good/40 bg-good-soft text-good')}
-            onClick={handleLogout}
-          >
-            <span className="size-2 rounded-full bg-good" aria-hidden="true" />
-            <span className="hidden sm:inline">Organizer</span>
+          <Button variant="outline-success" className={PILL} onClick={handleLogout}>
+            <span className="pulse-dot rounded-circle bg-success" aria-hidden="true" />
+            <span className="d-none d-sm-inline">Organizer</span>
             <LogOut size={15} aria-hidden="true" />
-            <span className="sr-only">Log out</span>
-          </button>
+            <span className="visually-hidden">Log out</span>
+          </Button>
         ) : (
-          <Link to="/login" className={PILL}>
+          <Button as={Link} to="/login" variant="outline-secondary" className={PILL}>
             <LogIn size={15} aria-hidden="true" />
-            <span className="hidden sm:inline">Log in</span>
-          </Link>
+            <span className="d-none d-sm-inline">Log in</span>
+          </Button>
         )}
 
         {/* State X-ray Toggle Pill */}
-        <button
-          type="button"
+        <Button
+          variant={xrayOn ? 'outline-primary' : 'outline-secondary'}
+          active={xrayOn}
           onClick={onToggleXray}
-          className={cx(
-            PILL,
-            'max-md:hidden',
-            xrayOn && 'border-accent/40 bg-accent-soft text-accent'
-          )}
+          className={cx(PILL, 'd-none d-md-inline-flex')}
           aria-pressed={xrayOn}
           title="Toggle live State X-ray inspector"
         >
           <Activity size={15} aria-hidden="true" />
           <span>State X-ray</span>
           <span
-            className={cx('size-2 rounded-full', xrayOn ? 'bg-accent' : 'bg-line')}
+            className={cx(
+              'pulse-dot rounded-circle',
+              xrayOn ? 'bg-primary' : 'bg-secondary-subtle'
+            )}
             aria-hidden="true"
           />
-        </button>
+        </Button>
 
-        <button
-          type="button"
+        <Button
+          variant="outline-secondary"
           role="switch"
           aria-checked={theme === 'dark'}
           aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
           onClick={onToggleTheme}
           onKeyDown={handleSwitchKeyDown}
-          className={cx(PILL, 'w-10 justify-center px-0')}
+          className={cx(PILL, 'px-0')}
+          style={{ width: '2.5rem' }}
           title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
         >
           {theme === 'dark' ? (
@@ -123,8 +135,8 @@ export default function Header({
           ) : (
             <Moon size={18} aria-hidden="true" />
           )}
-        </button>
+        </Button>
       </div>
-    </header>
+    </Navbar>
   );
 }

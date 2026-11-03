@@ -176,9 +176,9 @@ Work is split into seven milestones. Each one ends in a working, buildable app a
 | Task | Work                                                                                              |
 | ---- | ------------------------------------------------------------------------------------------------- |
 | 2.1  | App shell on `Container`, `Row` and `Col`, with the sidebar fixed on `lg` and up                  |
-| 2.2  | `Navbar` header with collapse on small screens, `Offcanvas` sidebar below `lg`                    |
+| 2.2  | `Navbar` header with icon-only actions on small screens, `Offcanvas` drawer for stations below `lg` |
 | 2.3  | Footer and page header restyled                                                                   |
-| 2.4  | Grid examples using xs to xxl breakpoints, `offset-*` and `order-*`                               |
+| 2.4  | Grid examples: sidebar and main at `lg` and `xl`, footer with `order-*` and `offset-*`, viewport badge showing xs to xxl |
 | 2.5  | Dark mode through `data-bs-theme`, persisted, set before first paint                              |
 
 **Exit criteria:** every route renders inside the new shell at 390, 820 and 1440 px, the drawer opens and closes, and the dark mode toggle works without a flash.
