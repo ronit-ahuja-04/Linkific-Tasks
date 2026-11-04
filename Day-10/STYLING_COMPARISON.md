@@ -41,7 +41,20 @@ Same app (HackHQ) was styled in Day 8 (Tailwind), Day 9 (Bootstrap) and Day 10 (
 - styled-components is in maintenance mode, and runtime CSS-in-JS is a poor fit for React Server Components. New projects often pick zero-runtime options (Tailwind, CSS Modules, vanilla-extract, Panda, Linaria) instead. Check current status before committing.
 - A hybrid is common: Tailwind or Modules for layout, CSS variables for theme tokens.
 
-## What I observed in this build
-- Variants (primary, secondary, danger, ghost), sizes and loading state live in one component file, which is easier to read than juggling classes.
-- Theme switching needed no component changes: swap the `ThemeProvider` value and every component re-styles.
-- Cost: bundle is 88 kB gzip total (React included), versus Tailwind's small CSS file.
+## Measured on the real app (HackHQ Day 9 Bootstrap vs Day 10 styled-components)
+Same pages, same features, same 134 tests. Production build, `vite build`.
+
+| | Day 9 Bootstrap | Day 10 styled-components |
+|---|---|---|
+| CSS file | 243 kB (35.5 kB gzip) | 7.5 kB (2.9 kB gzip, just the @font-face rules) |
+| JS bundle | 509 kB (151 kB gzip) | 541 kB (160 kB gzip) |
+| JS + CSS gzip | about 186 kB | about 163 kB |
+| Styled components declared | none | 519 across 48 files |
+| Runtime dependencies for styling | bootstrap, react-bootstrap | styled-components, polished |
+
+## What I observed
+- **Bundle:** the stylesheet nearly disappears and the JS grows by about 9 kB gzip, because styled-components and the CSS now ship inside the bundle. Total gzip is lower here because Bootstrap ships all of its CSS, used or not.
+- **Theming:** light/dark is one `ThemeProvider` value (`src/styles/theme.js`). No `data-bs-theme` variables, no mapping of brand tokens onto framework variables.
+- **Variants:** `Button` has variants, sizes, block and link rendering (`as={Link}`) in one `ui.jsx` definition. Day 9 needed a `buttonClass()` helper plus custom `.btn-brand` CSS overrides.
+- **Lost for free:** Bootstrap's grid, Offcanvas, Modal, Tabs and Accordion. I rebuilt them with `Grid`/`Stack` primitives and small hand-written components, which cost more effort and more accessibility care (focus trap, Esc, arrow keys).
+- **Gotcha found while building:** styled-components v6 removed `.withComponent()` and passes non-transient props to the DOM, so variant props must be `$`-prefixed.

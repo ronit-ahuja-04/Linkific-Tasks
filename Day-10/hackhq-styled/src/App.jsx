@@ -1,182 +1,225 @@
-import { useState } from 'react';
-import styled, { ThemeProvider, css } from 'styled-components';
-import { GlobalStyle } from './GlobalStyle';
-import { useThemeMode } from './useTheme';
-import { Button, PillButton, Card, CardTitle, CardText, Input, Modal, Badge, ThemeSwitcher } from './components';
-
-const Page = styled.main`
-  max-width: 980px; margin: 0 auto;
-  padding: ${({ theme }) => theme.space(6)} ${({ theme }) => theme.space(4)} ${({ theme }) => theme.space(16)};
-`;
-
-const Header = styled.header`
-  display: flex; align-items: center; justify-content: space-between; gap: 16px;
-  margin-bottom: ${({ theme }) => theme.space(8)};
-`;
-
-const Section = styled.section`
-  margin-bottom: ${({ theme }) => theme.space(10)};
-  > h2 { margin-bottom: ${({ theme }) => theme.space(1)}; }
-  > p { margin: 0 0 ${({ theme }) => theme.space(4)}; color: ${({ theme }) => theme.colors.muted}; }
-`;
-
-const Row = styled.div`
-  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
-`;
-
-// Media query + nested styling: grid collapses on small screens
-const Grid = styled.div`
-  display: grid; gap: 16px; grid-template-columns: repeat(3, 1fr);
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) { grid-template-columns: 1fr; }
-`;
-
-// Dynamic styling: props -> CSS (progress bar)
-const Bar = styled.div`
-  height: 10px; border-radius: 999px; background: ${({ theme }) => theme.colors.secondary}; overflow: hidden;
-  &::before {
-    content: ''; display: block; height: 100%;
-    width: ${({ $pct }) => $pct}%;
-    background: ${({ theme, $pct }) => ($pct > 80 ? theme.colors.danger : theme.colors.primary)};
-    transition: width .3s, background .3s;
-  }
-`;
-
-const Heading = styled.h2`
-  ${({ $big }) => $big && css`font-size: 2rem;`}
-`;
-
-// Pseudo-element + nested selector demo
-const FancyLink = styled.a`
-  position: relative; color: ${({ theme }) => theme.colors.primary}; font-weight: 600; text-decoration: none;
-  &::after {
-    content: ''; position: absolute; left: 0; bottom: -2px; height: 2px; width: 0;
-    background: currentColor; transition: width .2s;
-  }
-  &:hover::after { width: 100%; }
-  & + & { margin-left: 16px; }
-`;
-
-const Code = styled.pre`
-  margin: 0; padding: 12px 16px; overflow-x: auto; font-size: .8rem;
-  background: ${({ theme }) => theme.colors.surface}; border: 1px solid ${({ theme }) => theme.colors.border};
-  border-radius: ${({ theme }) => theme.radii.md};
-`;
+import { useCallback, useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from 'styled-components';
+import { themes } from './styles/theme.js';
+import { GlobalStyle } from './styles/GlobalStyle.js';
+import { useLocalStorage } from './hooks/useLocalStorage.js';
+import AppLayout from './components/layout/AppLayout.jsx';
+import CheckInStation from './components/stations/CheckInStation.jsx';
+import ChecklistStation from './components/stations/ChecklistStation.jsx';
+import TeamsStation from './components/stations/TeamsStation.jsx';
+import SwagStation from './components/stations/SwagStation.jsx';
+import StateLabStation from './components/stations/StateLabStation.jsx';
+import Home from './pages/Home.jsx';
+import About from './pages/About.jsx';
+import NotFound from './pages/NotFound.jsx';
+import DirectoryPage from './pages/stations/DirectoryPage.jsx';
+import ClockPage from './pages/stations/ClockPage.jsx';
+import PatternsPage from './pages/stations/PatternsPage.jsx';
+import ProductDetail from './pages/swag/ProductDetail.jsx';
+import Sponsors from './pages/Sponsors.jsx';
+import Contact from './pages/Contact.jsx';
+import ContactSent from './pages/ContactSent.jsx';
+import NavPatterns from './pages/NavPatterns.jsx';
+import Login from './pages/Login.jsx';
+import OrganizerHome from './pages/organizer/OrganizerHome.jsx';
+import Announcements from './pages/Announcements.jsx';
+import Schedule from './pages/Schedule.jsx';
+import UiKit from './pages/UiKit.jsx';
+import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
+import { SEED_ANNOUNCEMENTS } from './data/announcements.js';
+import {
+  EMPTY_CHANGES,
+  addAnnouncement,
+  applyChanges,
+  countUnread,
+  createAnnouncement,
+  editAnnouncement,
+  removeAnnouncement,
+} from './lib/announcements.js';
+import { toggleSaved } from './lib/schedule.js';
 
 export default function App() {
-  const { mode, toggle, theme } = useThemeMode();
-  const [open, setOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
-  const [pct, setPct] = useState(40);
+  // Theme state persisted via useLocalStorage (LS-1)
+  const [theme, setTheme] = useLocalStorage(
+    'hackhq_theme',
+    typeof window !== 'undefined' && window.matchMedia?.('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light'
+  );
 
-  const emailError = email && !/^\S+@\S+\.\S+$/.test(email) ? 'Enter a valid email' : '';
+  // Stopwatch laps persisted via useLocalStorage (LS-1, CK-2)
+  const [laps, setLaps] = useLocalStorage('hackhq_laps', []);
 
-  const fakeSubmit = () => {
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
+  const addLap = (lap) => {
+    setLaps((prev) => [lap, ...prev]);
   };
 
+  const clearLaps = () => {
+    setLaps([]);
+  };
+
+  // Demo organizer flag (PR-2). Persisted so a refresh keeps you signed in.
+  const [isOrganizer, setIsOrganizer] = useLocalStorage('hackhq_organizer', false);
+  const login = () => setIsOrganizer(true);
+  const logout = () => setIsOrganizer(false);
+
+  // Cart lifted here and persisted: /swag and /swag/:productId both read and update it
+  const [cart, setCart] = useLocalStorage('hackhq_cart', []);
+
+  // Announcements: the seed list never changes; organizer edits are stored as a separate
+  // { added, edited, removed } object and merged by id. `seenAt` drives the unread badge.
+  const [announcementChanges, setAnnouncementChanges] = useLocalStorage(
+    'hackhq_announcements',
+    EMPTY_CHANGES
+  );
+  const [announcementsSeenAt, setAnnouncementsSeenAt] = useLocalStorage(
+    'hackhq_announcements_seen',
+    null
+  );
+  const announcements = applyChanges(SEED_ANNOUNCEMENTS, announcementChanges);
+  const unreadAnnouncements = countUnread(announcements, announcementsSeenAt);
+  const markAnnouncementsSeen = useCallback(
+    () => setAnnouncementsSeenAt(Date.now()),
+    [setAnnouncementsSeenAt]
+  );
+  const addPost = (draft) =>
+    setAnnouncementChanges((prev) => addAnnouncement(prev, createAnnouncement(draft)));
+  const editPost = (id, fields) =>
+    setAnnouncementChanges((prev) => editAnnouncement(prev, id, fields));
+  const removePost = (id) => setAnnouncementChanges((prev) => removeAnnouncement(prev, id));
+
+  // My schedule: only the ids of saved sessions are stored; the sessions themselves are seed data
+  const [savedSessionIds, setSavedSessionIds] = useLocalStorage('hackhq_schedule_saved', []);
+  const toggleSavedSession = (id) => setSavedSessionIds((prev) => toggleSaved(prev, id));
+
+  // State X-ray live inspector toggle (LB-1)
+  const [xrayOn, setXrayOn] = useState(false);
+
+  // Toasts array state (SH-3) - max 3 visible, auto-dismiss via setTimeout in handler
+  const [toasts, setToasts] = useState([]);
+
+  const toggleTheme = () => {
+    setTheme((prevTheme) => (prevTheme === 'dark' ? 'light' : 'dark'));
+  };
+
+  const toggleXray = () => {
+    setXrayOn((prev) => !prev);
+  };
+
+  const dismissToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+
+  /**
+   * onNotify callback passed down to all stations (SH-3)
+   * Handled purely via event callback with setTimeout; zero lifecycle effects.
+   */
+  const notify = (message, action = null, type = 'info') => {
+    const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
+    const newToast = { id, message, action, type };
+
+    setToasts((prev) => {
+      // Keep at most 3 visible; prepend newest
+      const updated = [newToast, ...prev];
+      return updated.slice(0, 3);
+    });
+
+    // Auto-dismiss after 4.5 seconds
+    setTimeout(() => {
+      dismissToast(id);
+    }, 4500);
+  };
+
+  // Props shared by the Day 5 stations
+  const stationProps = { xrayOn, onToggleXray: toggleXray, onNotify: notify };
+
+  // CONCEPT: Routes picks the single best-matching Route; only that page is mounted
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={themes[theme] ?? themes.light}>
       <GlobalStyle />
-      <Page>
-        <Header>
-          <div>
-            <Heading as="h1" $big>HackHQ UI Kit</Heading>
-            <Badge>styled-components v6</Badge> <Badge $tone="neutral">{mode} theme</Badge>
-          </div>
-          <ThemeSwitcher mode={mode} onToggle={toggle} />
-        </Header>
-
-        <Section>
-          <h2>Button variants</h2>
-          <p>One component, variants + sizes via transient props ($variant, $size).</p>
-          <Row>
-            <Button>Primary</Button>
-            <Button $variant="secondary">Secondary</Button>
-            <Button $variant="danger">Danger</Button>
-            <Button $variant="ghost">Ghost</Button>
-            <Button disabled>Disabled</Button>
-          </Row>
-          <br />
-          <Row>
-            <Button $size="sm">Small</Button>
-            <Button $size="lg">Large</Button>
-            <PillButton>Extended: PillButton</PillButton>
-            <Button as="a" href="#links" $variant="secondary">I am an &lt;a&gt; (as prop)</Button>
-            <Button $loading={loading} onClick={fakeSubmit}>{loading ? 'Saving' : 'Click for spinner'}</Button>
-          </Row>
-        </Section>
-
-        <Section>
-          <h2>Cards</h2>
-          <p>Theme tokens for colour, radius, spacing; $interactive adds hover lift. Grid uses media queries.</p>
-          <Grid>
-            {[['Hack Night', 'info', 'Open'], ['Judging', 'neutral', 'Soon'], ['Prizes', 'danger', 'Closing']].map(([t, tone, label]) => (
-              <Card key={t} $interactive>
-                <CardTitle>{t} <Badge $tone={tone}>{label}</Badge></CardTitle>
-                <CardText>Hover me. Styles are scoped to a generated class, so nothing leaks.</CardText>
-                <Button $size="sm" $variant="ghost">Details</Button>
-              </Card>
-            ))}
-          </Grid>
-        </Section>
-
-        <Section>
-          <h2>Inputs</h2>
-          <p>Validation state flows in as a prop and restyles border, focus ring and hint.</p>
-          <Grid>
-            <Input label="Email" placeholder="you@hackhq.dev" value={email} onChange={(e) => setEmail(e.target.value)} error={emailError} hint="We never share it" />
-            <Input label="Team name" placeholder="Team Rocket" />
-            <Input label="Disabled" placeholder="Locked" disabled />
-          </Grid>
-        </Section>
-
-        <Section>
-          <h2>Dynamic styling</h2>
-          <p>Capacity: {pct}% (bar turns red above 80%).</p>
-          <Bar $pct={pct} />
-          <br />
-          <Row>
-            <Button $size="sm" $variant="secondary" onClick={() => setPct((p) => Math.max(0, p - 20))}>-20</Button>
-            <Button $size="sm" onClick={() => setPct((p) => Math.min(100, p + 20))}>+20</Button>
-          </Row>
-        </Section>
-
-        <Section id="links">
-          <h2>Pseudo-elements and nesting</h2>
-          <p>Underline grows on hover via &amp;::after.</p>
-          <FancyLink href="#links">Rules</FancyLink>
-          <FancyLink href="#links">Schedule</FancyLink>
-          <FancyLink href="#links">Sponsors</FancyLink>
-        </Section>
-
-        <Section>
-          <h2>Modal</h2>
-          <p>Keyframe animations, Esc and overlay click to close.</p>
-          <Button $variant="danger" onClick={() => setOpen(true)}>Delete project…</Button>
-          <Modal
-            open={open}
-            title="Delete this project?"
-            onClose={() => setOpen(false)}
-            actions={<>
-              <Button $variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button $variant="danger" onClick={() => setOpen(false)}>Delete</Button>
-            </>}
-          >
-            This cannot be undone.
-          </Modal>
-        </Section>
-
-        <Section>
-          <h2>Snippet</h2>
-          <Code>{`const Button = styled.button\`
-  background: \${({ theme }) => theme.colors.primary};
-  \${({ $variant }) => variants[$variant]}
-\`;`}</Code>
-        </Section>
-      </Page>
+      <Routes>
+        <Route
+          element={
+            <AppLayout
+              theme={theme}
+              onToggleTheme={toggleTheme}
+              xrayOn={xrayOn}
+              onToggleXray={toggleXray}
+              toasts={toasts}
+              onDismissToast={dismissToast}
+              isOrganizer={isOrganizer}
+              onLogout={logout}
+              unreadAnnouncements={unreadAnnouncements}
+            />
+          }
+        >
+          <Route index element={<Home />} />
+          <Route
+            path="announcements"
+            element={
+              <Announcements
+                announcements={announcements}
+                seenAt={announcementsSeenAt}
+                isOrganizer={isOrganizer}
+                onMarkSeen={markAnnouncementsSeen}
+                onAdd={addPost}
+                onEdit={editPost}
+                onRemove={removePost}
+                onNotify={notify}
+              />
+            }
+          />
+          <Route
+            path="schedule"
+            element={
+              <Schedule
+                savedIds={savedSessionIds}
+                onToggleSaved={toggleSavedSession}
+                onNotify={notify}
+              />
+            }
+          />
+          <Route path="kit" element={<UiKit />} />
+          <Route path="about" element={<About />} />
+          <Route path="directory/:userId?" element={<DirectoryPage />} />
+          <Route
+            path="clock"
+            element={<ClockPage laps={laps} onAddLap={addLap} onClearLaps={clearLaps} />}
+          />
+          <Route path="patterns" element={<PatternsPage />} />
+          <Route path="patterns/navigation" element={<NavPatterns />} />
+          <Route path="checklist" element={<ChecklistStation {...stationProps} />} />
+          <Route path="teams" element={<TeamsStation {...stationProps} />} />
+          <Route path="swag">
+            <Route
+              index
+              element={<SwagStation cart={cart} setCart={setCart} {...stationProps} />}
+            />
+            <Route
+              path=":productId"
+              element={<ProductDetail cart={cart} setCart={setCart} onNotify={notify} />}
+            />
+          </Route>
+          <Route path="login" element={<Login isOrganizer={isOrganizer} onLogin={login} />} />
+          {/* CONCEPT: Protected routes - one pathless guard wraps the whole /organizer area */}
+          <Route element={<ProtectedRoute isAllowed={isOrganizer} />}>
+            <Route path="organizer">
+              <Route index element={<OrganizerHome onLogout={logout} />} />
+              <Route path="checkin" element={<CheckInStation {...stationProps} />} />
+              <Route path="lab" element={<StateLabStation {...stationProps} />} />
+            </Route>
+          </Route>
+          <Route path="sponsors" element={<Sponsors />} />
+          <Route path="contact" element={<Contact onNotify={notify} />} />
+          <Route path="contact/sent" element={<ContactSent />} />
+          {/* CONCEPT: Declarative redirect - legacy URL, replaced so it never stays in history */}
+          <Route path="shop" element={<Navigate to="/swag" replace />} />
+          <Route path="checkin" element={<Navigate to="/organizer/checkin" replace />} />
+          <Route path="lab" element={<Navigate to="/organizer/lab" replace />} />
+          <Route path="*" element={<NotFound />} />
+        </Route>
+      </Routes>
     </ThemeProvider>
   );
 }
