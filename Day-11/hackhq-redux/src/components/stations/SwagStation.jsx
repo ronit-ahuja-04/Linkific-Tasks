@@ -30,8 +30,6 @@ import {
 import { animateRise, animateSettle, animateFade } from '../../styles/animations.js';
 import ContentModal from '../ContentModal.jsx';
 import StateXray from '../StateXray.jsx';
-import WishlistButton from '../WishlistButton.jsx';
-import UndoRedoButtons from '../UndoRedoButtons.jsx';
 import { SWAG_PRODUCTS } from '../../data/products.js';
 import { productPath } from '../../lib/routes.js';
 import {
@@ -162,12 +160,6 @@ const Price = styled.div`
   font-family: ${({ theme }) => theme.fonts.mono};
   font-size: 1.25rem;
   font-weight: 700;
-`;
-const CategoryRow = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
 `;
 const ProductFooter = styled.div`
   display: flex;
@@ -447,15 +439,12 @@ export default function SwagStation() {
             </Badge>
           </TitleRow>
           {/* Item count in header (SW-9) */}
-          <Stack $dir="row" $gap={2} $wrap $align="center">
-            <UndoRedoButtons slice="cart" label="cart" />
-            <CartPill aria-label={`Cart contains ${totalItems} items`}>
-              <ShoppingBag size={16} aria-hidden="true" />
-              <span>
-                Cart: <Mono as="strong">{totalItems}</Mono> items
-              </span>
-            </CartPill>
-          </Stack>
+          <CartPill aria-label={`Cart contains ${totalItems} items`}>
+            <ShoppingBag size={16} aria-hidden="true" />
+            <span>
+              Cart: <Mono as="strong">{totalItems}</Mono> items
+            </span>
+          </CartPill>
         </HeaderRow>
       </Header>
 
@@ -481,10 +470,9 @@ export default function SwagStation() {
                 <li key={product.id}>
                   <ProductCard>
                     <ProductBody>
-                      <CategoryRow>
+                      <div>
                         <Badge $tone="accent">{product.category}</Badge>
-                        <WishlistButton productId={product.id} productName={product.name} />
-                      </CategoryRow>
+                      </div>
                       <h3>
                         <Link to={productPath(product.id)}>{product.name}</Link>
                       </h3>

@@ -28,7 +28,6 @@ describe('localStorage persistence (src/store/persist.js)', () => {
         hackhq_organizer: JSON.stringify(true),
         hackhq_cart: JSON.stringify([{ productId: 'p1', quantity: 2 }]),
         hackhq_schedule_saved: JSON.stringify(['s1']),
-        hackhq_wishlist: JSON.stringify(['swag-tee']),
       })
     );
     const state = makeStore(loadPersistedState()).getState();
@@ -36,7 +35,6 @@ describe('localStorage persistence (src/store/persist.js)', () => {
     expect(state.auth.isOrganizer).toBe(true);
     expect(state.cart.items).toEqual([{ productId: 'p1', quantity: 2 }]);
     expect(state.schedule.savedIds).toEqual(['s1']);
-    expect(state.wishlist.ids).toEqual(['swag-tee']);
   });
 
   it('falls back to defaults on corrupt or wrong-shaped data', () => {
@@ -62,22 +60,5 @@ describe('localStorage persistence (src/store/persist.js)', () => {
     expect(['dark', 'light']).toContain(JSON.parse(storage.data.hackhq_theme));
     store.dispatch(markSeen());
     expect(typeof JSON.parse(storage.data.hackhq_announcements_seen)).toBe('number');
-  });
-
-  it('persists notifications and badges, but never the undo history or activity feed', () => {
-    const storage = fakeStorage({
-      hackhq_notifications: JSON.stringify([
-        { id: '1', message: 'Hi', type: 'info', createdAt: 1, read: false },
-      ]),
-      hackhq_badges: JSON.stringify({ planner: 123 }),
-    });
-    stubWindow(storage);
-    const store = makeStore(loadPersistedState());
-    expect(store.getState().notifications.items).toHaveLength(1);
-    expect(store.getState().badges.earned).toEqual({ planner: 123 });
-
-    startPersisting(store);
-    store.dispatch(addItem('swag-tee'));
-    expect(Object.keys(storage.data).some((k) => /history|activity/.test(k))).toBe(false);
   });
 });

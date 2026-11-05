@@ -1,6 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { dropToastAction, registerToastAction } from '../toastActions.js';
-import { notificationAdded } from './notificationsSlice.js';
 
 const MAX_TOASTS = 3;
 const AUTO_DISMISS_MS = 4500;
@@ -31,8 +30,6 @@ export const notify =
     const id = Date.now().toString() + Math.random().toString(36).slice(2, 6);
     if (action) registerToastAction(id, action.onClick);
     dispatch(toastAdded({ id, message, type, actionLabel: action?.label ?? null }));
-    // Every toast is also kept in the notifications history (the bell in the header)
-    dispatch(notificationAdded({ id, message, type, createdAt: Date.now() }));
     setTimeout(() => {
       dropToastAction(id);
       dispatch(toastDismissed(id));
