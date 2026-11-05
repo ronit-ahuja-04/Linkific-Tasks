@@ -30,7 +30,7 @@ Days 7 to 10 changed how HackHQ is routed and styled. Day 11 changes where its s
 
 ## 3. Non-goals
 
-- No new product features, no visual changes. Day 10 styling stays.
+- The migration itself adds no features and no visual changes (Day 10 styling stays). The one exception is the wishlist in 4.5, added afterwards.
 - No RTK Query, no `redux-persist`, no extra middleware libraries.
 - No TypeScript.
 - `src/lib/` pure logic is reused as it is. Reducers call it.
@@ -45,11 +45,11 @@ Days 7 to 10 changed how HackHQ is routed and styled. Day 11 changes where its s
 | User authentication state | `auth` slice (organizer login and logout, protects `/organizer`) |
 | Shopping cart with Redux | `cart` slice, swag station and product page |
 | Fetch data and store in Redux | `users` slice with `fetchUsers` and `fetchUserPosts` thunks |
-| Multiple slices working together | 10 slices combined with `combineReducers` |
+| Multiple slices working together | 11 slices combined with `combineReducers` |
 
 ### 4.2 Slices
 
-`theme`, `auth`, `cart`, `tasks`, `announcements`, `schedule`, `laps`, `toasts`, `ui`, `users`. Each lives in `src/store/slices/` with its actions and selectors. State shape and persisted keys are in the README.
+`theme`, `auth`, `cart`, `tasks`, `announcements`, `schedule`, `laps`, `toasts`, `ui`, `users`, `wishlist`. Each lives in `src/store/slices/` with its actions and selectors. State shape and persisted keys are in the README.
 
 ### 4.3 What stays local
 
@@ -66,12 +66,26 @@ Search text, filter tabs, coupon input, edit-in-place text, modal open flags and
 | Abort stale requests with the thunk `signal` | Same guarantee `useFetch` gave through `AbortController` |
 | `src/hooks/useFetch.js` kept in the repo | It is still a valid reference for the Day 6 pattern |
 
+### 4.5 New feature: swag wishlist
+
+One small feature added on top of the migration, to show a new slice joining the existing ones.
+
+| Part | Behaviour |
+| ---- | --------- |
+| Heart button | On each swag card and the product page. Toggles the product in the wishlist and shows a toast |
+| `/wishlist` page | Saved products with total price, remove, move to cart, move all to cart, clear, and an empty state |
+| Nav badge | Saved count next to "Wishlist" in the sidebar and drawer |
+| Cart rules | Moving to the cart respects the 10-per-item limit; an item that cannot be added stays saved and the user is told |
+| Persistence | `hackhq_wishlist` in localStorage |
+
+Design notes: the slice stores only product ids and resolves products from the catalog with a memoized selector, so a stale id is ignored. `moveToCart` is a thunk that coordinates the wishlist, cart and toast slices in one place.
+
 ## 5. Requirements
 
 | ID | Requirement | Verified by |
 | -- | ----------- | ----------- |
 | R1 | `@reduxjs/toolkit` and `react-redux` installed, `Provider` wraps the app | `package.json`, `main.jsx` |
-| R2 | At least 3 slices created with `createSlice` | `src/store/slices/` (10) |
+| R2 | At least 3 slices created with `createSlice` | `src/store/slices/` (11) |
 | R3 | `useSelector` and `useDispatch` used in components | checklist, swag, directory, toasts, announcements, schedule, clock |
 | R4 | An async thunk for an API call with loading, success and error states | `usersSlice.js`, unit tests |
 | R5 | Redux DevTools configured | `configureStore` options, README section 7 |
@@ -79,18 +93,20 @@ Search text, filter tabs, coupon input, edit-in-place text, modal open flags and
 | R7 | All earlier behaviour unchanged | 134 earlier tests, server render of every route |
 | R8 | New store logic has unit tests | `test/store.test.js`, `test/persist.test.js` |
 | R9 | README explains Redux concepts | `hackhq-redux/README.md` |
+| R10 | Wishlist: heart toggle, `/wishlist` page, move to cart respecting the cart limit, nav badge, persistence | `test/wishlist.test.js`, `test/persist.test.js`, render check |
 
 ## 6. Milestones
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
 | M1 | Store, slices, async thunks, persistence, component migration, tests, README | `day11/redux-toolkit` | #52 |
+| M2 | Feature: swag wishlist | `day11/wishlist` | #54 (this change) |
 
 ## 7. Verification
 
-- `npm run build`, `npx eslint .` (0 errors) and `npm test` (156 passing: 134 earlier plus 22 for the store and persistence).
-- Server-side render of 19 routes against the real store without errors. This caught a leftover `laps` reference in `App.jsx`, which was fixed.
-- **Not done:** a manual browser pass with the Redux DevTools extension (inspect, diff, time travel, replay), and clicking through the flows (add to cart, complete tasks, organizer login, directory search, undo toast, reload persistence).
+- `npm run build`, `npx eslint .` (0 errors) and `npm test` (168 passing: 134 earlier plus 34 for the store, persistence and wishlist).
+- Server-side render of every route against the real store without errors, plus `/wishlist` rendered empty and with saved items, and the hearts on `/swag` and the product page. This caught a leftover `laps` reference in `App.jsx`, which was fixed.
+- **Not done:** a manual browser pass with the Redux DevTools extension (inspect, diff, time travel, replay), and clicking through the flows (wishlist heart and move to cart, add to cart, complete tasks, organizer login, directory search, undo toast, reload persistence).
 
 ## 8. Risks
 
@@ -105,7 +121,7 @@ Search text, filter tabs, coupon input, edit-in-place text, modal open flags and
 ## 9. Deliverables
 
 - React app with Redux Toolkit (`Day-11/hackhq-redux`)
-- 10 Redux slices
+- 11 Redux slices
 - `useSelector` and `useDispatch` examples across the app
 - Async thunk for an API call
 - Redux DevTools configured

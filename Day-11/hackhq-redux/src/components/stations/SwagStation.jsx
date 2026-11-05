@@ -30,6 +30,7 @@ import {
 import { animateRise, animateSettle, animateFade } from '../../styles/animations.js';
 import ContentModal from '../ContentModal.jsx';
 import StateXray from '../StateXray.jsx';
+import WishlistButton from '../WishlistButton.jsx';
 import { SWAG_PRODUCTS } from '../../data/products.js';
 import { productPath } from '../../lib/routes.js';
 import {
@@ -160,6 +161,12 @@ const Price = styled.div`
   font-family: ${({ theme }) => theme.fonts.mono};
   font-size: 1.25rem;
   font-weight: 700;
+`;
+const CategoryRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
 `;
 const ProductFooter = styled.div`
   display: flex;
@@ -470,9 +477,10 @@ export default function SwagStation() {
                 <li key={product.id}>
                   <ProductCard>
                     <ProductBody>
-                      <div>
+                      <CategoryRow>
                         <Badge $tone="accent">{product.category}</Badge>
-                      </div>
+                        <WishlistButton productId={product.id} productName={product.name} />
+                      </CategoryRow>
                       <h3>
                         <Link to={productPath(product.id)}>{product.name}</Link>
                       </h3>

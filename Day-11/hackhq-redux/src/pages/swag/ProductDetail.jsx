@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { Badge, Button, Card, Mono, Stack } from '../../components/ui.jsx';
 import { animateRise, animateFloat } from '../../styles/animations.js';
 import { findProduct, getAdjacentProducts, productPath } from '../../lib/routes.js';
+import WishlistButton from '../../components/WishlistButton.jsx';
 import { addItem, makeSelectQuantity, selectCartCount } from '../../store/slices/cartSlice.js';
 import { notify } from '../../store/slices/toastsSlice.js';
 import { formatCurrencyINR, MAX_QUANTITY_PER_ITEM } from '../../lib/cart.js';
@@ -357,6 +358,7 @@ export default function ProductDetail() {
           <strong>{product.name}</strong>
           <span>{formatCurrencyINR(product.price)}</span>
         </BarInfo>
+        <WishlistButton productId={product.id} productName={product.name} />
         <Button as={Link} $variant="secondary" to="/swag" aria-label={`Cart: ${totalItems} items`}>
           <ShoppingBag size={16} aria-hidden="true" />
           <Mono>{totalItems}</Mono>
