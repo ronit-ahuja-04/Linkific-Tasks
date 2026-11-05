@@ -21,6 +21,12 @@ const logError = (label) => (err) => console.error(`${label} listener error`, er
 
 /** Keep state.auth in sync with Firebase Auth and save the user's profile for invitations */
 export function startAuthListener({ dispatch }) {
+  if (!isFirebaseConfigured) {
+    // No keys: nobody can be signed in, so report "signed out" and show the sign-in page
+    console.warn('Firebase is not configured. Copy .env.example to .env and add your keys.');
+    dispatch(authStateChanged(null));
+    return () => {};
+  }
   return onAuthStateChanged(auth, async (firebaseUser) => {
     dispatch(authStateChanged(firebaseUser));
     if (firebaseUser && isFirebaseConfigured) {
