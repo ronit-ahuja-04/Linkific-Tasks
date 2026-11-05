@@ -17,6 +17,7 @@ import {
 import styled, { css } from 'styled-components';
 import StateXray from '../StateXray.jsx';
 import PageHeader from '../layout/PageHeader.jsx';
+import UndoRedoButtons from '../UndoRedoButtons.jsx';
 import { Button, Card, Eyebrow, Board, Input, ErrorText, Stack } from '../ui.jsx';
 import { animateRise, animatePop } from '../../styles/animations.js';
 import { calculateProgress } from '../../lib/checklist.js';
@@ -445,6 +446,7 @@ export default function ChecklistStation() {
   return (
     <Page>
       <PageHeader breadcrumb="Checklist" title="Checklist" pill="Live">
+        <UndoRedoButtons slice="tasks" label="checklist" />{' '}
         <Button
           $variant="secondary"
           $size="sm"

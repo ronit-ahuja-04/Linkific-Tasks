@@ -3,6 +3,7 @@ import styled, { css } from 'styled-components';
 import { transparentize } from 'polished';
 import { Zap, Activity, Moon, Sun, Search, LogIn, LogOut, Menu } from 'lucide-react';
 import { Button, Kbd } from './ui.jsx';
+import NotificationBell from './NotificationBell.jsx';
 
 const Bar = styled.header`
   position: sticky;
@@ -223,6 +224,8 @@ export default function Header({
           <span>State X-ray</span>
           <Dot aria-hidden="true" $color="currentColor" $dim={!xrayOn} />
         </XrayBtn>
+
+        <NotificationBell />
 
         <SquareBtn
           $variant="secondary"
