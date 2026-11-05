@@ -113,7 +113,7 @@ Design notes: history lives in `state.history` so slices and selectors stay unch
 | -- | --------- | ------ | -- |
 | M1 | Store, slices, async thunks, persistence, component migration, tests, README | `day11/redux-toolkit` | #52 |
 | M2 | Feature: swag wishlist | `day11/wishlist` | #54 |
-| M3 | Features: notifications centre, undo/redo, badges and activity feed | `day11/notifications-undo-badges` | to be filled when merged |
+| M3 | Features: notifications centre, undo/redo, badges and activity feed | `day11/notifications-undo-badges` | #55 |
 
 ## 7. Verification
 
