@@ -11,7 +11,7 @@
 cd Day-11/hackhq-redux
 npm install
 npm run dev     # http://localhost:5173
-npm test        # 168 unit tests, 34 of them for the store, persistence and wishlist
+npm test        # 156 unit tests, 22 of them for the store
 npm run build
 ```
 Install the **Redux DevTools** browser extension, open the app, then open the "Redux" tab in DevTools. See section 7.
@@ -20,7 +20,7 @@ Install the **Redux DevTools** browser extension, open the app, then open the "R
 
 | Before (Day 10) | After (Day 11) |
 | --- | --- |
-| `useState` and `useLocalStorage` in `App.jsx`, passed down as props | 11 Redux Toolkit slices in `src/store/slices/` |
+| `useState` and `useLocalStorage` in `App.jsx`, passed down as props | 10 Redux Toolkit slices in `src/store/slices/` |
 | `cart`/`setCart`, `laps`/`onAddLap`, `savedIds`/`onToggleSaved` props | `useSelector` and `useDispatch` inside the components that need them |
 | `useFetch` hook for the directory and posts | `createAsyncThunk` with `pending`, `fulfilled`, `rejected` handling |
 | Toasts array in `App.jsx` with `setTimeout` | `toasts` slice plus a `notify` thunk |
@@ -83,7 +83,6 @@ Redux Toolkit uses Immer, so reducers can be written as `state.items.push(x)` an
 | `toasts` | `{ items }` | `toastAdded`, `toastDismissed`, thunk `notify` | not persisted |
 | `ui` | `{ xrayOn }` | `toggleXray` | not persisted |
 | `users` | `{ list, posts }` | thunks `fetchUsers`, `fetchUserPosts` | not persisted |
-| `wishlist` | `{ ids }` | `wishlistToggled`, `wishlistRemoved`, `wishlistCleared`, thunks `moveToCart`, `moveAllToCart` | `hackhq_wishlist` |
 
 ## 5. Connecting Redux to React
 
@@ -114,20 +113,6 @@ The Directory dispatches the thunk when the debounced search changes and aborts 
 
 One more pattern: toasts need an "Undo" button, but functions must not be stored in Redux. The store keeps only the label, and the click handler lives in `src/store/toastActions.js` keyed by toast id.
 
-## 6b. New feature: swag wishlist
-
-Added after the core migration to show a new slice joining the others.
-- **Heart button** on every product card in the swag shop and on the product page (`WishlistButton.jsx`, `aria-pressed`). A toast confirms each save or removal.
-- **`/wishlist` page** with the saved products, their total price, remove, **Move to cart**, **Move all to cart** and **Clear**. Items already at the 10-per-item cart limit stay saved and the button explains why.
-- **Nav badge** with the saved count, read from the store in `AppLayout`.
-- **Persistence** under `hackhq_wishlist`, like the other slices.
-- **Where the Redux ideas show up:**
-  - a new slice (`wishlistSlice.js`) whose pure logic lives in `src/lib/wishlist.js`
-  - memoized selectors for derived data (`selectWishlistProducts`, `selectWishlistTotal`)
-  - a selector factory so only one heart re-renders when its product changes
-  - thunks that coordinate two slices: `moveToCart` reads the cart with `getState`, dispatches `addItem`, then `wishlistRemoved` and a toast, and keeps the item saved when the cart refuses it
-- **Tests:** `test/wishlist.test.js`, 12 tests for the pure logic, the slice and both thunks.
-
 ## 7. Redux DevTools
 
 Configured in `src/store/index.js` (`devTools` is on in development, named "HackHQ", with action traces).
@@ -142,4 +127,4 @@ Configured in `src/store/index.js` (`devTools` is on in development, named "Hack
 
 ## 8. Tests
 
-`test/store.test.js` (19), `test/persist.test.js` (3) and `test/wishlist.test.js` (12) cover: every slice's reducers, the memoized selectors, the toast `notify` thunk (auto-dismiss, 3-toast cap, no functions in the store) and the async thunks with a mocked `fetch` (loading, success, failure, abort). A fresh store per test comes from `makeStore()`. Persistence tests check that old localStorage keys load into the store and changes are written back. The 134 earlier tests still pass (168 total).
+`test/store.test.js` (19 tests) and `test/persist.test.js` (3 tests) cover: every slice's reducers, the memoized selectors, the toast `notify` thunk (auto-dismiss, 3-toast cap, no functions in the store) and the async thunks with a mocked `fetch` (loading, success, failure, abort). A fresh store per test comes from `makeStore()`. Persistence tests check that old localStorage keys load into the store and changes are written back. The 134 earlier tests still pass (156 total).

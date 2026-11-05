@@ -12,7 +12,6 @@ import {
   Handshake,
   Megaphone,
   CalendarDays,
-  Heart,
 } from 'lucide-react';
 
 /**
@@ -91,14 +90,6 @@ export const STATIONS = [
     icon: ShoppingBag,
     badge: 'Cart',
     description: 'Pop-up merch store with coupons and a thermal receipt.',
-  },
-  {
-    id: 'wishlist',
-    path: '/wishlist',
-    name: 'Wishlist',
-    icon: Heart,
-    badge: 'Saved',
-    description: 'Save swag for later, then move it to the cart in one click.',
   },
   {
     id: 'organizer',

@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { selectWishlistCount } from '../../store/slices/wishlistSlice.js';
 import Header from '../Header.jsx';
 import styled from 'styled-components';
 import { Sidebar, NavDrawer } from '../Navigation.jsx';
@@ -92,9 +90,7 @@ export default function AppLayout({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // REDUX: the nav badge reads the wishlist count straight from the store
-  const wishlistCount = useSelector(selectWishlistCount);
-  const badges = { announcements: unreadAnnouncements, wishlist: wishlistCount };
+  const badges = { announcements: unreadAnnouncements };
 
   return (
     <Page>

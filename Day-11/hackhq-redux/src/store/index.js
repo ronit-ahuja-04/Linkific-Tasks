@@ -9,7 +9,6 @@ import laps from './slices/lapsSlice.js';
 import toasts from './slices/toastsSlice.js';
 import ui from './slices/uiSlice.js';
 import users from './slices/usersSlice.js';
-import wishlist from './slices/wishlistSlice.js';
 import { loadPersistedState, startPersisting } from './persist.js';
 
 // combineReducers: each key becomes one branch of the state tree, e.g. state.cart.items
@@ -24,7 +23,6 @@ export const rootReducer = combineReducers({
   toasts,
   ui,
   users,
-  wishlist,
 });
 
 /** Factory so tests can build a fresh store; the app uses the `store` singleton below */

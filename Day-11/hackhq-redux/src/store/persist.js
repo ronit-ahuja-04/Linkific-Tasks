@@ -7,7 +7,6 @@ const MAP = [
   ['cart', 'hackhq_cart', (s) => s.items, (v) => ({ items: v })],
   ['tasks', 'hackhq_tasks', (s) => s.items, (v) => ({ items: v })],
   ['laps', 'hackhq_laps', (s) => s.items, (v) => ({ items: v })],
-  ['wishlist', 'hackhq_wishlist', (s) => s.ids, (v) => ({ ids: v })],
   ['schedule', 'hackhq_schedule_saved', (s) => s.savedIds, (v) => ({ savedIds: v })],
 ];
 const ANNOUNCEMENTS_KEY = 'hackhq_announcements';
@@ -31,8 +30,7 @@ const write = (key, value) => {
 
 const isValid = (slice, value) => {
   if (value === undefined || value === null) return false;
-  if (['cart', 'tasks', 'laps', 'schedule', 'wishlist'].includes(slice))
-    return Array.isArray(value);
+  if (['cart', 'tasks', 'laps', 'schedule'].includes(slice)) return Array.isArray(value);
   return true;
 };
 
