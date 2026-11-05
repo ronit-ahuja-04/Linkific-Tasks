@@ -16,7 +16,7 @@
 
 Day 11 teaches Redux and Redux Toolkit. The deliverable is my own project, **FlowLane** (a Kanban project manager on React and Firebase), moved onto a Redux store. Its state lived in one 1,287-line `Dashboard` component with 22 `useState` calls and nine Firestore listeners. The Redux version moves that state into 8 slices and all Firestore reads and writes into listeners and thunks. The UI and CSS are unchanged.
 
-Related earlier work in the same folder: `Day-11/redux-app` (Redux Market, a small shop with todos, login and a cart that covers the items FlowLane has no equivalent for) and `Day-11/hackhq-redux` (a first pass on HackHQ).
+Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop with todos, login and a cart that covers the item FlowLane has no equivalent for).
 
 ## 2. Goals
 
