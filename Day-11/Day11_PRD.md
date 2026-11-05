@@ -7,7 +7,7 @@
 | Date      | Thursday, 5 November 2026                                 |
 | Repo path | `Linkific-Tasks/Day-11/hackhq-redux`                      |
 | Builds on | Day 10 `hackhq-styled`                                    |
-| Status    | **Shipped.** See PR list in section 6.                    |
+| Status    | **Shipped.** Merged via PR #52.                    |
 | Companion | `hackhq-redux/README.md`                                  |
 
 ---
@@ -84,7 +84,7 @@ Search text, filter tabs, coupon input, edit-in-place text, modal open flags and
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
-| M1 | Store, slices, async thunks, persistence, component migration, tests, README | `day11/redux-toolkit` | to be filled when merged |
+| M1 | Store, slices, async thunks, persistence, component migration, tests, README | `day11/redux-toolkit` | #52 |
 
 ## 7. Verification
 
