@@ -7,7 +7,7 @@
 | Date      | Thursday, 5 November 2026                                        |
 | Repo path | `Linkific-Tasks/Day-11/flowlane-redux`                           |
 | Builds on | FlowLane (GitLab `ahuja.ronit.0510/flowlane`, live at flow-lane.vercel.app), copied, original untouched |
-| Status    | **Built.** Merged via PR #59.                                    |
+| Status    | **Built.** Merged via PRs #59, #61, #62 and #63.                                    |
 | Companion | `flowlane-redux/README.md`                                       |
 
 ---
@@ -78,6 +78,9 @@ Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
 | M1 | FlowLane moved to Redux: store, slices, listeners, thunks, component refactor, tests, README | `day11/flowlane-redux` | #59 |
+| M2 | Runs without Firebase keys instead of crashing | `day11/flowlane-no-keys` | #61 |
+| M3 | Firestore security rules (the old test-mode rules had expired) with emulator tests, deployed | `day11/flowlane-firestore-rules` | #62 |
+| M4 | End-to-end and accessibility test suite, and the defects it found | `day11/flowlane-e2e` | #63 |
 
 ## 7. Verification
 
