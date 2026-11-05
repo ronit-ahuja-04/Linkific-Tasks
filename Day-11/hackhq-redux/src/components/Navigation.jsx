@@ -97,7 +97,10 @@ function NavList({ onNavigate, badges = {} }) {
                   {badges[station.id] > 0 && (
                     <Unread $tone="accent">
                       {badges[station.id]}
-                      <VisuallyHidden> unread</VisuallyHidden>
+                      <VisuallyHidden>
+                        {' '}
+                        {station.id === 'announcements' ? 'unread' : 'saved'}
+                      </VisuallyHidden>
                     </Unread>
                   )}
                 </>
