@@ -1,21 +1,22 @@
-# PRD: Redux Market, Redux Toolkit fundamentals (Day 11)
+# PRD: FlowLane + Redux Toolkit (Day 11)
 
-| Field     | Value                                                 |
-| --------- | ----------------------------------------------------- |
-| Owner     | Ronit Ahuja                                           |
-| Programme | Linkific internship, Month 1 (training phase), Day 11 |
-| Date      | Thursday, 5 November 2026                             |
-| Repo path | `Linkific-Tasks/Day-11/redux-app`                     |
-| Status    | **Built.** Merged via PR #58.  |
-| Companion | `redux-app/README.md`                                 |
+| Field     | Value                                                            |
+| --------- | ---------------------------------------------------------------- |
+| Owner     | Ronit Ahuja                                                      |
+| Programme | Linkific internship, Month 1 (training phase), Day 11           |
+| Date      | Thursday, 5 November 2026                                        |
+| Repo path | `Linkific-Tasks/Day-11/flowlane-redux`                           |
+| Builds on | FlowLane (GitLab `ahuja.ronit.0510/flowlane`, live at flow-lane.vercel.app), copied, original untouched |
+| Status    | **Built.** Merged via PR #59.                                    |
+| Companion | `flowlane-redux/README.md`                                       |
 
 ---
 
 ## 1. Summary
 
-Day 11 teaches Redux and Redux Toolkit. This day builds a small new app, **Redux Market**, instead of extending HackHQ: a shop with a cart, a todo list and a login, whose state lives in a Redux store. It covers each item in the Day 11 "Build Redux application" task and every deliverable.
+Day 11 teaches Redux and Redux Toolkit. The deliverable is my own project, **FlowLane** (a Kanban project manager on React and Firebase), moved onto a Redux store. Its state lived in one 1,287-line `Dashboard` component with 22 `useState` calls and nine Firestore listeners. The Redux version moves that state into 8 slices and all Firestore reads and writes into listeners and thunks. The UI and CSS are unchanged.
 
-Related earlier work: `Day-11/hackhq-redux` is a first pass that moved HackHQ's state into Redux. It stays in the repo and is not the Day 11 deliverable.
+Related earlier work in the same folder: `Day-11/redux-app` (Redux Market, a small shop with todos, login and a cart that covers the items FlowLane has no equivalent for) and `Day-11/hackhq-redux` (a first pass on HackHQ).
 
 ## 2. Goals
 
@@ -26,93 +27,80 @@ Related earlier work: `Day-11/hackhq-redux` is a first pass that moved HackHQ's 
 | G3 | Set up Redux Toolkit: `configureStore`, `createSlice`, `createAsyncThunk`, `Provider` |
 | G4 | Build at least 3 slices that work together |
 | G5 | Connect components with `useSelector` and `useDispatch` |
-| G6 | Handle API calls with async thunks, including pending, fulfilled and rejected states and error handling |
+| G6 | Handle async work with thunks: loading, error handling, optimistic updates |
 | G7 | Configure and use Redux DevTools |
 
-## 3. Non-goals
+## 3. Scope
 
-- No styling library, no TypeScript, no RTK Query, no `redux-persist`.
-- No real backend: data comes from the free DummyJSON API.
-- No features beyond the Day 11 list.
+**In scope (Core).** Auth, theme, projects, board (the todo part, with drag and drop), users, invitations, notifications and toasts, and UI state (modals, task panel, tabs).
+
+**Out of scope.** Chat, Messages and Google Calendar sync stay as they are, reading Firebase directly. No new product features, no visual changes, no TypeScript, no RTK Query. A shopping cart does not exist in FlowLane, so it is covered by Redux Market.
 
 ## 4. Design
 
-### 4.1 Mapping the task list to the app
+### 4.1 Mapping the Day 11 build list
 
-| Day 11 task | Implementation |
-| ----------- | -------------- |
-| Todo app with Redux state | `/todos`: add, toggle, edit, delete, filter (all, active, done), clear completed. Slice `todos` |
-| User authentication state | `/login` uses a `loginUser` thunk against DummyJSON `/auth/login`; `/todos` is a protected route; header shows the user. Slice `auth` |
-| Shopping cart with Redux | `/shop` adds products, `/cart` changes quantity (max 10), removes, clears, shows a memoized total. Slice `cart` |
-| Fetch data and store in Redux | `fetchProducts` (list and search) in slice `products`; `importTodos` in slice `todos` |
-| Multiple slices working together | `auth`, `todos`, `products`, `cart` combined; the cart page and header read more than one slice |
-| Handle async operations | Three thunks with loading, success and error states; aborting stale requests |
-| Redux DevTools | Enabled outside production, named "Redux Market"; README has the steps |
+| Day 11 task | FlowLane implementation |
+| ----------- | ----------------------- |
+| Todo app with Redux state | Kanban board in the `board` slice, with pure logic in `lib/board.js` |
+| User authentication state | `auth` slice wrapping Firebase Auth (email, Google, sign-out), plain user fields only |
+| Shopping cart with Redux | Not applicable here; see `Day-11/redux-app` |
+| Fetch data and store in Redux | Firestore listeners dispatching into slices; thunks for theme, invites, project creation |
+| Multiple slices working together | 8 slices; the Dashboard reads 7 of them; `ui` reacts to `board` actions |
 
-### 4.2 State shape
-
-```
-{
-  auth:     { user, token, status, error },
-  todos:    { items, filter, importStatus, importError },
-  products: { items, total, status, error },
-  cart:     { items: [{ id, title, price, thumbnail, quantity }] }
-}
-```
-
-### 4.3 Decisions
+### 4.2 Decisions
 
 | Decision | Reason |
 | -------- | ------ |
-| Form fields, search text and edit drafts stay in `useState` | Only one component needs them |
-| Cart stores a small snapshot of each product | Keeps state small and serializable |
-| `prepare` callbacks for ids and timestamps | Reducers stay pure |
-| `rejectWithValue` for login errors | Shows the server's message, not a generic one |
-| Statuses are not persisted | Loading and error state should start fresh |
-| Per-card selector factory in the shop | Adding one product does not re-render the other cards |
-| Plain CSS in one file | Day 11 is about Redux, not styling |
+| Firestore reads go through listeners that dispatch actions; writes go through thunks | Components stop depending on Firebase, and the store can be tested with Firebase mocked |
+| Optimistic updates with rollback keyed by `requestId` | Drag and drop stays instant, and a failed write cannot leave the board wrong |
+| `condition` on thunks | Skip no-op drags and run the first-project creation once |
+| Only plain fields of the Firebase user in the store; Timestamps become numbers | Redux state must be serializable |
+| Form fields stay in local state | Only one component needs them |
+| Kept the component props and markup | Chat, Messages, Calendar and the UI keep working unchanged |
 
 ## 5. Requirements
 
 | ID | Requirement | Verified by |
 | -- | ----------- | ----------- |
 | R1 | `@reduxjs/toolkit` and `react-redux` installed; `Provider` wraps the app | `package.json`, `main.jsx` |
-| R2 | At least 3 slices created with `createSlice` | 4 slices in `src/store/slices/` |
-| R3 | `useSelector` and `useDispatch` used in components | Layout, Todos, Shop, Cart, Login, ProtectedRoute |
-| R4 | Async thunk for an API call with pending, fulfilled and rejected handling | `fetchProducts`, `loginUser`, `importTodos`; unit tests |
-| R5 | Redux DevTools configured | `configureStore` option; README section 7 |
-| R6 | Global state shared across routes and kept across reloads | persistence tests |
-| R7 | Todo, auth, cart and fetch features all work | tests, live API check, render of every route |
-| R8 | README explains Redux concepts | `redux-app/README.md` |
+| R2 | At least 3 slices | 8 slices in `src/store/slices/` |
+| R3 | `useSelector` and `useDispatch` in components | Dashboard, App, Auth, TaskPanel |
+| R4 | Async thunks with loading, success and error handling | auth, projects, invitations, board thunks; unit tests |
+| R5 | Optimistic update with rollback | `dragTask`, `createTask`, `deleteTask`, `saveTask`; tests |
+| R6 | No component imports Firestore for in-scope state | grep: Firebase only in `src/store/`, `lib/` and the 3 out-of-scope components |
+| R7 | Redux DevTools configured | `store/index.js`; README section 8 |
+| R8 | Behaviour and UI unchanged | same markup and props; render check of Dashboard, Auth and notifications |
+| R9 | README explains Redux concepts | `flowlane-redux/README.md` |
 
 ## 6. Milestones
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
-| M1 | Redux Market: store, 4 slices, thunks, UI, persistence, tests, README | `day11/redux-app` | #58 |
+| M1 | FlowLane moved to Redux: store, slices, listeners, thunks, component refactor, tests, README | `day11/flowlane-redux` | #59 |
 
 ## 7. Verification
 
-- `npm run build` passes; `npm test` runs 33 tests (reducers, selectors, thunks with a mocked `fetch`, persistence, slices working together).
-- One-off live check against DummyJSON: good and bad login, product list and search, todo import. All matched what the code expects.
-- Every route rendered on the server, logged out and logged in, against a real store. This confirmed the content (products, cart totals, todo list, header pills).
-- **Not done:** a manual browser pass (clicking, typing, DevTools extension: inspect, diff, time travel, replay) and a reload to confirm login and cart persist.
+- `npm run build` passes, `oxlint` reports no errors, and `npm test` runs 76 tests with Firebase mocked: pure board logic, every slice and thunk (including rollback and overlapping requests), the Firestore listeners and serialization.
+- Render check against a loaded store (dummy Firebase config, no network): the Dashboard board with columns and tasks, the new-project and error modals, invite card, notifications view, unread badge, task panel, profile view and the sign-in page.
+- **Not done:** signing in against the real Firebase project and clicking through it. Needs the `.env` keys and is the one thing I could not do.
 
 ## 8. Risks
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| DummyJSON is down or changes | Errors shown in the UI with a retry; tests use a mocked `fetch` |
-| Putting too much in Redux | Written rule in the README on what stays local |
-| Stale search results overwrite newer ones | Abort the previous request in the effect cleanup |
-| Token in localStorage | Acceptable for a demo; real apps should prefer httpOnly cookies |
+| Not verified against real Firestore | Mocked tests plus a render check; a manual pass is listed in the README |
+| Listener leaks or double subscriptions | Each listener returns an unsubscribe; hooks start and stop them; tests check cleanup |
+| Rollback restoring the wrong state | One snapshot per request id; overlapping-failure test |
+| Non-serializable data in the store | Plain-user conversion and `toPlain`; tests |
+| Chat and Messages still talk to Firebase directly | Documented limit; out of scope for Day 11 |
 
 ## 9. Deliverables
 
-- React app with Redux Toolkit (`Day-11/redux-app`)
-- 4 Redux slices (auth, todos, products, cart)
+- React app with Redux Toolkit (`Day-11/flowlane-redux`)
+- 8 Redux slices
 - `useSelector` and `useDispatch` examples across the app
-- Async thunks for API calls (login, products, todo import)
+- Async thunks for Firebase writes and reads, including optimistic updates with rollback
 - Redux DevTools configured
-- Global state management working across routes, with persistence
+- Global state management working across the Dashboard, task panel, notifications and invitations
 - README explaining Redux concepts
