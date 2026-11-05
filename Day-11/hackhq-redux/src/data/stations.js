@@ -13,6 +13,7 @@ import {
   Megaphone,
   CalendarDays,
   Heart,
+  Trophy,
 } from 'lucide-react';
 
 /**
@@ -99,6 +100,15 @@ export const STATIONS = [
     icon: Heart,
     badge: 'Saved',
     description: 'Save swag for later, then move it to the cart in one click.',
+  },
+  {
+    id: 'activity',
+    path: '/activity',
+    name: 'Activity',
+    icon: Trophy,
+    badge: 'Badges',
+    description:
+      'Badges awarded by listener middleware and a live feed of every dispatched action.',
   },
   {
     id: 'organizer',
