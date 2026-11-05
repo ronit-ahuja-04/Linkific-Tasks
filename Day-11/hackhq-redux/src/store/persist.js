@@ -7,8 +7,6 @@ const MAP = [
   ['cart', 'hackhq_cart', (s) => s.items, (v) => ({ items: v })],
   ['tasks', 'hackhq_tasks', (s) => s.items, (v) => ({ items: v })],
   ['laps', 'hackhq_laps', (s) => s.items, (v) => ({ items: v })],
-  ['notifications', 'hackhq_notifications', (s) => s.items, (v) => ({ items: v })],
-  ['badges', 'hackhq_badges', (s) => s.earned, (v) => ({ earned: v })],
   ['wishlist', 'hackhq_wishlist', (s) => s.ids, (v) => ({ ids: v })],
   ['schedule', 'hackhq_schedule_saved', (s) => s.savedIds, (v) => ({ savedIds: v })],
 ];

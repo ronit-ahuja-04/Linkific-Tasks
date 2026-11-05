@@ -31,7 +31,6 @@ import { animateRise, animateSettle, animateFade } from '../../styles/animations
 import ContentModal from '../ContentModal.jsx';
 import StateXray from '../StateXray.jsx';
 import WishlistButton from '../WishlistButton.jsx';
-import UndoRedoButtons from '../UndoRedoButtons.jsx';
 import { SWAG_PRODUCTS } from '../../data/products.js';
 import { productPath } from '../../lib/routes.js';
 import {
@@ -447,15 +446,12 @@ export default function SwagStation() {
             </Badge>
           </TitleRow>
           {/* Item count in header (SW-9) */}
-          <Stack $dir="row" $gap={2} $wrap $align="center">
-            <UndoRedoButtons slice="cart" label="cart" />
-            <CartPill aria-label={`Cart contains ${totalItems} items`}>
-              <ShoppingBag size={16} aria-hidden="true" />
-              <span>
-                Cart: <Mono as="strong">{totalItems}</Mono> items
-              </span>
-            </CartPill>
-          </Stack>
+          <CartPill aria-label={`Cart contains ${totalItems} items`}>
+            <ShoppingBag size={16} aria-hidden="true" />
+            <span>
+              Cart: <Mono as="strong">{totalItems}</Mono> items
+            </span>
+          </CartPill>
         </HeaderRow>
       </Header>
 

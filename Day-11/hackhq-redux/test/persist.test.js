@@ -63,21 +63,4 @@ describe('localStorage persistence (src/store/persist.js)', () => {
     store.dispatch(markSeen());
     expect(typeof JSON.parse(storage.data.hackhq_announcements_seen)).toBe('number');
   });
-
-  it('persists notifications and badges, but never the undo history or activity feed', () => {
-    const storage = fakeStorage({
-      hackhq_notifications: JSON.stringify([
-        { id: '1', message: 'Hi', type: 'info', createdAt: 1, read: false },
-      ]),
-      hackhq_badges: JSON.stringify({ planner: 123 }),
-    });
-    stubWindow(storage);
-    const store = makeStore(loadPersistedState());
-    expect(store.getState().notifications.items).toHaveLength(1);
-    expect(store.getState().badges.earned).toEqual({ planner: 123 });
-
-    startPersisting(store);
-    store.dispatch(addItem('swag-tee'));
-    expect(Object.keys(storage.data).some((k) => /history|activity/.test(k))).toBe(false);
-  });
 });

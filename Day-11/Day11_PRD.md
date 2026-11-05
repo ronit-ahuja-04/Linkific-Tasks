@@ -45,11 +45,11 @@ Days 7 to 10 changed how HackHQ is routed and styled. Day 11 changes where its s
 | User authentication state | `auth` slice (organizer login and logout, protects `/organizer`) |
 | Shopping cart with Redux | `cart` slice, swag station and product page |
 | Fetch data and store in Redux | `users` slice with `fetchUsers` and `fetchUserPosts` thunks |
-| Multiple slices working together | 14 slices combined with `combineReducers` |
+| Multiple slices working together | 11 slices combined with `combineReducers` |
 
 ### 4.2 Slices
 
-`theme`, `auth`, `cart`, `tasks`, `announcements`, `schedule`, `laps`, `toasts`, `ui`, `users`, `wishlist`, `notifications`, `badges`, `activity`, and a `history` branch for undo/redo. Each lives in `src/store/slices/` with its actions and selectors. State shape and persisted keys are in the README.
+`theme`, `auth`, `cart`, `tasks`, `announcements`, `schedule`, `laps`, `toasts`, `ui`, `users`, `wishlist`. Each lives in `src/store/slices/` with its actions and selectors. State shape and persisted keys are in the README.
 
 ### 4.3 What stays local
 
@@ -80,23 +80,12 @@ One small feature added on top of the migration, to show a new slice joining the
 
 Design notes: the slice stores only product ids and resolves products from the catalog with a memoized selector, so a stale id is ignored. `moveToCart` is a thunk that coordinates the wishlist, cart and toast slices in one place.
 
-### 4.6 Notifications centre, undo/redo, badges and activity feed
-
-| Feature | Behaviour | Redux pattern shown |
-| ------- | --------- | ------------------- |
-| Notifications centre | Header bell keeps a history of every toast with unread count, mark read, clear all | One action feeding two slices from a thunk, memoized selectors |
-| Undo / redo | Buttons on the checklist and the cart; `past` and `future` stacks capped at 50 | Higher-order reducer (`withHistory`) |
-| Badges | 8 badges awarded automatically (e.g. finish all tasks, 5 cart items, save 3 sessions), each awards a toast and a notification | Listener middleware reacting to state |
-| Activity feed | `/activity` page with the badge grid and a live feed of dispatched actions | Custom middleware |
-
-Design notes: history lives in `state.history` so slices and selectors stay unchanged and persistence needs no special case. Badge rules are pure functions of state in `src/lib/badges.js`. Bookkeeping slices are excluded from the activity log so it cannot log itself, and `badgeEarned` is excluded from the badge listener so awarding cannot loop.
-
 ## 5. Requirements
 
 | ID | Requirement | Verified by |
 | -- | ----------- | ----------- |
 | R1 | `@reduxjs/toolkit` and `react-redux` installed, `Provider` wraps the app | `package.json`, `main.jsx` |
-| R2 | At least 3 slices created with `createSlice` | `src/store/slices/` (13 slices plus the history wrapper) |
+| R2 | At least 3 slices created with `createSlice` | `src/store/slices/` (11) |
 | R3 | `useSelector` and `useDispatch` used in components | checklist, swag, directory, toasts, announcements, schedule, clock |
 | R4 | An async thunk for an API call with loading, success and error states | `usersSlice.js`, unit tests |
 | R5 | Redux DevTools configured | `configureStore` options, README section 7 |
@@ -104,7 +93,6 @@ Design notes: history lives in `state.history` so slices and selectors stay unch
 | R7 | All earlier behaviour unchanged | 134 earlier tests, server render of every route |
 | R8 | New store logic has unit tests | `test/store.test.js`, `test/persist.test.js` |
 | R9 | README explains Redux concepts | `hackhq-redux/README.md` |
-| R11 | Notifications centre, undo/redo, badges and activity feed work as described in 4.6 and survive a reload where persisted | `test/history.test.js`, `test/notifications.test.js`, `test/badges.test.js`, `test/persist.test.js`, render check |
 | R10 | Wishlist: heart toggle, `/wishlist` page, move to cart respecting the cart limit, nav badge, persistence | `test/wishlist.test.js`, `test/persist.test.js`, render check |
 
 ## 6. Milestones
@@ -112,14 +100,13 @@ Design notes: history lives in `state.history` so slices and selectors stay unch
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
 | M1 | Store, slices, async thunks, persistence, component migration, tests, README | `day11/redux-toolkit` | #52 |
-| M2 | Feature: swag wishlist | `day11/wishlist` | #54 |
-| M3 | Features: notifications centre, undo/redo, badges and activity feed | `day11/notifications-undo-badges` | to be filled when merged |
+| M2 | Feature: swag wishlist | `day11/wishlist` | #54 (this change) |
 
 ## 7. Verification
 
-- `npm run build`, `npx eslint .` (0 errors) and `npm test` (193 passing: 134 earlier plus 59 for the store, persistence and the features).
-- Server-side render of every route against the real store without errors, plus `/wishlist` rendered empty and with saved items, the hearts on `/swag` and the product page, `/activity`, and the undo/redo buttons and bell on their pages. This caught a leftover `laps` reference in `App.jsx`, which was fixed.
-- **Not done:** a manual browser pass with the Redux DevTools extension (inspect, diff, time travel, replay), and clicking through the flows (wishlist heart and move to cart, notification bell, undo/redo on tasks and cart, earn a badge, add to cart, complete tasks, organizer login, directory search, undo toast, reload persistence).
+- `npm run build`, `npx eslint .` (0 errors) and `npm test` (168 passing: 134 earlier plus 34 for the store, persistence and wishlist).
+- Server-side render of every route against the real store without errors, plus `/wishlist` rendered empty and with saved items, and the hearts on `/swag` and the product page. This caught a leftover `laps` reference in `App.jsx`, which was fixed.
+- **Not done:** a manual browser pass with the Redux DevTools extension (inspect, diff, time travel, replay), and clicking through the flows (wishlist heart and move to cart, add to cart, complete tasks, organizer login, directory search, undo toast, reload persistence).
 
 ## 8. Risks
 
@@ -129,14 +116,12 @@ Design notes: history lives in `state.history` so slices and selectors stay unch
 | Over-using Redux for local UI state | Written rule in the README on what stays local |
 | Non-serializable values in the store | Toast handlers kept in a registry; RTK's serializability check stays on |
 | Race between rapid directory searches | Abort the previous thunk in the effect cleanup; aborted requests are not errors |
-| Undo history wipes state (found: phantom entry on partial saved state) | Guarded in `withHistory` and covered by a test |
-| Listener or logger middleware loops | Excluded action types and a test per rule |
 | Hand-moved persistence loses user data | Same keys and shapes as before; tests load old-format data |
 
 ## 9. Deliverables
 
 - React app with Redux Toolkit (`Day-11/hackhq-redux`)
-- 14 Redux slices (13 plus undo/redo history)
+- 11 Redux slices
 - `useSelector` and `useDispatch` examples across the app
 - Async thunk for an API call
 - Redux DevTools configured

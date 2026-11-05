@@ -31,7 +31,6 @@ import Announcements from './pages/Announcements.jsx';
 import Schedule from './pages/Schedule.jsx';
 import UiKit from './pages/UiKit.jsx';
 import Wishlist from './pages/Wishlist.jsx';
-import Activity from './pages/Activity.jsx';
 import ProtectedRoute from './components/auth/ProtectedRoute.jsx';
 
 export default function App() {
@@ -81,7 +80,6 @@ export default function App() {
           <Route path="checklist" element={<ChecklistStation />} />
           <Route path="teams" element={<TeamsStation {...stationProps} />} />
           <Route path="wishlist" element={<Wishlist />} />
-          <Route path="activity" element={<Activity />} />
           <Route path="swag">
             <Route index element={<SwagStation />} />
             <Route path=":productId" element={<ProductDetail />} />
