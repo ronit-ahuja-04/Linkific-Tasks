@@ -14,10 +14,10 @@ cd Day-11/flowlane-redux
 npm install
 cp .env.example .env    # then fill in your Firebase web app keys
 npm run dev
-npm test                # 76 unit tests, Firebase is mocked, no keys needed
+npm test                # 78 unit tests, Firebase is mocked, no keys needed
 npm run build
 ```
-Without `.env` the app builds and shows the sign-in page, but sign-in is refused with a clear message.
+Without `.env` the app still loads and shows the sign-in page, but sign-in is refused with the message "Firebase keys are required". Vite reads `.env` only at startup, so restart `npm run dev` after creating or editing it. The values are in the Firebase console (Project settings, your web app) and in your Vercel project's environment variables.
 
 ## 1. What changed
 
@@ -28,7 +28,7 @@ Without `.env` the app builds and shows the sign-in page, but sign-in is refused
 | `auth.currentUser` read directly in many places | `useSelector(selectUser)`, plain fields only |
 | Drag and drop: `setData` then `updateDoc`, no rollback | Optimistic `dragTask` thunk with rollback if the write fails |
 | Components import `firebase/firestore` | Only `src/store/` does (plus Chat, Messages and Calendar, see section 9) |
-| No tests | 76 unit tests |
+| No tests | 78 unit tests |
 
 ## 2. The store
 
@@ -144,12 +144,13 @@ Configured in `src/store/index.js` (on outside production, named "FlowLane"). In
 
 ## 9. Tests
 
-76 tests, all with Firebase mocked (`test/mocks/`), so no keys or network are needed:
+78 tests, all with Firebase mocked (`test/mocks/`), so no keys or network are needed:
 - `board.test.js`: the pure drag-and-drop, add, remove and update logic
 - `auth-theme.test.js`: plain-user conversion, sign-in/up/Google/out thunks, missing keys, theme
 - `board-slice.test.js`: optimistic move and rollback, overlapping requests, skipped no-ops, create, delete, save, assign
 - `projects-invites-notifs.test.js`: projects, invitations, notifications, UI slice, serialization helpers
 - `listeners.test.js`: snapshots arriving into the store, first-snapshot toasts, unsubscribe and reset
+- `no-keys.test.js`: the app starts and shows sign-in when no Firebase keys are configured
 
 ## 10. Limits and honest notes
 

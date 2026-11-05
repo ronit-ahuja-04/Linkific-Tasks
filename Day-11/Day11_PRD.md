@@ -81,7 +81,7 @@ Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop 
 
 ## 7. Verification
 
-- `npm run build` passes, `oxlint` reports no errors, and `npm test` runs 76 tests with Firebase mocked: pure board logic, every slice and thunk (including rollback and overlapping requests), the Firestore listeners and serialization.
+- `npm run build` passes, `oxlint` reports no errors, and `npm test` runs 78 tests with Firebase mocked: pure board logic, every slice and thunk (including rollback and overlapping requests), the Firestore listeners and serialization.
 - Render check against a loaded store (dummy Firebase config, no network): the Dashboard board with columns and tasks, the new-project and error modals, invite card, notifications view, unread badge, task panel, profile view and the sign-in page.
 - **Not done:** signing in against the real Firebase project and clicking through it. Needs the `.env` keys and is the one thing I could not do.
 

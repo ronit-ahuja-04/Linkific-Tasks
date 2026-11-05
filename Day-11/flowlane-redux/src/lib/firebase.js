@@ -11,19 +11,19 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// True when real keys are present (see .env.example). getAuth() throws
+// "auth/invalid-api-key" for an empty key, so without keys Firebase is not initialised at all:
+// the app still loads and shows the sign-in page, and sign-in explains that keys are missing.
+export const isFirebaseConfigured =
+  Boolean(firebaseConfig.apiKey) && firebaseConfig.apiKey !== 'YOUR_API_KEY';
 
-// Initialize Firebase services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
+
+// Firebase services (null when not configured; only used after a successful sign-in)
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
 
 // Setup Google Auth Provider
 export const googleProvider = new GoogleAuthProvider();
 // We request calendar scopes so we can sync calendar events when they login with Google
 googleProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-
-// True when real keys are present. Without them the app shows the sign-in screen but every
-// Firebase call is skipped, instead of failing with a network error.
-export const isFirebaseConfigured =
-  Boolean(firebaseConfig.apiKey) && firebaseConfig.apiKey !== 'YOUR_API_KEY';
