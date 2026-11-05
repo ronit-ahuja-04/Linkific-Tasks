@@ -83,13 +83,15 @@ Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop 
 
 - `npm run build` passes, `oxlint` reports no errors, and `npm test` runs 78 tests with Firebase mocked: pure board logic, every slice and thunk (including rollback and overlapping requests), the Firestore listeners and serialization.
 - Render check against a loaded store (dummy Firebase config, no network): the Dashboard board with columns and tasks, the new-project and error modals, invite card, notifications view, unread badge, task panel, profile view and the sign-in page.
-- **Not done:** signing in against the real Firebase project and clicking through it. Needs the `.env` keys and is the one thing I could not do.
+- Firestore security rules (`firestore.rules`) replace the expired test-mode rules; 23 emulator tests (`npm run test:rules`) cover allowed operations and attacks, and fail when a rule is weakened. The rules were deployed to the project and the release matches the repo file; an anonymous request to production gets a 403.
+- **Not done:** signing in against the real Firebase project and clicking through the app, which needs a person with the account.
 
 ## 8. Risks
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Not verified against real Firestore | Mocked tests plus a render check; a manual pass is listed in the README |
+| Not verified by a real sign-in | Mocked tests, emulator rules tests and a render check; a manual pass is listed in the README |
+| Firestore rules too open or too strict | Least-privilege rules with an emulator test per operation the app performs; known self-join trade-off documented |
 | Listener leaks or double subscriptions | Each listener returns an unsubscribe; hooks start and stop them; tests check cleanup |
 | Rollback restoring the wrong state | One snapshot per request id; overlapping-failure test |
 | Non-serializable data in the store | Plain-user conversion and `toPlain`; tests |

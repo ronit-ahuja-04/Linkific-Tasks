@@ -152,8 +152,25 @@ Configured in `src/store/index.js` (on outside production, named "FlowLane"). In
 - `listeners.test.js`: snapshots arriving into the store, first-snapshot toasts, unsubscribe and reset
 - `no-keys.test.js`: the app starts and shows sign-in when no Firebase keys are configured
 
-## 10. Limits and honest notes
+## 10. Firestore security rules
+
+The Firebase project was still on the default "test mode" rules, which **expire after 30 days**. They expired on 16 Oct 2026, so every read and write failed with `Missing or insufficient permissions` (the live site too). `firestore.rules` replaces them with rules written for how FlowLane uses its data:
+
+| Data | Rule in short |
+| --- | --- |
+| `users/{uid}` | Any signed-in user can read profiles. You write only your own. Others may only bump your `unreadMessages` counter (a direct message) |
+| `users/{uid}/notifications` | You read and dismiss your own. Other signed-in users can create one for you |
+| `projects/{id}` | Members read and edit the board. Only the owner changes the member list or deletes. An invited user may add only themselves |
+| `projects/{id}/messages`, `typing` | Members only; you post as yourself |
+| `invitations` | The invitee reads and answers their own; only project members can invite |
+| `direct_messages/{a_b}/...` | Only the two people in the chat id, posting as themselves |
+| everything else | Denied |
+
+`npm run test:rules` runs 23 tests against the Firestore emulator (needs Java). They check what the app does and what an attacker must not be able to do, and I confirmed they fail when a rule is weakened. Deploy with `firebase deploy --only firestore:rules --project <your-project-id>`.
+
+Known trade-off: an invitation is not verified when someone adds themselves to a project, so anyone who knows a project's id could join. Project ids are random 20-character strings, so this is hard to guess, but a stricter version would need the invitation id to be derived from the project and user ids.
+
+## 11. Limits and honest notes
 
 - **Chat, Messages and Calendar sync** still read and write Firebase directly. They were left out on purpose (see the PRD scope). They still receive a `notifyProjectMembers` prop from the Dashboard.
-- **Not checked against a real Firebase project.** The tests mock Firebase, and I rendered the Dashboard, Auth page and notifications view against a loaded store. I have not signed in against your Firestore data, so do a manual pass: sign in, drag cards, create and delete a task, invite someone, check the DevTools.
-- Firestore security rules are unchanged and are not part of this repo.
+- **Signing in against real data is yours to check.** The unit tests mock Firebase, the security rules are tested on the emulator, and I rendered the Dashboard, Auth page and notifications view against a loaded store. Do a manual pass: sign in, drag cards, create and delete a task, invite someone, check the DevTools.
