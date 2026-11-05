@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { createDraftTask } from '../lib/board';
 import { errorMessageOf } from '../lib/serialize';
@@ -9,7 +9,7 @@ import { selectUser, signOutUser } from '../store/slices/authSlice';
 import { selectTheme, toggleTheme as toggleThemeThunk } from '../store/slices/themeSlice';
 import { selectUsersById } from '../store/slices/usersSlice';
 import { createProject, deleteProject, makeSelectProject, selectProjects, selectProjectsLoading } from '../store/slices/projectsSlice';
-import { createTask, deleteTask, dragTask, selectBoard, selectBoardError, boardErrorCleared, taskUpdated } from '../store/slices/boardSlice';
+import { createTask, deleteTask, dragTask, selectBoard, selectBoardError, boardErrorCleared } from '../store/slices/boardSlice';
 import { acceptInvite, declineInvite, selectInvitations, sendInvite } from '../store/slices/invitationsSlice';
 import {
   clearUnreadMessages, dismissAllNotifications, dismissNotification, notifyProjectMembers as notifyProjectMembersThunk,
@@ -23,19 +23,13 @@ import {
 import { 
   LayoutDashboard, 
   Briefcase, 
-  CheckSquare, 
   Calendar, 
   MessageSquare,
-  Users,
   Settings,
-  Hash,
-  Search,
   Bell,
   Sun,
   Moon,
   Plus,
-  MoreHorizontal,
-  Paperclip,
   Trash,
   Edit2
 } from 'lucide-react';
@@ -96,12 +90,15 @@ function Dashboard() {
 
   // Start the Firestore listeners. They dispatch snapshots into the store (see store/listeners.js).
   useUserSync(user);
-  useProjectSync(selectedProjectId, user?.uid);
 
   // A selector factory: only re-render when THIS project changes, not when any project does
   const selectActiveProject = useMemo(() => makeSelectProject(selectedProjectId), [selectedProjectId]);
   const activeProject = useSelector(selectActiveProject);
   const isOwner = user?.uid === activeProject?.owner;
+
+  // Only listen to a project the signed-in user is known to belong to. A URL with an unknown id
+  // (or a project that was just deleted) must not open a listener the server would refuse.
+  useProjectSync(activeProject ? selectedProjectId : null, user?.uid);
 
   // Route redirect effect
   useEffect(() => {
@@ -219,8 +216,6 @@ function Dashboard() {
     dispatch(deleteTask(taskId));
   };
 
-  const updateTaskInState = (updatedTask) => dispatch(taskUpdated(updatedTask));
-
   const handleDeleteProject = () => {
     if (!isOwner || !selectedProjectId) return;
     dispatch(modalOpened('deleteProject'));
@@ -283,7 +278,7 @@ function Dashboard() {
               <Briefcase size={18} /> {project.name}
             </li>
           ))}
-          <li className="nav-item" onClick={() => dispatch(modalOpened('newProject'))} style={{color: 'var(--primary-color)'}}>
+          <li className="nav-item" onClick={() => dispatch(modalOpened('newProject'))} style={{color: 'var(--primary-text)'}}>
             <Plus size={18} /> New Project
           </li>
         </ul>
@@ -305,11 +300,14 @@ function Dashboard() {
             <button className="icon-btn" onClick={toggleTheme} title="Toggle Theme">
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <button className="icon-btn" onClick={() => navigate('/notifications')}><Bell size={20} /></button>
+            <button className="icon-btn" onClick={() => navigate('/notifications')} aria-label="Notifications" title="Notifications"><Bell size={20} /></button>
             {user && (
-               <div 
+               <button 
+                 type="button"
+                 aria-label="My profile"
+                 title="My profile"
                  onClick={() => navigate('/profile')}
-                 style={{width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--border-color)', backgroundImage: `url(${user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`})`, backgroundSize: 'cover', cursor: 'pointer'}} 
+                 style={{border: 'none', padding: 0, width: 32, height: 32, borderRadius: '50%', backgroundColor: 'var(--border-color)', backgroundImage: `url(${user.photoURL || `https://ui-avatars.com/api/?name=${user.email}`})`, backgroundSize: 'cover', cursor: 'pointer'}} 
                />
             )}
           </div>
@@ -333,6 +331,9 @@ function Dashboard() {
                   <div style={{color: 'var(--text-secondary)', fontSize: 13}}>Switch between light and dark themes.</div>
                 </div>
                 <button 
+                  role="switch"
+                  aria-checked={theme === 'dark'}
+                  aria-label="Dark mode"
                   onClick={toggleTheme}
                   style={{
                     width: 48, height: 26, borderRadius: 13, border: 'none', 
@@ -379,12 +380,12 @@ function Dashboard() {
               <button 
                 onClick={() => dispatch(signOutUser())}
                 style={{
-                  padding: '14px 48px', borderRadius: 100, border: '2px solid #ef4444', 
-                  background: 'transparent', color: '#ef4444', fontWeight: 700, cursor: 'pointer',
+                  padding: '14px 48px', borderRadius: 100, border: '2px solid var(--danger-text)', 
+                  background: 'transparent', color: 'var(--danger-text)', fontWeight: 700, cursor: 'pointer',
                   fontSize: 15, transition: 'all 0.2s', textTransform: 'uppercase', letterSpacing: '1px'
                 }}
-                onMouseOver={(e) => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = '#fff'; }}
-                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#ef4444'; }}
+                onMouseOver={(e) => { e.currentTarget.style.background = 'var(--danger-strong)'; e.currentTarget.style.color = '#fff'; }}
+                onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--danger-text)'; }}
               >
                 Sign Out
               </button>
@@ -437,7 +438,7 @@ function Dashboard() {
                     onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--border-color)'; }}
                   >
                     <div style={{display: 'flex', flexDirection: 'column', gap: 8}}>
-                      <span style={{fontSize: 12, fontWeight: 700, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.5px'}}>New Notification</span>
+                      <span style={{fontSize: 12, fontWeight: 700, color: 'var(--primary-text)', textTransform: 'uppercase', letterSpacing: '0.5px'}}>New Notification</span>
                       <span style={{fontSize: 15, color: 'var(--text-primary)', lineHeight: 1.4}}>{notif.message}</span>
                       <span style={{fontSize: 12, color: 'var(--text-secondary)', marginTop: 4}}>Click to view project</span>
                     </div>
@@ -497,7 +498,7 @@ function Dashboard() {
                     {isOwner && (
                       <button
                         onClick={handleDeleteProject}
-                        style={{display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'transparent', color: '#ef4444', border: '1px solid #ef4444', borderRadius: 20, fontWeight: 600, cursor: 'pointer', fontSize: 13, transition: 'all 0.2s'}}
+                        style={{display: 'flex', alignItems: 'center', gap: 6, padding: '8px 16px', background: 'transparent', color: 'var(--danger-text)', border: '1px solid var(--danger-text)', borderRadius: 20, fontWeight: 600, cursor: 'pointer', fontSize: 13, transition: 'all 0.2s'}}
                         onMouseOver={(e) => { e.currentTarget.style.background = '#fef2f2'; }}
                         onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
                       >
@@ -517,7 +518,7 @@ function Dashboard() {
                             style={{padding: '8px 12px', borderRadius: 8, border: '1px solid var(--border-color)', background: 'var(--bg-main)', color: 'var(--text-primary)'}}
                             required
                           />
-                          <button type="submit" style={{padding: '8px', borderRadius: 8, background: 'var(--primary-color)', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer'}}>
+                          <button type="submit" style={{padding: '8px', borderRadius: 8, background: 'var(--primary-strong)', color: 'white', border: 'none', fontWeight: 600, cursor: 'pointer'}}>
                             Send Invite
                           </button>
                         </form>
@@ -539,6 +540,7 @@ function Dashboard() {
             {/* Tab Content */}
             {activeTab === 'board' && (
               <div className="board-container">
+                <div className="board-columns">
                 <DragDropContext onDragEnd={onDragEnd}>
                   {data.columnOrder.map((columnId) => {
                     const column = data.columns[columnId];
@@ -554,7 +556,7 @@ function Dashboard() {
                         {column.id === data.columnOrder[0] && isOwner && (
                           <button 
                             onClick={() => handleAddTask(column.id)}
-                            style={{display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--primary-color)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 11}}
+                            style={{display: 'flex', alignItems: 'center', gap: 4, padding: '4px 8px', background: 'var(--primary-strong)', color: '#fff', border: 'none', borderRadius: 6, fontWeight: 600, cursor: 'pointer', fontSize: 11}}
                           >
                             <Plus size={12} /> Add Task
                           </button>
@@ -566,7 +568,7 @@ function Dashboard() {
                           <div 
                             ref={provided.innerRef}
                             {...provided.droppableProps}
-                            style={{minHeight: 100, flex: 1, overflowY: 'auto', paddingRight: 4}}
+                            style={{minHeight: 100, flex: 1}}
                           >
                             {tasks.map((task, index) => (
                               <Draggable key={task.id} draggableId={task.id} index={index}>
@@ -576,6 +578,7 @@ function Dashboard() {
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
+                                    role="group" // the card contains Edit and Delete buttons, so it cannot also be a button
                                     onClick={() => { dispatch(taskPanelOpened(task)); }}
                                     style={{
                                       ...provided.draggableProps.style,
@@ -646,6 +649,7 @@ function Dashboard() {
                   );
                 })}
                 </DragDropContext>
+                </div>
               </div>
             )}
 
@@ -687,7 +691,7 @@ function Dashboard() {
             />
           </div>
           <div>
-            <label style={{display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--text-secondary)'}}>Assigner (Owner) Email <span style={{fontWeight: 'normal', opacity: 0.6}}>(Optional)</span></label>
+            <label style={{display: 'block', marginBottom: 8, fontSize: 13, color: 'var(--text-secondary)'}}>Assigner (Owner) Email <span style={{fontWeight: 'normal', color: 'var(--text-tertiary)'}}>(Optional)</span></label>
             <input 
               type="email" 
               value={newProjectAssignerEmail}
@@ -706,7 +710,7 @@ function Dashboard() {
             </button>
             <button 
               type="submit"
-              style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--primary-color)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
+              style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--primary-strong)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
             >
               Create Project
             </button>
@@ -741,7 +745,7 @@ function Dashboard() {
         <div style={{display: 'flex', justifyContent: 'flex-end'}}>
           <button 
             onClick={() => dispatch(successDismissed())}
-            style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--primary-color)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
+            style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--primary-strong)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
           >
             Awesome
           </button>
@@ -779,7 +783,7 @@ function Dashboard() {
             }}
           >
             <div className="toast-content" style={{display: 'flex', flexDirection: 'column', gap: 6}}>
-              <span style={{fontSize: 11, fontWeight: 700, color: 'var(--primary-color)', textTransform: 'uppercase', letterSpacing: '0.5px'}}>New Notification</span>
+              <span style={{fontSize: 11, fontWeight: 700, color: 'var(--primary-text)', textTransform: 'uppercase', letterSpacing: '0.5px'}}>New Notification</span>
               <span style={{fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.4}}>{toastItem.message}</span>
             </div>
           </div>
@@ -795,9 +799,7 @@ function Dashboard() {
         isOpen={isTaskPanelOpen}
         onClose={() => dispatch(taskPanelClosed())}
         task={selectedTask}
-        projectId={selectedProjectId}
         isOwner={isOwner}
-        updateTaskInState={updateTaskInState}
         handleCreateDraftTask={handleCreateDraftTask}
         handleDeleteTask={handleDeleteTask}
         projectMembers={activeProject?.members || []}
@@ -822,7 +824,7 @@ function Dashboard() {
             </button>
             <button 
               onClick={confirmDeleteProject}
-              style={{ padding: '8px 16px', borderRadius: '8px', background: '#ef4444', border: 'none', color: 'white', fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '8px 16px', borderRadius: '8px', background: 'var(--danger-strong)', border: 'none', color: 'white', fontWeight: 600, cursor: 'pointer' }}
             >
               Delete Project
             </button>

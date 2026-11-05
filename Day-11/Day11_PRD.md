@@ -70,7 +70,7 @@ Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop 
 | R5 | Optimistic update with rollback | `dragTask`, `createTask`, `deleteTask`, `saveTask`; tests |
 | R6 | No component imports Firestore for in-scope state | grep: Firebase only in `src/store/`, `lib/` and the 3 out-of-scope components |
 | R7 | Redux DevTools configured | `store/index.js`; README section 8 |
-| R8 | Behaviour and UI unchanged | same markup and props; render check of Dashboard, Auth and notifications |
+| R8 | Behaviour unchanged; UI changed only to fix defects found by testing (board scrolling, accessibility names, colour contrast) | 50 browser tests, README section 7 lists each change |
 | R9 | README explains Redux concepts | `flowlane-redux/README.md` |
 
 ## 6. Milestones
@@ -81,16 +81,25 @@ Related work in the same folder: `Day-11/redux-app` (Redux Market, a small shop 
 
 ## 7. Verification
 
-- `npm run build` passes, `oxlint` reports no errors, and `npm test` runs 78 tests with Firebase mocked: pure board logic, every slice and thunk (including rollback and overlapping requests), the Firestore listeners and serialization.
-- Render check against a loaded store (dummy Firebase config, no network): the Dashboard board with columns and tasks, the new-project and error modals, invite card, notifications view, unread badge, task panel, profile view and the sign-in page.
-- Firestore security rules (`firestore.rules`) replace the expired test-mode rules; 23 emulator tests (`npm run test:rules`) cover allowed operations and attacks, and fail when a rule is weakened. The rules were deployed to the project and the release matches the repo file; an anonymous request to production gets a 403.
-- **Not done:** signing in against the real Firebase project and clicking through the app, which needs a person with the account.
+| Layer | Result |
+| ----- | ------ |
+| Build and lint | `npm run build` passes; `oxlint` has no errors (4 warnings in the out-of-scope Chat, Messages and Calendar components) |
+| Unit tests (`npm test`) | 87 passing: board logic, every slice and thunk, listeners, serialization, running without keys; Firebase mocked |
+| Security rules (`npm run test:rules`) | 23 passing against the Firestore emulator; they fail when a rule is weakened |
+| Browser end to end (`npm run test:e2e`) | 50 passing in Chrome against the Auth and Firestore emulators with the real rules: auth, projects, board and drag and drop, three-user collaboration, chat and direct messages, accessibility. Every test fails on any console error, warning or browser Issue hint |
+| Production bundle (`npm run test:e2e:prod`) | The same 50 pass against the built app, in two consecutive runs |
+| Accessibility | axe-core WCAG 2.1 A and AA: zero violations on every screen in light and dark |
+| Production Firebase | Rules deployed and the release matches the repo file; an anonymous request gets a 403 |
+
+The browser tests found 9 real defects that the unit tests could not (listed in the README, section 7): two listener races, the empty app after deleting the last project, the wiped task form, nested scrolling in drag and drop, and several accessibility problems.
+
+**Not covered:** Google sign-in end to end and a linked Google Calendar (need real Google), browsers other than Chrome, phone-sized screens, and a manual run against the real Firebase project with real data.
 
 ## 8. Risks
 
 | Risk | Mitigation |
 | ---- | ---------- |
-| Not verified by a real sign-in | Mocked tests, emulator rules tests and a render check; a manual pass is listed in the README |
+| Not verified by a real sign-in or real Google | Emulator-based browser tests with the real rules, plus a short manual pass listed in the README |
 | Firestore rules too open or too strict | Least-privilege rules with an emulator test per operation the app performs; known self-join trade-off documented |
 | Listener leaks or double subscriptions | Each listener returns an unsubscribe; hooks start and stop them; tests check cleanup |
 | Rollback restoring the wrong state | One snapshot per request id; overlapping-failure test |

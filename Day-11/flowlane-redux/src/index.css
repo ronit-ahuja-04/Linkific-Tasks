@@ -8,11 +8,19 @@
   --bg-surface: #FFFFFF;
   --text-primary: #172B4D;
   --text-secondary: #5E6C84;
-  --text-tertiary: #8993A4;
+  --text-tertiary: #626F86; /* AA contrast on white (was #8993A4, 3.1:1) */
   --border-color: #DFE1E6;
   --accent-color: #FF5630;
   --primary-color: #FF5630;
   --accent-hover: #DE350B;
+  /* Accessible variants (WCAG AA, 4.5:1): the brand orange and red are too light for small text
+     on white, or under white text. Use these wherever text meets them. */
+  --primary-strong: #D23A11;  /* background under white text */
+  --primary-text: #D23A11;    /* orange text on a light surface */
+  --danger-text: #D12A2A;     /* red text / border on a light surface */
+  --danger-strong: #D12A2A;   /* background under white text */
+  --priority-medium-text: #A15C07;
+  --priority-low-text: #047857;
   
   /* Gradients */
   --grad-todo: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(244,245,247,1) 100%);
@@ -50,11 +58,17 @@
   --bg-surface: #161A22;
   --text-primary: #C9D1D9;
   --text-secondary: #8B949E;
-  --text-tertiary: #484F58;
+  --text-tertiary: #7D8590; /* AA contrast on the dark surfaces (was #484F58, 2.3:1) */
   --border-color: #30363D;
   --accent-color: #FF5630;
   --primary-color: #FF5630;
   --accent-hover: #DE350B;
+  --primary-strong: #D23A11;
+  --primary-text: #FF5630;   /* the brand orange reads fine on dark surfaces */
+  --danger-text: #F87171;
+  --danger-strong: #D12A2A;
+  --priority-medium-text: #F59E0B;
+  --priority-low-text: #34D399;
   
   --grad-todo: linear-gradient(135deg, rgba(33,38,45,0.9) 0%, rgba(22,26,34,0.9) 100%);
   --grad-inprogress: linear-gradient(135deg, rgba(33,38,45,0.9) 0%, rgba(45,30,22,0.9) 100%);
@@ -128,19 +142,28 @@ body {
 .board-container {
   flex: 1;
   padding: 32px;
-  overflow-x: auto;
-  overflow-y: hidden;
-  display: flex;
-  gap: 24px;
+  /* The board is the ONLY scroll container (sideways and down). Drag and drop supports one scroll
+     parent per column, so the columns themselves must not scroll. */
+  overflow: auto;
   background: radial-gradient(circle at 100% 0%, rgba(255,86,48,0.05) 0%, transparent 40%),
               radial-gradient(circle at 0% 100%, rgba(54,179,126,0.05) 0%, transparent 40%);
+}
+
+/* The columns row grows with its tallest column and stretches the others to the same height, so
+   every column stays a drop target however far a long column is scrolled. */
+.board-columns {
+  display: flex;
+  align-items: stretch;
+  gap: 24px;
+  min-height: 100%;
+  width: max-content;
+  min-width: 100%;
 }
 
 /* Kanban Columns */
 .column {
   width: 340px;
   min-width: 340px;
-  max-height: 100%;
   display: flex;
   flex-direction: column;
   border-radius: 16px;
@@ -152,7 +175,14 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 16px;
-  padding: 0 8px;
+  padding: 8px 8px;
+  /* Stays visible while a long column scrolls under it */
+  position: sticky;
+  top: -32px; /* the board has 32px of padding; this pins the header to the very top edge */
+  z-index: 2;
+  background: color-mix(in srgb, var(--bg-main) 88%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: 0 0 10px 10px;
 }
 
 .column-title {
@@ -378,7 +408,7 @@ body {
 }
 
 .btn-accept {
-  background: var(--primary-color);
+  background: var(--primary-strong);
   color: white;
 }
 
@@ -677,7 +707,7 @@ body {
 }
 
 .chat-message-me .chat-bubble {
-  background: var(--primary-color);
+  background: var(--primary-strong);
   color: white;
   border-top-right-radius: 4px;
   border-top-left-radius: 16px;
@@ -736,7 +766,7 @@ body {
   height: 42px;
   border-radius: 50%;
   border: none;
-  background: var(--primary-color);
+  background: var(--primary-strong);
   color: white;
   display: flex;
   align-items: center;
@@ -1195,7 +1225,7 @@ body {
   padding: 14px;
   border-radius: 10px;
   border: none;
-  background-color: var(--accent-color);
+  background-color: var(--primary-strong);
   color: #fff;
   font-size: 15px;
   font-weight: 600;
@@ -1205,7 +1235,7 @@ body {
 }
 
 .submit-btn:hover {
-  background-color: var(--accent-hover);
+  background-color: #B5300E; /* darker than --primary-strong, so white text keeps its contrast */
 }
 
 .auth-switch {
@@ -1216,7 +1246,7 @@ body {
 }
 
 .auth-switch span {
-  color: var(--accent-color);
+  color: var(--primary-text);
   font-weight: 600;
   cursor: pointer;
 }

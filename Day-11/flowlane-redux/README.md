@@ -14,7 +14,11 @@ cd Day-11/flowlane-redux
 npm install
 cp .env.example .env    # then fill in your Firebase web app keys
 npm run dev
-npm test                # 78 unit tests, Firebase is mocked, no keys needed
+npm test                # 87 unit tests, Firebase is mocked, no keys needed
+npm run test:rules      # 23 security-rules tests (Firestore emulator, needs Java)
+npm run test:e2e        # 50 browser tests: Chrome + Auth/Firestore emulators (see section 9)
+npm run test:e2e:prod   # the same 50 tests against the production bundle
+npm run test:all        # unit + rules + e2e
 npm run build
 ```
 Without `.env` the app still loads and shows the sign-in page, but sign-in is refused with the message "Firebase keys are required". Vite reads `.env` only at startup, so restart `npm run dev` after creating or editing it. The values are in the Firebase console (Project settings, your web app) and in your Vercel project's environment variables.
@@ -28,7 +32,7 @@ Without `.env` the app still loads and shows the sign-in page, but sign-in is re
 | `auth.currentUser` read directly in many places | `useSelector(selectUser)`, plain fields only |
 | Drag and drop: `setData` then `updateDoc`, no rollback | Optimistic `dragTask` thunk with rollback if the write fails |
 | Components import `firebase/firestore` | Only `src/store/` does (plus Chat, Messages and Calendar, see section 9) |
-| No tests | 78 unit tests |
+| No tests | 87 unit tests, 23 rules tests, 50 browser tests |
 
 ## 2. The store
 
@@ -126,13 +130,27 @@ A drag does not edit the board. It dispatches `board/dragTask/pending` with the 
 
 **Serializable state.** Firebase's user object and Firestore Timestamps are class instances. The reducer for `authStateChanged` keeps four plain fields, and `toPlain` turns Timestamps into numbers before anything is dispatched.
 
-## 7. Bugs found and fixed while moving the code
+## 7. Bugs found and fixed
 
-- `Dashboard.jsx` called `serverTimestamp()` without importing it, so every notification write failed. The notification helper now imports it, and tests check the written document.
-- `Auth.jsx` used `GoogleAuthProvider.credentialFromResult` without importing `GoogleAuthProvider`, so Google sign-in would throw after the popup. The thunk imports it and a test covers saving the OAuth token.
-- The first-project effect ran on every empty snapshot and could create duplicates. It is now a thunk with `condition`.
-- Deleting a task made two separate writes. It is one write now.
-- Editing assignees on an unsaved draft task put a half-created task into the board data. Draft updates now change only the open panel.
+Found while moving the code, or by the browser tests (marked **E2E**):
+
+| Bug | Fix |
+| --- | --- |
+| `Dashboard.jsx` called `serverTimestamp()` without importing it, so every notification write failed | Imported in the notification helper; a test checks the written document |
+| `Auth.jsx` used `GoogleAuthProvider` without importing it, so Google sign-in threw after the popup | The thunk imports it; a test covers saving the OAuth token |
+| Without Firebase keys the app crashed with `auth/invalid-api-key` before showing anything | Firebase is only initialised when keys exist; the sign-in page loads and explains what is missing |
+| **E2E** Creating the first project opened a board listener before the server had the project, so Firestore answered `permission-denied` | A project is published to the UI only after the server confirms it, and stays published while later edits are pending |
+| **E2E** Deleting a project (or opening an unknown project URL) opened a listener the server refuses | Listeners start only for projects the user belongs to; `permission-denied` on a project listener drops that project quietly |
+| **E2E** Deleting your last project left the app empty, because the "create the first project" guard never reset | The guard is released once a project exists, and re-armed after a failed attempt |
+| **E2E** Typing a title, then changing assignees, wiped the title and description | The task panel resets its form only when it opens or a different task is shown |
+| The first project could be created twice by repeated Firestore snapshots, and by an empty snapshot from the cache | Thunk `condition` plus ignoring cache-only snapshots |
+| Deleting a task made two separate writes | One write |
+| **E2E** The drag-and-drop library warned about nested scroll containers (each column scrolled inside a scrolling board), and its auto-scroll could misbehave | The board is the only scroll container, columns stretch to the same height so each stays a drop target, and column headers stay pinned while scrolling |
+| **E2E** Browser Issues hints: inputs without `autocomplete`, `id` or a label | Labels, ids, names and `autocomplete` added to the sign-in form |
+| **E2E** Icon buttons with no accessible name (close, send), an unnamed priority select, the avatar as a plain div, a task card that was a "button" containing buttons | `aria-label`s, a real profile button, `role="dialog"` on modals, the card is a labelled group |
+| **E2E** Low colour contrast (WCAG AA): grey helper text, orange text and white-on-orange buttons, red text, amber and green priority labels | Four small colour tokens (deeper orange and red, darker grey, in both themes) used only where text meets them |
+
+**What changed visually, for transparency:** the board scrolls as one area with pinned column headers instead of each column scrolling on its own; the brand orange under white text and the red used as text are a shade deeper; helper text is slightly darker. Nothing else about the design was touched.
 
 ## 8. Redux DevTools
 
@@ -144,13 +162,25 @@ Configured in `src/store/index.js` (on outside production, named "FlowLane"). In
 
 ## 9. Tests
 
-78 tests, all with Firebase mocked (`test/mocks/`), so no keys or network are needed:
-- `board.test.js`: the pure drag-and-drop, add, remove and update logic
-- `auth-theme.test.js`: plain-user conversion, sign-in/up/Google/out thunks, missing keys, theme
-- `board-slice.test.js`: optimistic move and rollback, overlapping requests, skipped no-ops, create, delete, save, assign
-- `projects-invites-notifs.test.js`: projects, invitations, notifications, UI slice, serialization helpers
-- `listeners.test.js`: snapshots arriving into the store, first-snapshot toasts, unsubscribe and reset
-- `no-keys.test.js`: the app starts and shows sign-in when no Firebase keys are configured
+Four layers, from fastest to most realistic:
+
+| Layer | Command | What it covers |
+| --- | --- | --- |
+| **Unit** (87) | `npm test` | Pure board logic, every slice and thunk (optimistic updates, rollback, overlapping requests, `condition`), the Firestore listeners, serialization, running without keys. Firebase is mocked, so no keys or network |
+| **Security rules** (23) | `npm run test:rules` | Allowed operations and attacks against the Firestore emulator. They fail when a rule is weakened |
+| **Browser end to end** (50) | `npm run test:e2e` | The real app in Chrome against the Auth and Firestore **emulators** with the real rules. Never touches your project: the emulator mode only works with a `demo-*` project id |
+| **Accessibility** (3, part of the 50) | same | WCAG 2.1 A and AA with axe-core on every screen, light and dark, with zero violations required |
+
+The browser tests (`e2e/`) cover:
+- **Auth:** sign up, sign in, sign out, wrong password, duplicate email, weak password, session after reload, route protection.
+- **Projects:** create (with and without an owner email), validation, switch, delete (cancel and confirm), deleting the last project, unknown URLs, settings, profile, theme persistence, calendar prompt.
+- **Board:** create, edit, delete, priorities, cancel flows, drag by keyboard between and within columns, the Done column lock, persistence after reload, draft form kept while assigning.
+- **Collaboration with two or three browsers at once:** invite, accept, decline, unknown and duplicate invites, live task and move sync, owner-only controls, assignment notifications, notifications page, project deletion seen by a member, assigning another owner.
+- **Chat:** project chat live, the new-activity dot, direct messages, the unread badge, people search.
+
+Every test also **fails on any console error, warning or browser "Issue" hint**, which is how most of the bugs above were found. The only exceptions, each commented in `e2e/fixtures.js`, are the browser's own log line for an expected rejected sign-in, the Firestore SDK retrying its write channel, and the Google popup script that the tests deliberately stub.
+
+`npm run test:e2e:prod` builds the production bundle and runs the same suite against it. Both modes pass.
 
 ## 10. Firestore security rules
 
@@ -173,4 +203,5 @@ Known trade-off: an invitation is not verified when someone adds themselves to a
 ## 11. Limits and honest notes
 
 - **Chat, Messages and Calendar sync** still read and write Firebase directly. They were left out on purpose (see the PRD scope). They still receive a `notifyProjectMembers` prop from the Dashboard.
-- **Signing in against real data is yours to check.** The unit tests mock Firebase, the security rules are tested on the emulator, and I rendered the Dashboard, Auth page and notifications view against a loaded store. Do a manual pass: sign in, drag cards, create and delete a task, invite someone, check the DevTools.
+- **Not covered by the automated tests:** Google sign-in end to end (the popup needs real Google, so only the token handling is unit-tested), Google Calendar sync with a linked account, browsers other than Chrome, phone-sized screens (the app targets desktop and tablet), and a run against your real Firebase project. Please do a short manual pass there: sign in, drag a card, create and delete a task, invite someone, and watch the Redux DevTools.
+- **Lint:** `npm run lint` has no errors and 4 warnings, all in Chat, Messages and Calendar (hook dependency lists and a setState in an effect). Those components were left as they were; changing them risks chat behaviour.
