@@ -80,8 +80,11 @@ export default function Auth() {
 
           <form onSubmit={handleSubmit} className="auth-form">
             <div className="form-group">
-              <label>Email</label>
+              <label htmlFor="auth-email">Email</label>
               <input 
+                id="auth-email"
+                name="email"
+                autoComplete="email"
                 type="email" 
                 placeholder="hello@flowlane.com" 
                 value={email}
@@ -91,8 +94,11 @@ export default function Auth() {
             </div>
             
             <div className="form-group">
-              <label>Password</label>
+              <label htmlFor="auth-password">Password</label>
               <input 
+                id="auth-password"
+                name="password"
+                autoComplete={isLogin ? 'current-password' : 'new-password'}
                 type="password" 
                 placeholder="••••••••" 
                 value={password}

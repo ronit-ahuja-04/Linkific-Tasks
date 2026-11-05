@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('firebase/firestore', async () => (await import('./mocks/firestore.js')).firestoreMock);
 vi.mock('firebase/auth', async () => (await import('./mocks/auth.js')).authMock);
@@ -9,19 +9,24 @@ import { authMock } from './mocks/auth.js';
 import { makeStore } from '../src/store/index.js';
 import { startAuthListener, startProjectListener, startUserListeners } from '../src/store/listeners.js';
 import { authStateChanged, selectAuthStatus, selectUser } from '../src/store/slices/authSlice.js';
-import { selectProjects, selectProjectsLoading } from '../src/store/slices/projectsSlice.js';
+import { projectsReceived, selectProjects, selectProjectsLoading } from '../src/store/slices/projectsSlice.js';
 import { selectUsersById } from '../src/store/slices/usersSlice.js';
 import { selectNotifications, selectToasts, selectUnreadMessages } from '../src/store/slices/notificationsSlice.js';
 import { selectInvitations } from '../src/store/slices/invitationsSlice.js';
 import { selectHasNewActivity, tabChanged } from '../src/store/slices/uiSlice.js';
 
-const snap = (docs, changes = []) => ({
-  docs: docs.map(({ id, ...data }) => ({ id, data: () => data })),
+// `pending` lists the ids of documents that still have local writes the server has not confirmed
+const snap = (docs, changes = [], { pending = [], fromCache = false } = {}) => ({
+  docs: docs.map(({ id, ...data }) => ({ id, data: () => data, metadata: { hasPendingWrites: pending.includes(id) } })),
   docChanges: () => changes.map((c) => ({ type: c.type, doc: { id: c.id, data: () => c.data } })),
+  metadata: { fromCache },
 });
 
 /** Run startX, then hand back the onSnapshot callbacks in the order they were registered */
-const registered = () => fs.onSnapshot.mock.calls.map(([target, next]) => ({ target, next }));
+const registered = () =>
+  fs.onSnapshot.mock.calls.map(([target, ...rest]) => ({ target, next: rest.find((a) => typeof a === 'function'), error: rest.filter((a) => typeof a === 'function')[1] }));
+
+afterEach(() => vi.restoreAllMocks()); // console spies must not leak between tests
 
 beforeEach(() => {
   resetFirestoreMock();
@@ -114,6 +119,44 @@ describe('startUserListeners', () => {
     expect(projectWrites).toHaveLength(1);
   });
 
+  it('publishes a new project only once the server has confirmed it, and keeps it while later edits are pending', () => {
+    const { store, listeners } = start();
+    // created locally, not yet on the server: not published (a board listener would be refused)
+    listeners[0].next(snap([{ id: 'p1', name: 'New', members: ['u1'] }], [], { pending: ['p1'] }));
+    expect(selectProjects(store.getState())).toEqual([]);
+    // the server confirms it
+    listeners[0].next(snap([{ id: 'p1', name: 'New', members: ['u1'] }]));
+    expect(selectProjects(store.getState()).map((p) => p.id)).toEqual(['p1']);
+    // a later edit (a new task, a drag) is pending again: the project must NOT disappear
+    listeners[0].next(snap([{ id: 'p1', name: 'New', members: ['u1'] }], [], { pending: ['p1'] }));
+    expect(selectProjects(store.getState()).map((p) => p.id)).toEqual(['p1']);
+    // deleted on the server: gone
+    listeners[0].next(snap([]));
+    expect(selectProjects(store.getState())).toEqual([]);
+  });
+
+  it('listens with metadata changes so it hears when a pending project is confirmed', () => {
+    start();
+    const options = fs.onSnapshot.mock.calls[0].find((a) => a && typeof a === 'object' && 'includeMetadataChanges' in a);
+    expect(options).toEqual({ includeMetadataChanges: true });
+  });
+
+  it('does not create a first project from an empty snapshot that came from the cache', async () => {
+    const { listeners } = start();
+    listeners[0].next(snap([], [], { fromCache: true }));
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(fs.setDoc.mock.calls.filter(([ref]) => ref.path.startsWith('projects/'))).toHaveLength(0);
+  });
+
+  it('creates a new first project when the user later deletes their last one', async () => {
+    const { listeners } = start();
+    listeners[0].next(snap([]));
+    await vi.waitFor(() => expect(fs.setDoc.mock.calls.filter(([ref]) => ref.path.startsWith('projects/'))).toHaveLength(1));
+    listeners[0].next(snap([{ id: 'p1', members: ['u1'] }])); // the first project arrives
+    listeners[0].next(snap([])); // ...and is deleted
+    await vi.waitFor(() => expect(fs.setDoc.mock.calls.filter(([ref]) => ref.path.startsWith('projects/'))).toHaveLength(2));
+  });
+
   it('unsubscribes everything and clears per-user state when stopped', () => {
     const { store, stop, listeners } = start();
     const unsubs = fs.onSnapshot.mock.results.map((r) => r.value);
@@ -178,6 +221,28 @@ describe('startProjectListener', () => {
     store.dispatch(tabChanged('board'));
     listeners[1].next(message('u2'));
     expect(selectHasNewActivity(store.getState())).toBe(true);
+  });
+
+  it('treats permission-denied as "this project is gone" and drops it quietly', () => {
+    const store = makeStore();
+    store.dispatch(projectsReceived([{ id: 'p1', members: ['u1'] }, { id: 'p2', members: ['u1'] }]));
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    startProjectListener(store, 'p1', 'u1');
+    const [board, activity] = registered();
+    board.error({ code: 'permission-denied', message: 'denied' });
+    expect(selectProjects(store.getState()).map((p) => p.id)).toEqual(['p2']);
+    activity.error({ code: 'permission-denied', message: 'denied' });
+    expect(log.mock.calls).toEqual([]);
+    log.mockRestore();
+  });
+
+  it('still logs any other listener error', () => {
+    const store = makeStore();
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
+    startProjectListener(store, 'p1', 'u1');
+    registered()[0].error({ code: 'unavailable', message: 'offline' });
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('board listener error: unavailable'));
+    log.mockRestore();
   });
 
   it('unsubscribes both listeners', () => {

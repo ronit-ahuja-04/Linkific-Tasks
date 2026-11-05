@@ -28,3 +28,8 @@ dist-ssr
 
 # Firebase emulator logs
 *-debug.log
+
+# Firebase emulators and test output
+*-debug.log
+test-results/
+playwright-report/

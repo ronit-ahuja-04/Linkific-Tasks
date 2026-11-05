@@ -200,7 +200,7 @@ export default function Chat({ projectId, isDirectMessage = false, directMessage
           placeholder="Type a message..."
           className="chat-input"
         />
-        <button type="submit" className="chat-send-btn" disabled={!newMessage.trim()}>
+        <button type="submit" className="chat-send-btn" disabled={!newMessage.trim()} aria-label="Send message" title="Send message">
           <Send size={18} />
         </button>
       </form>

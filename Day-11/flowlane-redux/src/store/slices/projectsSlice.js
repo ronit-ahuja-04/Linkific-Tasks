@@ -66,17 +66,29 @@ const projectsSlice = createSlice({
     projectsReceived(state, action) {
       state.items = action.payload;
       state.status = 'ready';
+      // Once the user has a project the "create the first one" guard is released, so deleting
+      // their last project later creates a new default one instead of leaving the app empty
+      if (action.payload.length > 0) state.defaultRequested = false;
+    },
+    // A project we can no longer read (deleted, or access removed): forget it so the UI moves on
+    projectRemoved(state, action) {
+      state.items = state.items.filter((p) => p.id !== action.payload);
     },
     projectsReset: () => initialState,
   },
   extraReducers: (builder) => {
-    builder.addCase(ensureDefaultProject.pending, (state) => {
-      state.defaultRequested = true;
-    });
+    builder
+      .addCase(ensureDefaultProject.pending, (state) => {
+        state.defaultRequested = true;
+      })
+      .addCase(ensureDefaultProject.rejected, (state, action) => {
+        // a skipped thunk (condition) is also reported as rejected: only a real failure re-arms it
+        if (!action.meta.condition) state.defaultRequested = false;
+      });
   },
 });
 
-export const { projectsReceived, projectsReset } = projectsSlice.actions;
+export const { projectsReceived, projectRemoved, projectsReset } = projectsSlice.actions;
 export const selectProjects = (state) => state.projects.items;
 export const selectProjectsLoading = (state) => state.projects.status === 'loading';
 export const makeSelectProject = (projectId) =>

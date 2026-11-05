@@ -9,7 +9,7 @@ import { loadedStore } from './mocks/setup.js';
 import { makeStore } from '../src/store/index.js';
 import { authStateChanged } from '../src/store/slices/authSlice.js';
 import {
-  createProject, deleteProject, ensureDefaultProject, projectsReceived, projectsReset, selectProjects,
+  createProject, deleteProject, ensureDefaultProject, projectRemoved, projectsReceived, projectsReset, selectProjects,
   selectProjectsLoading, makeSelectProject,
 } from '../src/store/slices/projectsSlice.js';
 import { acceptInvite, declineInvite, invitationsReceived, selectInvitations, sendInvite } from '../src/store/slices/invitationsSlice.js';
@@ -77,6 +77,37 @@ describe('projects slice', () => {
     expect(second.meta.condition).toBe(true); // skipped by `condition`
     expect(fs.setDoc).toHaveBeenCalledOnce();
     expect(fs.setDoc.mock.calls[0][1].name).toBe('My First Project');
+  });
+
+  it('re-arms the first-project guard when a project exists, so deleting the last one creates a new default', async () => {
+    const store = makeStore();
+    store.dispatch(authStateChanged({ uid: 'u1', email: 'ann@x.com', displayName: 'Ann' }));
+    await store.dispatch(ensureDefaultProject());
+    expect(store.getState().projects.defaultRequested).toBe(true);
+    store.dispatch(projectsReceived([{ id: 'p1', members: ['u1'] }]));
+    expect(store.getState().projects.defaultRequested).toBe(false);
+    fs.setDoc.mockClear();
+    await store.dispatch(ensureDefaultProject());
+    expect(fs.setDoc).toHaveBeenCalledOnce();
+  });
+
+  it('lets a failed first-project attempt be retried, but not a skipped one', async () => {
+    const store = makeStore();
+    store.dispatch(authStateChanged({ uid: 'u1', email: 'ann@x.com', displayName: 'Ann' }));
+    fs.setDoc.mockRejectedValueOnce(new Error('offline'));
+    await store.dispatch(ensureDefaultProject());
+    expect(store.getState().projects.defaultRequested).toBe(false); // failed: can retry
+    await store.dispatch(ensureDefaultProject());
+    expect(store.getState().projects.defaultRequested).toBe(true);
+    await store.dispatch(ensureDefaultProject()); // skipped by `condition`
+    expect(store.getState().projects.defaultRequested).toBe(true);
+  });
+
+  it('drops a project that became unreadable', () => {
+    const store = makeStore();
+    store.dispatch(projectsReceived([{ id: 'p1' }, { id: 'p2' }]));
+    store.dispatch(projectRemoved('p1'));
+    expect(selectProjects(store.getState()).map((p) => p.id)).toEqual(['p2']);
   });
 
   it('deletes a project and finds one with a selector factory', async () => {

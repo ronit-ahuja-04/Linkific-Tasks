@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSelector, createSlice, current } from '@reduxjs/toolkit';
-import { collection, doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { addTask, findColumnOfTask, makeEmptyBoard, moveTask, removeTask, updateTask } from '../../lib/board';
 import { notifyMembers } from '../../lib/notify';

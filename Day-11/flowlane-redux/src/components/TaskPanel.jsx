@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { Trash2, X, Calendar, AlignLeft, Tag, Users, CheckSquare, Edit3 } from 'lucide-react';
+import { Trash2, X, AlignLeft, Tag, Users, CheckSquare, Edit3 } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { saveTask, assignTaskUsers } from '../store/slices/boardSlice';
 import '../index.css';
 
-export default function TaskPanel({ isOpen, onClose, task, projectId, updateTaskInState, handleCreateDraftTask, handleDeleteTask, isOwner, projectMembers, usersMap }) {
+export default function TaskPanel({ isOpen, onClose, task, handleCreateDraftTask, handleDeleteTask, isOwner, projectMembers, usersMap }) {
   // REDUX: useDispatch returns the store's dispatch; thunks and plain actions are sent through it
   const dispatch = useDispatch();
   // We determine initial mode based on whether it's a draft
@@ -29,6 +29,8 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Reset the form when the panel opens or a different task is shown. It must NOT run when the
+  // same task changes (e.g. someone is assigned), or whatever you had typed would be wiped.
   useEffect(() => {
     if (task) {
       setTitle(task.content || '');
@@ -36,7 +38,8 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
       setPriority(task.priority || 'medium');
       setMode(task._isDraft ? 'edit' : 'view');
     }
-  }, [task]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, task?.id]);
 
   if (!isOpen || !task) return null;
 
@@ -96,9 +99,12 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
 
   return (
     <>
-      <div className="modal-overlay" onClick={handleClose} style={{display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>
+      <div className="modal-overlay" onClick={handleClose} role="presentation" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000}}>
         <div 
           className="modal-content" 
+          role="dialog"
+          aria-modal="true"
+          aria-label={task._isDraft ? 'New task' : 'Task details'}
           onClick={e => e.stopPropagation()} 
           style={{
             maxWidth: 600, 
@@ -133,6 +139,8 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
             </div>
             <button 
               onClick={handleClose}
+              aria-label="Close task panel"
+              title="Close"
               style={{background: 'var(--bg-main)', border: '1px solid var(--border-color)', borderRadius: '50%', width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--text-secondary)', transition: 'all 0.2s', flexShrink: 0}}
               onMouseOver={e => { e.currentTarget.style.background = 'var(--bg-card)'; e.currentTarget.style.color = 'var(--text-primary)'; }}
               onMouseOut={e => { e.currentTarget.style.background = 'var(--bg-main)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
@@ -219,12 +227,13 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
                     <span style={{
                       fontSize: 12, fontWeight: 700, textTransform: 'uppercase', padding: '4px 8px', borderRadius: 4,
                       background: priority === 'high' ? 'rgba(239, 68, 68, 0.1)' : priority === 'medium' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(16, 185, 129, 0.1)',
-                      color: priority === 'high' ? '#ef4444' : priority === 'medium' ? '#f59e0b' : '#10b981'
+                      color: priority === 'high' ? 'var(--danger-text)' : priority === 'medium' ? 'var(--priority-medium-text)' : 'var(--priority-low-text)'
                     }}>
                       {priority}
                     </span>
                   ) : (
                     <select 
+                      aria-label="Priority"
                       className="clean-input" 
                       value={priority}
                       onChange={(e) => setPriority(e.target.value)}
@@ -284,7 +293,7 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
                   onClick={onSubmitDraft}
                   disabled={!title.trim()}
                   style={{
-                    padding: '10px 20px', background: 'var(--primary-color)', color: '#fff', 
+                    padding: '10px 20px', background: 'var(--primary-strong)', color: '#fff', 
                     border: 'none', borderRadius: 8, fontWeight: 600, cursor: title.trim() ? 'pointer' : 'not-allowed',
                     opacity: title.trim() ? 1 : 0.5
                   }}
@@ -296,13 +305,13 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
               <>
                 <button 
                   onClick={onDelete}
-                  style={{padding: '10px 20px', borderRadius: 8, border: '1px solid #ef4444', background: 'transparent', color: '#ef4444', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8}}
+                  style={{padding: '10px 20px', borderRadius: 8, border: '1px solid var(--danger-text)', background: 'transparent', color: 'var(--danger-text)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8}}
                 >
                   <Trash2 size={16} /> Delete Task
                 </button>
                 <button 
                   onClick={() => setMode('edit')}
-                  style={{padding: '10px 20px', borderRadius: 8, border: 'none', background: 'var(--primary-color)', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8}}
+                  style={{padding: '10px 20px', borderRadius: 8, border: 'none', background: 'var(--primary-strong)', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8}}
                 >
                   <Edit3 size={16} /> Edit Task
                 </button>
@@ -324,7 +333,7 @@ export default function TaskPanel({ isOpen, onClose, task, projectId, updateTask
                   onClick={handleUpdateClick}
                   disabled={!title.trim()}
                   style={{
-                    padding: '10px 20px', background: 'var(--primary-color)', color: '#fff', 
+                    padding: '10px 20px', background: 'var(--primary-strong)', color: '#fff', 
                     border: 'none', borderRadius: 8, fontWeight: 600, cursor: title.trim() ? 'pointer' : 'not-allowed',
                     opacity: title.trim() ? 1 : 0.5
                   }}
