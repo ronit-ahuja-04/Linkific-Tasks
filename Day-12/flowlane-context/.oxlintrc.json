@@ -16,5 +16,24 @@
   "ignorePatterns": [
     "dist/",
     "e2e/"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "test/**"
+      ],
+      "rules": {
+        "react/globals": "off",
+        "react/immutability": "off"
+      }
+    },
+    {
+      "files": [
+        "src/context/**"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
   ]
 }

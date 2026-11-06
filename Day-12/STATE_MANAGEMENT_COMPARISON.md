@@ -31,6 +31,7 @@ Written after building the same app (FlowLane) with Redux for everything on Day 
 | Signed-in user | Context | Read by almost everything, changes at sign-in and sign-out only |
 | Theme | Context | One value, changes on a click |
 | Language | Context | Read by every component that shows text, changes rarely |
+| Toast messages | Context with `useReducer` | Triggered from anywhere, drawn in one place, nothing else needs the list |
 | Open tab, modals, task panel | Redux | Code outside React reads the open tab (the chat listener decides whether to show a new-activity dot) |
 | Board, projects, users, invitations, notifications | Redux | Live Firestore data from five listeners, optimistic drag and drop with rollback, many writers |
 
@@ -61,12 +62,18 @@ Without the split, both would re-render every time. The fix is cheap: put values
 
 | | Day 11 (Redux for everything) | Day 12 (Context + Redux) |
 | --- | --- | --- |
-| JS bundle, gzipped | 300.5 kB | 308.5 kB |
+| JS bundle, gzipped | 300.5 kB | 311.1 kB |
 | State code for auth and theme | 2 Redux slices, 167 lines | 2 contexts, 248 lines |
 | Redux slices | 8 | 6 |
-| Other work in the Day 12 build | | Language switching (3 languages, 123 keys each), a reusable `Tabs` component |
+| Other work in the Day 12 build | | Language switching (3 languages), compound `Tabs` and `Dropdown`, toasts, an animated theme switch |
 
-The bundle grew 8 kB, which is the new language dictionaries and the Tabs component, not Context itself (Context is built into React). The Context versions of auth and theme are longer than the slices they replaced because they now also contain the Firebase sign-in logic and the profile syncing that used to live in separate listeners and thunks, so the lines moved rather than multiplied.
+The bundle grew about 10.6 kB, which is the new language dictionaries, the Tabs and Dropdown components and the toast code, not Context itself (Context is built into React). The Context versions of auth and theme are longer than the slices they replaced because they now also contain the Firebase sign-in logic and the profile syncing that used to live in separate listeners and thunks, so the lines moved rather than multiplied.
+
+## A reducer inside a Context
+
+The toast list changes through a few named actions (add, dismiss, clear), so `ToastContext` holds it with `useReducer` instead of several `useState` calls. The reducer is a plain function (`toastReducer`), tested without React, and it enforces the rule "at most four toasts, drop the oldest" in one place. It also uses the split from above: `useToast()` returns actions that never change, so a button handler that shows a toast does not re-render when toasts appear and vanish (a test counts: 0 extra renders). Only the viewport that draws the list reads it.
+
+`useReducer` plus Context is the usual middle step between `useState` and Redux: structured updates and a testable reducer, no extra library. It stops being enough when other code (outside React) must dispatch into it or you want middleware and time travel, which is when the board moves to Redux.
 
 ## Mistakes and lessons from this build
 

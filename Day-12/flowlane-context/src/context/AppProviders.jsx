@@ -3,6 +3,7 @@ import { store as defaultStore } from '../store';
 import { AuthProvider } from './AuthContext';
 import { ThemeProvider } from './ThemeContext';
 import { LanguageProvider } from './LanguageContext';
+import { ToastProvider } from './ToastContext';
 
 /**
  * CONTEXT COMPOSITION: every provider in one place, in dependency order.
@@ -11,6 +12,7 @@ import { LanguageProvider } from './LanguageContext';
  *     AuthProvider     who is signed in
  *       ThemeProvider  needs Auth (saves the theme on the user's profile), so it goes inside it
  *         LanguageProvider
+ *           ToastProvider  its viewport translates the close button, so it sits inside Language
  *
  * Order matters only where one provider uses another: ThemeProvider calls useAuth(), so
  * AuthProvider must wrap it. Keeping them here means main.jsx and the tests wrap the app the same way.
@@ -20,7 +22,9 @@ export default function AppProviders({ children, store = defaultStore }) {
     <ReduxProvider store={store}>
       <AuthProvider>
         <ThemeProvider>
-          <LanguageProvider>{children}</LanguageProvider>
+          <LanguageProvider>
+            <ToastProvider>{children}</ToastProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </AuthProvider>
     </ReduxProvider>

@@ -13,9 +13,9 @@ cd Day-12/flowlane-context
 npm install
 cp .env.example .env    # your Firebase web app keys
 npm run dev
-npm test                # 141 unit and component tests (Firebase mocked)
+npm test                # 181 unit and component tests (Firebase mocked)
 npm run test:rules      # 23 Firestore security-rules tests (emulator, needs Java)
-npm run test:e2e        # 61 browser tests against the Firebase emulators
+npm run test:e2e        # 81 browser tests against the Firebase emulators
 npm run test:all
 ```
 
@@ -26,6 +26,7 @@ npm run test:all
 | Signed-in user, sign-in/out functions | **AuthContext** | Read everywhere, changes rarely, no async orchestration or time travel needed |
 | Light or dark theme | **ThemeContext** | UI preference, one value |
 | Interface language and `t()` | **LanguageContext** | Read by every component that shows text, changes rarely |
+| Short feedback messages (toasts) | **ToastContext** (`useReducer`) | Triggered from anywhere, shown in one place, nothing else needs them |
 | Open tab, modals, task panel | Redux (`ui` slice) | Other code (the activity listener) reads it outside React |
 | Projects, board, users, invitations, notifications | **Redux** | Live Firestore data, optimistic updates with rollback, many writers, DevTools |
 | Form fields, which task is being edited | `useState` | Only one component cares |
@@ -39,7 +40,8 @@ main.jsx
       AuthProvider                  who is signed in
         ThemeProvider               uses useAuth() to save the theme on the profile
           LanguageProvider
-            App
+            ToastProvider           its viewport translates the close button, so it sits inside Language
+              App
 ```
 
 ## 2. Context basics, where to find each
@@ -65,7 +67,7 @@ export function useAuth() {
 ```
 The context is created with `null` as its default, so forgetting the provider fails immediately with a message that says what to do, instead of an obscure `undefined` error later.
 
-## 3. The three contexts
+## 3. The contexts
 
 **AuthContext** (`user`, `status`, `busy`, `error`, `signIn`, `signUp`, `signInWithGoogle`, `signOut`, `clearError`)
 - Subscribes to Firebase Auth once, keeps only four plain fields of the Firebase user, and saves the profile so teammates can find the user by email.
@@ -75,6 +77,10 @@ The context is created with `null` as its default, so forgetting the provider fa
 **ThemeContext** (`mode`, `isDark`, `toggleTheme`, `setTheme`)
 - Applies `data-theme` to `<html>`, so even the sign-in page follows the saved theme.
 - Saves the theme on the user's profile and follows it live: a change on another device applies here. It listens to the profile and only applies the server-confirmed version, because right after sign-in the app is also writing the profile and a plain read could answer from that half-written local copy (found by a browser test).
+
+**ToastContext** (`useToast()` gives `success`, `error`, `info`, `dismiss`, `clear`; `useToasts()` gives the list)
+- A reducer inside a Context: `toastReducer` is a pure function (add, dismiss, clear, at most four) and the provider holds it with `useReducer`.
+- Split into a state context (only the viewport reads it) and an actions context that never changes, so a component that just shows a toast never re-renders when toasts come and go.
 
 **LanguageContext** (`locale`, `locales`, `setLocale`, `t`)
 - English, Spanish and Hindi, 123 keys each, one dictionary file per area of the app (`src/i18n/<lang>/`).
@@ -100,7 +106,7 @@ They are not rivals. The only coupling is one line of data flow, from Context to
 - **Redux does not feed Context.** Nothing in a context depends on the store, which keeps the dependency one-way and easy to test.
 - A browser test signs out and in as someone else and checks that thunks act as the *new* user.
 
-## 6. Compound component: `Tabs`
+## 6. Compound components: `Tabs` and `Dropdown`
 
 `src/components/Tabs.jsx`: `Tabs`, `Tabs.List`, `Tabs.Tab`, `Tabs.Panel`.
 ```jsx
@@ -120,21 +126,34 @@ They are not rivals. The only coupling is one line of data flow, from Context to
 
 Used twice: the project Board/Activity tabs and the Settings Appearance/Language tabs.
 
-## 7. Comparing local state, Context and Redux
+`Dropdown` (`Dropdown.Trigger`, `Dropdown.Menu`, `Dropdown.Item`) follows the same idea for a menu button: the parts share open/closed state and ids through a private Context, and own the behaviour people expect (click outside and Escape close it, focus returns to the button, arrow keys, Home and End move between items, `role="menu"` with checkable `menuitemradio` items). It powers the language menu in the header.
+
+## 7. Visible polish built on those patterns
+
+| What you see | Built with | Where |
+| --- | --- | --- |
+| **Theme switch grows out of the button** as an expanding circle | `ThemeContext` plus the View Transitions API. `toggleTheme(clickEvent)` snapshots the page, flips the theme inside the transition and animates a `clip-path` circle from the click. Keyboard use grows from the button's centre. Falls back to an instant flip when the API is missing or the user prefers reduced motion | `context/ThemeContext.jsx`, CSS `::view-transition-*` |
+| **Language menu in the header** (globe, current code, checked language, arrow keys, Escape, click outside) | A second **compound component**, `Dropdown` (`Dropdown.Trigger`, `.Menu`, `.Item`), driven by `LanguageContext`. The choice is announced in the language just picked | `components/Dropdown.jsx`, `components/LanguageMenu.jsx` |
+| **Toasts** for task created, moved and deleted, theme and language changes, project actions and errors | `ToastContext` with **`useReducer` inside a Context**. A pure `toastReducer` (add, dismiss, clear, max four), a split state and actions context so callers never re-render, a countdown bar, pause on hover or focus, an exit animation, `role="status"` for messages and `role="alert"` for errors | `context/ToastContext.jsx`, `components/ToastViewport.jsx` |
+| **Tab underline glides** between tabs and follows a tab when its text changes width | The `Tabs` compound component moves one decorative element by writing to its style directly (no React state, so a tab change costs no extra render) and watches tab sizes with a `ResizeObserver` | `components/Tabs.jsx` |
+
+The success and error pop-up modals were replaced by toasts; errors stay on screen longer and are announced to screen readers. Motion respects `prefers-reduced-motion` everywhere.
+
+## 8. Comparing local state, Context and Redux
 
 See [STATE_MANAGEMENT_COMPARISON.md](../STATE_MANAGEMENT_COMPARISON.md) for the table, the decision rules, and measured numbers from this app.
 
-## 8. Tests
+## 9. Tests
 
 | Layer | Command | Count | Covers |
 | --- | --- | --- | --- |
-| Unit and component | `npm test` | 141 | Redux slices and thunks, listeners, the three contexts and their hooks (errors outside the provider, memoization, render counts), Tabs behaviour and keyboard, translations complete in every language |
+| Unit and component | `npm test` | 181 | Redux slices and thunks, listeners, the three contexts and their hooks (errors outside the provider, memoization, render counts), Tabs behaviour, keyboard and the sliding indicator, the Dropdown, the toast reducer and viewport (timers, pausing, limits), the animated theme switch with its fallbacks, translations complete in every language |
 | Security rules | `npm run test:rules` | 23 | Firestore rules against the emulator |
-| Browser end to end | `npm run test:e2e` | 61 | Auth, projects, board and drag and drop, collaboration with several browsers, chat, language switching, theme persistence, Tabs keyboard use, the Context-to-Redux bridge, and WCAG 2.1 AA audits (including Spanish and Hindi) |
+| Browser end to end | `npm run test:e2e` | 81 | Auth, projects, board and drag and drop, collaboration with several browsers, chat, language switching and the header language menu, toasts (auto-dismiss, pause on hover, close, stacking, alerts), the animated theme switch and its reduced-motion fallback, the sliding tab underline, theme persistence, Tabs keyboard use, the Context-to-Redux bridge, and WCAG 2.1 AA audits (including Spanish and Hindi, the open language menu and toasts on screen) |
 
 Every browser test fails on any console error, warning or browser Issue hint. The translation tests check that every language has exactly the same keys as English, no empty values, the same placeholders, that every `t('...')` key used in the code exists, and that no dictionary key is unused.
 
-## 9. Limits and honest notes
+## 10. Limits and honest notes
 
 - **Cart context:** the task list mentions a shopping-cart context. FlowLane has no cart, so it is not built here. The Day 11 app `redux-app` has the cart (in Redux); the comparison document shows how it would differ as a Context.
 - **Translations:** the interface text is translated. Messages stored in Firestore (notifications) and error texts that come from the store stay in English. Spanish and Hindi were written by me and should be reviewed by a native speaker before shipping.

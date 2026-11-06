@@ -1060,15 +1060,22 @@ body {
 .tab-panel[hidden] {
   display: none;
 }
-.tab.active::after {
-  content: '';
+/* The underline is a real element that glides between tabs (see Tabs.jsx) */
+.tab-list {
+  position: relative;
+}
+.tab-indicator {
   position: absolute;
   bottom: -1px;
   left: 0;
-  right: 0;
   height: 2px;
+  width: 0;
   background-color: var(--accent-color);
   border-radius: 2px 2px 0 0;
+  pointer-events: none;
+}
+.tab-indicator[data-ready] {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Auth Page Styles */
@@ -1296,4 +1303,123 @@ body {
     width: 100%;
     padding: 20px;
   }
+}
+
+
+/* ---------- Animated theme switch (View Transitions API, see ThemeContext.jsx) ---------- */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* ---------- Toasts (see ToastContext.jsx, ToastViewport.jsx), top centre ---------- */
+.snack-viewport {
+  position: fixed;
+  top: 84px; /* just under the header, so it never covers the chat box or the bottom of the page */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(420px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.snack {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 12px 14px 14px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  pointer-events: auto;
+  animation: snack-in 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.snack--leaving { animation: snack-out 0.22s ease-in both; }
+.snack-icon { flex-shrink: 0; margin-top: 1px; }
+.snack--success .snack-icon { color: var(--priority-low-text); }
+.snack--error .snack-icon { color: var(--danger-text); }
+.snack--info .snack-icon { color: var(--primary-text); }
+.snack-message { flex: 1; margin: 0; font-size: 14px; line-height: 1.4; }
+.snack-close {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.snack-close:hover { background: var(--border-color); color: var(--text-primary); }
+.snack-bar {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: currentColor;
+  transform-origin: left;
+  animation: snack-countdown linear forwards;
+}
+.snack--success .snack-bar { color: var(--priority-low-text); }
+.snack--error .snack-bar { color: var(--danger-text); }
+.snack--info .snack-bar { color: var(--primary-text); }
+@keyframes snack-in { from { opacity: 0; transform: translateY(-16px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes snack-out { to { opacity: 0; transform: translateY(-8px) scale(0.96); } }
+@keyframes snack-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* ---------- Dropdown (see Dropdown.jsx) and the language menu ---------- */
+.dropdown { position: relative; display: inline-flex; }
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1500;
+  min-width: 170px;
+  padding: 6px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+  animation: dropdown-in 0.15s ease-out both;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 10px;
+  background: none;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+.dropdown-item:hover,
+.dropdown-item:focus-visible { background: var(--bg-main); outline: none; }
+.dropdown-item:focus-visible { box-shadow: inset 0 0 0 2px var(--accent-color); }
+.dropdown-item.selected { font-weight: 600; }
+.language-trigger { width: auto; padding: 0 10px; gap: 6px; }
+.language-code { font-size: 12px; font-weight: 700; letter-spacing: 0.04em; }
+@keyframes dropdown-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .snack, .snack--leaving, .dropdown-menu { animation-duration: 0.01ms; }
+  .snack-bar { animation: none; }
+  .tab-indicator[data-ready] { transition: none; }
 }

@@ -138,7 +138,6 @@ test.describe('context and Redux working together', () => {
     await page.locator('.sidebar .nav-item', { hasText: 'New Project' }).click();
     await page.getByPlaceholder('e.g. Website Redesign').fill('Second users project');
     await page.getByRole('button', { name: 'Create Project' }).click();
-    await page.getByRole('button', { name: 'Awesome' }).click();
     await expect(sidebarProject(page, 'Second users project')).toHaveCount(1);
     await page.reload();
     await expect(sidebarProject(page, 'Second users project')).toHaveCount(1);

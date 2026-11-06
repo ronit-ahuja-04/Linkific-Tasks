@@ -168,6 +168,87 @@ describe('ThemeProvider', () => {
   });
 });
 
+describe('animated theme switch (View Transitions API)', () => {
+  const click = (x = 100, y = 50) => ({ currentTarget: { getBoundingClientRect: () => ({ left: 0, top: 0, width: 40, height: 40 }) }, clientX: x, clientY: y, detail: 1 });
+  let startViewTransition;
+  let animate;
+
+  beforeEach(() => {
+    animate = vi.fn();
+    document.documentElement.animate = animate;
+    startViewTransition = vi.fn((callback) => {
+      callback();
+      return { ready: Promise.resolve() };
+    });
+    document.startViewTransition = startViewTransition;
+    vi.stubGlobal('matchMedia', () => ({ matches: false }));
+  });
+  afterEach(() => {
+    delete document.startViewTransition;
+    delete document.documentElement.animate;
+  });
+
+  it('with a click event: runs the change inside a view transition and reveals it from the pointer', async () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme(click(100, 50)));
+    expect(startViewTransition).toHaveBeenCalledOnce();
+    expect(result.current.mode).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+    await act(async () => {}); // let transition.ready resolve
+    const [keyframes, options] = animate.mock.calls[0];
+    expect(keyframes.clipPath[0]).toBe('circle(0px at 100px 50px)');
+    expect(keyframes.clipPath[1]).toMatch(/^circle\([\d.]+px at 100px 50px\)$/);
+    expect(options).toMatchObject({ pseudoElement: '::view-transition-new(root)' });
+  });
+
+  it('a keyboard activation grows from the centre of the button, not from (0, 0)', async () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme({ ...click(), clientX: 0, clientY: 0, detail: 0 }));
+    await act(async () => {});
+    expect(animate.mock.calls[0][0].clipPath[0]).toBe('circle(0px at 20px 20px)');
+  });
+
+  it('accepts a plain {x, y} origin too', async () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme({ x: 7, y: 9 }));
+    await act(async () => {});
+    expect(animate.mock.calls[0][0].clipPath[0]).toBe('circle(0px at 7px 9px)');
+  });
+
+  it('without an origin (toggleTheme() alone) it just flips, no transition', () => {
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme());
+    expect(startViewTransition).not.toHaveBeenCalled();
+    expect(result.current.mode).toBe('dark');
+  });
+
+  it('respects prefers-reduced-motion: flips with no transition', () => {
+    vi.stubGlobal('matchMedia', () => ({ matches: true }));
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme(click()));
+    expect(startViewTransition).not.toHaveBeenCalled();
+    expect(result.current.mode).toBe('dark');
+  });
+
+  it('falls back to a plain flip in browsers without the API', () => {
+    delete document.startViewTransition;
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme(click()));
+    expect(result.current.mode).toBe('dark');
+  });
+
+  it('an interrupted transition is not an error', async () => {
+    startViewTransition.mockImplementation((callback) => {
+      callback();
+      return { ready: Promise.reject(new Error('InvalidStateError')) };
+    });
+    const { result } = renderHook(() => useTheme(), { wrapper });
+    act(() => result.current.toggleTheme(click()));
+    await act(async () => {});
+    expect(result.current.mode).toBe('dark');
+  });
+});
+
 describe('splitting a context to avoid needless re-renders', () => {
   it('a component using only useThemeActions does NOT re-render when the theme changes; one using useThemeState does', () => {
     const renders = { actionsOnly: 0, stateReader: 0 };

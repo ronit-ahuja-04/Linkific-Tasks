@@ -1,3 +1,4 @@
+import { flushSync } from 'react-dom';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../lib/firebase';
@@ -21,6 +22,21 @@ const ThemeStateContext = createContext(null);
 const ThemeActionsContext = createContext(null);
 
 const STORAGE_KEY = 'theme';
+
+/** Where the click happened, so the new theme can grow out of it. Accepts a click event or {x, y}. */
+function originOf(arg) {
+  if (!arg) return null;
+  if (typeof arg.x === 'number' && typeof arg.y === 'number') return { x: arg.x, y: arg.y };
+  if (arg.currentTarget?.getBoundingClientRect) {
+    const rect = arg.currentTarget.getBoundingClientRect();
+    // detail is 0 for a keyboard "click": use the centre of the button instead of the pointer
+    return arg.detail === 0
+      ? { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 }
+      : { x: arg.clientX, y: arg.clientY };
+  }
+  return null;
+}
+const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
 const readStoredTheme = () => {
   try {
@@ -90,9 +106,39 @@ export function ThemeProvider({ children }) {
     }
   }, []);
 
-  const toggleTheme = useCallback(() => {
-    setTheme(modeRef.current === 'dark' ? 'light' : 'dark');
-  }, [setTheme]);
+  /**
+   * toggleTheme() flips at once. toggleTheme(clickEvent) flips with a circular reveal that grows
+   * from the button, using the View Transitions API: the browser snapshots the old page, we change
+   * the theme inside the callback, and the new page is revealed through an expanding circle.
+   * It falls back to the plain flip where the API is missing or the user prefers reduced motion.
+   */
+  const toggleTheme = useCallback(
+    (arg) => {
+      const next = modeRef.current === 'dark' ? 'light' : 'dark';
+      const origin = originOf(arg);
+      if (!origin || !document.startViewTransition || prefersReducedMotion()) {
+        setTheme(next);
+        return;
+      }
+      const radius = Math.hypot(Math.max(origin.x, window.innerWidth - origin.x), Math.max(origin.y, window.innerHeight - origin.y));
+      const transition = document.startViewTransition(() => {
+        // flushSync makes React update the DOM inside the callback, which the browser needs
+        flushSync(() => {
+          document.documentElement.setAttribute('data-theme', next);
+          setTheme(next);
+        });
+      });
+      transition.ready
+        .then(() =>
+          document.documentElement.animate(
+            { clipPath: [`circle(0px at ${origin.x}px ${origin.y}px)`, `circle(${radius}px at ${origin.x}px ${origin.y}px)`] },
+            { duration: 550, easing: 'ease-in-out', pseudoElement: '::view-transition-new(root)' }
+          )
+        )
+        .catch(() => {}); // an interrupted transition is not an error
+    },
+    [setTheme]
+  );
 
   // Both values are memoized. `actions` has no dependencies that ever change, so it is created once.
   const state = useMemo(() => ({ mode, isDark: mode === 'dark' }), [mode]);

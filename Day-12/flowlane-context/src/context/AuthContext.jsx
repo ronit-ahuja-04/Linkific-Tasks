@@ -26,17 +26,17 @@ const NOT_CONFIGURED = 'Firebase keys are required. Add them to .env (see .env.e
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  // 'loading' until Firebase reports once, then 'authenticated' or 'unauthenticated'
-  const [status, setStatus] = useState('loading');
+  // 'loading' until Firebase reports once, then 'authenticated' or 'unauthenticated'.
+  // Without Firebase keys nothing can ever report, so it starts signed out.
+  const [status, setStatus] = useState(isFirebaseConfigured ? 'loading' : 'unauthenticated');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
 
   // Listen to Firebase Auth for the lifetime of the app
   useEffect(() => {
     if (!isFirebaseConfigured) {
-      // No keys: nobody can be signed in, so show the sign-in page
+      // No keys: nobody can be signed in, so the sign-in page is shown (status starts as signed out)
       console.warn('Firebase is not configured. Copy .env.example to .env and add your keys.');
-      setStatus('unauthenticated');
       return undefined;
     }
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {

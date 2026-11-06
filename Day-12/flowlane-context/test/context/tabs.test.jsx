@@ -137,7 +137,7 @@ describe('Tabs (compound component)', () => {
         <Tabs.Panel value="a" className="mine">A</Tabs.Panel>
       </Tabs>
     );
-    expect(screen.getByTestId('list').className).toBe('project-tabs');
+    expect(screen.getByTestId('list').className).toBe('tab-list project-tabs');
     expect(screen.getByRole('tab').className).toBe('tab active extra');
     expect(screen.getByRole('tabpanel').className).toBe('mine');
   });
@@ -154,5 +154,61 @@ describe('Tabs (compound component)', () => {
     fireEvent.click(firstTwo);
     expect(firstTwo.getAttribute('aria-selected')).toBe('true');
     expect(secondTwo.getAttribute('aria-selected')).toBe('false');
+  });
+
+  describe('sliding indicator', () => {
+    // jsdom has no layout, so give each tab a size and position from data attributes
+    const originalWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+    const originalLeft = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetLeft');
+    afterEach(() => {
+      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalWidth);
+      Object.defineProperty(HTMLElement.prototype, 'offsetLeft', originalLeft);
+    });
+    const layout = () => {
+      Object.defineProperty(HTMLElement.prototype, 'offsetWidth', { configurable: true, get() { return Number(this.dataset?.w ?? 0); } });
+      Object.defineProperty(HTMLElement.prototype, 'offsetLeft', { configurable: true, get() { return Number(this.dataset?.x ?? 0); } });
+    };
+    const Two = (props) => (
+      <Tabs {...props}>
+        <Tabs.List aria-label="v">
+          <Tabs.Tab value="a" data-w="60" data-x="0">A</Tabs.Tab>
+          <Tabs.Tab value="b" data-w="90" data-x="92">B</Tabs.Tab>
+        </Tabs.List>
+      </Tabs>
+    );
+
+    it('renders a decorative indicator element inside the tab list', () => {
+      layout();
+      render(<Two defaultValue="a" />);
+      const indicator = document.querySelector('.tab-indicator');
+      expect(indicator).not.toBeNull();
+      expect(indicator.getAttribute('aria-hidden')).toBe('true');
+      expect(screen.getByRole('tablist').contains(indicator)).toBe(true);
+    });
+
+    it('sits under the active tab and glides to the next one when the tab changes', async () => {
+      layout();
+      render(<Two defaultValue="a" />);
+      const indicator = document.querySelector('.tab-indicator');
+      expect(indicator.style.width).toBe('60px');
+      expect(indicator.style.transform).toBe('translateX(0px)');
+      await userEvent.click(screen.getByRole('tab', { name: 'B' }));
+      expect(indicator.style.width).toBe('90px');
+      expect(indicator.style.transform).toBe('translateX(92px)');
+    });
+
+    it('is moved by editing the DOM directly: a tab change does not re-render the list', async () => {
+      layout();
+      let renders = 0;
+      function Probe() {
+        renders += 1;
+        return null;
+      }
+      render(<Tabs defaultValue="a"><Tabs.List aria-label="v"><Tabs.Tab value="a" data-w="60" data-x="0">A</Tabs.Tab><Tabs.Tab value="b" data-w="90" data-x="92">B</Tabs.Tab><Probe /></Tabs.List></Tabs>);
+      const before = renders;
+      await userEvent.click(screen.getByRole('tab', { name: 'B' }));
+      // the Tabs state changed (so children re-render once), but the indicator itself needed no state
+      expect(renders - before).toBeLessThanOrEqual(1);
+    });
   });
 });

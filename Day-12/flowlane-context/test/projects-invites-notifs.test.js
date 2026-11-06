@@ -19,8 +19,8 @@ import {
   unreadMessagesChanged,
 } from '../src/store/slices/notificationsSlice.js';
 import {
-  activityFlagged, errorDismissed, errorShown, modalClosed, modalOpened, selectActiveTab, selectErrorMessage,
-  selectHasNewActivity, selectModals, selectSuccessMessage, successDismissed, successShown, tabChanged,
+  activityFlagged, modalClosed, modalOpened, selectActiveTab,
+  selectHasNewActivity, selectModals, tabChanged,
   taskPanelClosed, taskPanelOpened, selectTaskPanel,
 } from '../src/store/slices/uiSlice.js';
 import { errorMessageOf, toPlain } from '../src/lib/serialize.js';
@@ -252,18 +252,12 @@ describe('ui slice', () => {
     expect(selectHasNewActivity(store.getState())).toBe(false);
   });
 
-  it('opens and closes modals independently and shows feedback messages', () => {
+  it('opens and closes modals independently', () => {
     const store = makeStore();
     store.dispatch(modalOpened('newProject'));
     store.dispatch(modalOpened('invite'));
     store.dispatch(modalClosed('invite'));
     expect(selectModals(store.getState())).toEqual({ newProject: true, deleteProject: false, invite: false });
-    store.dispatch(errorShown('Oops'));
-    store.dispatch(successShown('Yay'));
-    expect([selectErrorMessage(store.getState()), selectSuccessMessage(store.getState())]).toEqual(['Oops', 'Yay']);
-    store.dispatch(errorDismissed());
-    store.dispatch(successDismissed());
-    expect([selectErrorMessage(store.getState()), selectSuccessMessage(store.getState())]).toEqual(['', '']);
   });
 
   it('opens and closes the task panel', () => {
