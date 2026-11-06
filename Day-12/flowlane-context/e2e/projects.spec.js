@@ -4,8 +4,7 @@ test.describe('projects', () => {
   test('creates a project: success message, sidebar entry, navigation and persistence', async ({ page }) => {
     await signUp(page, uniqueEmail('proj'));
     await createProject(page, 'Website Redesign');
-    await expect(page.locator('.modal-content', { hasText: 'Created project "Website Redesign"!' })).toBeVisible();
-    await page.getByRole('button', { name: 'Awesome' }).click();
+    await expect(page.locator('.snack--success', { hasText: 'Created project "Website Redesign"!' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Website Redesign' })).toBeVisible();
     await expect(sidebarProject(page, 'Website Redesign')).toHaveClass(/active/);
     await expect(page).toHaveURL(/\/projects\/[A-Za-z0-9]+$/);
@@ -34,15 +33,13 @@ test.describe('projects', () => {
   test('explains when the chosen owner email does not exist', async ({ page }) => {
     await signUp(page, uniqueEmail('badowner'));
     await createProject(page, 'Ghost Project', 'nobody-here@test.dev');
-    await expect(page.locator('.modal-content', { hasText: 'Could not find a user with that email in the system.' })).toBeVisible();
-    await page.getByRole('button', { name: 'Okay' }).click();
+    await expect(page.getByRole('alert').filter({ hasText: 'Could not find a user with that email in the system.' })).toBeVisible();
     await expect(sidebarProject(page, 'Ghost Project')).toHaveCount(0);
   });
 
   test('switches between projects from the sidebar', async ({ page }) => {
     await signUp(page, uniqueEmail('switch'));
     await createProject(page, 'Second One');
-    await page.getByRole('button', { name: 'Awesome' }).click();
     await expect(page.getByRole('heading', { name: 'Second One' })).toBeVisible();
     await sidebarProject(page, 'My First Project').click();
     await expect(page.getByRole('heading', { name: 'My First Project' })).toBeVisible();
@@ -53,7 +50,6 @@ test.describe('projects', () => {
   test('the owner can delete a project after confirming; cancelling keeps it', async ({ page }) => {
     await signUp(page, uniqueEmail('del'));
     await createProject(page, 'Doomed');
-    await page.getByRole('button', { name: 'Awesome' }).click();
     await page.getByRole('button', { name: 'Delete Project' }).click();
     const dialog = page.locator('.modal-content', { hasText: 'This action cannot be undone' });
     await expect(dialog).toContainText('Doomed');

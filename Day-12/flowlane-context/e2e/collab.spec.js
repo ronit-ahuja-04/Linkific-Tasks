@@ -12,13 +12,15 @@ async function keyboardDrag(page, cardLocator, keys) {
 }
 
 async function invite(page, email) {
-  await page.getByRole('button', { name: 'Invite' }).click();
-  await page.getByPlaceholder('Email address').fill(email);
+  const input = page.getByPlaceholder('Email address');
+  // after an error toast the invite box stays open so the email can be corrected
+  if (!(await input.isVisible())) await page.getByRole('button', { name: 'Invite', exact: true }).click();
+  await input.fill(email);
   await page.getByRole('button', { name: 'Send Invite' }).click();
 }
 
 const toast = (page, text) => page.locator('.toast', { hasText: text });
-const closeSuccess = (page) => page.getByRole('button', { name: 'Awesome' }).click();
+const snack = (page, text) => page.locator('.snack', { hasText: text });
 
 /** A owns "Team Alpha"; B has been invited and has accepted. Returns both pages and emails. */
 async function team(page, newUserPage) {
@@ -28,15 +30,12 @@ async function team(page, newUserPage) {
   await signUp(page, emailA);
   await signUp(b, emailB);
   await createProject(page, 'Team Alpha');
-  await closeSuccess(page);
   await expect(page.getByRole('heading', { name: 'Team Alpha' })).toBeVisible();
   await invite(page, emailB);
-  await expect(page.locator('.modal-content', { hasText: `Invitation sent to ${nameOf(emailB)}!` })).toBeVisible();
-  await closeSuccess(page);
+  await expect(snack(page, `Invitation sent to ${nameOf(emailB)}!`)).toBeVisible();
   await expect(toast(b, 'invited you to')).toContainText('Team Alpha');
   await toast(b, 'invited you to').getByRole('button', { name: 'Accept' }).click();
-  await expect(b.locator('.modal-content', { hasText: 'You joined Team Alpha!' })).toBeVisible();
-  await closeSuccess(b);
+  await expect(snack(b, 'You joined Team Alpha!')).toBeVisible();
   await sidebarProject(b, 'Team Alpha').click();
   await expect(b.getByRole('heading', { name: 'Team Alpha' })).toBeVisible();
   return { a: page, b, emailA, emailB };
@@ -66,26 +65,22 @@ test.describe('invitations', () => {
     await expect(page.getByText(emailC, { exact: true })).toBeVisible();
     await page.locator('.sidebar .nav-item', { hasText: 'My First Project' }).click();
     await invite(page, emailC);
-    await closeSuccess(page);
     await toast(c, 'invited you to').getByRole('button', { name: 'Decline' }).click();
     await expect(toast(c, 'invited you to')).toHaveCount(0);
     await c.reload();
     await expect(c.getByText('Your Projects')).toBeVisible();
     await expect(toast(c, 'invited you to')).toHaveCount(0);
     await invite(page, emailC);
-    await expect(page.locator('.modal-content', { hasText: 'Invitation sent' })).toBeVisible();
-    await closeSuccess(page);
+    await expect(snack(page, 'Invitation sent')).toBeVisible();
     await expect(toast(c, 'invited you to')).toBeVisible();
   });
 
   test('explains when the email is unknown or the person is already a member', async ({ page, newUserPage }) => {
     const { a, emailB } = await team(page, newUserPage);
     await invite(a, 'nobody-registered@test.dev');
-    await expect(a.locator('.modal-content', { hasText: 'No user found with that email' })).toBeVisible();
-    await a.getByRole('button', { name: 'Okay' }).click();
+    await expect(a.getByRole('alert').filter({ hasText: 'No user found with that email' })).toBeVisible();
     await invite(a, emailB);
-    await expect(a.locator('.modal-content', { hasText: `${nameOf(emailB)} is already in this project!` })).toBeVisible();
-    await a.getByRole('button', { name: 'Okay' }).click();
+    await expect(a.getByRole('alert').filter({ hasText: `${nameOf(emailB)} is already in this project!` })).toBeVisible();
   });
 
   test('the invite box closes when you click elsewhere', async ({ page }) => {
@@ -184,8 +179,7 @@ test.describe('shared board', () => {
   test('assigning someone else as owner when creating a project: they become the owner, you do not', async ({ page, newUserPage }) => {
     const { a, b, emailB } = await team(page, newUserPage);
     await createProject(a, 'Bobs Project', emailB);
-    await expect(a.locator('.modal-content', { hasText: 'Created project "Bobs Project"!' })).toBeVisible();
-    await closeSuccess(a);
+    await expect(snack(a, 'Created project "Bobs Project"!')).toBeVisible();
     await expect(toast(b, 'assigned you as the owner')).toBeVisible();
     await sidebarProject(b, 'Bobs Project').click();
     await expect(b.getByRole('button', { name: 'Add Task' })).toBeVisible(); // owner
@@ -201,7 +195,7 @@ test.describe('chat', () => {
     await a.getByText('Activity', { exact: true }).click();
     await expect(a.getByText('No messages yet. Say hi!')).toBeVisible();
     await a.getByPlaceholder('Type a message...').fill('hello team');
-    await a.getByRole('button', { name: '', exact: false }).filter({ has: a.locator('svg') }).last().click();
+    await a.getByRole('button', { name: 'Send message' }).click();
     await expect(a.locator('.chat-messages', { hasText: 'hello team' })).toBeVisible();
 
     // B is on the board: the Activity tab shows a dot, then the message after opening it

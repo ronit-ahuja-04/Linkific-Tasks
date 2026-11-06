@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * COMPOUND COMPONENTS: Tabs is a family of components that only make sense together.
@@ -59,8 +59,33 @@ export function Tabs({ value, defaultValue, onChange, children }) {
 }
 
 function TabList({ children, className = '', ...props }) {
-  useTabsContext('Tabs.List');
+  const { value } = useTabsContext('Tabs.List');
   const listRef = useRef(null);
+  const indicatorRef = useRef(null);
+
+  // The sliding underline. It is moved by writing straight to the element's style, not through
+  // React state, so a tab change costs no extra render. The first placement has no animation, or
+  // the line would slide in from the left edge when the page loads.
+  const placeIndicator = useCallback(() => {
+    const indicator = indicatorRef.current;
+    const active = listRef.current?.querySelector('[role="tab"][aria-selected="true"]');
+    if (!indicator || !active) return;
+    indicator.style.width = `${active.offsetWidth}px`;
+    indicator.style.transform = `translateX(${active.offsetLeft}px)`;
+    if (!indicator.dataset.ready) requestAnimationFrame(() => { indicator.dataset.ready = 'true'; });
+  }, []);
+
+  useLayoutEffect(placeIndicator, [value, placeIndicator]);
+
+  // Tabs change width when their text does (a new language): follow them
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list || typeof ResizeObserver === 'undefined') return undefined;
+    const observer = new ResizeObserver(placeIndicator);
+    observer.observe(list);
+    list.querySelectorAll('[role="tab"]').forEach((tab) => observer.observe(tab));
+    return () => observer.disconnect();
+  }, [placeIndicator]);
 
   const handleKeyDown = (event) => {
     const tabs = [...listRef.current.querySelectorAll('[role="tab"]:not([disabled])')];
@@ -78,8 +103,9 @@ function TabList({ children, className = '', ...props }) {
   };
 
   return (
-    <div role="tablist" ref={listRef} className={className} onKeyDown={handleKeyDown} {...props}>
+    <div role="tablist" ref={listRef} className={`tab-list ${className}`.trim()} onKeyDown={handleKeyDown} {...props}>
       {children}
+      <span ref={indicatorRef} className="tab-indicator" aria-hidden="true" />
     </div>
   );
 }

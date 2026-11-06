@@ -1,6 +1,8 @@
 import { Tabs } from '../components/Tabs';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
+import { announceLanguage } from '../lib/languageToast';
 
 const card = { background: 'var(--bg-secondary)', borderRadius: 12, padding: 24, border: '1px solid var(--border-color)', marginBottom: 24 };
 
@@ -11,6 +13,7 @@ const card = { background: 'var(--bg-secondary)', borderRadius: 12, padding: 24,
 export default function SettingsView({ onBack }) {
   const { mode, toggleTheme } = useTheme();
   const { t, locale, locales, setLocale } = useLanguage();
+  const toast = useToast();
 
   return (
     <div style={{ padding: '40px 60px', maxWidth: 800, margin: '0 auto', width: '100%' }}>
@@ -40,7 +43,10 @@ export default function SettingsView({ onBack }) {
                 role="switch"
                 aria-checked={mode === 'dark'}
                 aria-label={t('settings.darkMode.aria')}
-                onClick={toggleTheme}
+                onClick={(event) => {
+                  toggleTheme(event);
+                  toast.info(mode === 'dark' ? t('ui.toast.themeLight') : t('ui.toast.themeDark'));
+                }}
                 style={{
                   width: 48, height: 26, borderRadius: 13, border: 'none',
                   background: mode === 'dark' ? 'var(--primary-color)' : 'var(--border-color)',
@@ -66,7 +72,10 @@ export default function SettingsView({ onBack }) {
                     name="language"
                     value={option.code}
                     checked={locale === option.code}
-                    onChange={() => setLocale(option.code)}
+                    onChange={() => {
+                      setLocale(option.code);
+                      announceLanguage(toast, option);
+                    }}
                     lang={option.code}
                   />
                   <span lang={option.code}>{option.label}</span>

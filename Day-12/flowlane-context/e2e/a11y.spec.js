@@ -15,6 +15,10 @@ async function expectAccessible(page, label) {
 
 async function tour(page, theme) {
   await addTask(page, `${theme} task`);
+  await expectAccessible(page, `${theme}: board with a toast on screen`);
+  await page.getByRole('button', { name: 'Language' }).click();
+  await expectAccessible(page, `${theme}: language menu open`);
+  await page.keyboard.press('Escape');
   await expectAccessible(page, `${theme}: board`);
   await page.locator('.task-card').click();
   await expectAccessible(page, `${theme}: task panel (view)`);

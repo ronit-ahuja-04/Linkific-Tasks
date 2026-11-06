@@ -9,6 +9,9 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useTheme } from '../context/ThemeContext';
 import { Tabs } from '../components/Tabs';
+import LanguageMenu from '../components/LanguageMenu';
+import { useToast } from '../context/ToastContext';
+import { moveTask } from '../lib/board';
 import SettingsView from './SettingsView';
 import { selectUsersById } from '../store/slices/usersSlice';
 import { createProject, deleteProject, makeSelectProject, selectProjects, selectProjectsLoading } from '../store/slices/projectsSlice';
@@ -19,8 +22,8 @@ import {
   selectNotifications, selectToasts, selectUnreadMessages, toastDismissed, toastsCleared,
 } from '../store/slices/notificationsSlice';
 import {
-  errorDismissed, errorShown, modalClosed, modalOpened, selectActiveTab, selectErrorMessage, selectHasNewActivity,
-  selectModals, selectSuccessMessage, selectTaskPanel, successDismissed, successShown, tabChanged,
+  modalClosed, modalOpened, selectActiveTab, selectHasNewActivity,
+  selectModals, selectTaskPanel, tabChanged,
   taskPanelClosed, taskPanelOpened,
 } from '../store/slices/uiSlice';
 import { 
@@ -60,6 +63,7 @@ function Dashboard() {
   // CONTEXT: the signed-in user and the theme come from contexts (src/context/), not from Redux
   const { user, signOut } = useAuth();
   const { mode: theme, toggleTheme } = useTheme();
+  const toast = useToast(); // short feedback messages (see context/ToastContext.jsx)
   const { t } = useLanguage();
   const data = useSelector(selectBoard);
   const projects = useSelector(selectProjects);
@@ -72,8 +76,6 @@ function Dashboard() {
   const activeTab = useSelector(selectActiveTab);
   const hasNewActivity = useSelector(selectHasNewActivity);
   const modals = useSelector(selectModals);
-  const errorModalMsg = useSelector(selectErrorMessage);
-  const successModalMsg = useSelector(selectSuccessMessage);
   const { open: isTaskPanelOpen, task: selectedTask } = useSelector(selectTaskPanel);
   const boardError = useSelector(selectBoardError);
 
@@ -152,10 +154,10 @@ function Dashboard() {
   // A failed optimistic write (e.g. a drag) was rolled back by the board slice: tell the user
   useEffect(() => {
     if (boardError) {
-      dispatch(errorShown(boardError));
+      toast.error(boardError);
       dispatch(boardErrorCleared());
     }
-  }, [boardError, dispatch]);
+  }, [boardError, dispatch, toast]);
 
   // Passed to Chat, which still writes its own messages
   const notifyProjectMembers = (message, projectId) =>
@@ -169,13 +171,13 @@ function Dashboard() {
       const { id } = await dispatch(
         createProject({ name: newProjectName, ownerEmail: newProjectAssignerEmail })
       ).unwrap();
-      dispatch(successShown(t('dashboard.msg.projectCreated', { name: newProjectName })));
+      toast.success(t('dashboard.msg.projectCreated', { name: newProjectName }));
       dispatch(modalClosed('newProject'));
       setNewProjectName('');
       setNewProjectAssignerEmail('');
       navigate(`/projects/${id}`);
     } catch (err) {
-      dispatch(errorShown(errorMessageOf(err)));
+      toast.error(errorMessageOf(err));
     }
   };
 
@@ -188,18 +190,18 @@ function Dashboard() {
       const { displayName } = await dispatch(sendInvite({ email: inviteEmail, projectId: selectedProjectId })).unwrap();
       dispatch(modalClosed('invite'));
       setInviteEmail('');
-      dispatch(successShown(t('dashboard.msg.invitationSent', { name: displayName })));
+      toast.success(t('dashboard.msg.invitationSent', { name: displayName }));
     } catch (err) {
-      dispatch(errorShown(errorMessageOf(err)));
+      toast.error(errorMessageOf(err));
     }
   };
 
   const handleAcceptInvite = async (invite) => {
     try {
       await dispatch(acceptInvite(invite)).unwrap();
-      dispatch(successShown(t('dashboard.msg.joined', { name: invite.projectName })));
+      toast.success(t('dashboard.msg.joined', { name: invite.projectName }));
     } catch (err) {
-      dispatch(errorShown(errorMessageOf(err, 'Failed to join project.')));
+      toast.error(errorMessageOf(err, 'Failed to join project.'));
     }
   };
 
@@ -207,8 +209,14 @@ function Dashboard() {
 
   // Drag and drop: the dragTask thunk moves the card at once and writes to Firestore, and the
   // board slice puts the card back if the write fails (optimistic update with rollback).
+  const columnLabel = (id) => (['todo', 'inprogress', 'done'].includes(id) ? t('dashboard.column.' + id) : data.columns[id]?.title ?? id);
+
   const onDragEnd = ({ source, destination, draggableId }) => {
-    dispatch(dragTask({ source, destination, draggableId }));
+    const move = { source, destination, draggableId };
+    // tell the user where the card went, but only for moves that actually change the board
+    const changesColumn = destination && destination.droppableId !== source.droppableId && moveTask(data, move) !== data;
+    dispatch(dragTask(move));
+    if (changesColumn) toast.info(t('ui.toast.taskMoved', { column: columnLabel(destination.droppableId) }));
   };
 
   const handleAddTask = (columnId) => {
@@ -220,11 +228,19 @@ function Dashboard() {
   const handleCreateDraftTask = (task) => {
     if (!selectedProjectId) return;
     dispatch(createTask({ task, columnId: task._columnId }));
+    toast.success(t('ui.toast.taskCreated'));
   };
 
   const handleDeleteTask = (taskId) => {
     if (!selectedProjectId) return;
     dispatch(deleteTask(taskId));
+    toast.success(t('ui.toast.taskDeleted'));
+  };
+
+  // Passing the click event makes the new theme grow out of the button (animated reveal)
+  const handleToggleTheme = (event) => {
+    toggleTheme(event);
+    toast.info(theme === 'dark' ? t('ui.toast.themeLight') : t('ui.toast.themeDark'));
   };
 
   const handleDeleteProject = () => {
@@ -236,10 +252,11 @@ function Dashboard() {
     try {
       await dispatch(deleteProject(selectedProjectId)).unwrap();
       dispatch(modalClosed('deleteProject'));
+      toast.success(t('ui.toast.projectDeleted'));
       navigate('/'); // Go back to dashboard/home
     } catch (err) {
       console.error('Error deleting project:', err);
-      alert('Failed to delete project. Please try again.');
+      toast.error(t('ui.toast.projectDeleteFailed'));
     }
   };
 
@@ -308,7 +325,8 @@ function Dashboard() {
         {/* Header */}
         <header className="header">
           <div className="header-actions">
-            <button className="icon-btn" onClick={toggleTheme} title={t('dashboard.header.toggleTheme')}>
+            <LanguageMenu />
+            <button className="icon-btn" onClick={handleToggleTheme} title={t('dashboard.header.toggleTheme')}>
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
             <button className="icon-btn" onClick={() => navigate('/notifications')} aria-label={t('dashboard.header.notifications')} title={t('dashboard.header.notifications')}><Bell size={20} /></button>
@@ -691,40 +709,6 @@ function Dashboard() {
             </button>
           </div>
         </form>
-      </Modal>
-
-      {/* Error Modal */}
-      <Modal 
-        isOpen={!!errorModalMsg} 
-        onClose={() => dispatch(errorDismissed())} 
-        title={t('dashboard.error.title')}
-      >
-        <p style={{color: 'var(--tag-high-text)', marginBottom: 20}}>{errorModalMsg}</p>
-        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <button 
-            onClick={() => dispatch(errorDismissed())}
-            style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--tag-high-text)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
-          >
-            {t('dashboard.error.okay')}
-          </button>
-        </div>
-      </Modal>
-
-      {/* Success Modal */}
-      <Modal 
-        isOpen={!!successModalMsg} 
-        onClose={() => dispatch(successDismissed())} 
-        title={t('dashboard.success.title')}
-      >
-        <p style={{color: 'var(--tag-dev-text)', marginBottom: 20}}>{successModalMsg}</p>
-        <div style={{display: 'flex', justifyContent: 'flex-end'}}>
-          <button 
-            onClick={() => dispatch(successDismissed())}
-            style={{padding: '8px 16px', borderRadius: 8, border: 'none', background: 'var(--primary-strong)', color: '#fff', cursor: 'pointer', fontWeight: 600}}
-          >
-            {t('dashboard.success.awesome')}
-          </button>
-        </div>
       </Modal>
 
       {/* Toasts Layer */}
