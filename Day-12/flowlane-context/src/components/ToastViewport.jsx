@@ -58,13 +58,34 @@ function ToastItem({ toast, onDismiss }) {
   );
 }
 
-/** Draws the stack of toasts, top centre. The only component that reads the toast list. */
+/** Draws the stack of toasts, bottom right. The only component that reads the toast list. */
 export default function ToastViewport() {
   const toasts = useToasts();
   const { dismiss } = useToast();
   const { t } = useLanguage();
+  const ref = useRef(null);
+
+  // Publish the stack's height as a CSS variable. The older notification toasts (invitations,
+  // assignments) live in the same corner and use it to sit above this stack instead of under it.
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || typeof ResizeObserver === 'undefined') return undefined;
+    const root = document.documentElement;
+    const publish = () => {
+      const height = element.getBoundingClientRect().height;
+      root.style.setProperty('--snack-offset', height > 0 ? `${Math.ceil(height) + 12}px` : '0px');
+    };
+    const observer = new ResizeObserver(publish);
+    observer.observe(element);
+    publish();
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--snack-offset');
+    };
+  }, []);
+
   return (
-    <div className="snack-viewport" role="region" aria-label={t('ui.toast.region')}>
+    <div ref={ref} className="snack-viewport" role="region" aria-label={t('ui.toast.region')}>
       {toasts.map((toast) => (
         <ToastItem key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
       ))}

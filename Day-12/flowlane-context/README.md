@@ -13,9 +13,9 @@ cd Day-12/flowlane-context
 npm install
 cp .env.example .env    # your Firebase web app keys
 npm run dev
-npm test                # 181 unit and component tests (Firebase mocked)
+npm test                # 182 unit and component tests (Firebase mocked)
 npm run test:rules      # 23 Firestore security-rules tests (emulator, needs Java)
-npm run test:e2e        # 81 browser tests against the Firebase emulators
+npm run test:e2e        # 84 browser tests against the Firebase emulators
 npm run test:all
 ```
 
@@ -147,9 +147,9 @@ See [STATE_MANAGEMENT_COMPARISON.md](../STATE_MANAGEMENT_COMPARISON.md) for the 
 
 | Layer | Command | Count | Covers |
 | --- | --- | --- | --- |
-| Unit and component | `npm test` | 181 | Redux slices and thunks, listeners, the three contexts and their hooks (errors outside the provider, memoization, render counts), Tabs behaviour, keyboard and the sliding indicator, the Dropdown, the toast reducer and viewport (timers, pausing, limits), the animated theme switch with its fallbacks, translations complete in every language |
+| Unit and component | `npm test` | 182 | Redux slices and thunks, listeners, the three contexts and their hooks (errors outside the provider, memoization, render counts), Tabs behaviour, keyboard and the sliding indicator, the Dropdown, the toast reducer and viewport (timers, pausing, limits), the animated theme switch with its fallbacks, translations complete in every language |
 | Security rules | `npm run test:rules` | 23 | Firestore rules against the emulator |
-| Browser end to end | `npm run test:e2e` | 81 | Auth, projects, board and drag and drop, collaboration with several browsers, chat, language switching and the header language menu, toasts (auto-dismiss, pause on hover, close, stacking, alerts), the animated theme switch and its reduced-motion fallback, the sliding tab underline, theme persistence, Tabs keyboard use, the Context-to-Redux bridge, and WCAG 2.1 AA audits (including Spanish and Hindi, the open language menu and toasts on screen) |
+| Browser end to end | `npm run test:e2e` | 84 | Auth, projects, board and drag and drop, collaboration with several browsers, chat, language switching and the header language menu, toasts (auto-dismiss, pause on hover, close, stacking, alerts), the animated theme switch and its reduced-motion fallback, the sliding tab underline, theme persistence, Tabs keyboard use, the Context-to-Redux bridge, and WCAG 2.1 AA audits (including Spanish and Hindi, the open language menu and toasts on screen) |
 
 Every browser test fails on any console error, warning or browser Issue hint. The translation tests check that every language has exactly the same keys as English, no empty values, the same placeholders, that every `t('...')` key used in the code exists, and that no dictionary key is unused.
 

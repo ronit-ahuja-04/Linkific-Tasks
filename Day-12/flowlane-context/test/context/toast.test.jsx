@@ -183,3 +183,39 @@ describe('ToastViewport', () => {
     expect(document.querySelector('.snack-bar').style.animationDuration).toBe('2500ms');
   });
 });
+
+describe('ToastViewport publishes its height for the older notification toasts', () => {
+  let observe;
+  let heightNow;
+  beforeEach(() => {
+    heightNow = 0;
+    observe = vi.fn();
+    vi.stubGlobal('ResizeObserver', class {
+      constructor(callback) { this.callback = callback; observe.callback = callback; }
+      observe() { observe(); }
+      disconnect() {}
+    });
+    vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function () {
+      return { height: this.classList?.contains('snack-viewport') ? heightNow : 0, width: 0, top: 0, left: 0, right: 0, bottom: 0, x: 0, y: 0 };
+    });
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    document.documentElement.style.removeProperty('--snack-offset');
+  });
+
+  it('is 0 with no toasts, then height plus a gap when there are, and is removed on unmount', () => {
+    const { unmount } = render(<LanguageProvider><ToastProvider><span /></ToastProvider></LanguageProvider>);
+    const root = document.documentElement;
+    expect(root.style.getPropertyValue('--snack-offset')).toBe('0px');
+    heightNow = 120.4;
+    act(() => observe.callback());
+    expect(root.style.getPropertyValue('--snack-offset')).toBe('133px'); // ceil(120.4) + 12
+    heightNow = 0;
+    act(() => observe.callback());
+    expect(root.style.getPropertyValue('--snack-offset')).toBe('0px');
+    unmount();
+    expect(root.style.getPropertyValue('--snack-offset')).toBe('');
+  });
+});

@@ -350,8 +350,9 @@ body {
 /* Toast Notifications */
 .toast-container {
   position: fixed;
-  bottom: 24px;
+  bottom: calc(24px + var(--toast-lift, 0px) + var(--snack-offset, 0px));
   right: 24px;
+  transition: bottom 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -1315,12 +1316,18 @@ body {
 ::view-transition-old(root) { z-index: 1; }
 ::view-transition-new(root) { z-index: 2; }
 
-/* ---------- Toasts (see ToastContext.jsx, ToastViewport.jsx), top centre ---------- */
+/* ---------- Toasts (see ToastContext.jsx, ToastViewport.jsx), bottom right ---------- */
+:root {
+  --toast-lift: 0px;   /* extra room under the toasts */
+  --snack-offset: 0px; /* height of the toast stack, set by ToastViewport, so the older notification toasts sit above it */
+}
+/* When the chat is open its input row is at the bottom right: lift the toasts above it */
+body:has(.chat-input-container) { --toast-lift: 76px; }
 .snack-viewport {
   position: fixed;
-  top: 84px; /* just under the header, so it never covers the chat box or the bottom of the page */
-  left: 50%;
-  transform: translateX(-50%);
+  right: 24px;
+  /* --toast-lift raises everything above the chat input when the chat is open */
+  bottom: calc(24px + var(--toast-lift));
   z-index: 2000;
   display: flex;
   flex-direction: column;
@@ -1375,8 +1382,8 @@ body {
 .snack--success .snack-bar { color: var(--priority-low-text); }
 .snack--error .snack-bar { color: var(--danger-text); }
 .snack--info .snack-bar { color: var(--primary-text); }
-@keyframes snack-in { from { opacity: 0; transform: translateY(-16px) scale(0.96); } to { opacity: 1; transform: none; } }
-@keyframes snack-out { to { opacity: 0; transform: translateY(-8px) scale(0.96); } }
+@keyframes snack-in { from { opacity: 0; transform: translateX(28px) scale(0.96); } to { opacity: 1; transform: none; } }
+@keyframes snack-out { to { opacity: 0; transform: translateX(20px) scale(0.96); } }
 @keyframes snack-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
 /* ---------- Dropdown (see Dropdown.jsx) and the language menu ---------- */
