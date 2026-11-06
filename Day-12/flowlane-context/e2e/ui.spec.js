@@ -1,4 +1,4 @@
-import { test, expect, uniqueEmail, signUp, addTask, card, column, createProject } from './fixtures.js';
+import { test, expect, uniqueEmail, signUp, addTask, card, createProject } from './fixtures.js';
 
 const languageButton = (page) => page.getByRole('button', { name: /^(Language|Idioma|भाषा)$/ });
 const snack = (page, text) => page.locator('.snack', { hasText: text });
@@ -235,5 +235,65 @@ test.describe('sliding tab underline', () => {
     await page.getByRole('tab', { name: 'Language' }).click();
     const tab = await box(page.getByRole('tab', { name: 'Language' }));
     await expect.poll(async () => Math.abs((await box(page.locator('.tab-indicator'))).x - tab.x)).toBeLessThan(1.5);
+  });
+});
+
+test.describe('toast position', () => {
+  const box = (locator) => locator.boundingBox();
+  const overlaps = (a, b) => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+
+  test('toasts sit in the bottom right corner', async ({ page }) => {
+    await signUp(page, uniqueEmail('corner'));
+    await page.getByTitle('Toggle Theme').click();
+    const toast = snack(page, 'Dark mode on');
+    await expect(toast).toBeVisible();
+    await page.waitForTimeout(400); // let the slide-in finish
+    const { x, y, width, height } = await box(toast);
+    const viewport = page.viewportSize();
+    expect(Math.abs(viewport.width - (x + width) - 24)).toBeLessThan(3); // 24px from the right edge
+    expect(Math.abs(viewport.height - (y + height) - 24)).toBeLessThan(3); // 24px from the bottom
+  });
+
+  test('with the chat open, toasts rise above the message box and never cover the send button', async ({ page }) => {
+    await signUp(page, uniqueEmail('chatlift'));
+    await page.getByText('Activity', { exact: true }).click();
+    await expect(page.locator('.chat-send-btn')).toBeVisible();
+    await page.getByTitle('Toggle Theme').click();
+    const toast = snack(page, 'Dark mode on');
+    await expect(toast).toBeVisible();
+    await page.waitForTimeout(400);
+    expect(overlaps(await box(toast), await box(page.locator('.chat-send-btn')))).toBe(false);
+    expect(overlaps(await box(toast), await box(page.getByPlaceholder('Type a message...')))).toBe(false);
+    // and the send button still works while the toast is on screen
+    await page.getByPlaceholder('Type a message...').fill('still clickable');
+    await page.getByRole('button', { name: 'Send message' }).click();
+    await expect(page.locator('.chat-messages', { hasText: 'still clickable' })).toBeVisible();
+  });
+
+  test('an invitation toast and a feedback toast share the corner without overlapping', async ({ page, newUserPage }) => {
+    const emailB = uniqueEmail('bobcorner');
+    const b = await newUserPage('B');
+    await signUp(page, uniqueEmail('alicecorner'));
+    await signUp(b, emailB);
+    // the owner can invite someone only once their profile exists: wait until it is visible to them
+    await page.locator('.nav-item', { hasText: 'Messages' }).click();
+    await expect(page.getByText(emailB, { exact: true })).toBeVisible();
+    await page.locator('.sidebar .nav-item', { hasText: 'My First Project' }).click();
+    await page.getByRole('button', { name: 'Invite', exact: true }).click();
+    await page.getByPlaceholder('Email address').fill(emailB);
+    await page.getByRole('button', { name: 'Send Invite' }).click();
+
+    const invitation = b.locator('.toast', { hasText: 'invited you to' });
+    await expect(invitation).toBeVisible();
+    await b.getByTitle('Toggle Theme').click(); // a feedback toast appears in the same corner
+    const feedback = b.locator('.snack', { hasText: 'Dark mode on' });
+    await expect(feedback).toBeVisible();
+    await b.waitForTimeout(500); // the older stack moves up when the new one appears
+    const [inviteBox, feedbackBox] = [await invitation.boundingBox(), await feedback.boundingBox()];
+    expect(overlaps(inviteBox, feedbackBox)).toBe(false);
+    expect(inviteBox.y + inviteBox.height).toBeLessThanOrEqual(feedbackBox.y + 1); // the invitation sits above
+    // both are still usable
+    await invitation.getByRole('button', { name: 'Decline' }).click();
+    await expect(invitation).toHaveCount(0);
   });
 });

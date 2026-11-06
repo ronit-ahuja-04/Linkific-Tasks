@@ -7,7 +7,7 @@
 | Date      | Friday, 6 November 2026                                         |
 | Repo path | `Linkific-Tasks/Day-12/flowlane-context`                        |
 | Builds on | Day 11 `flowlane-redux`                                         |
-| Status    | **Built.** Merged via PRs #65 and #66.                                   |
+| Status    | **Built.** Merged via PRs #65, #66 and #67.                                   |
 | Companion | `flowlane-context/README.md`, `STATE_MANAGEMENT_COMPARISON.md`  |
 
 ---
@@ -67,7 +67,7 @@ Day 12 covers React Context and when to use it instead of Redux. FlowLane (Day 1
 | Tabs renders no wrapper element, controlled or uncontrolled | Flexible layout; Redux keeps the open tab for the project view |
 | Only interface text is translated | Server-written text cannot be translated client-side |
 | Toasts replace the success and error modals | Less interruptive; errors stay longer and use `role="alert"`; one consistent feedback channel |
-| Toasts at the top centre | They never cover the chat input or the bottom of the page |
+| Toasts at the bottom right, lifted above the chat input when the chat is open, with the older notification toasts stacked above them | One corner for all messages without overlap: the toast stack publishes its height as a CSS variable and the notification stack sits above it |
 | Theme animation through the View Transitions API with fallbacks | A striking effect with no dependency; instant flip for unsupported browsers and `prefers-reduced-motion` |
 | Tab underline moved by writing to its style, not React state | No extra renders on a tab change |
 
@@ -95,15 +95,15 @@ Day 12 covers React Context and when to use it instead of Redux. FlowLane (Day 1
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
 | M1 | Contexts, hooks, Tabs, i18n, tests, comparison and README | `day12/flowlane-context` | #65 |
-| M2 | Visible polish: toasts, language menu, animated theme switch, sliding tab underline | `day12/visible-ui` | #66 |
+| M2 | Visible polish: toasts, language menu, animated theme switch, sliding tab underline | `day12/visible-ui` | #66, #67 |
 
 ## 7. Verification
 
 | Layer | Result |
 | ----- | ------ |
 | Build and lint | `npm run build` passes; no lint errors |
-| Unit and component tests | 181 passing: Redux slices and thunks, listeners, contexts and hooks, render counts, Tabs and its indicator, Dropdown, toast reducer and viewport, theme transition and fallbacks, translation completeness |
-| Browser end to end | 81 passing in Chrome against the Firebase emulators: the Day 11 tests, plus language, theme, Tabs, bridge, toast, language-menu, theme-animation and tab-underline tests |
+| Unit and component tests | 182 passing: Redux slices and thunks, listeners, contexts and hooks, render counts, Tabs and its indicator, Dropdown, toast reducer and viewport, theme transition and fallbacks, translation completeness |
+| Browser end to end | 84 passing in Chrome against the Firebase emulators: the Day 11 tests, plus language, theme, Tabs, bridge, toast, language-menu, theme-animation and tab-underline tests |
 | Accessibility | axe-core WCAG 2.1 AA: zero violations in light, dark, Spanish and Hindi |
 
 A browser test found a real defect in how the saved theme is restored (also present in the Day 11 version); it is fixed here and covered by unit and browser tests.
