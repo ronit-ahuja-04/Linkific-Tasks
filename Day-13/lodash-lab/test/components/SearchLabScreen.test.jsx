@@ -1,0 +1,107 @@
+// @vitest-environment jsdom
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, act, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import SearchLabScreen from '../../src/screens/SearchLabScreen';
+import { DataProvider } from '../../src/context/DataContext';
+import { ToastProvider } from '../../src/context/ToastContext';
+
+// Testing Library detects fake timers through a `jest` global; point it at Vitest's clock so its async helpers do not hang
+beforeEach(() => {
+  globalThis.jest = { advanceTimersByTime: (ms) => vi.advanceTimersByTime(ms) };
+  vi.useFakeTimers();
+});
+afterEach(() => {
+  vi.useRealTimers();
+  delete globalThis.jest;
+});
+
+const setup = () => {
+  const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
+  render(
+    <ToastProvider>
+      <DataProvider initialSize={1000} initialTab="search">
+        <SearchLabScreen />
+      </DataProvider>
+    </ToastProvider>
+  );
+  return user;
+};
+const advance = (ms) => act(() => { vi.advanceTimersByTime(ms); });
+
+describe('SearchLabScreen debounce', () => {
+  it('5 keystrokes produce 1 search call after the wait', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Type here'), 'ana m');
+    expect(screen.getByText('Keystrokes: 5')).toBeTruthy();
+    expect(screen.getByText('Search calls: 0')).toBeTruthy();
+    expect(screen.getByText(/Pending/)).toBeTruthy();
+    advance(299);
+    expect(screen.getByText('Search calls: 0')).toBeTruthy();
+    advance(1);
+    expect(screen.getByText('Search calls: 1')).toBeTruthy();
+    expect(screen.getByText('Saved: 4')).toBeTruthy();
+    expect(screen.getByText(/users match/)).toBeTruthy();
+    expect(screen.getByText('Idle')).toBeTruthy();
+  });
+
+  it('cancel prevents the call and clears pending', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Type here'), 'abc');
+    await user.click(screen.getByRole('button', { name: 'Cancel pending' }));
+    expect(screen.getByText('Idle')).toBeTruthy();
+    advance(2000);
+    expect(screen.getByText('Search calls: 0')).toBeTruthy();
+  });
+
+  it('flush runs the pending call immediately', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Type here'), 'abc');
+    expect(screen.getByText('Search calls: 0')).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Flush now' }));
+    expect(screen.getByText('Search calls: 1')).toBeTruthy();
+    expect(screen.getByText('Idle')).toBeTruthy();
+  });
+
+  it('respects the wait slider', async () => {
+    const user = setup();
+    fireEvent.change(screen.getByLabelText(/^Wait:/), { target: { value: '600' } });
+    await user.type(screen.getByLabelText('Type here'), 'ab');
+    advance(500);
+    expect(screen.getByText('Search calls: 0')).toBeTruthy();
+    advance(100);
+    expect(screen.getByText('Search calls: 1')).toBeTruthy();
+  });
+
+  it('leading mode calls on the first keystroke', async () => {
+    const user = setup();
+    await user.click(screen.getByLabelText('Leading'));
+    await user.type(screen.getByLabelText('Type here'), 'ab');
+    expect(screen.getByText('Search calls: 1')).toBeTruthy();
+    advance(300);
+    expect(screen.getByText('Search calls: 2')).toBeTruthy();
+  });
+
+  it('logs keystrokes and calls, newest first', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Type here'), 'ab');
+    advance(300);
+    const items = screen.getByRole('log').querySelectorAll('li');
+    expect(items).toHaveLength(3);
+    expect(items[0].textContent).toContain('call');
+    expect(items[2].textContent).toContain('+0 ms keystroke');
+  });
+});
+
+describe('SearchLabScreen throttle', () => {
+  it('runs the handler fewer times than there are events', async () => {
+    const user = setup();
+    const button = screen.getByRole('button', { name: 'Click as fast as you can' });
+    for (let i = 0; i < 10; i += 1) await user.click(button);
+    advance(1000);
+    expect(screen.getByText('Events: 10')).toBeTruthy();
+    const runs = Number(screen.getByText(/Handler runs:/).textContent.replace(/\D/g, ''));
+    expect(runs).toBeGreaterThan(0);
+    expect(runs).toBeLessThan(10);
+  });
+});

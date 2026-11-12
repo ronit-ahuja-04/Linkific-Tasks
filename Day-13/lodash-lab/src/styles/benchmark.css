@@ -1,0 +1,9 @@
+.bench-sizes { display: flex; flex-wrap: wrap; gap: 8px 20px; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px 12px; margin: 0; }
+.bench-sizes legend { padding: 0 6px; font-size: 13px; color: var(--text-secondary); }
+.bench .summary { font-size: 15px; }
+.bars { display: flex; flex-direction: column; gap: 3px; width: 160px; }
+.bar { display: block; height: 6px; border-radius: 3px; min-width: 2px; }
+.bar-lodash { background: var(--chart-1); }
+.bar-native { background: var(--chart-2); }
+.bench details summary { cursor: pointer; font-size: 14px; }
+.bench details p { margin-top: 8px; }
