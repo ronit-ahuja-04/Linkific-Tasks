@@ -1,0 +1,19 @@
+.methods { display: flex; flex-direction: column; gap: 16px; }
+.methods-header h2 { font-size: 20px; }
+.methods-controls { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; justify-content: space-between; }
+.methods-search { min-width: 220px; }
+.method-filter.active { background: var(--primary-strong); border-color: var(--primary-strong); color: #fff; }
+.method-filter.active:hover:not(:disabled) { background: #B8300C; }
+.methods-cat { font-size: 16px; margin: 8px 0 10px; color: var(--text-secondary); }
+.methods-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; }
+.method-card { min-width: 0; }
+.method-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.method-head h3 code { font-size: 16px; }
+.method-body h4 { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); }
+.method-body section { display: flex; flex-direction: column; gap: 4px; }
+.method-card .codebox { font-size: 12.5px; }
+.method-badge.same { color: var(--success-text); border-color: var(--success-text); }
+.method-badge.differs { color: var(--danger-text); border-color: var(--danger-text); }
+.method-badge.random { color: var(--info-text); border-color: var(--info-text); }
+.method-facts { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-primary); }
+.method-runs { font-size: 12px; }

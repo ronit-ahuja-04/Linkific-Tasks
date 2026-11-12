@@ -1,0 +1,25 @@
+.dash-intro { margin-bottom: 16px; }
+.dash-kpis { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 16px; }
+.kpi-label { color: var(--text-secondary); font-size: 13px; }
+.kpi-value { font-size: 24px; font-weight: 700; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.dash-grid { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); align-items: start; }
+.dash-card details { margin-top: 12px; font-size: 13px; color: var(--text-secondary); }
+.dash-card summary { cursor: pointer; }
+.dash-card details .codebox { margin-top: 6px; color: var(--text-primary); font-size: 12px; }
+.hbar-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hbar-row { display: grid; grid-template-columns: 110px 1fr 56px; align-items: center; gap: 8px; font-size: 13px; color: var(--text-primary); }
+.hbar-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hbar-num { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-secondary); }
+.hbar-track { background: var(--chart-track); border-radius: 4px; height: 14px; overflow: hidden; }
+.hbar-fill { background: var(--chart-1); height: 100%; border-radius: 4px; min-width: 2px; }
+.vbars { display: flex; align-items: flex-end; gap: 4px; height: 160px; padding-bottom: 2px; border-bottom: 1px solid var(--border-color); }
+.vbar-col { flex: 1; height: 100%; display: flex; align-items: flex-end; background: var(--chart-track); border-radius: 3px 3px 0 0; min-width: 0; }
+.vbar { width: 100%; background: var(--chart-2); border-radius: 3px 3px 0 0; min-height: 2px; }
+.vbar-labels { display: flex; gap: 4px; font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+.vbar-labels span { flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.stacked { display: flex; height: 22px; border-radius: 6px; overflow: hidden; background: var(--chart-track); }
+.stacked-senior { background: var(--chart-1); }
+.stacked-junior { background: var(--chart-2); }
+.legend { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; color: var(--text-primary); }
+.legend-swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+.table-wrap { overflow-x: auto; }

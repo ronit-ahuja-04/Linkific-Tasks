@@ -1,0 +1,23 @@
+.dir-toolbar { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; align-items: end; }
+.dir-search { grid-column: span 2; }
+.dir-search input, .dir-toolbar select { width: 100%; }
+.dir-age { border: 0; margin: 0; padding: 0; min-width: 0; }
+.dir-age legend { padding: 0; margin-bottom: 4px; }
+.dir-age input { width: 5.5em; }
+.directory fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+.dir-departments legend { font-size: 13px; margin-bottom: 4px; padding: 0; }
+.dir-check { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: var(--text-primary); }
+.dir-inline { gap: 6px; font-size: 13px; }
+.dir-count { font-weight: 600; font-size: 14px; margin-left: auto; }
+.dir-hint { font-size: 13px; font-style: italic; }
+.dir-empty { padding: 32px 8px; text-align: center; color: var(--text-secondary); }
+.dir-sort { display: inline-flex; align-items: center; gap: 4px; background: none; border: 0; padding: 2px 4px; margin: -2px -4px; font: inherit; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-radius: 4px; }
+.dir-sort:hover { color: var(--text-primary); background: var(--bg-sunken); }
+.dir-order { padding: 0 6px; font-size: 11px; }
+.dir-name { display: flex; flex-direction: column; line-height: 1.3; }
+.dir-name .muted { font-size: 12px; }
+.dir-link { background: none; border: 0; padding: 0; font: inherit; font-weight: 600; color: var(--primary-text); text-decoration: underline; cursor: pointer; }
+.dir-pager { justify-content: space-between; }
+.directory tr.is-picked td, .directory tr.is-picked th { background: var(--bg-sunken); box-shadow: inset 0 0 0 1px var(--primary-text); }
+.directory table.data tbody th { color: var(--text-primary); }
+@media (max-width: 720px) { .dir-search { grid-column: span 1; } .dir-count { margin-left: 0; } }
