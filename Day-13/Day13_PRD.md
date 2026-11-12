@@ -7,7 +7,7 @@
 | Date      | Thursday, 12 November 2026                                         |
 | Repo path | `Linkific-Tasks/Day-13/lodash-lab`                                 |
 | Builds on | Day 12 patterns (Tabs, toasts, theme switch), new standalone app   |
-| Status    | **Built.** Merged via PR #PR_NUMBER.                               |
+| Status    | **Built.** Merged via PR #68.                               |
 | Companion | `lodash-lab/README.md`, `LODASH_VS_NATIVE.md`                      |
 
 ---
@@ -79,7 +79,7 @@ In: six tabs (Directory, Dashboard, Search lab, Profile form, Methods, Benchmark
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
-| M1 | Data layer, six screens, tests, scripts, README, comparison | `day13/lodash-lab` | #PR_NUMBER |
+| M1 | Data layer, six screens, tests, scripts, README, comparison | `day13/lodash-lab` | #68 |
 
 ## 7. Verification
 
