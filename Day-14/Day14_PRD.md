@@ -7,7 +7,7 @@
 | Date      | Friday, 13 November 2026                                           |
 | Repo path | `Linkific-Tasks/Day-14/salespulse`                                 |
 | Builds on | Day 12 and 13 patterns (Tabs, toasts, theme switch); new app       |
-| Status    | **Built.** Merged via PR #PR_NUMBER.                               |
+| Status    | **Built.** Merged via PR #69.                               |
 | Companion | `salespulse/README.md`, `CHART_CHOICE_GUIDE.md`                    |
 
 ---
@@ -87,7 +87,7 @@ In: five tabs (Overview, Sales, Users, Revenue, Explore), a filter row, a preten
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
-| M1 | Data, API, metrics, shared chart pieces, five tabs, tests, README, guide | `day14/salespulse` | #PR_NUMBER |
+| M1 | Data, API, metrics, shared chart pieces, five tabs, tests, README, guide | `day14/salespulse` | #69 |
 
 ## 7. Verification
 
