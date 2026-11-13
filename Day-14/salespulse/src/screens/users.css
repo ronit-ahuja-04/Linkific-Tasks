@@ -1,0 +1,9 @@
+.users-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.users-controls-label { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
+.users-stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); margin-bottom: 12px; }
+.users-stat { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: var(--shadow-sm); padding: 12px 16px; }
+.users-stat dt { font-size: 13px; color: var(--text-secondary); }
+.users-stat dd { margin: 2px 0 0; font-size: 24px; font-weight: 700; color: var(--text-primary); }
+.users-insight { margin: 0 0 16px; padding: 10px 14px; border: 1px solid var(--border-color); border-left: 4px solid var(--series-1); border-radius: 8px; background: var(--bg-surface); color: var(--text-primary); font-size: 14px; }
+.users-stack { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+.users-hint { color: var(--text-secondary); font-size: 13px; margin: 0 0 8px; }
