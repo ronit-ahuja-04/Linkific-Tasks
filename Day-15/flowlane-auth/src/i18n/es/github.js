@@ -47,6 +47,7 @@ export default {
   'github.error.unavailable': 'GitHub no responde en este momento. Inténtalo de nuevo en un momento.',
   'github.error.generic': 'Algo salió mal al hablar con GitHub. Inténtalo de nuevo.',
   'github.error.credential_in_use': 'Esa cuenta de GitHub ya está vinculada a otro usuario de FlowLane.',
+  'github.error.provider_off': 'El inicio de sesión con GitHub aún no está activado en este proyecto. Activa el proveedor GitHub en la consola de Firebase (Authentication > Sign-in method).',
   'github.error.unknown': 'No se pudo conectar con GitHub. Inténtalo de nuevo.',
   'github.badge.aria': 'Abrir la incidencia #{number} en GitHub',
 };

@@ -20,6 +20,7 @@ const PROVIDER_KEYS = { password: 'security.provider.password', 'google.com': 's
 const GITHUB_ERROR_KEYS = {
   last_provider: 'security.github.error.last',
   credential_in_use: 'security.github.error.inUse',
+  provider_off: 'security.github.error.providerOff',
   unknown: 'security.github.error.unknown',
 };
 

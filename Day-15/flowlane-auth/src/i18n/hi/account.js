@@ -35,6 +35,7 @@ export default {
   'account.error.invalidEmail': 'सही ईमेल पता दर्ज करें।',
   'account.error.mismatch': 'दोनों पासवर्ड मेल नहीं खाते।',
   'account.error.weakChosen': 'ज्यादा मजबूत पासवर्ड चुनें (कम से कम "ठीक-ठाक")।',
+  'account.error.providerOff': 'यह साइन-इन तरीका इस प्रोजेक्ट में अभी चालू नहीं है। Firebase कंसोल में Authentication > Sign-in method में जाकर इसे चालू करें।',
   'account.error.generic': 'कुछ गड़बड़ हो गई। कृपया फिर कोशिश करें।',
 
   'account.verify.banner': 'कृपया अपना ईमेल पता ({email}) सत्यापित करें। हमने आपको एक लिंक भेजा है।',

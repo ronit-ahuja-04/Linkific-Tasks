@@ -39,5 +39,9 @@ export function mapGithubAuthError(error) {
   if (firebaseCode === 'auth/credential-already-in-use') {
     return { code: 'credential_in_use', message: 'That GitHub account is already linked to another user.' };
   }
+  if (firebaseCode === 'auth/operation-not-allowed') {
+    // the GitHub provider is not switched on in the Firebase console for this project
+    return { code: 'provider_off', message: 'The GitHub sign-in provider is not enabled for this project.' };
+  }
   return { code: 'unknown', message: error?.message || 'Could not connect GitHub.' };
 }

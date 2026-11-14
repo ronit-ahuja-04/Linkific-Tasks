@@ -45,6 +45,7 @@ export default {
   "security.github.connectedHint": "GitHub एक्सेस टोकन केवल मेमोरी में रखा जाता है। पेज रीलोड करने पर यह चला जाता है।",
   "security.github.error.last": "आप अपना एकमात्र साइन-इन तरीका नहीं हटा सकते। पहले कोई दूसरा जोड़ें।",
   "security.github.error.inUse": "वह GitHub खाता पहले से किसी दूसरे FlowLane यूज़र से जुड़ा है।",
+  "security.github.error.providerOff": "इस प्रोजेक्ट में GitHub साइन-इन अभी चालू नहीं है। Firebase कंसोल में GitHub प्रोवाइडर चालू करें (Authentication > Sign-in method)।",
   "security.github.error.unknown": "GitHub के साथ कुछ गलत हो गया। कृपया फिर कोशिश करें।",
   "security.github.linked": "GitHub जोड़ा गया",
   "security.github.unlinked": "GitHub हटाया गया",

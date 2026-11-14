@@ -14,7 +14,7 @@ export default function ConnectStep({ reconnect, connecting, error, onConnect })
       <p className="gh-muted">{t('github.connect.memory')}</p>
       {error && (
         <p className="gh-error-text" role="alert">
-          {t(`github.error.${error.code === 'credential_in_use' ? 'credential_in_use' : 'unknown'}`)}
+          {t(`github.error.${['credential_in_use', 'provider_off'].includes(error.code) ? error.code : 'unknown'}`)}
         </p>
       )}
       <div className="gh-actions">

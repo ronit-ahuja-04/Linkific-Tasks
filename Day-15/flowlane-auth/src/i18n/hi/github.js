@@ -47,6 +47,7 @@ export default {
   'github.error.unavailable': 'GitHub अभी जवाब नहीं दे रहा। थोड़ी देर बाद फिर कोशिश करें।',
   'github.error.generic': 'GitHub से बात करते समय कुछ गड़बड़ हो गई। फिर कोशिश करें।',
   'github.error.credential_in_use': 'वह GitHub खाता पहले से किसी दूसरे FlowLane उपयोगकर्ता से जुड़ा है।',
+  'github.error.provider_off': 'इस प्रोजेक्ट में GitHub साइन-इन अभी चालू नहीं है। Firebase कंसोल में GitHub प्रोवाइडर चालू करें (Authentication > Sign-in method)।',
   'github.error.unknown': 'GitHub से कनेक्ट नहीं हो सका। कृपया फिर कोशिश करें।',
   'github.badge.aria': 'GitHub पर इश्यू #{number} खोलें',
 };
