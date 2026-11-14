@@ -7,7 +7,7 @@
 | Date      | Saturday, 14 November 2026                                             |
 | Repo path | `Linkific-Tasks/Day-15/flowlane-auth` (the web app and `server/`)      |
 | Builds on | Day 12 `flowlane-context` (copied unchanged, then extended)            |
-| Status    | **Built.** Merged via PR #PR_NUMBER (follows PR #70, the first version) |
+| Status    | **Built.** Merged via PR #71 (follows PR #70, the first version) |
 | Companion | `flowlane-auth/README.md`, `AUTH_STORAGE_COMPARISON.md`                |
 
 ---
@@ -91,7 +91,7 @@ In: the auth additions, the Security tab, the GitHub import, the Express API wit
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
 | M0 | First version: standalone app with its own Express login backend | `day15/flowlane-auth` | #70 |
-| M1 | The real FlowLane extended with the Day 15 features and GitHub; replaces M0 in `Day-15/flowlane-auth` | `day15/flowlane-github` | #PR_NUMBER |
+| M1 | The real FlowLane extended with the Day 15 features and GitHub; replaces M0 in `Day-15/flowlane-auth` | `day15/flowlane-github` | #71 |
 
 ## 7. Verification
 
