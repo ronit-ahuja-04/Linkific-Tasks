@@ -35,6 +35,7 @@ export default {
   'account.error.invalidEmail': 'Introduce un correo válido.',
   'account.error.mismatch': 'Las dos contraseñas no coinciden.',
   'account.error.weakChosen': 'Elige una contraseña más segura (al menos "Aceptable").',
+  'account.error.providerOff': 'Este método de inicio de sesión aún no está activado en este proyecto. Actívalo en la consola de Firebase, en Authentication > Sign-in method.',
   'account.error.generic': 'Algo salió mal. Inténtalo de nuevo.',
 
   'account.verify.banner': 'Confirma tu correo electrónico ({email}). Te enviamos un enlace.',

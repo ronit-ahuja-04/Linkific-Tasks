@@ -45,6 +45,7 @@ export default {
   "security.github.connectedHint": "El token de acceso de GitHub solo se guarda en memoria. Desaparece al recargar la página.",
   "security.github.error.last": "No puedes desvincular tu único método de acceso. Añade otro primero.",
   "security.github.error.inUse": "Esa cuenta de GitHub ya está vinculada a otro usuario de FlowLane.",
+  "security.github.error.providerOff": "El inicio de sesión con GitHub aún no está activado en este proyecto. Activa el proveedor GitHub en la consola de Firebase (Authentication > Sign-in method).",
   "security.github.error.unknown": "Algo salió mal con GitHub. Inténtalo de nuevo.",
   "security.github.linked": "GitHub vinculado",
   "security.github.unlinked": "GitHub desvinculado",

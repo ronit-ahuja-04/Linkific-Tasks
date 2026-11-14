@@ -320,8 +320,9 @@ describe('notice: why the user was signed out', () => {
   it("the user's own signOut gives no notice", async () => {
     const { result } = setup();
     act(() => emitAuth(fbUser()));
+    // Firebase tells its listeners "signed out" DURING signOut(), before the promise resolves: do the same here
+    authMock.signOut.mockImplementationOnce(async () => { emitAuth(null); });
     await act(async () => { await result.current.signOut(); });
-    act(() => emitAuth(null));
     expect(result.current.notice).toBeNull();
   });
   it('a forced sign-out after an own one is detected again (flag was cleared)', async () => {
@@ -338,8 +339,8 @@ describe('notice: why the user was signed out', () => {
     const { result } = setup();
     expect(result.current.signedOutByUser).toBe(false);
     act(() => emitAuth(fbUser()));
+    authMock.signOut.mockImplementationOnce(async () => { emitAuth(null); });
     await act(async () => { await result.current.signOut(); });
-    act(() => emitAuth(null));
     expect(result.current.signedOutByUser).toBe(true);
     act(() => emitAuth(fbUser()));
     expect(result.current.signedOutByUser).toBe(false);

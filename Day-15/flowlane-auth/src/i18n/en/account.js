@@ -35,6 +35,7 @@ export default {
   'account.error.invalidEmail': 'Enter a valid email address.',
   'account.error.mismatch': 'The two passwords do not match.',
   'account.error.weakChosen': 'Choose a stronger password (at least "Fair").',
+  'account.error.providerOff': 'This sign-in method is not turned on for this project yet. Enable it in the Firebase console under Authentication > Sign-in method.',
   'account.error.generic': 'Something went wrong. Please try again.',
 
   'account.verify.banner': 'Please confirm your email address ({email}). We sent you a link.',

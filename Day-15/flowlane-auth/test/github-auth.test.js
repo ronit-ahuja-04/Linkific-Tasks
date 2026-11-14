@@ -46,6 +46,7 @@ describe('mapGithubAuthError', () => {
   });
   it('maps credential-already-in-use', () => {
     expect(mapGithubAuthError({ code: 'auth/credential-already-in-use' })).toMatchObject({ code: 'credential_in_use' });
+    expect(mapGithubAuthError({ code: 'auth/operation-not-allowed' })).toMatchObject({ code: 'provider_off' }); // provider not enabled in the Firebase console
   });
   it('maps everything else to unknown with a message', () => {
     expect(mapGithubAuthError({ code: 'auth/network-request-failed', message: 'offline' })).toEqual({ code: 'unknown', message: 'offline' });

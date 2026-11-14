@@ -11,6 +11,7 @@ describe('authErrors', () => {
     ['auth/too-many-requests', 'account.error.tooManyRequests'],
     ['auth/network-request-failed', 'account.error.network'],
     ['auth/account-exists-with-different-credential', 'account.error.accountExists'],
+    ['auth/operation-not-allowed', 'account.error.providerOff'], // e.g. the GitHub provider is not enabled in the Firebase console yet
   ])('%s -> %s', (code, key) => {
     expect(errorKeyFor(code)).toBe(key);
     expect(DICTIONARIES.en[key]).toBeTruthy();

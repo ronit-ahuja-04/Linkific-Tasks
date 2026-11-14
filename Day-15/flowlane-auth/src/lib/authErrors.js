@@ -21,6 +21,8 @@ const KEYS = {
   'auth/popup-blocked': 'account.error.popupBlocked',
   'auth/user-disabled': 'account.error.userDisabled',
   'auth/invalid-email': 'account.error.invalidEmail',
+  // The provider (GitHub, Google...) is not switched on in the Firebase console for this project
+  'auth/operation-not-allowed': 'account.error.providerOff',
 };
 
 /** The user closed the popup on purpose: not an error, show nothing */

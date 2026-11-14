@@ -259,6 +259,13 @@ describe('SecurityPanel: Sign-in methods', () => {
     expect(await screen.findByText('GitHub token forgotten')).toBeTruthy();
   });
 
+  it('says the provider is off (not a raw Firebase message) when GitHub is not enabled in the Firebase console', async () => {
+    setup({ github: { error: { code: 'provider_off', message: 'raw' } } });
+    await screen.findByText('uid-123');
+    expect(screen.getByRole('alert').textContent).toMatch(/not turned on for this project yet/);
+    expect(screen.queryByText('raw')).toBeNull();
+  });
+
   it('shows friendly translated errors from useGitHub().error', async () => {
     setup({ github: { error: { code: 'credential_in_use', message: 'raw' } } });
     await screen.findByText('uid-123');

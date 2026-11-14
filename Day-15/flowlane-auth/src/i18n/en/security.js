@@ -45,6 +45,7 @@ export default {
   "security.github.connectedHint": "A GitHub access token is held in memory only. It disappears when you reload the page.",
   "security.github.error.last": "You cannot unlink your only sign-in method. Add another one first.",
   "security.github.error.inUse": "That GitHub account is already linked to another FlowLane user.",
+  "security.github.error.providerOff": "GitHub sign-in is not turned on for this project yet. Enable the GitHub provider in the Firebase console (Authentication > Sign-in method).",
   "security.github.error.unknown": "Something went wrong with GitHub. Please try again.",
   "security.github.linked": "GitHub linked",
   "security.github.unlinked": "GitHub unlinked",

@@ -121,6 +121,15 @@ describe('step 1: connect', () => {
     expect(screen.queryByRole('button', { name: 'Connect GitHub' })).toBeNull();
   });
 
+  it('explains that GitHub sign-in is not enabled for the project when Firebase says operation-not-allowed', async () => {
+    h.connect = async () => false;
+    h.connectError = { code: 'provider_off', message: 'x' };
+    renderImport();
+    await openModal();
+    await user.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    expect(screen.getByRole('alert').textContent).toMatch(/GitHub sign-in is not turned on for this project yet/);
+  });
+
   it('shows a friendly error when connecting fails', async () => {
     h.connect = async () => false;
     h.connectError = { code: 'credential_in_use', message: 'x' };
