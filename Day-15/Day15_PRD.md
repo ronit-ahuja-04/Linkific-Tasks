@@ -7,7 +7,7 @@
 | Date      | Saturday, 14 November 2026                                          |
 | Repo path | `Linkific-Tasks/Day-15/flowlane-auth` (`client/`, `server/`, `e2e/`) |
 | Builds on | FlowLane's look and Day 12 to 14 UI patterns; new app and new API   |
-| Status    | **Built.** Merged via PR #PR_NUMBER.                                |
+| Status    | **Built.** Merged via PR #70.                                |
 | Companion | `flowlane-auth/README.md`, `AUTH_STORAGE_COMPARISON.md`             |
 
 ---
@@ -90,7 +90,7 @@ In: Express API (auth, OAuth, projects and tasks, admin), React client (auth pag
 
 | #  | Milestone | Branch | PR |
 | -- | --------- | ------ | -- |
-| M1 | API, client, tests, README, storage comparison | `day15/flowlane-auth` | #PR_NUMBER |
+| M1 | API, client, tests, README, storage comparison | `day15/flowlane-auth` | #70 |
 
 ## 7. Verification
 
