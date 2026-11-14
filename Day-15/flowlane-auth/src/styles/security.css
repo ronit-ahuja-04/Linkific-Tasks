@@ -1,0 +1,21 @@
+/* Security page: uses the FlowLane tokens so light and dark both work */
+.security-card { background: var(--bg-secondary); border-radius: 12px; padding: 24px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+.security-card h3 { font-size: 16px; margin-bottom: 8px; }
+.security-hint { color: var(--text-secondary); font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+.security-claims { display: grid; grid-template-columns: max-content 1fr; gap: 8px 16px; margin: 0 0 16px; font-size: 14px; }
+.security-claims dt { color: var(--text-secondary); font-weight: 600; }
+.security-claims dd { margin: 0; overflow-wrap: anywhere; }
+.security-claims code { font-size: 13px; }
+.security-countdown { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; margin-bottom: 16px; }
+.security-countdown[data-expired='true'] { color: var(--text-secondary); }
+.security-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 8px; }
+.security-btn { background: var(--primary-strong); color: #fff; border: 1px solid transparent; border-radius: 8px; padding: 8px 14px; font-size: 14px; font-weight: 600; cursor: pointer; }
+.security-btn.secondary { background: transparent; color: var(--text-primary); border-color: var(--border-color); }
+.security-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.security-btn:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+.security-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1px solid var(--border-color); }
+.security-error { border: 1px solid var(--border-color); border-left: 4px solid #d93025; border-radius: 8px; padding: 10px 12px; margin-top: 12px; font-size: 14px; }
+.security-providers { list-style: none; padding: 0; margin: 0 0 12px; display: flex; flex-direction: column; gap: 8px; }
+.security-providers li { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.security-icon { display: inline-flex; width: 28px; height: 28px; align-items: center; justify-content: center; border-radius: 6px; border: 1px solid var(--border-color); font-weight: 700; font-size: 13px; }
+.security-list { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; line-height: 1.5; }

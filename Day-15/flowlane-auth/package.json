@@ -1,21 +1,48 @@
 {
   "name": "flowlane-auth",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
-    "dev": "concurrently -n api,web -c yellow,cyan \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
-    "build": "npm --prefix client run build",
-    "test": "npm --prefix server test && npm --prefix client test",
-    "lint": "npm --prefix server run lint && npm --prefix client run lint",
-    "test:e2e": "playwright test",
-    "test:e2e:prod": "E2E_PROD=1 playwright test",
-    "test:all": "npm test && npm run test:e2e"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "oxlint",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-flowlane \"vitest run --config vitest.rules.config.js\"",
+    "test:e2e": "firebase emulators:exec --only auth,firestore --project demo-flowlane \"playwright test\"",
+    "test:e2e:prod": "E2E_PROD=1 firebase emulators:exec --only auth,firestore --project demo-flowlane \"playwright test\"",
+    "test:all": "npm test && npm run test:server && npm run test:rules && npm run test:e2e",
+    "dev:api": "npm --prefix server run dev",
+    "dev:all": "concurrently -n api,web -c yellow,cyan \"npm run dev:api\" \"npm run dev\"",
+    "test:server": "npm --prefix server test",
+    "dev:fake-github": "node server/src/dev/fake-github.js"
+  },
+  "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
+    "@reduxjs/toolkit": "^2.14.0",
+    "axios": "^1.21.1",
+    "firebase": "^12.19.0",
+    "lucide-react": "^1.46.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "react-redux": "^9.3.1",
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.65.0",
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@playwright/test": "^1.64.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.81.0",
+    "vite": "^8.3.0",
+    "vitest": "^4.1.12",
     "concurrently": "^9.2.0"
   }
 }

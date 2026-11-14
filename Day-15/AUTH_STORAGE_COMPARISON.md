@@ -1,68 +1,66 @@
-# Where to keep the token: localStorage, memory or a cookie
+# Where does the sign-in live in the browser?
 
-A comparison written while building `flowlane-auth/`. The question every single-page app answers, often without noticing: after sign-in, where does the proof of identity live in the browser, and what can go wrong?
+A comparison written while building FlowLane's Day 15 authentication. The question every single-page app answers, often without noticing: after sign-in, where does the proof of identity live, and what can an attacker do to it?
+
+This project went through two designs, and the contrast is the point:
+- **First version (merged in PR #70, still in git history):** its own Express backend. Access token in JavaScript memory, rotating refresh token in an HttpOnly cookie.
+- **This version (the extended, original FlowLane):** Firebase Auth. The Firebase SDK keeps the session, and a small Express API only *verifies* the ID token.
 
 ## The three attacks that matter
 
 | Attack | What the attacker does | Needs |
 |---|---|---|
 | **XSS** (cross-site scripting) | Runs their JavaScript inside your page (an injected script, or a compromised npm package) | One output-escaping bug or one bad dependency |
-| **CSRF** (cross-site request forgery) | Makes the victim's browser send a request to your site from the attacker's page, and the browser attaches the victim's cookies by itself | The victim is signed in and the credential is a cookie |
-| **Theft of a stored token** (a leaked log, a stolen laptop, a copied cookie value) | Replays the token from somewhere else | A copy of the token |
+| **CSRF** (cross-site request forgery) | Makes the victim's browser send a request to your site from the attacker's page; the browser attaches cookies by itself | The credential is a cookie |
+| **Copying a stored token** | Replays the token from somewhere else | A copy of the token |
 
 ## The options
 
-| Where the credential lives | XSS can read it? | CSRF risk | Survives reload? | Notes |
+| Where the credential lives | Can XSS read it? | CSRF risk | Survives reload? | Notes |
 |---|---|---|---|---|
-| `localStorage` | **Yes, trivially** (`localStorage.getItem`) | None (never sent automatically) | Yes | Simplest and the most common. One XSS bug exposes every user's token, and it stays valid until it expires |
-| `sessionStorage` | **Yes** | None | Per tab only | Same exposure as `localStorage`, shorter life |
-| JavaScript variable (**memory**) | Only while the script runs (it can still *use* the token, but cannot copy it away for later) | None | **No** | Gone on reload and in other tabs, so you need a way to get a fresh one |
-| **HttpOnly cookie** | **No** (scripts cannot read it, though injected script can still make requests *as* the user) | **Yes**, unless mitigated | Yes | `SameSite=Strict`, a custom request header and an Origin check close most of the CSRF gap |
-| Non-HttpOnly cookie | Yes | Yes | Yes | The worst of both: no benefit over `localStorage` |
+| `localStorage` | **Yes, trivially** | None | Yes | Simplest, most common. One XSS bug exposes every user's token |
+| `sessionStorage` | **Yes** | None | Per tab only | Same exposure, shorter life |
+| **IndexedDB** (what Firebase uses by default) | **Yes** (any script on the page can read it) | None | Yes, shared by all tabs | Like localStorage for security purposes |
+| JavaScript variable (**memory**) | Only while the script runs (it can still *use* it, but cannot copy it away for later) | None | **No** | Gone on reload; needs a way to get a new one |
+| **HttpOnly cookie** | **No** (scripts cannot read it; injected script can still make requests as the user) | **Yes**, unless mitigated | Yes | `SameSite=Strict`, a custom header and an Origin check close most of the CSRF gap |
 
-Nothing makes XSS harmless: injected script can still call your API while the page is open. What the better options remove is the **copyable, long-lived** secret: with `localStorage` the attacker takes the token home and uses it for days; with memory plus an HttpOnly cookie they can only act while the victim's tab is open.
+Nothing makes XSS harmless: injected script can still call your API while the page is open. What the better options remove is the **copyable, long-lived secret**.
 
-## What FlowLane Auth does: a split
+## What each project version does
 
-| Token | Where | Why |
+| | First version (own backend) | This version (Firebase) |
 |---|---|---|
-| **Access token** (JWT, 15 minutes) | JavaScript **memory** | Even if read, it dies in minutes; nothing is persisted to steal |
-| **Refresh token** (random, 30 days or session) | **HttpOnly, SameSite=Strict, `Secure`** cookie scoped to `/api/auth` | Scripts cannot read it; the browser only sends it to the two endpoints that need it |
+| Short-lived token | JWT, 15 minutes, **memory** | Firebase ID token (JWT, RS256, 1 hour), **IndexedDB** (or `sessionStorage` if "Remember me" is off) |
+| Long-lived token | Random refresh token, **HttpOnly cookie**, rotated on every use, reuse detection | Firebase refresh token, **IndexedDB**, renewed by the SDK, never seen by the app |
+| Who signs the JWT | Our server (HS256, one secret) | Google (RS256; anyone can verify, only Google can sign) |
+| Theft detection | Yes: a replayed old refresh token kills the session | Handled by Google's service; the app cannot see or control it |
+| CSRF defence needed | Yes (cookie): SameSite=Strict, a custom header, an Origin check | No (the token is sent in an `Authorization` header by code, never by the browser on its own) |
+| Reload keeps you signed in | One refresh call on every page load | The SDK restores the user from IndexedDB |
+| Code to maintain | A whole server: passwords, bcrypt, reset tokens, rate limits, sessions table | Almost none: Google runs it |
+| What you can show and explain | Everything: every step is in the repo | The concepts, but the machinery is behind the SDK |
 
-On reload the memory is empty, so the app calls `/auth/refresh`; the cookie goes along and a new access token comes back. That one call is also how "stay signed in" works.
+**The honest trade-off:** the first version is more secure against XSS (nothing copyable in the browser) and shows every step, but it is a login system you must secure and run yourself. Firebase hands the token to scripts on the page, but removes a whole class of server mistakes. For FlowLane, whose data already lives in Firestore behind Firebase rules, using Firebase Auth is the only design where the board keeps working: Firestore decides access from the Firebase user, and a hand-built JWT does not unlock it (a backend could mint Firebase custom tokens, but that needs a Firebase service account, which this project does not have).
 
-CSRF on the cookie endpoints is handled in layers, because no single one is enough: `SameSite=Strict` (the browser does not send the cookie on cross-site requests), a required `X-Requested-With: fetch` header (a cross-site page cannot add a custom header without a CORS preflight, which the server does not approve), and a same-site `Origin` check. All other endpoints use `Authorization: Bearer`, which a browser never adds by itself, so they are not CSRF targets at all.
+## The GitHub token is a different token
 
-## Stateless JWT sessions vs server-side sessions
+Signing in with GitHub gives the browser a **GitHub access token**: permission to call GitHub *as the user*. It is not a FlowLane credential. FlowLane keeps it **only in memory**: not in storage, not in the database; a reload forgets it and the "Connect GitHub" button asks again. The Express API forwards it to GitHub in the request and never stores or logs it. The trade-off is one extra click after every reload, in exchange for no long-lived GitHub credential sitting in the browser.
 
-| | Stateless JWT only | Server-side session (cookie holds an id) | **This project: short JWT + stored refresh sessions** |
-|---|---|---|---|
-| Server stores per user | Nothing | A session row | One row per refresh session (hash only) |
-| Revoke one user *now* | Hard (wait for expiry, or keep a denylist) | Delete the row | Revoke the session row; the server also checks it on each request, so access dies immediately |
-| Detect a stolen token | No | Possible | **Yes**: rotation plus reuse detection |
-| Scales across servers | Easily | Needs a shared store | Needs a shared store for the refresh table |
-| Cost per request | Verify a signature | Look up a row | Verify a signature (plus a revoked-session check) |
+## What the tests proved along the way
 
-The honest trade-off: the moment you want "log this device out" or "a reset must end all sessions", pure statelessness stops being possible. The access token stays stateless and short; the refresh side keeps the state that makes revocation real.
-
-## What this project verifies (browser tests against the real API)
-
-- No JWT (`eyJ...`) in `localStorage`, `sessionStorage` or `document.cookie`; the refresh cookie is `HttpOnly`, `SameSite=Strict`, path `/api/auth`.
-- Replaying an old refresh token returns `401 refresh_invalid` and also kills the newer one.
-- A refresh without the CSRF header, or with a foreign `Origin`, returns `403 csrf_blocked`.
-- A tampered token (`role` changed to `admin`) is rejected.
-- "Remember me" gives a persistent cookie of about 30 days; without it, a session cookie.
+- "Remember me" must use `indexedDBLocalPersistence`, not `browserLocalPersistence`. The second one uses localStorage while a fresh tab starts with IndexedDB; the new tab then **moves the user across and signs the first tab out**. A browser test with two tabs found it.
+- The API's JWT check rejects: a wrong audience or issuer, an expired token (a distinct "expired" answer so the client knows to refresh), `alg: none`, and the HS256-with-the-public-key trick.
+- No JWT and no GitHub token appears anywhere in `localStorage` or `sessionStorage` (the Firebase session is the one thing in IndexedDB, as described above).
 
 ## When to pick what
 
 | Situation | Choice |
 |---|---|
-| A prototype or an internal tool with no untrusted content | `localStorage` is tolerable, but accept the XSS exposure knowingly |
-| A public app with user-generated content | Memory + HttpOnly refresh cookie (this project) |
-| Same-site server-rendered pages | A plain session cookie (`HttpOnly`, `SameSite=Lax`/`Strict`) and CSRF tokens on forms |
-| Several services behind one login | Short JWTs signed with asymmetric keys (RS256/ES256) so services verify without the secret, plus a central refresh endpoint |
-| Mobile app | Tokens in the platform's secure storage (Keychain, Keystore), not the web options |
+| A prototype or an internal tool | `localStorage` or Firebase defaults are tolerable; know the XSS exposure |
+| A public app with user-generated content, and you can run a backend | Memory + HttpOnly refresh cookie (the first version) |
+| An app already built on Firebase or another auth service | Use the service; harden XSS (escaping, CSP, dependency hygiene) |
+| Several services behind one login | Short JWTs signed with asymmetric keys so services verify without a shared secret (Firebase already does this) |
+| Mobile app | The platform's secure storage (Keychain, Keystore) |
 
 ## Limits of this comparison
 
-It reflects the choices made in one training project; it is not a security audit. XSS prevention (escaping, CSP, dependency hygiene) matters whichever option you pick, and none of the options replaces HTTPS.
+It reflects the choices made in one training project; it is not a security audit. XSS prevention matters whichever option you pick, and none of the options replaces HTTPS.

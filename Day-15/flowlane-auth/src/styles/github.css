@@ -1,0 +1,69 @@
+/* GitHub import + badge. Only existing theme tokens, so light and dark both work. */
+.gh-open-btn {
+  display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: transparent;
+  color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 20px;
+  font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.gh-open-btn:hover { background: var(--bg-card); }
+.gh-open-btn:focus-visible, .gh-btn:focus-visible, .gh-link:focus-visible, .gh-row:focus-visible,
+.gh-badge:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+/* the shared modal is 400px wide; the picker needs more room */
+.modal-content:has(.gh-import) { max-width: 560px; }
+.gh-import { display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto; color: var(--text-primary); }
+.gh-steps { font-size: 12px; color: var(--text-secondary); margin: 0; }
+.gh-heading { font-size: 16px; margin: 0; outline: none; }
+.gh-step { display: flex; flex-direction: column; gap: 12px; font-size: 14px; line-height: 1.5; }
+.gh-step p { margin: 0; }
+.gh-muted { color: var(--text-secondary); font-size: 13px; }
+.gh-scopes { margin: 0; padding-left: 20px; }
+.gh-field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary); }
+.gh-field input {
+  width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-color);
+  background: var(--bg-main); color: var(--text-primary); font-family: inherit; font-size: 14px;
+}
+.gh-field input:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+
+.gh-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.gh-row {
+  width: 100%; display: flex; flex-direction: column; gap: 4px; text-align: left; padding: 10px 12px;
+  border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card);
+  color: var(--text-primary); font-family: inherit; font-size: 14px; cursor: pointer;
+}
+button.gh-row:hover { border-color: var(--primary-color); }
+.gh-row-main { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.gh-visibility { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-secondary); }
+.gh-clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.gh-check { flex-direction: row; align-items: flex-start; gap: 10px; }
+.gh-check input { margin-top: 3px; width: 16px; height: 16px; accent-color: var(--primary-color); }
+.gh-select-all { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+.gh-row-disabled { cursor: default; opacity: 0.85; }
+.gh-row-main-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.gh-issue-title { overflow-wrap: anywhere; }
+.gh-number { color: var(--text-secondary); font-weight: 600; }
+.gh-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.gh-chip {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 2px 8px;
+  border-radius: 999px; border: 1px solid var(--border-color); background: var(--bg-main); color: var(--text-primary);
+}
+.gh-dot { width: 8px; height: 8px; border-radius: 50%; border: 1px solid var(--border-color); flex-shrink: 0; }
+.gh-imported { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--bg-main); color: var(--text-secondary); border: 1px solid var(--border-color); }
+.gh-comments { display: inline-flex; align-items: center; gap: 4px; }
+.gh-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+.gh-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.gh-footer { position: sticky; bottom: 0; background: var(--bg-surface); padding-top: 8px; }
+.gh-btn { padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; border: 1px solid transparent; }
+.gh-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.gh-btn-primary { background: var(--primary-strong); color: #fff; }
+.gh-btn-secondary { background: transparent; color: var(--text-primary); border-color: var(--border-color); }
+.gh-link { background: none; border: none; padding: 0; color: var(--text-primary); font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: underline; }
+.gh-error { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--danger-text); color: var(--danger-text); }
+.gh-error-text { color: var(--danger-text); }
+
+.gh-badge {
+  display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 3px 7px;
+  border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-main);
+  color: var(--text-secondary); text-decoration: none;
+}
+a.gh-badge:hover { color: var(--text-primary); border-color: var(--text-secondary); }
