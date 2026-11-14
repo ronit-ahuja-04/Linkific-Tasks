@@ -1,20 +1,17 @@
-import 'dotenv/config';
-import { createApp } from './app.js';
-import { loadConfig } from './config.js';
-import { seedDemo } from './seed.js';
-import { createStore } from './store.js';
+import 'dotenv/config'
+import { createApp } from './app.js'
+import { loadConfig } from './config.js'
 
-const config = loadConfig(process.env);
-const store = createStore({ dbFile: config.dbFile });
-if (config.seedDemo) seedDemo(store, config);
-
-if (config.secretGenerated) {
-  console.warn('[config] JWT_SECRET is not set: using a random one. All tokens become invalid when the server restarts.');
+const config = loadConfig()
+if (config.emulatorHost) {
+  console.warn(`[api] WARNING: FIREBASE_AUTH_EMULATOR_HOST is set (${config.emulatorHost}): accepting UNSIGNED emulator tokens. Development only.`)
+}
+if (config.emulatorIgnored) {
+  console.warn('[api] FIREBASE_AUTH_EMULATOR_HOST is ignored because NODE_ENV=production.')
 }
 
-const app = createApp({ config, store });
-app.listen(config.port, () => {
-  // Never print secrets: only non-sensitive settings.
-  console.log(`FlowLane API listening on http://localhost:${config.port} (${config.nodeEnv})`);
-  console.log(`  client: ${config.clientUrl} | dev outbox: ${config.enableDevOutbox} | fake OAuth: ${config.oauthFake} | db: ${config.dbFile === ':memory:' ? 'memory' : 'file'}`);
-});
+const server = createApp({ config }).listen(config.port, () => {
+  console.log(`[api] FlowLane API listening on :${config.port} (project ${config.projectId}, GitHub ${config.githubApiUrl})`)
+})
+
+for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => server.close(() => process.exit(0)))
