@@ -201,6 +201,22 @@ test.describe('sessions that end', () => {
   });
 });
 
+test.describe('Settings scrolling', () => {
+  test('the Security tab is taller than the window and can be scrolled to the end with the mouse wheel', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 640 });
+    await signUp(page, uniqueEmail('scroll'), STRONG);
+    await page.goto('/settings');
+    await page.getByRole('tab', { name: 'Security' }).click();
+    const last = page.getByRole('heading', { name: 'How sessions work' });
+    await expect(last).toBeAttached();
+    expect((await last.boundingBox()).y).toBeGreaterThan(640); // below the fold at first
+    await page.mouse.move(640, 400);
+    await page.mouse.wheel(0, 4000); // a real scroll: it does nothing when the page area is clipped
+    await expect.poll(async () => (await last.boundingBox()).y).toBeLessThan(640);
+    await expect(last).toBeInViewport();
+  });
+});
+
 test.describe('Security tab', () => {
   test('shows the decoded ID token, counts down, refreshes, and the API verifies the same token', async ({ page }) => {
     const email = uniqueEmail('security');

@@ -17,6 +17,9 @@ export default function SettingsView({ onBack }) {
   const toast = useToast();
 
   return (
+    // The page area around this view is `overflow: hidden`, so the view must scroll by itself: the Security
+    // tab is taller than the window. `minHeight: 0` lets a flex child shrink below its content so it can scroll.
+    <div style={{ flex: 1, minHeight: 0, overflowY: 'auto' }}>
     <div style={{ padding: '40px 60px', maxWidth: 800, margin: '0 auto', width: '100%' }}>
       <button
         onClick={onBack}
@@ -91,6 +94,7 @@ export default function SettingsView({ onBack }) {
           <SecurityPanel />
         </Tabs.Panel>
       </Tabs>
+    </div>
     </div>
   );
 }
