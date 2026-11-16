@@ -11,6 +11,12 @@
     },
     "ui": {
       "enabled": false
+    },
+    "storage": {
+      "port": 9299
     }
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
