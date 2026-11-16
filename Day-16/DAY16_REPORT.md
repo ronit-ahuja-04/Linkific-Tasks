@@ -4,7 +4,7 @@
 **Author:** Ronit Ahuja
 **Project:** FlowLane with Firebase Storage and a live dashboard, in `Day-16/flowlane-firebase` (the Day 15 FlowLane, copied and extended)
 **Pull requests:** #76 (start from the Day 15 app), #77 (Storage layer, rules, tests), #78 (profile photo and task images), #79 (Live dashboard, README, PRD), #80 and #81 (local emulator mode, upload timeout and its fix)
-**Time spent:** [fill in your hours]
+**Time spent:** 4 hours
 
 ## 1. Summary
 
@@ -71,9 +71,3 @@ I read the Day 15 app first and mapped the task list to it, which showed that up
 - Only the project owner can add task images (the same people who can edit tasks). Images are not resized or compressed.
 - Deleting a project removes the images of the project that is open, the only board the browser holds.
 - Only Chrome was tested, and no real phone.
-
-## 9. Next steps
-
-1. Upgrade the Firebase project to Blaze (with a budget alert), turn on Storage, deploy the rules with `firebase deploy --only firestore:rules,storage`, and run the real-project checklist.
-2. Delete a project's images with a small server-side function so no file is left behind.
-3. Resize images in the browser before upload, and allow members (not only the owner) to attach images if the product wants that.
