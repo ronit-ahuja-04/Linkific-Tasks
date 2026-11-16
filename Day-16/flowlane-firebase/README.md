@@ -1,139 +1,190 @@
-# FlowLane + authentication, JWT and GitHub
+# FlowLane + Firebase: Storage, real-time dashboard and a setup guide
 
-**Day 15 project:** Linkific Month 1 Training
+**Day 16 project:** Linkific Month 1 Training
 **Author:** Ronit Ahuja
-**Stack:** React 19, Vite, Firebase Auth and Firestore, Redux Toolkit (server data), React Context (user, theme, language, toast), axios, a small Express API, Vitest, Testing Library, Playwright
-**PRD:** [Day15_PRD.md](../Day15_PRD.md)
-**Comparison:** [AUTH_STORAGE_COMPARISON.md](../AUTH_STORAGE_COMPARISON.md)
-**Starting point:** the Day 12 app (`Day-12/flowlane-context`), copied unchanged and extended. Same board, chat, notifications, invitations, calendar sync, themes and three languages; the Day 11 and 12 folders are untouched.
+**Stack:** React 19, Vite, Firebase (Auth, Firestore, Cloud Storage), Redux Toolkit, React Context, Vitest, Testing Library, Playwright
+**PRD:** [Day16_PRD.md](../Day16_PRD.md)
+**Starting point:** the Day 15 app (`Day-15/flowlane-auth`), copied unchanged and extended. Everything from Day 15 (GitHub sign-in, JWT-checking API, protected routes, three languages, dark mode) still works.
 
-## What Day 15 adds
+FlowLane is a collaborative task board with chat. It already ran on Firebase Auth and Firestore, so most of the Day 16 task list was met by it. Day 16 adds what was missing and documents the whole thing:
 
-| Feature | Where it lives |
+| New on Day 16 | Where it lives |
 |---|---|
-| **Sign in with GitHub** (OAuth through Firebase's GitHub provider) | `Auth` page, `signInWithGithub` in `AuthContext` |
-| **Import GitHub issues as tasks** into the open project | "Import from GitHub" button in the project header, `ImportFromGitHub`, `importTasks` thunk |
-| **Remember me** (session lasts across restarts, or only until the tab closes) | `AuthContext`, Firebase persistence |
-| **Forgot and reset password**, **email verification** (with a banner and "Resend") | `ForgotPassword`, `AuthAction` (`/auth/action`), `VerifyEmailBanner` |
-| **Password strength meter** | `PasswordStrength`, `lib/password.js` |
-| **Protected routes** that return you to the page you wanted | `RouteGuards` (`ProtectedRoute`, `PublicOnlyRoute`) |
-| **Auto-logout** after 30 minutes of inactivity, and a notice when a session is ended elsewhere | `AuthProvider` idle timer and `notice` |
-| **Security page** (Settings, Security tab): your decoded ID token, a live expiry countdown, linked sign-in methods, email status | `SecurityPanel` |
-| **A small Express API** that verifies the Firebase ID token (a real JWT check) and proxies GitHub | `server/` |
-| **axios instance with interceptors** (adds the token, on a 401 refreshes once and retries) | `src/api/client.js` |
+| **Profile photo**: upload, replace, remove (Cloud Storage) | Profile page: `AvatarUploader`, `lib/profilePhoto.js` |
+| **Task images**: up to 6 per task, shown as thumbnails, opened full size, removed | Task panel: `TaskAttachments`, thunks in `boardSlice.js` |
+| **Storage security rules**: images only, size limits, tied to the project | `storage.rules` |
+| **Live tab**: a real-time dashboard (counts, bars, who has what, all projects, latest chat) | `LivePulse`, `lib/stats.js`, `lib/useLatestMessages.js` |
+| This setup guide | below |
 
-## Run
+---
+
+## Firebase setup guide (from an empty project to a running app)
+
+### 1. Create the project
+1. [console.firebase.google.com](https://console.firebase.google.com) → **Add project** → name it → (Analytics is optional) → **Create**.
+
+### 2. Turn on Authentication
+Build → **Authentication** → **Get started** → **Sign-in method**:
+- **Email/Password**: enable.
+- **Google**: enable, choose a support email.
+- (Day 15, optional) **GitHub**: see "Turn on GitHub sign-in" in `Day-15/flowlane-auth/README.md`.
+
+Under **Settings → Authorized domains**, `localhost` is there by default. Add your hosting domain when you deploy.
+
+### 3. Create the Firestore database
+Build → **Firestore Database** → **Create database** → pick a location → **Start in production mode**. Production mode starts closed; the rules in step 6 open exactly what FlowLane needs. (Test mode expires after 30 days and then blocks everything. That already happened to this project once, on 16 October 2026.)
+
+### 4. Turn on Cloud Storage
+Build → **Storage** → **Get started** → choose a location. Firebase may ask you to switch the project to the **Blaze (pay as you go)** plan before it creates the default bucket; there is a free monthly allowance, and you can set a budget alert. If you would rather not, the app still works for everything except images, and the emulators (below) run every image feature locally for free.
+
+### 5. Register the web app and copy its config
+Project settings (gear icon) → **Your apps** → **`</>` Web** → register → copy the `firebaseConfig` values into a `.env` file:
 
 ```bash
-cd Day-15/flowlane-auth
+cd Day-16/flowlane-firebase
+cp .env.example .env
+```
+
+```
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_PROJECT_ID=your-project
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app   # exactly as the console shows it
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
+```
+
+`.env` is git-ignored. These keys identify the project; they are not secrets. What protects the data is the rules in the next step. Without keys the app still starts and the sign-in page explains that they are missing.
+
+### 6. Publish the security rules
+```bash
+npm install -g firebase-tools
+firebase login
+firebase use --add            # choose your project
+firebase deploy --only firestore:rules,storage
+```
+`firestore.rules` and `storage.rules` are in this folder. Read them: each has a comment block that says who may do what.
+
+### 7. Run it
+```bash
 npm install
-npm --prefix server install
-cp .env.example .env            # your Firebase web app keys, as before
-npm run dev:all                 # web on :5173 and the API on :4000
-npm test                        # unit and component tests (Firebase mocked)
-npm run test:server             # the Express API's tests
-npm run test:rules              # Firestore security-rules tests (emulator, needs Java)
-npm run test:e2e                # browser tests against the Firebase emulators
-npm run test:e2e:prod           # the same against the production bundle
+npm --prefix server install     # only for the Day 15 Security tab and GitHub import
+npm run dev                     # http://localhost:5173
 ```
+Sign up, open **Profile** (the round avatar, top right), upload a photo. Open a task and add an image. Open the **Live** tab.
 
-Only the web app is needed for everything except the Security tab's "Ask the API" and the GitHub import. `npm run dev` starts just the web app.
-
-### Turn on GitHub sign-in (once)
-1. GitHub → Settings → Developer settings → OAuth Apps → **New OAuth App**. Homepage `http://localhost:5173`. The **Authorization callback URL** is the one Firebase shows you: Firebase console → Authentication → Sign-in method → GitHub (it looks like `https://<project>.firebaseapp.com/__/auth/handler`).
-2. In Firebase, enable the GitHub provider and paste the app's Client ID and Client secret. The secret lives only in Firebase, never in this repo.
-3. Nothing else: the app already requests `read:user` and `user:email`. Reading issues of public repositories needs no more; private repositories need the broader `repo` scope, which this app does not request.
-
-Tests and demos need none of this: the browser tests use the Auth emulator's fake GitHub popup and a fake GitHub API (`npm run dev:fake-github`).
-
-**Not verified here: a sign-in and an import against the real GitHub** (it needs your own GitHub OAuth app). Everything else around it is covered by tests with the emulator and the fake GitHub, and the real GitHub calls by tests with a mocked `fetch`.
-
-## How the pieces fit
-
+### Optional: run everything locally with the emulators (no cloud, no cost)
+```bash
+firebase emulators:start --only auth,firestore,storage --project demo-flowlane
 ```
-Browser (React)                                  Express API (server/)              GitHub
-  Firebase Auth SDK  ──ID token (JWT, 1 hour)──►  verify signature + claims
-  axios client       ──Authorization: Bearer──►   GET /api/me                        
-                     ──+ X-GitHub-Token────────►  GET /api/github/repos, /issues ──► api.github.com
-  Firestore (board, chat, ...)  ◄─ secured by Firebase rules, as before
-```
+In a second terminal, start the app with these variables set: `VITE_USE_EMULATORS=true`, `VITE_FIREBASE_PROJECT_ID=demo-flowlane` and any non-empty values for the other keys (the browser tests do exactly this, see `playwright.config.js`). `src/lib/firebase.js` refuses to use the emulators with a project id that does not start with `demo-`, so it can never touch real data. The emulators need Java.
 
-Firebase Auth already is a JWT system. After sign-in the browser holds an **ID token** (a JWT signed RS256 by Google, valid 1 hour). The SDK also keeps a long-lived **refresh token** and renews the ID token by itself. The Express API checks that same ID token: it downloads Google's public certificates, picks the one named in the token's `kid` header, verifies the RS256 signature, then checks `aud`, `iss`, `sub`, `auth_time` and the expiry. A forged or expired token is a 401.
-
-### The GitHub token
-Signing in (or connecting) with GitHub gives the browser a **GitHub access token**. It is a different thing from the Firebase token: it lets the app call GitHub as you. It is kept **in memory only** (`lib/githubToken.js`): not in `localStorage`, not in `sessionStorage`. A reload forgets it, and "Connect GitHub" runs the popup again. It travels in an `X-GitHub-Token` header to the API, which forwards it to GitHub and never stores or logs it.
-
-### What the axios client does (`src/api/client.js`)
-1. **Request:** adds `Authorization: Bearer <ID token>` (the SDK hands over the cached token and renews it when it is close to expiry), plus `X-GitHub-Token` when the call needs it.
-2. **401 `token_expired` or `unauthorized`:** force-refreshes the ID token once (parallel failures share one refresh) and retries the request once. If it fails again the user is signed out with the notice "Your session expired".
-3. **401 `github_token_invalid`:** forgets the GitHub token; the import dialog offers **Reconnect GitHub**. This is a different failure from an expired FlowLane token, so it is handled differently.
-4. **Network failure:** becomes a friendly error; nothing is retried twice.
-
-### Sessions and sign-out
-- **Remember me** picks Firebase's persistence: ticked uses IndexedDB (survives closing the browser, shared by all tabs); unticked uses `sessionStorage` (a new tab starts signed out).
-- **Idle auto-logout:** 30 minutes without a click, key or scroll signs you out with the notice "You were signed out after a period of inactivity" (`VITE_IDLE_MINUTES` changes it).
-- **A session that ends elsewhere:** when Firebase signs the user out because the account was disabled or the refresh token is no longer valid, the sign-in page says "Your session expired".
-- **After you press Sign out** nothing is remembered, so the next person to sign in on this browser starts at the dashboard, not on your last page.
-
-### Import GitHub issues
-Open a project → **Import from GitHub** → connect (skipped if you signed in with GitHub) → pick a repository → tick issues → **Import**. Imported issues become tasks in To Do, with a `#123` badge that links back to the issue. Pull requests (GitHub's issues endpoint includes them) are filtered out by the API; issues already imported are shown as such and cannot be picked again (matched by their URL); the whole import is **one** Firestore write and **one** notification to the members. Labels become tags.
-
-## Where things are
-
-| Concern | Files |
+### Things that go wrong
+| You see | Cause |
 |---|---|
-| Auth state, persistence, idle logout, notices | `src/context/AuthContext.jsx`, `src/lib/session.js`, `src/lib/authErrors.js` |
-| Route guards | `src/components/RouteGuards.jsx`, `src/App.jsx` |
-| Sign-in, forgot password, email links | `src/pages/Auth.jsx`, `ForgotPassword.jsx`, `AuthAction.jsx`, `src/components/PasswordStrength.jsx`, `PasswordField.jsx`, `VerifyEmailBanner.jsx` |
-| Security tab | `src/components/SecurityPanel.jsx`, `src/pages/SettingsView.jsx` |
-| API client and GitHub calls | `src/api/client.js`, `src/api/github.js`, `src/context/GitHubContext.jsx`, `src/lib/githubAuth.js`, `src/lib/githubToken.js` |
-| Import dialog, badge, bulk thunk | `src/components/ImportFromGitHub.jsx`, `src/components/github/`, `GitHubBadge.jsx`, `importTasks` in `src/store/slices/boardSlice.js` |
-| Express API | `server/src/` (`firebaseToken.js`, `routes/`, `middleware/`, `dev/fake-github.js`); see `server/README.md` |
-| Translations (English, Spanish, Hindi) | `src/i18n/*/account.js`, `security.js`, `github.js` |
+| "File storage is not set up" | `VITE_FIREBASE_STORAGE_BUCKET` is empty in `.env`; restart `npm run dev` after editing it |
+| "The storage bucket was not found" | Storage was not turned on (step 4) |
+| "You are not allowed to do that" on an upload | The Storage rules were not deployed (step 6), or you are not the project's owner (only the owner adds task images) |
+| Everything is "permission denied" | Firestore rules missing or expired (step 3 and 6) |
+| Google sign-in popup says unauthorized domain | Add the domain under Authentication → Settings → Authorized domains |
 
-## Security notes
+---
 
-| Practice | How |
-|---|---|
-| Tokens never logged | The API logs only `METHOD /path STATUS`; no query strings, headers or tokens (tested) |
-| JWT checked properly | RS256 only, certificate chosen by `kid`, `aud` / `iss` / `sub` / `auth_time` / expiry checked; `alg: none` and HS256-with-the-public-key tricks are rejected (tested) |
-| GitHub token | memory only, never stored or logged by the API, cleared on sign-out and on a 401 from GitHub |
-| Enumeration | "Forgot password" gives the same answer for any email |
-| Weak passwords | strength meter on sign-up and reset; Firebase enforces its own minimum |
-| Rate limiting | per signed-in user on the API |
-| XSS | React escapes output; no `dangerouslySetInnerHTML` is used for user data; imported issue text is rendered as text and links only open when the URL is `http(s)` |
-| The emulator shortcut | The API accepts the Auth emulator's **unsigned** tokens only when `FIREBASE_AUTH_EMULATOR_HOST` is set and `NODE_ENV` is not `production` |
+## The Day 16 task list, item by item
 
-**What Firebase stores in the browser:** by default the ID and refresh tokens are kept by the Firebase SDK in IndexedDB, which scripts on the page can read. That is Firebase's design; it is why the app avoids raw HTML, and the comparison document shows the alternative (memory plus an HttpOnly cookie, which needs your own backend) that the previous version of this project built.
+| Task | How it is met | Where |
+|---|---|---|
+| Firebase in React: config file, init app, Auth, Firestore | One module exports `auth`, `db` and `storage`, with an emulator switch | `src/lib/firebase.js` |
+| Email and password; Google sign-in; sign up, sign in, sign out; current user; `onAuthStateChanged` | Yes. The user lives in a React Context | `src/context/AuthContext.jsx`, `src/pages/Auth.jsx` |
+| Collections and documents; add, get, update, delete | `projects`, `users`, `invitations`, `direct_messages`, and sub-collections (`messages`, `notifications`, `typing`) | `src/store/`, `src/lib/` |
+| Queries: `where`, `orderBy`, `limit` | `where('members', 'array-contains', uid)` and `where('inviteeEmail', '==', email)`; `orderBy` on chat and notifications; `orderBy` + `limit(5)` in the Live tab's chat feed | `store/listeners.js`, `components/Chat.jsx`, `lib/useLatestMessages.js` |
+| Real-time listeners with `onSnapshot` | Every list in the app is a listener. They are stopped when a screen closes | `store/listeners.js`, `store/useFirebaseSync.js` |
+| Chat with real-time messages | Project chat and one-to-one chat, with a typing indicator and unread counts | `components/Chat.jsx`, `MessagesView.jsx` |
+| Live notifications | A `notifications` sub-collection per user, shown as toasts | `lib/notify.js`, `store/slices/notificationsSlice.js` |
+| Collaborative todo list | The Kanban board: when one person drags a card, everyone sees it move | `pages/Dashboard.jsx`, `store/slices/boardSlice.js` |
+| Real-time dashboard data | **New:** the Live tab | `components/LivePulse.jsx`, `lib/stats.js` |
+| Storage: setup, upload images, download URLs, display, delete | **New:** profile photo and task images | `lib/storage.js`, `AvatarUploader.jsx`, `TaskAttachments.jsx`, `storage.rules` |
+| Complete app: auth, profile in Firestore, CRUD, real-time, image upload, protected routes | FlowLane as a whole. The profile document is `users/{uid}`; routes are guarded by `components/RouteGuards.jsx` | |
+| README with Firebase setup guide | This file | |
+
+---
+
+## What was added
+
+### Image uploads (Cloud Storage)
+
+```
+Browser ──uploadBytesResumable──► Cloud Storage   avatars/{uid}/{id}-{name}
+   │                                              projects/{projectId}/tasks/{taskId}/{id}-{name}
+   └─ getDownloadURL ─► saved in Firebase Auth (photoURL) and Firestore (users/{uid}),
+                        or as an entry on the task document (tasks.{taskId}.attachments)
+```
+
+- **Upload with progress.** `uploadFile` in `lib/storage.js` wraps `uploadBytesResumable` and reports 0 to 100.
+- **Display.** The download URL is a long-lived `https` link, used as an `<img src>`. Only `http(s)` URLs are ever rendered, because anyone on a project can write the entry.
+- **Delete.** Replacing or removing a photo deletes the old file. Removing an image deletes its file. Deleting a task or a project deletes its images (best effort: one file that cannot be deleted does not block the rest).
+- **Limits.** PNG, JPEG, GIF or WebP only (SVG can carry scripts, so it is refused). Photos under 2 MB, task images under 5 MB, six per task. The browser checks first for a friendly message; `storage.rules` is the real protection.
+- **Race-safe lists.** A task's images are changed with `arrayUnion` and `arrayRemove`, so two people attaching at the same moment cannot overwrite each other.
+- **Live for everyone.** The Firestore listeners already keep the board current, so a teammate sees a new photo or image without reloading.
+
+`storage.rules` in one table:
+
+| Path | Read | Create / update | Delete |
+|---|---|---|---|
+| `avatars/{uid}/*` | any signed-in user | that user, image, under 2 MB | that user |
+| `projects/{id}/tasks/{task}/*` | members of that project | the project's owner, image, under 5 MB | the project's owner |
+| anything else | nobody | nobody | nobody |
+
+The task rules read the project's Firestore document (`firestore.get`), so a file is reachable only by people on the project. They match who can edit the board in the UI: the owner.
+
+### The Live tab
+
+A fourth view next to Board and Activity. It shows task, done, in-progress, high-priority-not-done and image counts; tasks per column and per priority as bars; who has how many open and done tasks; every project the user belongs to; and the five newest chat messages. A line at the top says "Live" and how long ago the last update arrived.
+
+It polls nothing. The numbers are computed (`lib/stats.js`, pure functions) from the board already in Redux, which a Firestore `onSnapshot` listener keeps current. When anyone changes the board, the snapshot arrives, the store changes and the numbers change; a change flashes briefly (not for people who prefer reduced motion). The "All your projects" table needs no extra listener: the projects listener already receives whole project documents. Bars carry a text alternative and never rely on colour alone.
+
+---
 
 ## Tests
 
-| Layer | What |
-|---|---|
-| Unit and component | the original 182, plus Day 15: auth context and persistence, route guards, the pages, password strength, API client and interceptors, GitHub context, import dialog, bulk-import thunk, Security panel |
-| Server | token verification (valid, expired, wrong audience or issuer, wrong algorithm, key rotation, emulator mode), every endpoint with a fake GitHub, rate limiting, validation, no secrets in logs |
-| Security rules | the original 23 (tasks gained an optional `source` field the rules allow) |
-| Browser (Chrome, emulators) | the original 84, plus Day 15: remember me across tabs, forgot and reset password, email verification, idle logout, a disabled account, GitHub sign-in through the emulator's popup, linking and unlinking, importing issues (pull requests filtered, never twice), a rejected GitHub token and an expired ID token handled by the interceptor, the Security tab, and axe WCAG 2.1 AA on every new screen in light and dark. Every test fails on an unexpected console error or warning |
+```bash
+npm test               # unit and component tests (Firebase mocked)
+npm run test:server    # the Day 15 Express API
+npm run test:rules     # Firestore and Storage security rules, against the emulators (needs Java)
+npm run test:e2e       # the real app in Chrome against the Auth, Firestore and Storage emulators
+npm run test:all       # all of the above
+```
 
-The GitHub popup tests need the internet for one thing: Firebase's popup loads Google's script loader (`apis.google.com`), so those tests let that one host through instead of stubbing it.
+| Layer | Count | New on Day 16 |
+|---|---|---|
+| Unit and component | 556 | storage helpers, profile photo flow, avatar uploader, task attachments (component and Redux thunks), stats, Live tab, latest-messages hook |
+| Server | 110 | none |
+| Security rules | 38 | 15: avatars (own folder, images only, 2 MB, who can read or delete), attachments (owner only, members read, outsiders and signed-out refused, 5 MB, unknown project), everything else closed |
+| Browser (Chrome, emulators) | 134 | profile photo (upload, replace, remove, files checked in Storage itself, teammate sees it live), task images (add, reload, remove, delete task, read-only for members, live for members), Live tab (two users, counts change without reload, who has what, chat feed), axe WCAG 2.1 AA on every new screen in light and dark |
+
+Every browser test fails on an unexpected console error or warning.
+
+**Last full run (`npm run test:all`):** 556 unit, 110 server and 38 rules tests all passed; of 134 browser tests 132 passed and 2 failed. Both are flaky ones from earlier days, not Day 16 code: "the people search filters the list" passed 3 of 3 when rerun alone, and "the GitHub token is rejected, the dialog offers Reconnect" fails the same way when run several times in a row in the untouched Day 15 app (it passes when run once, and passed in the previous full run).
 
 ## Bugs the tests found
 
-- **Opening a second tab signed the first tab out.** "Remember me" used `browserLocalPersistence` (localStorage), but a fresh tab starts with Firebase's default (IndexedDB), moves the user over, and removes it from localStorage. It now uses `indexedDBLocalPersistence`.
-- **The next person to sign in landed on the previous user's project URL.** The guard remembered the page after a voluntary sign-out. It now remembers nothing in that case.
-- A few contrast problems the new screens exposed in the original styles: the dev tag text (orange on pale yellow, used by imported labels), the column count, and the dark-theme divider text. The Security button used the brand orange under white text (about 3:1) and now uses the darker `--primary-strong`.
-- The Express API's test config picked up the web app's Vitest config from the parent folder.
+- **Removing a photo failed with "Something went wrong".** Firebase Auth rejects `updateProfile({ photoURL: null })` ("photoUrl must be a string"), although `null` is documented as the way to clear it. An empty string works, and the app treats it as "no photo".
+- **A removed photo's file stayed in Storage, one run in six.** The file's path was read from the Firestore user document, and right after a page load a plain read can come from a half-empty local cache. Reading from the server fixed most runs; the lasting fix was to take the path from the photo's own URL, which already contains it (Firestore is only the fallback).
+- **The two security-rules test files broke each other.** They share one Firestore emulator and each clears it, so they now run one after the other.
+- **`.visually-hidden` was never defined** in the stylesheet (the Settings language legend used it). It is now, which the file inputs also need.
+- The Day 12 test of the project tabs assumed two tabs; it now covers three.
 
 ## Limits
 
-- The API must be hosted for the Security "Ask the API" button and the GitHub import in production (`VITE_API_URL`). `vercel.json` covers the web app only.
-- Real GitHub sign-in and import are unverified (see above); only the fake and the mocked paths ran.
-- The GitHub token is gone after a reload, by design.
-- Private repositories are not covered (no `repo` scope is requested).
-- Two-way sync (a GitHub issue closing a task) is not built; the import is one-way and one-time.
+- **Real Firebase Storage was not exercised.** Every image feature ran against the Storage emulator, which applies the real rules but is not Google's service. The first deploy to a real project should be checked by hand: upload a photo, add a task image, remove both, and check that the files disappear from the Storage console.
+- New projects may need the Blaze plan before Storage can be turned on (step 4).
+- Deleting files is best effort. If a delete is refused or the connection drops, the file stays in Storage (an orphan). The app never shows a broken image, because the entry is removed first.
+- Deleting a project removes the images of the project that is open (the one whose delete button you pressed); that is the only board whose tasks the browser holds.
+- Only the project owner can add task images, the same people who can edit tasks.
+- Images are uploaded as they are: no resizing or compression.
+- The Live tab shows the open project's numbers live; the other projects' totals come from the project list and are as fresh as that listener.
 - Only Chrome was tested, and no real phone.
-- The ID and refresh tokens live in IndexedDB (Firebase's choice).
 
-## Original FlowLane notes
+## Day 15 features
 
-The Day 12 sections (who owns which state, Context patterns, compound components, toasts, language and theme) still describe this app: see `Day-12/flowlane-context/README.md`. The original product requirements are in `prd.md` in this folder.
+GitHub sign-in and issue import, the JWT-verifying Express API, remember me, password reset, email verification, idle logout and the Security tab are unchanged. See `Day-15/flowlane-auth/README.md` for how they work and how to turn GitHub sign-in on.

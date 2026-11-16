@@ -113,6 +113,8 @@ export function startProjectListener({ dispatch, getState }, projectId, uid) {
             tasks: data.tasks || {},
             columns: data.columns,
             columnOrder: data.columnOrder || [],
+            // When this snapshot arrived: the Live tab shows "Updated 3s ago" from it
+            receivedAt: Date.now(),
           })
         );
       } else {

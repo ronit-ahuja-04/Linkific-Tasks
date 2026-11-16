@@ -21,7 +21,7 @@ vi.mock('../src/lib/storage.js', () => ({
   deleteFile: (...a) => h.deleteFile(...a),
 }));
 
-const { setProfilePhoto, removeProfilePhoto } = await import('../src/lib/profilePhoto.js');
+const { setProfilePhoto, removeProfilePhoto, pathFromPhotoUrl } = await import('../src/lib/profilePhoto.js');
 const stored = (photoPath) => h.getDocFromServer.mockResolvedValue({ data: () => (photoPath ? { photoPath } : {}) });
 
 beforeEach(() => {
@@ -75,6 +75,15 @@ describe('setProfilePhoto', () => {
   });
 });
 
+describe('removeProfilePhoto: path from the photo URL', () => {
+  it('deletes the file named in the Auth photo URL without asking Firestore', async () => {
+    h.currentUser = { uid: 'u1', photoURL: 'https://x/v0/b/b/o/avatars%2Fu1%2Fcur.png?alt=media' };
+    await removeProfilePhoto();
+    expect(h.deleteFile).toHaveBeenCalledWith('avatars/u1/cur.png');
+    expect(h.getDocFromServer).not.toHaveBeenCalled();
+  });
+});
+
 describe('removeProfilePhoto', () => {
   it('deletes the file and clears the photo in Auth and Firestore', async () => {
     await removeProfilePhoto();
@@ -96,6 +105,21 @@ describe('removeProfilePhoto', () => {
     await removeProfilePhoto();
     expect(h.deleteFile).not.toHaveBeenCalled();
     expect(h.updateProfile).toHaveBeenCalledOnce();
+  });
+});
+
+describe('pathFromPhotoUrl', () => {
+  const url = (path) => `https://firebasestorage.googleapis.com/v0/b/app.appspot.com/o/${encodeURIComponent(path)}?alt=media&token=t`;
+  it('reads the storage path out of a download URL', () => {
+    expect(pathFromPhotoUrl(url('avatars/u1/ab-me.png'), 'u1')).toBe('avatars/u1/ab-me.png');
+    expect(pathFromPhotoUrl('http://127.0.0.1:9299/v0/b/x/o/avatars%2Fu1%2Fa.png?alt=media', 'u1')).toBe('avatars/u1/a.png');
+  });
+  it('ignores anything that is not this user\'s own avatar file', () => {
+    expect(pathFromPhotoUrl(url('avatars/u2/a.png'), 'u1')).toBeNull();
+    expect(pathFromPhotoUrl(url('projects/p/tasks/t/a.png'), 'u1')).toBeNull();
+    expect(pathFromPhotoUrl('https://lh3.googleusercontent.com/a/photo=s96-c', 'u1')).toBeNull();
+    expect(pathFromPhotoUrl(null, 'u1')).toBeNull();
+    expect(pathFromPhotoUrl('not a url', 'u1')).toBeNull();
   });
 });
 
