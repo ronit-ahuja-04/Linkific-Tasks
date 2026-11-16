@@ -1,0 +1,55 @@
+/* Day 15 account UI: uses the FlowLane tokens from index.css, so light and dark both work. */
+
+/* Remember me + forgot password row */
+.auth-options { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -4px 0 16px; font-size: 13px; }
+.auth-check { display: inline-flex; align-items: center; gap: 8px; color: var(--text-secondary); cursor: pointer; }
+.auth-check input { width: 16px; height: 16px; accent-color: var(--primary-strong); cursor: pointer; }
+.auth-link { color: var(--primary-text); font-weight: 600; text-decoration: none; }
+.auth-link:hover { text-decoration: underline; }
+.auth-box .github-btn { margin-top: 10px; }
+.auth-notice {
+  background-color: var(--bg-surface); color: var(--text-primary); padding: 12px; border-radius: 8px;
+  font-size: 13px; margin-bottom: 20px; border: 1px solid var(--border-color); border-left: 4px solid var(--prio-medium);
+}
+.auth-info { color: var(--text-secondary); font-size: 14px; line-height: 1.5; margin-bottom: 8px; }
+.auth-center { justify-content: center; }
+.auth-box .auth-actions { margin-top: 24px; }
+.auth-box a.submit-btn { display: block; text-align: center; text-decoration: none; box-sizing: border-box; }
+
+/* Show/hide password */
+.form-group .pw-field { position: relative; }
+.form-group .pw-field input { padding-right: 46px; }
+.pw-field__toggle {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%); width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center; border: none; border-radius: 8px;
+  background: transparent; color: var(--text-secondary); cursor: pointer;
+}
+.pw-field__toggle:hover { background: var(--border-color); }
+.pw-field__toggle:focus-visible { outline: 2px solid var(--accent-color); outline-offset: 1px; }
+.pw-field__toggle[aria-pressed="true"] { color: var(--primary-text); }
+
+/* Strength meter: four segments plus a text label, so colour is never the only signal */
+.pw-strength { margin: -8px 0 16px; min-height: 0; }
+.pw-meter { display: flex; gap: 4px; margin-bottom: 6px; }
+.pw-meter__seg { flex: 1; height: 6px; border-radius: 3px; background: var(--border-color); }
+.pw-meter[data-score="0"] .is-on, .pw-meter[data-score="1"] .is-on { background: var(--danger-strong); }
+.pw-meter[data-score="2"] .is-on { background: var(--prio-medium); }
+.pw-meter[data-score="3"] .is-on, .pw-meter[data-score="4"] .is-on { background: var(--prio-low); }
+.pw-strength__label { font-size: 12px; font-weight: 600; color: var(--text-primary); margin: 0 0 4px; }
+.pw-strength__tips { margin: 0; padding-left: 18px; font-size: 12px; color: var(--text-secondary); }
+
+/* Verify-email banner, top of the dashboard */
+.verify-banner {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 20px;
+  background: var(--bg-surface); border-bottom: 1px solid var(--border-color); border-left: 4px solid var(--prio-medium);
+  color: var(--text-primary); font-size: 14px;
+}
+.verify-banner svg { color: var(--priority-medium-text); flex-shrink: 0; }
+.verify-banner p { margin: 0; flex: 1; min-width: 200px; }
+.verify-banner__actions { display: flex; gap: 8px; }
+.verify-banner button {
+  padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card);
+  color: var(--text-primary); font-size: 13px; font-weight: 600; cursor: pointer;
+}
+.verify-banner button:hover:not(:disabled) { background: var(--border-color); }
+.verify-banner button:disabled { opacity: 0.6; cursor: default; }
