@@ -28,7 +28,7 @@ export default {
   "storage.error.size": "La imagen es demasiado grande. El límite es {max}.",
   "storage.error.denied": "No tienes permiso para hacerlo. Vuelve a iniciar sesión o consulta al propietario del proyecto.",
   "storage.error.quota": "Se agotó la cuota de almacenamiento.",
-  "storage.error.network": "Se perdió la conexión. Revisa tu red e inténtalo de nuevo.",
+  "storage.error.network": "No se pudo conectar con el almacenamiento. Revisa tu red y que Storage esté activado en este proyecto de Firebase, e inténtalo de nuevo.",
   "storage.error.canceled": "Se canceló la subida.",
   "storage.error.notConfigured": "El almacenamiento de archivos no está configurado. Añade VITE_FIREBASE_STORAGE_BUCKET a tu archivo .env.",
   "storage.error.noBucket": "No se encontró el bucket de almacenamiento. Activa Storage en la consola de Firebase.",

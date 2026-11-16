@@ -73,15 +73,16 @@ npm run dev                     # http://localhost:5173
 ```
 Sign up, open **Profile** (the round avatar, top right), upload a photo. Open a task and add an image. Open the **Live** tab.
 
-### Optional: run everything locally with the emulators (no cloud, no cost)
+### Optional: run everything locally with the emulators (no cloud, no card, no Blaze)
 ```bash
-firebase emulators:start --only auth,firestore,storage --project demo-flowlane
+npm run dev:local
 ```
-In a second terminal, start the app with these variables set: `VITE_USE_EMULATORS=true`, `VITE_FIREBASE_PROJECT_ID=demo-flowlane` and any non-empty values for the other keys (the browser tests do exactly this, see `playwright.config.js`). `src/lib/firebase.js` refuses to use the emulators with a project id that does not start with `demo-`, so it can never touch real data. The emulators need Java.
+This starts the Auth, Firestore and Storage emulators and the app together at http://localhost:5173, with the emulator settings passed in (your `.env` is ignored). It is a separate, empty world: sign up with any email, and everything including photo and image uploads works. Stop it with Ctrl+C and its data is gone. The emulators need Java. `src/lib/firebase.js` refuses to use the emulators with a project id that does not start with `demo-`, so it can never touch real data. The emulators need Java.
 
 ### Things that go wrong
 | You see | Cause |
 |---|---|
+| Upload stuck, then "Could not reach file storage" (Chrome shows a CORS error on `firebasestorage.googleapis.com`) | Storage was never turned on for the project (step 4): the bucket does not exist. `firebase deploy --only storage` says "Storage has not been set up" too. No Blaze plan, no bucket: use `npm run dev:local` |
 | "File storage is not set up" | `VITE_FIREBASE_STORAGE_BUCKET` is empty in `.env`; restart `npm run dev` after editing it |
 | "The storage bucket was not found" | Storage was not turned on (step 4) |
 | "You are not allowed to do that" on an upload | The Storage rules were not deployed (step 6), or you are not the project's owner (only the owner adds task images) |

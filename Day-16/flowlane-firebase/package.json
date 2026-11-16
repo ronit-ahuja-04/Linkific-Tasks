@@ -16,7 +16,8 @@
     "dev:api": "npm --prefix server run dev",
     "dev:all": "concurrently -n api,web -c yellow,cyan \"npm run dev:api\" \"npm run dev\"",
     "test:server": "npm --prefix server test",
-    "dev:fake-github": "node server/src/dev/fake-github.js"
+    "dev:fake-github": "node server/src/dev/fake-github.js",
+    "dev:local": "concurrently -k -n emulators,web -c yellow,cyan \"firebase emulators:start --only auth,firestore,storage --project demo-flowlane\" \"VITE_USE_EMULATORS=true VITE_FIREBASE_API_KEY=demo-key VITE_FIREBASE_AUTH_DOMAIN=demo-flowlane.firebaseapp.com VITE_FIREBASE_PROJECT_ID=demo-flowlane VITE_FIREBASE_STORAGE_BUCKET=demo-flowlane.appspot.com VITE_FIREBASE_MESSAGING_SENDER_ID=1 VITE_FIREBASE_APP_ID=1:1:web:1 vite\""
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

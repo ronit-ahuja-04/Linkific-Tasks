@@ -28,7 +28,7 @@ export default {
   "storage.error.size": "यह चित्र बहुत बड़ा है। सीमा {max} है।",
   "storage.error.denied": "आपको ऐसा करने की अनुमति नहीं है। दोबारा साइन इन करें, या प्रोजेक्ट के मालिक से पूछें।",
   "storage.error.quota": "स्टोरेज का कोटा खत्म हो गया है।",
-  "storage.error.network": "कनेक्शन टूट गया। अपना नेटवर्क जाँचें और दोबारा कोशिश करें।",
+  "storage.error.network": "फ़ाइल स्टोरेज तक नहीं पहुँच सके। अपना नेटवर्क जाँचें और देखें कि इस Firebase प्रोजेक्ट में Storage चालू है, फिर दोबारा कोशिश करें।",
   "storage.error.canceled": "अपलोड रद्द कर दिया गया।",
   "storage.error.notConfigured": "फ़ाइल स्टोरेज सेट नहीं है। अपनी .env फ़ाइल में VITE_FIREBASE_STORAGE_BUCKET जोड़ें।",
   "storage.error.noBucket": "स्टोरेज बकेट नहीं मिला। Firebase कंसोल में Storage चालू करें।",
