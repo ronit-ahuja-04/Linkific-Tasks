@@ -34,4 +34,6 @@ export const authMock = {
   linkWithPopup: vi.fn().mockResolvedValue({}),
   reauthenticateWithPopup: vi.fn().mockResolvedValue({}),
   unlink: vi.fn().mockResolvedValue({}),
+  // Day 16
+  updateProfile: vi.fn().mockResolvedValue(undefined),
 };

@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSelector, createSlice, current } from '@reduxjs/toolkit';
-import { doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { arrayRemove, arrayUnion, doc, setDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { db } from '../../lib/firebase';
 import { addTask, addTasks, findColumnOfTask, makeEmptyBoard, moveTask, removeTask, updateTask } from '../../lib/board';
 import { notifyMembers } from '../../lib/notify';
 import { userLabel } from '../../lib/serialize';
+import { deleteAttachmentFiles } from '../../lib/attachments';
 
 const projectRef = (state) => doc(db, 'projects', state.board.projectId);
 const boardOf = (state) => ({
@@ -86,12 +87,14 @@ export const importTasks = createAsyncThunk(
 
 export const deleteTask = createAsyncThunk(
   'board/deleteTask',
-  async (taskId, { getState }) => {
+  async (taskId, { getState, requestId }) => {
     const state = getState();
     await updateDoc(projectRef(state), {
       tasks: state.board.tasks,
       columns: state.board.columns,
     });
+    // The task is gone: its images go too (the optimistic snapshot still has the task as it was)
+    await deleteAttachmentFiles(state.board.snapshots[requestId]?.tasks?.[taskId]?.attachments);
     return taskId;
   },
   // Nothing to do (and nothing to write) for a task that is not on the board
@@ -101,6 +104,38 @@ export const deleteTask = createAsyncThunk(
 export const saveTask = createAsyncThunk('board/saveTask', async (task, { getState }) => {
   const state = getState();
   await updateDoc(projectRef(state), { [`tasks.${task.id}`]: task });
+});
+
+/**
+ * Add an image (already uploaded to Storage) to a task. arrayUnion adds just this entry, so two people
+ * attaching at the same moment cannot overwrite each other. Optimistic, rolled back on failure.
+ */
+export const addAttachment = createAsyncThunk('board/addAttachment', async ({ taskId, attachment }, { getState, dispatch }) => {
+  const state = getState();
+  const before = state.board.tasks[taskId];
+  if (!before) throw new Error('That task no longer exists.');
+  dispatch(taskUpdated({ ...before, attachments: [...(before.attachments ?? []), attachment] }));
+  try {
+    await updateDoc(projectRef(state), { [`tasks.${taskId}.attachments`]: arrayUnion(attachment) });
+  } catch (err) {
+    dispatch(taskUpdated(before));
+    throw err;
+  }
+});
+
+/** Remove an image from a task, then delete its file. The entry goes first so nobody is left with a broken image. */
+export const removeAttachment = createAsyncThunk('board/removeAttachment', async ({ taskId, attachment }, { getState, dispatch }) => {
+  const state = getState();
+  const before = state.board.tasks[taskId];
+  if (!before) return;
+  dispatch(taskUpdated({ ...before, attachments: (before.attachments ?? []).filter((a) => a.id !== attachment.id) }));
+  try {
+    await updateDoc(projectRef(state), { [`tasks.${taskId}.attachments`]: arrayRemove(attachment) });
+  } catch (err) {
+    dispatch(taskUpdated(before));
+    throw err;
+  }
+  await deleteAttachmentFiles([attachment]);
 });
 
 /** Toggle who a task is assigned to; the newly assigned person gets a notification */

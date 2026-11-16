@@ -5,8 +5,9 @@ import { saveTask, assignTaskUsers } from '../store/slices/boardSlice';
 import '../index.css';
 import { useLanguage } from '../context/LanguageContext';
 import GitHubBadge from './GitHubBadge';
+import TaskAttachments from './TaskAttachments';
 
-export default function TaskPanel({ isOpen, onClose, task, handleCreateDraftTask, handleDeleteTask, isOwner, projectMembers, usersMap }) {
+export default function TaskPanel({ isOpen, onClose, task, projectId, handleCreateDraftTask, handleDeleteTask, isOwner, projectMembers, usersMap }) {
   // REDUX: useDispatch returns the store's dispatch; thunks and plain actions are sent through it
   const dispatch = useDispatch();
   const { t } = useLanguage();
@@ -286,6 +287,8 @@ export default function TaskPanel({ isOpen, onClose, task, handleCreateDraftTask
                 />
               )}
             </div>
+
+            <TaskAttachments task={task} projectId={projectId} canEdit={isOwner} />
           </div>
 
           {/* Footer / Actions */}

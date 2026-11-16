@@ -21,7 +21,7 @@ export const toPlainUser = (user) =>
         uid: user.uid,
         email: user.email,
         displayName: user.displayName ?? null,
-        photoURL: user.photoURL ?? null,
+        photoURL: user.photoURL || null, // '' (a cleared photo) counts as none
         // Has the user clicked the link in the verification email? Google and GitHub accounts
         // usually arrive already verified; password accounts start as false.
         emailVerified: Boolean(user.emailVerified),

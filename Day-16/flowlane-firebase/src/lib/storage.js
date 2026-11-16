@@ -102,3 +102,7 @@ export function storageErrorKey(err) {
       return 'storage.error.generic';
   }
 }
+
+/** The message key for a code from validateImage ('none' | 'type' | 'size') */
+export const validationErrorKey = (code) =>
+  ({ none: 'storage.error.none', type: 'storage.error.type', size: 'storage.error.size' })[code] ?? 'storage.error.generic';
