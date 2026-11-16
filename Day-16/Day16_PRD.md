@@ -7,7 +7,7 @@
 | Date      | Monday, 16 November 2026                                               |
 | Repo path | `Linkific-Tasks/Day-16/flowlane-firebase`                              |
 | Builds on | Day 15 `flowlane-auth` (copied unchanged, then extended)               |
-| Status    | **Built.** PR trail at the end of this document                        |
+| Status    | **Built.** Merged via PRs #76 to #81 (see section 6)                  |
 | Companion | `flowlane-firebase/README.md` (the Firebase setup guide)               |
 
 ---
@@ -84,12 +84,13 @@ Out: anything the Day 16 task list does not name. GitHub and JWT (Day 15) are un
 | M1 | Start from the Day 15 app | #76 |
 | M2 | Storage layer, rules and rules tests | #77 |
 | M3 | Profile photo and task image attachments | #78 |
-| M4 | Live dashboard | see below |
-| M5 | README, PRD, final verification | see below |
+| M4 | Live dashboard, README setup guide, PRD | #79 |
+| M5 | Local emulator mode (`npm run dev:local`), upload timeout and its fix | #80, #81 |
+| M6 | Submission documents (report, PDF, standup script) | #82 |
 
 ## 7. Verification
 
-The numbers are recorded in the README (section "Tests") after the final run.
+Last full run (`npm run test:all`): 556 unit, 110 server and 38 rules tests passed; of 134 browser tests 132 passed and 2 failed (flaky tests from earlier days, see the README). Details are in the README, section "Tests".
 
 ## 8. Risks
 

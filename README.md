@@ -2,7 +2,7 @@
 
 **Author:** Ronit Ahuja
 **Programme:** Linkific internship, Month 1 (training phase)
-**Status:** Days 1–8 delivered
+**Status:** Days 1–16 delivered
 
 One repository, one folder per training day. Days 1–3 are small standalone deliverables. From Day 5 onward the work compounds into a single product, **HackHQ**, a control room for a 24-hour hackathon, rebuilt each day around the concept being taught.
 
@@ -49,6 +49,14 @@ Backend services, authentication against a real server, and any library the day'
 | 6   | `useEffect` and custom hooks             | HackHQ Live: debounced directory, hack clock, localStorage       | [README](Day-06/hackhq-live/README.md) · [Plan](Day-06/DAY6_PLAN.md)                                              |
 | 7   | React Router and navigation              | HackHQ Router: real URLs for every station, protected routes     | [README](Day-07/hackhq-router/README.md) · [PRD](Day-07/Day7_PRD.md) · [Architecture](Day-07/Day7_TECH_STACK_AND_ARCHITECTURE.md) · [Design spec](Day-07/Day7_DESIGN_SPEC.md) |
 | 8   | Tailwind CSS                             | HackHQ Tailwind: full restyle, design tokens, dark mode          | [README](Day-08/hackhq-tailwind/README.md) · [PRD](Day-08/Day8_PRD.md)                                           |
+| 9   | Bootstrap 5                              | HackHQ Bootstrap: redesign with two new features                 | [PRD](Day-09/Day9_PRD.md) · [Baseline](Day-09/BASELINE.md) · [Bootstrap vs Tailwind](Day-09/BOOTSTRAP_VS_TAILWIND.md) |
+| 10  | styled-components                        | HackHQ Styled: styled-components redesign                        | [PRD](Day-10/Day10_PRD.md) · [Report](Day-10/DAY10_REPORT.md) · [Comparison](Day-10/STYLING_COMPARISON.md)          |
+| 11  | Redux Toolkit                            | FlowLane: board, chat and notifications on Redux Toolkit         | [PRD](Day-11/Day11_PRD.md) · [Report](Day-11/DAY11_REPORT.md)                                                    |
+| 12  | React Context                            | FlowLane with Context for auth, theme and language               | [PRD](Day-12/Day12_PRD.md) · [Report](Day-12/DAY12_REPORT.md) · [Comparison](Day-12/STATE_MANAGEMENT_COMPARISON.md) |
+| 13  | Lodash                                   | DataDesk: a Lodash lab                                           | [PRD](Day-13/Day13_PRD.md) · [Report](Day-13/DAY13_REPORT.md) · [Lodash vs native](Day-13/LODASH_VS_NATIVE.md)     |
+| 14  | Recharts                                 | SalesPulse: a Recharts dashboard                                 | [PRD](Day-14/Day14_PRD.md) · [Report](Day-14/DAY14_REPORT.md) · [Chart guide](Day-14/CHART_CHOICE_GUIDE.md)        |
+| 15  | Authentication, JWT, OAuth               | FlowLane with GitHub sign-in, issue import and a JWT-checking API | [README](Day-15/flowlane-auth/README.md) · [PRD](Day-15/Day15_PRD.md) · [Report](Day-15/DAY15_REPORT.md)          |
+| 16  | Firebase: Storage and real-time          | FlowLane with image uploads, a live dashboard and a setup guide  | [README](Day-16/flowlane-firebase/README.md) · [PRD](Day-16/Day16_PRD.md) · [Report](Day-16/DAY16_REPORT.md)       |
 
 ---
 
