@@ -28,7 +28,7 @@ export default {
   "storage.error.size": "That image is too big. The limit is {max}.",
   "storage.error.denied": "You are not allowed to do that. Sign in again, or ask the project owner.",
   "storage.error.quota": "The storage quota is used up.",
-  "storage.error.network": "The connection dropped. Check your network and try again.",
+  "storage.error.network": "Could not reach file storage. Check your network, and that Storage is turned on for this Firebase project, then try again.",
   "storage.error.canceled": "The upload was cancelled.",
   "storage.error.notConfigured": "File storage is not set up. Add VITE_FIREBASE_STORAGE_BUCKET to your .env file.",
   "storage.error.noBucket": "The storage bucket was not found. Enable Storage in the Firebase console.",
