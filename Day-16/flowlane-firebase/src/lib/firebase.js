@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 // Local testing: VITE_USE_EMULATORS=true points the app at the Firebase emulators (see
 // firebase.json and e2e/). It only works with a demo-* project id, so it can never touch real data.
@@ -26,6 +27,8 @@ const app = isFirebaseConfigured ? initializeApp(firebaseConfig) : null;
 // Firebase services (null when not configured; only used after a successful sign-in)
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
+// Cloud Storage (Day 16): profile photos and task image attachments
+export const storage = app && firebaseConfig.storageBucket ? getStorage(app) : null;
 
 if (app && useEmulators) {
   if (!String(firebaseConfig.projectId).startsWith('demo-')) {
@@ -33,6 +36,7 @@ if (app && useEmulators) {
   }
   connectAuthEmulator(auth, 'http://127.0.0.1:9199', { disableWarnings: true });
   connectFirestoreEmulator(db, '127.0.0.1', 8189);
+  if (storage) connectStorageEmulator(storage, '127.0.0.1', 9299);
 }
 
 // Setup Google Auth Provider

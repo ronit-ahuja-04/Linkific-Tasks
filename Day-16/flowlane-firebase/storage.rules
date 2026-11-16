@@ -1,0 +1,40 @@
+rules_version = '2';
+
+// FlowLane Cloud Storage rules (Day 16). Only images, and only small ones.
+//
+//   avatars/{uid}/{file}                         a profile photo: anyone signed in may see it, only its owner may change it
+//   projects/{projectId}/tasks/{taskId}/{file}   a task attachment: project members may see it, only the project owner may add or delete
+//
+// The attachment rules read the project's Firestore document (firestore.get) to learn the owner and the members,
+// so a file can never be reached by someone who is not on the project.
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isImage() {
+      return request.resource.contentType.matches('image/(png|jpeg|gif|webp)');
+    }
+    function smallerThanMB(n) {
+      return request.resource.size < n * 1024 * 1024;
+    }
+    function projectDoc(projectId) {
+      return firestore.get(/databases/(default)/documents/projects/$(projectId)).data;
+    }
+
+    match /avatars/{uid}/{file} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid && isImage() && smallerThanMB(2);
+      allow delete: if signedIn() && request.auth.uid == uid;
+    }
+
+    match /projects/{projectId}/tasks/{taskId}/{file} {
+      allow read: if signedIn() && request.auth.uid in projectDoc(projectId).members;
+      allow create: if signedIn() && request.auth.uid == projectDoc(projectId).owner && isImage() && smallerThanMB(5);
+      allow delete: if signedIn() && request.auth.uid == projectDoc(projectId).owner;
+    }
+
+    // Everything else is closed
+  }
+}
