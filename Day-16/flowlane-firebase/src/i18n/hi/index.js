@@ -8,6 +8,7 @@ import ui from './ui';
 import account from './account';
 import security from './security';
 import github from './github';
+import storage from './storage';
 
 // One file per area of the app, merged into one flat dictionary of dotted keys
-export default { ...common, ...auth, ...dashboard, ...task, ...chat, ...settings, ...ui, ...account, ...security, ...github };
+export default { ...common, ...auth, ...dashboard, ...task, ...chat, ...settings, ...ui, ...account, ...security, ...github, ...storage };

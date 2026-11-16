@@ -1430,3 +1430,6 @@ body:has(.chat-input-container) { --toast-lift: 76px; }
   .snack-bar { animation: none; }
   .tab-indicator[data-ready] { transition: none; }
 }
+
+/* Text for screen readers only (also used for file inputs that a visible button opens) */
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

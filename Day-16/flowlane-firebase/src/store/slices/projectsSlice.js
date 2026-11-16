@@ -4,6 +4,7 @@ import { db } from '../../lib/firebase';
 import { makeEmptyBoard } from '../../lib/board';
 import { sendNotification } from '../../lib/notify';
 import { userLabel } from '../../lib/serialize';
+import { deleteAttachmentFiles } from '../../lib/attachments';
 import { selectUserByEmail } from './usersSlice';
 
 /**
@@ -52,7 +53,13 @@ export const ensureDefaultProject = createAsyncThunk(
   { condition: (_arg, { getState }) => !getState().projects.defaultRequested }
 );
 
-export const deleteProject = createAsyncThunk('projects/delete', async (projectId) => {
+export const deleteProject = createAsyncThunk('projects/delete', async (projectId, { getState }) => {
+  // Delete the task images first: once the project document is gone, Storage can no longer tell who owns them.
+  // Only the open project's tasks are loaded, and the delete button is on the open project.
+  const { board } = getState();
+  if (board.projectId === projectId) {
+    await deleteAttachmentFiles(Object.values(board.tasks).flatMap((task) => task.attachments ?? []));
+  }
   await deleteDoc(doc(db, 'projects', projectId));
   return projectId;
 });

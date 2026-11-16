@@ -27,6 +27,7 @@ export const firestoreMock = {
   limit: vi.fn((n) => ({ limit: n })),
   onSnapshot: vi.fn(),
   arrayUnion: vi.fn((...values) => ({ arrayUnion: values })),
+  arrayRemove: vi.fn((...values) => ({ arrayRemove: values })),
   serverTimestamp: vi.fn(() => 'SERVER_TS'),
 };
 

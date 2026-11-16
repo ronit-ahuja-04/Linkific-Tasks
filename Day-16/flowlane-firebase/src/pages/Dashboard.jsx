@@ -45,6 +45,7 @@ import ImportFromGitHub from '../components/ImportFromGitHub';
 import GitHubBadge from '../components/GitHubBadge';
 import Modal from '../components/Modal';
 import Chat from '../components/Chat';
+import AvatarUploader from '../components/AvatarUploader';
 import TaskPanel from '../components/TaskPanel';
 import VerifyEmailBanner from '../components/VerifyEmailBanner';
 import MessagesView from '../components/MessagesView';
@@ -361,13 +362,7 @@ function Dashboard() {
             <h2 style={{fontSize: 28, marginBottom: 32}}>{t('dashboard.profile.title')}</h2>
             
             <div style={{background: 'var(--bg-secondary)', borderRadius: 16, padding: '48px 40px', border: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 24, textAlign: 'center', boxShadow: '0 12px 32px rgba(0,0,0,0.08)'}}>
-              <div style={{
-                width: 120, height: 120, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-color), #f43f5e)', 
-                color: '#fff', fontSize: 48, fontWeight: 'bold', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                boxShadow: '0 8px 24px rgba(244, 63, 94, 0.3)'
-              }}>
-                {user?.email?.[0].toUpperCase()}
-              </div>
+              <AvatarUploader />
               
               <div>
                 <div style={{fontSize: 28, fontWeight: 800, marginBottom: 8, color: 'var(--text-primary)', letterSpacing: '-0.5px'}}>{user?.displayName || t('dashboard.profile.fallbackName')}</div>
@@ -765,6 +760,7 @@ function Dashboard() {
         isOpen={isTaskPanelOpen}
         onClose={() => dispatch(taskPanelClosed())}
         task={selectedTask}
+        projectId={selectedProjectId}
         isOwner={isOwner}
         handleCreateDraftTask={handleCreateDraftTask}
         handleDeleteTask={handleDeleteTask}
