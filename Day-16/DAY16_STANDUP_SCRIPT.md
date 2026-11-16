@@ -1,6 +1,6 @@
 # Day 16 Standup Walkthrough (about 5 minutes)
 
-**Time spent:** [fill in your hours]. **Pull requests:** #76 to #81 (the main ones: #77 Storage layer, #78 uploads, #79 Live dashboard).
+**Time spent:** 4 hours. **Pull requests:** #76 to #81 (the main ones: #77 Storage layer, #78 uploads, #79 Live dashboard).
 
 Before you start: `cd Day-16/flowlane-firebase && npm run dev:local` and open http://localhost:5173. That runs the app on the Firebase emulators, so uploads work without the paid plan. Sign up with any email. Have a second browser window (a private window works) signed in as a teammate who accepted an invitation to your project, with the task open. Keep `storage.rules` and `src/lib/stats.js` ready in the editor, and a small PNG on the desktop.
 
@@ -25,6 +25,6 @@ Open `storage.rules`.
 
 "556 unit tests, 110 for the API, 38 security-rules tests, 15 of them new for Storage, and 134 browser tests in Chrome against the emulators, with an accessibility audit on every new screen, light and dark. The browser tests found two real bugs: Firebase rejects clearing a photo with null, and a removed photo's file stayed in Storage one run in six because I read its path from a cache that could be empty after a reload. I now read it from the photo's own URL. In the last full run two older tests failed; they are flaky and I documented them."
 
-## 4:50 to 5:00, Gaps and next (say)
+## 4:50 to 5:00, Gaps (say)
 
-"One thing I could not verify by the automated tests: real Firebase Storage. A new bucket needs the paid Blaze plan, so the tests ran on the emulator, which applies the real rules. [If you have since enabled Storage and tried a real upload, say so here.] Next: enable Blaze with a budget alert, deploy the rules and run the real-project checklist in the README."
+"One thing I could not verify by the automated tests: real Firebase Storage. A new bucket needs the paid Blaze plan, so the tests ran on the emulator, which applies the real rules. [If you have since enabled Storage and tried a real upload, say so here.]"
