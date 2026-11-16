@@ -1,0 +1,105 @@
+rules_version = '2';
+
+// FlowLane security rules. They replace the default "test mode" rules, which expire after 30 days
+// (the old ones stopped working on 16 Oct 2026, which blocked every read and write).
+//
+// Data model, as used by the app:
+//   users/{uid}                         profile: uid, email, displayName, photoURL, theme, unreadMessages
+//   users/{uid}/notifications/{id}      notifications for that user (others write them)
+//   projects/{projectId}                name, owner, members[], tasks, columns, columnOrder
+//   projects/{projectId}/messages|typing  project chat
+//   invitations/{id}                    projectId, inviteeEmail, inviterName, ...
+//   direct_messages/{a_b}/messages|typing  one-to-one chat, chat id = the two uids sorted and joined by _
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+    function project(projectId) {
+      return get(/databases/$(database)/documents/projects/$(projectId)).data;
+    }
+    function isProjectMember(projectId) {
+      return signedIn() && request.auth.uid in project(projectId).members;
+    }
+    // Chat ids look like "uidA_uidB": only those two people may read or write the chat
+    function inDirectChat(chatId) {
+      return signedIn() && request.auth.uid in chatId.split('_');
+    }
+
+    // ---------- users ----------
+    match /users/{uid} {
+      // The app lists everyone (avatars, invites by email, the Messages page)
+      allow read: if signedIn();
+      // You manage your own profile (sign-in writes it, plus theme and unread count)
+      allow create, update: if isSelf(uid);
+      // When someone sends you a direct message they bump your unread counter, and only that
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['unreadMessages'])
+        && request.resource.data.unreadMessages is number;
+
+      match /notifications/{notificationId} {
+        allow read, delete: if isSelf(uid);
+        // Project members and chat partners create notifications for you; assignments reuse an id
+        allow create, update: if signedIn() && request.resource.data.message is string;
+      }
+    }
+
+    // ---------- projects ----------
+    match /projects/{projectId} {
+      allow read: if signedIn() && request.auth.uid in resource.data.members;
+
+      allow create: if signedIn()
+        && request.resource.data.name is string
+        && request.resource.data.owner is string
+        && request.auth.uid in request.resource.data.members;
+
+      allow update: if signedIn() && (
+        // members edit the board; only the owner may change who the members are
+        (request.auth.uid in resource.data.members
+          && (request.resource.data.members == resource.data.members
+              || request.auth.uid == resource.data.owner))
+        // accepting an invitation: add yourself to members and change nothing else
+        || (!(request.auth.uid in resource.data.members)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members'])
+            && request.resource.data.members == resource.data.members.concat([request.auth.uid]))
+      );
+
+      allow delete: if signedIn() && request.auth.uid == resource.data.owner;
+
+      match /messages/{messageId} {
+        allow read: if isProjectMember(projectId);
+        allow create: if isProjectMember(projectId) && request.resource.data.uid == request.auth.uid;
+      }
+      match /typing/{userId} {
+        allow read: if isProjectMember(projectId);
+        allow write: if isProjectMember(projectId) && userId == request.auth.uid;
+      }
+    }
+
+    // ---------- invitations ----------
+    match /invitations/{invitationId} {
+      // The invitee sees and answers an invitation addressed to their email
+      allow read, delete: if signedIn() && resource.data.inviteeEmail == request.auth.token.email;
+      // Only members of a project can invite people to it
+      allow create: if signedIn()
+        && request.resource.data.inviteeEmail is string
+        && isProjectMember(request.resource.data.projectId);
+    }
+
+    // ---------- direct messages ----------
+    match /direct_messages/{chatId}/messages/{messageId} {
+      allow read: if inDirectChat(chatId);
+      allow create: if inDirectChat(chatId) && request.resource.data.uid == request.auth.uid;
+    }
+    match /direct_messages/{chatId}/typing/{userId} {
+      allow read: if inDirectChat(chatId);
+      allow write: if inDirectChat(chatId) && userId == request.auth.uid;
+    }
+
+    // Everything else is closed
+  }
+}
