@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth, GithubAuthProvider, GoogleAuthProvider } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
-import { connectStorageEmulator, getStorage, setMaxOperationRetryTime, setMaxUploadRetryTime } from "firebase/storage";
+import { connectStorageEmulator, getStorage } from "firebase/storage";
 
 // Local testing: VITE_USE_EMULATORS=true points the app at the Firebase emulators (see
 // firebase.json and e2e/). It only works with a demo-* project id, so it can never touch real data.
@@ -32,8 +32,8 @@ export const storage = app && firebaseConfig.storageBucket ? getStorage(app) : n
 // The default is to keep retrying a failed upload for 10 minutes, which looks like an upload stuck at 0% (for example
 // when Storage was never turned on for the project). 20 seconds, then it fails and the user is told.
 if (storage) {
-  setMaxUploadRetryTime(storage, 20_000);
-  setMaxOperationRetryTime(storage, 20_000);
+  storage.maxUploadRetryTime = 20_000;
+  storage.maxOperationRetryTime = 20_000;
 }
 
 if (app && useEmulators) {
