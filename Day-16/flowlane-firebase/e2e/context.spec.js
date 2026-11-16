@@ -89,11 +89,16 @@ test.describe('compound Tabs component', () => {
   test('project tabs: arrow keys, Home and End switch views, and only the open tab is in the Tab order', async ({ page }) => {
     await signUp(page, uniqueEmail('tabs'));
     const board = page.getByRole('tab', { name: 'Board' });
+    const live = page.getByRole('tab', { name: 'Live' });
     const activity = page.getByRole('tab', { name: 'Activity' });
     await expect(board).toHaveAttribute('aria-selected', 'true');
     await expect(board).toHaveAttribute('tabindex', '0');
+    await expect(live).toHaveAttribute('tabindex', '-1');
     await expect(activity).toHaveAttribute('tabindex', '-1');
     await board.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(live).toBeFocused();
+    await expect(live).toHaveAttribute('aria-selected', 'true');
     await page.keyboard.press('ArrowRight');
     await expect(activity).toBeFocused();
     await expect(activity).toHaveAttribute('aria-selected', 'true');

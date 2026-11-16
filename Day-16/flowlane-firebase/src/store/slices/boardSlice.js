@@ -171,6 +171,7 @@ export const assignTaskUsers = createAsyncThunk(
 const initialState = {
   ...makeEmptyBoard(),
   projectId: null,
+  receivedAt: null, // ms timestamp of the latest Firestore snapshot of the open project
   status: 'idle', // 'idle' | 'ready'
   snapshots: {}, // requestId -> board before an optimistic change
   error: null,
@@ -188,8 +189,9 @@ const boardSlice = createSlice({
   reducers: {
     // A Firestore snapshot of the open project
     boardReceived(state, action) {
-      const { projectId, tasks, columns, columnOrder } = action.payload;
+      const { projectId, tasks, columns, columnOrder, receivedAt } = action.payload;
       state.projectId = projectId;
+      state.receivedAt = receivedAt ?? null;
       applyBoard(state, { tasks, columns, columnOrder });
       state.status = 'ready';
       state.error = null;
@@ -248,5 +250,6 @@ export const selectBoard = createSelector(
 );
 export const selectBoardError = (state) => state.board.error;
 export const selectBoardProjectId = (state) => state.board.projectId;
+export const selectBoardReceivedAt = (state) => state.board.receivedAt;
 export const selectColumnOfTask = (taskId) => (state) => findColumnOfTask(state.board, taskId);
 export default boardSlice.reducer;

@@ -28,6 +28,7 @@ import {
 } from '../store/slices/uiSlice';
 import { 
   LayoutDashboard, 
+  Activity,
   Briefcase, 
   Calendar, 
   MessageSquare,
@@ -46,6 +47,7 @@ import GitHubBadge from '../components/GitHubBadge';
 import Modal from '../components/Modal';
 import Chat from '../components/Chat';
 import AvatarUploader from '../components/AvatarUploader';
+import LivePulse from '../components/LivePulse';
 import TaskPanel from '../components/TaskPanel';
 import VerifyEmailBanner from '../components/VerifyEmailBanner';
 import MessagesView from '../components/MessagesView';
@@ -526,6 +528,7 @@ function Dashboard() {
               
               <Tabs.List className="project-tabs" aria-label={t('dashboard.tabs.label')}>
                 <Tabs.Tab value="board"><LayoutDashboard size={14} style={{marginRight: 6, verticalAlign: 'middle', marginTop: -2}} aria-hidden="true" /> {t('dashboard.tabs.board')}</Tabs.Tab>
+                <Tabs.Tab value="pulse"><Activity size={14} style={{marginRight: 6, verticalAlign: 'middle', marginTop: -2}} aria-hidden="true" /> {t('pulse.tab')}</Tabs.Tab>
                 <Tabs.Tab value="activity">
                   <MessageSquare size={14} style={{marginRight: 6, verticalAlign: 'middle', marginTop: -2}} aria-hidden="true" /> {t('dashboard.tabs.activity')}
                   {hasNewActivity && <span style={{display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: '#ef4444', marginLeft: 6}} />}
@@ -648,6 +651,10 @@ function Dashboard() {
                 </DragDropContext>
                 </div>
               </div>
+            </Tabs.Panel>
+
+            <Tabs.Panel value="pulse">
+              <LivePulse projectId={selectedProjectId} />
             </Tabs.Panel>
 
             <Tabs.Panel value="activity">
