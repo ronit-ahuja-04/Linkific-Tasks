@@ -1,0 +1,24 @@
+.lab-safe { align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
+.lab-filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+.lab-chip[aria-pressed='true'] { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+.lab-chip[aria-pressed='true']:hover:not(:disabled) { background: var(--accent-strong-hover); }
+.lab-list { display: flex; flex-direction: column; gap: 16px; }
+.lab-example { display: flex; flex-direction: column; gap: 12px; }
+.lab-example-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+.lab-example-head h3 { font-size: 17px; }
+.lab-explain { color: var(--text-secondary); font-size: 14px; }
+.lab-code-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 12px; }
+.lab-code-grid > * { min-width: 0; } /* a long line scrolls inside its box instead of widening the page */
+.lab-code-grid h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 4px; }
+.lab-code { margin: 0; padding: 12px; background: var(--bg-sunken); border: 1px solid var(--border-color); border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.5; color: var(--text-primary); }
+.lab-run { align-self: flex-start; }
+.lab-result { display: flex; flex-direction: column; gap: 8px; }
+.lab-result-status { font-size: 14px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-sunken); overflow-wrap: anywhere; }
+.lab-result-rows { background: var(--success-bg); color: var(--success-text); border-color: var(--success-text); }
+.lab-result-empty, .lab-result-skipped { background: var(--warning-bg); color: var(--warning-text); border-color: var(--warning-text); }
+.lab-result-error, .lab-result-bad { background: var(--danger-bg); color: var(--danger-text); border-color: var(--danger-text); }
+.lab-json summary { cursor: pointer; font-size: 13px; color: var(--text-secondary); }
+.lab-json pre { margin: 6px 0 0; padding: 12px; background: var(--bg-sunken); border-radius: 8px; overflow-x: auto; max-height: 260px; font-size: 12px; }
+.lab-events { margin: 0; padding-left: 20px; font-size: 14px; }
+.lab-rls { font-size: 14px; }
+@media (max-width: 720px) { .lab-code-grid { grid-template-columns: minmax(0, 1fr); } }
