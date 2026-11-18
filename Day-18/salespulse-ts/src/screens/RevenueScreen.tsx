@@ -1,46 +1,76 @@
 import { useMemo, useState } from 'react';
+import type { PieLabelRenderProps, PieSectorShapeProps } from 'recharts';
 import { Area, AreaChart, Bar, BarChart, Cell, CartesianGrid, LabelList, Pie, PieChart, Sector, Tooltip, XAxis, YAxis } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
-import ChartCard from '../charts/ChartCard';
-import ChartTooltip from '../charts/ChartTooltip';
+import ChartCard, { type TableSpec } from '../charts/ChartCard';
+import ChartTooltip, { type TooltipEntry } from '../charts/ChartTooltip';
 import ResponsiveChart from '../charts/ResponsiveChart';
 import { useChartMotion } from '../charts/useChartMotion';
-import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, categoryColor, regionColor } from '../charts/theme';
+import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, entityColor } from '../charts/theme';
+import { numberField, stringField } from '../lib/guards';
 import { formatCompactMoney, formatMoney, formatPercent, monthlySeries, totalsBy } from '../lib/metrics';
+import type { Share } from '../types';
 import './revenue.css';
 
 // "Slice by" options: which column of the sales rows the donut is split on, and the colour that follows each entity.
-const DIMENSIONS = {
-  region: { label: 'Region', other: 'category', otherLabel: 'category', color: regionColor, otherColor: categoryColor },
-  category: { label: 'Category', other: 'region', otherLabel: 'region', color: categoryColor, otherColor: regionColor },
+type Dimension = 'region' | 'category';
+interface DimensionSpec {
+  label: string;
+  /** the other dimension: what the drill-down splits a selected slice by */
+  other: Dimension;
+  otherLabel: string;
+  color: (name: string) => string;
+  otherColor: (name: string) => string;
+}
+const DIMENSIONS: Record<Dimension, DimensionSpec> = {
+  region: { label: 'Region', other: 'category', otherLabel: 'category', color: (n) => entityColor('region', n), otherColor: (n) => entityColor('category', n) },
+  category: { label: 'Category', other: 'region', otherLabel: 'region', color: (n) => entityColor('category', n), otherColor: (n) => entityColor('region', n) },
 };
+const DIMENSION_KEYS: readonly Dimension[] = ['region', 'category'];
+
+/** A donut slice: a total per region (or category) plus the colour it is drawn in */
+interface Slice extends Share {
+  fill: string;
+}
+
+/** Recharts types a tooltip entry's `.payload` as `any`; this turns it into a real Slice, or says it is not one */
+function toSlice(value: unknown): Slice | null {
+  const name = stringField(value, 'name');
+  const fill = stringField(value, 'fill');
+  const revenue = numberField(value, 'revenue');
+  const profit = numberField(value, 'profit');
+  const orders = numberField(value, 'orders');
+  const share = numberField(value, 'share');
+  if (name === undefined || fill === undefined || revenue === undefined || profit === undefined || orders === undefined || share === undefined) return null;
+  return { name, fill, revenue, profit, orders, share };
+}
 const SLICE_MIN_LABEL = 8; // only slices of at least 8% get a printed percentage: smaller ones would overlap
 
 /**
  * Pie tooltip. For a pie, Recharts gives `payload[0]` whose `.payload` is OUR data row
  * ({ name, revenue, profit, orders, share }). We turn that one row into several tooltip lines.
  */
-function PieTooltip({ active, payload }) {
-  const row = payload?.[0]?.payload;
+function PieTooltip({ active, payload }: { active?: boolean; payload?: readonly { payload?: unknown }[] }) {
+  const row = toSlice(payload?.[0]?.payload);
   if (!active || !row) return null;
-  const lines = [
-    { name: 'Revenue', value: formatMoney(row.revenue), color: payload[0].payload.fill },
+  const lines: TooltipEntry[] = [
+    { name: 'Revenue', value: formatMoney(row.revenue), color: row.fill },
     { name: 'Share', value: formatPercent(row.share) },
     { name: 'Profit', value: formatMoney(row.profit) },
     { name: 'Orders', value: row.orders.toLocaleString('en-US') },
   ];
-  return <ChartTooltip active payload={lines.map((l) => ({ ...l, dataKey: l.name }))} label={row.name} formatValue={(v) => v} />;
+  return <ChartTooltip active payload={lines.map((l) => ({ ...l, dataKey: l.name }))} label={row.name} />;
 }
 
 export default function RevenueScreen() {
   const { ready, refreshing, periodRows, range } = useDashboard();
   const motion = useChartMotion();
-  const [by, setBy] = useState('region');
+  const [by, setBy] = useState<Dimension>('region');
   // The selection remembers which dimension it belongs to, so switching "Slice by" clears it.
-  const [selection, setSelection] = useState(null);
+  const [selection, setSelection] = useState<{ by: Dimension; name: string } | null>(null);
   const dim = DIMENSIONS[by];
 
-  const slices = useMemo(() => totalsBy(periodRows, by).map((s) => ({ ...s, fill: dim.color(s.name) })), [periodRows, by, dim]);
+  const slices = useMemo((): Slice[] => totalsBy(periodRows, by).map((s) => ({ ...s, fill: dim.color(s.name) })), [periodRows, by, dim]);
   const total = slices.reduce((t, s) => t + s.revenue, 0);
   // Only trust a selection that still exists after filters changed.
   const selected = selection?.by === by ? slices.find((s) => s.name === selection.name) ?? null : null;
@@ -57,12 +87,12 @@ export default function RevenueScreen() {
 
   if (!ready) return null;
 
-  const select = (name) => setSelection((cur) => (cur?.by === by && cur.name === name ? null : { by, name }));
-  const switchBy = (next) => { setBy(next); setSelection(null); };
+  const select = (name: string) => setSelection((cur) => (cur?.by === by && cur.name === name ? null : { by, name }));
+  const switchBy = (next: Dimension) => { setBy(next); setSelection(null); };
 
   // A custom SLICE SHAPE (Recharts 3 `shape` prop): called once per slice. The selected one is drawn
   // 6px bigger so it "pops out"; the others dim while something is selected. The 2px surface stroke separates slices.
-  const renderSlice = (props) => {
+  const renderSlice = (props: PieSectorShapeProps) => {
     const isSelected = props.index === selectedIndex;
     return (
       <Sector
@@ -77,18 +107,19 @@ export default function RevenueScreen() {
   };
 
   // A custom LABEL (function): put the percentage in the middle of the ring, only on big slices.
-  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, payload }) => {
-    if (payload.share < SLICE_MIN_LABEL) return null;
+  const renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, payload }: PieLabelRenderProps) => {
+    const share = numberField(payload, 'share');
+    if (share === undefined || share < SLICE_MIN_LABEL || midAngle === undefined) return null;
     const r = (innerRadius + outerRadius) / 2;
     const angle = (-midAngle * Math.PI) / 180;
     return (
       <text x={cx + r * Math.cos(angle)} y={cy + r * Math.sin(angle)} textAnchor="middle" dominantBaseline="central" className="revenue-slice-label">
-        {formatPercent(payload.share, 0)}
+        {formatPercent(share, 0)}
       </text>
     );
   };
 
-  const pieTable = {
+  const pieTable: TableSpec<Slice> = {
     columns: [
       { key: 'name', label: dim.label },
       { key: 'revenue', label: 'Revenue', format: formatMoney },
@@ -98,14 +129,16 @@ export default function RevenueScreen() {
     ],
     rows: slices,
   };
-  const splitTable = detail && {
-    columns: [
-      { key: 'name', label: DIMENSIONS[dim.other].label },
-      { key: 'revenue', label: 'Revenue', format: formatMoney },
-      { key: 'share', label: 'Share', format: (v) => formatPercent(v) },
-    ],
-    rows: detail.split,
-  };
+  const splitTable: TableSpec<Slice> | undefined = detail
+    ? {
+        columns: [
+          { key: 'name', label: DIMENSIONS[dim.other].label },
+          { key: 'revenue', label: 'Revenue', format: formatMoney },
+          { key: 'share', label: 'Share', format: (v) => formatPercent(v) },
+        ],
+        rows: detail.split,
+      }
+    : undefined;
 
   const top = slices[0];
   const summary = top
@@ -124,8 +157,8 @@ export default function RevenueScreen() {
           <div className="revenue-switch">
             <span id="revenue-slice-by" className="filter-label">Slice by</span>
             <div className="segmented" role="group" aria-labelledby="revenue-slice-by">
-              {Object.entries(DIMENSIONS).map(([key, d]) => (
-                <button key={key} type="button" aria-pressed={by === key} onClick={() => switchBy(key)}>{d.label}</button>
+              {DIMENSION_KEYS.map((key) => (
+                <button key={key} type="button" aria-pressed={by === key} onClick={() => switchBy(key)}>{DIMENSIONS[key].label}</button>
               ))}
             </div>
           </div>
@@ -155,7 +188,7 @@ export default function RevenueScreen() {
                   label={renderLabel}
                   labelLine={false}
                   shape={renderSlice}
-                  onClick={(entry) => select(entry.name)}
+                  onClick={(entry) => { if (entry.name !== undefined) select(entry.name); }}
                   {...motion}
                 >
                   {slices.map((s) => <Cell key={s.name} fill={s.fill} />)}
@@ -185,7 +218,7 @@ export default function RevenueScreen() {
         table={splitTable}
         busy={refreshing}
       >
-        {!selected ? (
+        {!selected || !detail ? (
           <p className="revenue-hint">Select a slice to drill down</p>
         ) : (
           <>
@@ -204,7 +237,7 @@ export default function RevenueScreen() {
                 <Bar dataKey="revenue" name="Revenue" barSize={18} radius={[0, 4, 4, 0]} {...motion}>
                   {detail.split.map((s) => <Cell key={s.name} fill={s.fill} />)}
                   {/* LabelList prints each bar's value at its end */}
-                  <LabelList dataKey="revenue" position="right" formatter={formatCompactMoney} fill="var(--text-primary)" fontSize={12} />
+                  <LabelList dataKey="revenue" position="right" formatter={(value) => (typeof value === 'number' ? formatCompactMoney(value) : '')} fill="var(--text-primary)" fontSize={12} />
                 </Bar>
               </BarChart>
             </ResponsiveChart>

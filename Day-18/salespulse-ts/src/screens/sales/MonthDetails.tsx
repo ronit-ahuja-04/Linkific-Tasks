@@ -1,12 +1,22 @@
 import { DataTable } from '../../charts/ChartCard';
-import { regionColor, categoryColor } from '../../charts/theme';
+import { entityColor } from '../../charts/theme';
 import { formatMoney, formatPercent, monthName, totalsBy } from '../../lib/metrics';
+import type { MonthKey, SalesRow } from '../../types';
 
 /**
  * The "Month details" panel: everything about the month picked in the bar chart (by click or by
  * the "Inspect a month" select). Pure numbers from the period's rows, no Recharts needed here.
  */
-export default function MonthDetails({ month, rows, split, onClear }) {
+interface MonthDetailsProps {
+  /** the month picked in the chart, or null when none is */
+  month: MonthKey | null;
+  /** the rows of the whole period; this component picks out the month */
+  rows: readonly SalesRow[];
+  split: 'region' | 'category';
+  onClear: () => void;
+}
+
+export default function MonthDetails({ month, rows, split, onClear }: MonthDetailsProps) {
   if (!month) {
     return <p className="sales-details-empty">Click a bar in the chart, or use the "Inspect a month" menu, to see that month in detail.</p>;
   }
@@ -17,13 +27,13 @@ export default function MonthDetails({ month, rows, split, onClear }) {
   const bestRegion = totalsBy(monthRows, 'region')[0];
   const bestCategory = totalsBy(monthRows, 'category')[0];
   const shares = totalsBy(monthRows, split);
-  const colorOf = split === 'region' ? regionColor : categoryColor;
-  const stats = [
+  /** [term, value, optional note under the value] */
+  const stats: [string, string, string?][] = [
     ['Revenue', formatMoney(revenue)],
     ['Profit', formatMoney(profit)],
     ['Orders', orders.toLocaleString('en-US')],
-    ['Best region', bestRegion?.name ?? 'None', bestRegion && formatPercent(bestRegion.share) + ' of revenue'],
-    ['Best category', bestCategory?.name ?? 'None', bestCategory && formatPercent(bestCategory.share) + ' of revenue'],
+    ['Best region', bestRegion?.name ?? 'None', bestRegion ? formatPercent(bestRegion.share) + ' of revenue' : undefined],
+    ['Best category', bestCategory?.name ?? 'None', bestCategory ? formatPercent(bestCategory.share) + ' of revenue' : undefined],
   ];
   return (
     <div>
@@ -38,7 +48,7 @@ export default function MonthDetails({ month, rows, split, onClear }) {
       <DataTable
         caption={`${monthName(month)}: share of revenue by ${split}`}
         columns={[
-          { key: 'name', label: split === 'region' ? 'Region' : 'Category', numeric: false, format: (v) => <><span className="sales-share-key" style={{ background: colorOf(v) }} aria-hidden="true" />{v}</> },
+          { key: 'name', label: split === 'region' ? 'Region' : 'Category', numeric: false, format: (v) => <><span className="sales-share-key" style={{ background: entityColor(split, v) }} aria-hidden="true" />{v}</> },
           { key: 'revenue', label: 'Revenue', format: formatMoney },
           { key: 'share', label: 'Share', format: (v) => formatPercent(v) },
         ]}

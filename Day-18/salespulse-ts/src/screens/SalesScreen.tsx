@@ -1,20 +1,50 @@
 import { useId, useMemo, useState } from 'react';
+import type { ReactElement } from 'react';
+import type { BarShapeProps } from 'recharts';
 import { Bar, BarChart, Brush, CartesianGrid, Legend, LabelList, Line, LineChart, Rectangle, ReferenceLine, Tooltip, XAxis, YAxis } from 'recharts';
 import { useDashboard } from '../context/DashboardContext';
-import ChartCard from '../charts/ChartCard';
+import ChartCard, { type TableSpec } from '../charts/ChartCard';
 import ChartTooltip from '../charts/ChartTooltip';
 import ResponsiveChart from '../charts/ResponsiveChart';
 import { useChartMotion } from '../charts/useChartMotion';
-import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, LEGEND_PROPS, categoryColor, regionColor, seriesColor } from '../charts/theme';
+import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, LEGEND_PROPS, entityColor, seriesColor } from '../charts/theme';
 import { CATEGORIES, REGIONS } from '../data/generate';
+import { numberField, stringField } from '../lib/guards';
 import { formatCompactMoney, formatMoney, monthName, monthlyBy } from '../lib/metrics';
+import type { MonthKey, MonthlyPoint } from '../types';
 import MonthDetails from './sales/MonthDetails';
 import './sales.css';
 
 const LABEL_MAX_MONTHS = 6; // totals above the bars only fit on short ranges
 
-/** A small group of toggle buttons: real buttons + aria-pressed, labelled as a group. */
-function Segmented({ label, options, value, onChange }) {
+type Split = 'region' | 'category';
+type Layout = 'stacked' | 'grouped';
+
+/** One bar-chart row: a month, a number per region (or per category), and the month's total */
+interface BarRow {
+  month: MonthKey;
+  label: string;
+  total: number;
+  [name: string]: string | number;
+}
+
+/** The brush window of the line chart, remembered with the series length it belongs to */
+interface Zoom {
+  length: number;
+  start: number;
+  end: number;
+}
+
+interface SegmentedProps<T extends string> {
+  label: string;
+  /** [id, text] pairs */
+  options: readonly (readonly [T, string])[];
+  value: T;
+  onChange: (next: T) => void;
+}
+
+/** A small group of toggle buttons: real buttons + aria-pressed, labelled as a group. `T` is the union of option ids. */
+function Segmented<T extends string>({ label, options, value, onChange }: SegmentedProps<T>) {
   return (
     <div className="sales-control" role="group" aria-label={label}>
       <span className="sales-label" aria-hidden="true">{label}</span>
@@ -31,25 +61,27 @@ export default function SalesScreen() {
   const { ready, refreshing, range, periodRows, periodSeries } = useDashboard();
   const motion = useChartMotion();
   const selectId = useId();
-  const [split, setSplit] = useState('region');
-  const [layout, setLayout] = useState('stacked');
-  const [picked, setPicked] = useState(null);
+  const [split, setSplit] = useState<Split>('region');
+  const [layout, setLayout] = useState<Layout>('stacked');
+  const [picked, setPicked] = useState<MonthKey | null>(null);
   // Brush zoom is remembered together with the series length it belongs to. If the period changes
   // (length changes) the stored zoom no longer applies, so we fall back to "show everything".
-  const [zoom, setZoom] = useState({ length: 0, start: 0, end: 0 });
+  const [zoom, setZoom] = useState<Zoom>({ length: 0, start: 0, end: 0 });
 
-  const names = split === 'region' ? REGIONS : CATEGORIES;
-  const colorOf = split === 'region' ? regionColor : categoryColor;
+  const names: readonly string[] = split === 'region' ? REGIONS : CATEGORIES;
+  const colorOf = (name: string): string => entityColor(split, name);
   const stacked = layout === 'stacked';
 
   // One object per month with a column per region/category, plus a `total` used for labels, tooltip and table.
-  const barData = useMemo(
-    () => monthlyBy(periodRows, split, range).map((m) => ({ ...m, total: names.reduce((t, n) => t + m[n], 0) })),
-    [periodRows, split, range, names],
-  );
+  const barData = useMemo((): BarRow[] => {
+    const rows = split === 'region' ? monthlyBy(periodRows, 'region', range) : monthlyBy(periodRows, 'category', range);
+    return rows.map((m) => ({ ...m, total: names.reduce((t, n) => t + (numberField(m, n) ?? 0), 0) }));
+  }, [periodRows, split, range, names]);
   // The selected month only counts while it is still inside the period.
   const month = barData.some((m) => m.month === picked) ? picked : null;
-  const toggleMonth = (m) => setPicked((current) => (current === m ? null : m));
+  const toggleMonth = (m: MonthKey | undefined) => {
+    if (m !== undefined) setPicked((current) => (current === m ? null : m));
+  };
 
   if (!ready) return null;
 
@@ -66,19 +98,23 @@ export default function SalesScreen() {
 
   const grandTotal = barData.reduce((t, m) => t + m.total, 0);
   const barSummary = `Revenue by month for the last ${barData.length} months, split by ${split}, ${stacked ? 'stacked' : 'grouped'}. Total ${formatMoney(grandTotal)}.`;
-  const barTable = {
-    columns: [{ key: 'label', label: 'Month', numeric: false }, ...names.map((n) => ({ key: n, label: n, format: formatMoney })), { key: 'total', label: 'Total', format: formatMoney }],
+  const barTable: TableSpec<BarRow> = {
+    columns: [
+      { key: 'label', label: 'Month', numeric: false },
+      ...names.map((n) => ({ key: n, label: n, format: (v: string | number) => formatMoney(Number(v)) })),
+      { key: 'total', label: 'Total', format: (v) => formatMoney(Number(v)) },
+    ],
     rows: barData,
   };
-  const lineTable = {
+  const lineTable: TableSpec<MonthlyPoint> = {
     columns: [{ key: 'label', label: 'Month', numeric: false }, { key: 'revenue', label: 'Revenue', format: formatMoney }],
     rows: visible,
   };
 
   // A Bar's `shape` draws each rectangle. We reuse Recharts' own <Rectangle> and only change its
   // opacity: when a month is selected, every other month's bars fade to 35%.
-  const barShape = (props) => (
-    <Rectangle {...props} fillOpacity={month && props.payload?.month !== month ? 0.35 : 1} />
+  const barShape = (props: BarShapeProps): ReactElement => (
+    <Rectangle {...props} fillOpacity={month && stringField(props.payload, 'month') !== month ? 0.35 : 1} />
   );
 
   return (
@@ -108,7 +144,7 @@ export default function SalesScreen() {
             <XAxis dataKey="label" tickLine={false} axisLine={AXIS_LINE} tick={AXIS_TICK} interval="preserveStartEnd" minTickGap={12} />
             <YAxis tickLine={false} axisLine={false} tick={AXIS_TICK} tickFormatter={formatCompactMoney} width={56} />
             <Tooltip
-              content={<ChartTooltip formatValue={formatMoney} title={(label) => `Revenue in ${label}`} footer={(payload) => `Total ${formatMoney(payload[0]?.payload?.total ?? 0)}`} />}
+              content={<ChartTooltip formatValue={formatMoney} title={(label) => `Revenue in ${label}`} footer={(payload) => `Total ${formatMoney(numberField(payload[0]?.payload, 'total') ?? 0)}`} />}
               cursor={{ fill: 'var(--bg-sunken)', opacity: 0.6 }}
             />
             <Legend {...LEGEND_PROPS} />
@@ -129,12 +165,12 @@ export default function SalesScreen() {
                   radius={stacked ? (isTop ? [4, 4, 0, 0] : 0) : [4, 4, 0, 0]}
                   maxBarSize={48}
                   shape={barShape}
-                  onClick={(d) => toggleMonth(d?.payload?.month ?? d?.month)}
+                  onClick={(d) => toggleMonth(stringField(d.payload, 'month') ?? stringField(d, 'month'))}
                   {...motion}
                 >
                   {/* LabelList on the top segment prints the month TOTAL above the stack, short ranges only */}
                   {stacked && isTop && barData.length <= LABEL_MAX_MONTHS && (
-                    <LabelList dataKey="total" position="top" formatter={formatCompactMoney} fill="var(--text-secondary)" fontSize={12} />
+                    <LabelList dataKey="total" position="top" formatter={(value) => (typeof value === 'number' ? formatCompactMoney(value) : '')} fill="var(--text-secondary)" fontSize={12} />
                   )}
                 </Bar>
               );
@@ -185,7 +221,7 @@ export default function SalesScreen() {
               stroke="var(--axis)"
               fill="var(--bg-sunken)"
               travellerWidth={10}
-              onChange={(r) => setZoom({ length: count, start: r.startIndex, end: r.endIndex })}
+              onChange={(r) => setZoom({ length: count, start: r.startIndex ?? 0, end: r.endIndex ?? Math.max(0, count - 1) })}
             />
           </LineChart>
         </ResponsiveChart>

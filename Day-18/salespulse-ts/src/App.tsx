@@ -10,7 +10,11 @@ import UsersScreen from './screens/UsersScreen';
 import RevenueScreen from './screens/RevenueScreen';
 import ExploreScreen from './screens/ExploreScreen';
 
-const TABS = [
+interface TabSpec {
+  id: string;
+  label: string;
+}
+const TABS: readonly TabSpec[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'sales', label: 'Sales' },
   { id: 'users', label: 'Users' },
@@ -19,7 +23,7 @@ const TABS = [
 ];
 
 export default function App() {
-  const [tab, setTab] = useState('overview');
+  const [tab, setTab] = useState<string>('overview');
   const { ready, loading } = useDashboard();
   const { isDark } = useThemeState();
   const { toggleTheme } = useThemeActions();
