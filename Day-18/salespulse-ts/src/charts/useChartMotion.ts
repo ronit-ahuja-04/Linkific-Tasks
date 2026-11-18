@@ -8,14 +8,21 @@ import { useSyncExternalStore } from 'react';
  *   <Bar dataKey="revenue" {...motion} />
  */
 const QUERY = '(prefers-reduced-motion: reduce)';
-const subscribe = (callback) => {
+const subscribe = (callback: () => void) => {
   const media = window.matchMedia?.(QUERY);
   media?.addEventListener?.('change', callback);
   return () => media?.removeEventListener?.('change', callback);
 };
 const getSnapshot = () => window.matchMedia?.(QUERY).matches ?? false;
 
-export function useChartMotion(duration = 700) {
+/** The three animation props every Recharts series accepts */
+export interface ChartMotion {
+  isAnimationActive: boolean;
+  animationDuration: number;
+  animationEasing: 'ease-out';
+}
+
+export function useChartMotion(duration = 700): ChartMotion {
   const reduced = useSyncExternalStore(subscribe, getSnapshot, () => false);
   return { isAnimationActive: !reduced, animationDuration: duration, animationEasing: 'ease-out' };
 }
