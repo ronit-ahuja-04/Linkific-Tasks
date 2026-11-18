@@ -93,7 +93,7 @@ For plain object shapes either works. This workbook uses `interface` for shapes 
 | `weekdays.push('Sat')` on a `readonly string[]` | `Property 'push' does not exist on type 'readonly string[]'` |
 | `{ id: 1, name: 'Ann', emial: 'a@x.com' }` | `... 'emial' does not exist in type 'User'. Did you mean to write 'email'?` |
 | `data.a` where `data` is `unknown` | `'data' is of type 'unknown'` |
-| `pluck(todos, 'name')` | `Argument of type '"name"' is not assignable to parameter of type '"id" \| "title"'` |
+| `pluck(todos, 'name')` | `Argument of type '"name"' is not assignable to parameter of type 'keyof Todo'` |
 
 ## Tests
 

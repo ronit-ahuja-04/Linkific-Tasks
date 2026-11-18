@@ -1,0 +1,17 @@
+.overview { display: flex; flex-direction: column; gap: 16px; }
+.overview-heading { font-size: 18px; margin-bottom: 10px; }
+.overview-heading span { color: var(--text-secondary); font-weight: 400; font-size: 14px; margin-left: 6px; }
+.overview .kpi-grid { margin-bottom: 0; }
+.overview-kpi { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: var(--shadow-sm); padding: 14px 16px; min-width: 0; }
+.overview-kpi-label { color: var(--text-secondary); font-size: 13px; }
+.overview-kpi-value { color: var(--text-primary); font-size: 26px; font-weight: 700; line-height: 1.2; margin: 2px 0 6px; overflow-wrap: anywhere; }
+.overview-kpi-note { font-size: 13px; }
+.overview-kpi-none, .overview-kpi-vs { color: var(--text-muted); }
+.overview-kpi-change { display: inline-flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.overview-kpi-change.is-up strong, .overview-kpi-change.is-up svg { color: var(--success-text); }
+.overview-kpi-change.is-down strong, .overview-kpi-change.is-down svg { color: var(--danger-text); }
+.overview-kpi-change.is-flat strong, .overview-kpi-change.is-flat svg { color: var(--text-secondary); }
+.overview-insights { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 10px; box-shadow: var(--shadow-sm); padding: 16px; }
+.overview-insights h3 { font-size: 16px; margin-bottom: 8px; }
+.overview-insights ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; color: var(--text-secondary); }
+.overview-insights strong { color: var(--text-primary); }
