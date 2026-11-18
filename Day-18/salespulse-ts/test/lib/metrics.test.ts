@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { ALL, currentRows, dailyUsers, filterProducts, filterSales, filterUsers, formatCompact, formatCompactMoney, formatMoney, kpis, monthLabel, monthName, monthlyBy, monthlySeries, radarData, splitPeriods, totalsBy, weeklyUsers, RADAR_AXES } from '../../src/lib/metrics';
+import { must } from '../helpers';
+import { ALL, currentRows, dailyUsers, filterProducts, filterSales, filterUsers, formatCompact, formatCompactMoney, formatMoney, kpis, monthLabel, monthName, monthlyBy, monthlySeries, radarData, splitPeriods, sum, totalsBy, weeklyUsers, RADAR_AXES } from '../../src/lib/metrics';
 import { CATEGORIES, REGIONS, generateProducts, generateSales, generateScores, generateUsers } from '../../src/data/generate';
 
 const sales = generateSales();
-const sum = (rows, key) => rows.reduce((n, r) => n + r[key], 0);
 
 describe('formatting', () => {
   it('formats months, money and compact numbers', () => {
@@ -38,8 +38,11 @@ describe('monthlySeries', () => {
     series.forEach((m) => expect(m.profit).toBe(m.revenue - m.cost));
   });
   it('computes a 3-month moving average (shorter at the start)', () => {
-    expect(series[0].average3).toBe(series[0].revenue);
-    expect(series[2].average3).toBe(Math.round((series[0].revenue + series[1].revenue + series[2].revenue) / 3));
+    const first = must(series[0]);
+    const second = must(series[1]);
+    const third = must(series[2]);
+    expect(first.average3).toBe(first.revenue);
+    expect(third.average3).toBe(Math.round((first.revenue + second.revenue + third.revenue) / 3));
   });
   it('handles an empty list', () => {
     expect(monthlySeries([])).toEqual([]);
@@ -52,15 +55,16 @@ describe('periods and KPIs', () => {
     const { current, previous } = splitPeriods(series, 6);
     expect(current).toHaveLength(6);
     expect(previous).toHaveLength(6);
-    expect(current[0].month > previous.at(-1).month).toBe(true);
+    expect(must(current[0]).month > must(previous.at(-1)).month).toBe(true);
     expect(splitPeriods(series, 24).previous).toEqual([]);
   });
   it('computes totals and the change against the previous period', () => {
     const k = kpis(series, 12);
     const { current, previous } = splitPeriods(series, 12);
     expect(k.revenue).toBe(sum(current, 'revenue'));
-    expect(k.change.revenue).toBeCloseTo(((k.revenue - sum(previous, 'revenue')) / sum(previous, 'revenue')) * 100, 0);
-    expect(k.change.revenue).toBeGreaterThan(0); // the business grows
+    const change = must(k.change, 'a previous period');
+    expect(change.revenue).toBeCloseTo(((k.revenue - sum(previous, 'revenue')) / sum(previous, 'revenue')) * 100, 0);
+    expect(change.revenue).toBeGreaterThan(0); // the business grows
     expect(k.margin).toBeGreaterThan(30);
     expect(k.averageOrder).toBe(Math.round(k.revenue / k.orders));
   });
@@ -75,14 +79,14 @@ describe('breakdowns', () => {
     expect(rows).toHaveLength(24);
     for (const row of rows) expect(REGIONS.reduce((n, r) => n + row[r], 0)).toBe(sum(sales.filter((s) => s.month === row.month), 'revenue'));
     expect(monthlyBy(sales, 'category', 6)).toHaveLength(6);
-    expect(Object.keys(monthlyBy(sales, 'category')[0])).toEqual(expect.arrayContaining(CATEGORIES));
+    expect(Object.keys(must(monthlyBy(sales, 'category')[0]))).toEqual(expect.arrayContaining([...CATEGORIES]));
   });
   it('totalsBy ranks biggest first and shares add to about 100', () => {
     const regions = totalsBy(sales, 'region');
     expect(regions.map((r) => r.revenue)).toEqual([...regions.map((r) => r.revenue)].sort((a, b) => b - a));
-    expect(regions[0].name).toBe('North America');
+    expect(must(regions[0]).name).toBe('North America');
     expect(regions.reduce((n, r) => n + r.share, 0)).toBeGreaterThan(99.8);
-    expect(totalsBy(sales, 'category')[0].name).toBe('Software');
+    expect(must(totalsBy(sales, 'category')[0]).name).toBe('Software');
     expect(totalsBy([], 'region')).toEqual([]);
   });
   it('currentRows keeps the last N months', () => {
@@ -95,10 +99,11 @@ describe('users', () => {
   it('rolls up regions per day and limits to the last N days', () => {
     const daily = dailyUsers(users, 30);
     expect(daily).toHaveLength(30);
-    expect(daily[0].date < daily.at(-1).date).toBe(true);
-    const day = users.filter((u) => u.date === daily[0].date);
-    expect(daily[0].visitors).toBe(sum(day, 'visitors'));
-    expect(daily[0].conversion).toBeGreaterThan(1);
+    const firstDay = must(daily[0]);
+    expect(firstDay.date < must(daily.at(-1)).date).toBe(true);
+    const day = users.filter((u) => u.date === firstDay.date);
+    expect(firstDay.visitors).toBe(sum(day, 'visitors'));
+    expect(firstDay.conversion).toBeGreaterThan(1);
     expect(dailyUsers(users)).toHaveLength(365);
   });
   it('groups days into weeks without losing visitors', () => {
@@ -120,11 +125,11 @@ describe('radarData', () => {
       expect(row[c]).toBeGreaterThanOrEqual(0);
       expect(row[c]).toBeLessThanOrEqual(100);
     }
-    expect(data.find((d) => d.axis === 'Revenue').Software).toBe(100); // Software is the biggest category
+    expect(must(data.find((d) => d.axis === 'Revenue')).Software).toBe(100); // Software is the biggest category
   });
   it('can be limited to one region', () => {
     const all = radarData(sales, scores).raw;
     const europe = radarData(sales, scores, { region: 'Europe' }).raw;
-    expect(europe[0].revenue).toBeLessThan(all[0].revenue);
+    expect(must(europe[0]).revenue).toBeLessThan(must(all[0]).revenue);
   });
 });

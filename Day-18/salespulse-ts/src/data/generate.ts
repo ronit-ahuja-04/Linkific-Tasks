@@ -63,7 +63,7 @@ export function generateSales(seed = 14): SalesRow[] {
       for (const category of CATEGORIES) {
         const trend = (1 + REGION_GROWTH[region]) ** monthIndex;
         const noise = between(rng, 0.93, 1.07);
-        const revenue = round(CATEGORY_BASE[category] * REGION_SIZE[region] * trend * SEASON[monthNumber] * noise);
+        const revenue = round(CATEGORY_BASE[category] * REGION_SIZE[region] * trend * (SEASON[monthNumber] ?? 1) * noise);
         const marginNoise = between(rng, -0.025, 0.025);
         const cost = round(revenue * (1 - (CATEGORY_MARGIN[category] + marginNoise)));
         const averageOrder = category === 'Hardware' ? 310 : category === 'Software' ? 140 : 520;

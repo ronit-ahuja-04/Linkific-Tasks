@@ -1,4 +1,4 @@
-import { test, expect, open } from './fixtures';
+import { test, expect, open, boxOf } from './fixtures';
 
 test('loads the dashboard and shows every tab', async ({ page }) => {
   await page.goto('/');
@@ -26,7 +26,7 @@ test('region filter changes the numbers instantly; reset restores them', async (
   await open(page, 'Overview');
   await expect(page.getByRole('heading', { name: 'Key numbers' })).toBeVisible();
   const revenue = page.locator('.kpi-grid').first();
-  const before = await revenue.textContent();
+  const before = (await revenue.textContent()) ?? '';
   await page.getByLabel('Region').selectOption('Latin America');
   await expect(revenue).not.toHaveText(before);
   await page.getByRole('button', { name: 'Reset' }).click();
@@ -56,7 +56,7 @@ test('every chart has a table view with the same numbers', async ({ page }) => {
 test('hovering a chart shows a tooltip', async ({ page }) => {
   await open(page, 'Overview');
   const chart = page.locator('.recharts-wrapper').first();
-  const box = await chart.boundingBox();
+  const box = await boxOf(chart);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await expect(page.locator('.chart-tooltip').first()).toBeVisible();
 });

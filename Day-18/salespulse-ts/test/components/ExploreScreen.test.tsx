@@ -2,10 +2,11 @@
 import { describe, expect, it } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { createApi } from '../../src/api/mockApi';
-import { DashboardProvider, useDashboard } from '../../src/context/DashboardContext';
+import { DashboardProvider, useDashboard, type DashboardValue } from '../../src/context/DashboardContext';
 import ExploreScreen from '../../src/screens/ExploreScreen';
+import { must } from '../helpers';
 
-let setCategory;
+let setCategory: DashboardValue['setCategory'] | undefined;
 function Probe() {
   setCategory = useDashboard().setCategory;
   return null;
@@ -24,7 +25,7 @@ describe('ExploreScreen', () => {
     await screen.findByRole('heading', { name: 'Price vs units sold' });
     expect(screen.getByRole('heading', { name: 'How the categories compare' })).toBeTruthy();
     expect(container.querySelectorAll('.recharts-wrapper').length).toBe(2);
-    const log = screen.getByLabelText('Log scale');
+    const log = screen.getByLabelText<HTMLInputElement>('Log scale');
     fireEvent.click(log);
     expect(log.checked).toBe(true);
   });
@@ -55,7 +56,7 @@ describe('ExploreScreen', () => {
     setup();
     await screen.findByRole('heading', { name: 'How the categories compare' });
     expect(screen.getAllByRole('columnheader', { name: 'Margin' }).length).toBeGreaterThan(0);
-    act(() => setCategory('Services'));
+    act(() => must(setCategory)('Services'));
     expect(await screen.findByText(/10 products plotted/)).toBeTruthy();
     expect(screen.queryByRole('list', { name: 'Show or hide categories' })).toBeNull();
   });

@@ -2,12 +2,13 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createApi } from '../../src/api/mockApi';
-import { DashboardProvider, useDashboard } from '../../src/context/DashboardContext';
+import { DashboardProvider, useDashboard, type DashboardValue } from '../../src/context/DashboardContext';
 import SalesScreen from '../../src/screens/SalesScreen';
+import { must } from '../helpers';
 
 afterEach(cleanup);
 
-let controls;
+let controls: DashboardValue | undefined;
 function Probe() {
   controls = useDashboard();
   return null;
@@ -26,7 +27,7 @@ describe('SalesScreen', () => {
     await screen.findByRole('heading', { name: 'Revenue by month' });
     expect(screen.getByRole('heading', { name: 'Monthly revenue, zoomable' })).toBeTruthy();
     expect(container.querySelectorAll('.recharts-wrapper').length).toBe(2);
-    expect(container.querySelector('.recharts-legend-wrapper').textContent).toContain('Europe');
+    expect(must(container.querySelector('.recharts-legend-wrapper'), 'the legend').textContent).toContain('Europe');
   });
 
   it('switches the split and layout with pressed buttons', async () => {
@@ -43,8 +44,8 @@ describe('SalesScreen', () => {
   it('selects a month from the select and clears it', async () => {
     setup();
     await screen.findByRole('heading', { name: 'Revenue by month' });
-    const select = screen.getByLabelText('Inspect a month');
-    fireEvent.change(select, { target: { value: select.options[3].value } });
+    const select = screen.getByLabelText<HTMLSelectElement>('Inspect a month');
+    fireEvent.change(select, { target: { value: must(select.options[3]).value } });
     expect(screen.getByRole('heading', { name: 'Month details' })).toBeTruthy();
     expect(screen.getByText('Best region')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
@@ -54,32 +55,33 @@ describe('SalesScreen', () => {
   it('selects a month by clicking a bar', async () => {
     const { container } = setup();
     await screen.findByRole('heading', { name: 'Revenue by month' });
-    const bar = await vi_waitFor(() => container.querySelector('.recharts-bar-rectangle path, .recharts-bar-rectangle'));
+    const bar = await waitForElement(() => container.querySelector('.recharts-bar-rectangle path, .recharts-bar-rectangle'));
     fireEvent.click(bar);
-    expect(screen.getByLabelText('Inspect a month').value).not.toBe('');
+    expect(screen.getByLabelText<HTMLSelectElement>('Inspect a month').value).not.toBe('');
   });
 
   it('shows a table view and a reset-zoom button that starts disabled', async () => {
     setup();
     await screen.findByRole('heading', { name: 'Revenue by month' });
-    expect(screen.getByRole('button', { name: 'Reset zoom' }).disabled).toBe(true);
+    expect(screen.getByRole<HTMLButtonElement>('button', { name: 'Reset zoom' }).disabled).toBe(true);
     expect(screen.getByText(/Showing .* \(12 months\)/)).toBeTruthy();
-    fireEvent.click(screen.getAllByRole('button', { name: /Table view/ })[0]);
+    fireEvent.click(must(screen.getAllByRole('button', { name: /Table view/ })[0]));
     expect(screen.getByRole('table', { name: /Revenue by month: data/ })).toBeTruthy();
   });
 
   it('keeps the zoom text valid when the period changes', async () => {
     setup();
     await screen.findByRole('heading', { name: 'Revenue by month' });
-    act(() => controls.setRange(3));
+    act(() => must(controls).setRange(3));
     expect(await screen.findByText(/Showing .* \(3 months\)/)).toBeTruthy();
   });
 });
 
 import { waitFor } from '@testing-library/react';
-async function vi_waitFor(fn) {
+/** Wait until `find` returns an element, then hand it back (typed as an Element, never null) */
+async function waitForElement(find: () => Element | null): Promise<Element> {
   return waitFor(() => {
-    const el = fn();
+    const el = find();
     if (!el) throw new Error('not yet');
     return el;
   });

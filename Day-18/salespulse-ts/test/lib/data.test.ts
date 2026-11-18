@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_MONTHS, CATEGORIES, DAY_COUNT, FIRST_MONTH, LAST_MONTH, MONTH_COUNT, REGIONS, addMonths, generateProducts, generateSales, generateScores, generateUsers, getWarehouse, mulberry32 } from '../../src/data/generate';
 import { createApi } from '../../src/api/mockApi';
+import type { UsersRow } from '../../src/types';
 
 describe('generated data', () => {
   it('is deterministic', () => {
@@ -26,7 +27,7 @@ describe('generated data', () => {
       expect(r.cost).toBeLessThan(r.revenue);
       expect(r.orders).toBeGreaterThan(0);
     }
-    const monthTotal = (m) => sales.filter((r) => r.month === m).reduce((n, r) => n + r.revenue, 0);
+    const monthTotal = (m: string) => sales.filter((r) => r.month === m).reduce((n, r) => n + r.revenue, 0);
     expect(monthTotal('2025-12')).toBeGreaterThan(monthTotal('2025-09')); // December beats September
     expect(monthTotal('2026-06')).toBeGreaterThan(monthTotal('2025-06')); // a year of growth
   });
@@ -36,7 +37,7 @@ describe('generated data', () => {
     expect(users).toHaveLength(DAY_COUNT * REGIONS.length);
     const sat = users.filter((u) => new Date(`${u.date}T00:00:00Z`).getUTCDay() === 6);
     const wed = users.filter((u) => new Date(`${u.date}T00:00:00Z`).getUTCDay() === 3);
-    const mean = (rows) => rows.reduce((n, r) => n + r.visitors, 0) / rows.length;
+    const mean = (rows: readonly UsersRow[]) => rows.reduce((n, r) => n + r.visitors, 0) / rows.length;
     expect(mean(sat)).toBeLessThan(mean(wed));
     users.forEach((u) => expect(u.sessions).toBeGreaterThan(u.visitors));
   });

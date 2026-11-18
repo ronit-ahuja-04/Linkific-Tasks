@@ -77,9 +77,11 @@ export default function UsersScreen() {
   if (peak) {
     const endDate = users[Math.min(users.findIndex((d) => d.date === peak.date) + 6, users.length - 1)]?.date ?? peak.date;
     const inPeak = visible.filter((r) => r.date >= peak.date && r.date <= endDate);
-    if (inPeak.length) {
-      peakFrom = inPeak[0].label;
-      peakTo = inPeak[inPeak.length - 1].label;
+    const [peakFirst] = inPeak;
+    const peakLast = inPeak[inPeak.length - 1];
+    if (peakFirst && peakLast) {
+      peakFrom = peakFirst.label;
+      peakTo = peakLast.label;
     }
   }
 
@@ -87,7 +89,9 @@ export default function UsersScreen() {
   const labelHeader = weekly ? 'Week starting' : 'Day';
   const labelCol: TableColumn<UserRow> = { key: 'label', label: labelHeader, numeric: false };
   const tableRows = visible; // capped to the zoomed range
-  const periodText = visible.length ? `${visible[0].label} to ${visible[visible.length - 1].label}` : 'no data';
+  const firstVisible = visible[0];
+  const lastVisible = visible[visible.length - 1];
+  const periodText = firstVisible && lastVisible ? `${firstVisible.label} to ${lastVisible.label}` : 'no data';
 
   const tooltip = <Tooltip content={<UsersTooltip daily={!weekly} />} cursor={{ stroke: 'var(--axis)' }} />;
   const commonChart: { data: UserRow[]; syncId: string; syncMethod: 'value'; margin: typeof MARGIN } = {

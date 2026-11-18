@@ -1,12 +1,15 @@
 // @vitest-environment jsdom
+import type { ComponentProps } from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { LineChart, Line } from 'recharts';
 import { createApi } from '../../src/api/mockApi';
-import { DashboardProvider, useDashboard } from '../../src/context/DashboardContext';
+import { DashboardProvider, useDashboard, type DashboardValue } from '../../src/context/DashboardContext';
 import FilterBar from '../../src/components/FilterBar';
-import ChartCard from '../../src/charts/ChartCard';
+import ChartCard, { type TableSpec } from '../../src/charts/ChartCard';
+import type { DashboardApi } from '../../src/types';
+import { must } from '../helpers';
 import ChartTooltip from '../../src/charts/ChartTooltip';
 import ResponsiveChart from '../../src/charts/ResponsiveChart';
 
@@ -18,8 +21,18 @@ function Probe() {
     </p>
   );
 }
-const read = () => JSON.parse(screen.getByTestId('probe').textContent);
-const setup = (api, props) => render(<DashboardProvider api={api} {...props}><FilterBar /><Probe /></DashboardProvider>);
+/** What <Probe> prints. JSON.parse hands back untyped data, so this is the one place the test states what it expects. */
+interface ProbeState {
+  loading: boolean;
+  refreshing: boolean;
+  ready: boolean;
+  error: string | null;
+  revenue: number | null;
+  months: number;
+  region: string;
+}
+const read = (): ProbeState => JSON.parse(screen.getByTestId('probe').textContent ?? 'null');
+const setup = (api: DashboardApi, props?: Omit<ComponentProps<typeof DashboardProvider>, 'children' | 'api'>) => render(<DashboardProvider api={api} {...props}><FilterBar /><Probe /></DashboardProvider>);
 
 describe('DashboardProvider and FilterBar', () => {
   it('loads once, then scopes every number by region instantly (no new request)', async () => {
@@ -28,7 +41,7 @@ describe('DashboardProvider and FilterBar', () => {
     expect(read().loading).toBe(true);
     await waitFor(() => expect(read().ready).toBe(true));
     expect(read()).toMatchObject({ loading: false, refreshing: false, months: 12 });
-    const all = read().revenue;
+    const all = must(read().revenue);
     await userEvent.selectOptions(screen.getByLabelText('Region'), 'Europe');
     expect(read().revenue).toBeLessThan(all);
     expect(read().region).toBe('Europe');
@@ -86,18 +99,18 @@ describe('DashboardProvider and FilterBar', () => {
   });
 
   it('exposes setters that scope the data', async () => {
-    let dashboard;
+    let dashboard: DashboardValue | undefined;
     function Grab() { dashboard = useDashboard(); return null; }
     render(<DashboardProvider api={createApi({ delayMs: 0 })}><Grab /><Probe /></DashboardProvider>);
     await waitFor(() => expect(read().ready).toBe(true));
-    act(() => dashboard.setCategory('Hardware'));
-    expect(dashboard.hasFilters).toBe(true);
-    expect(dashboard.periodRows.every((r) => r.category === 'Hardware')).toBe(true);
+    act(() => must(dashboard).setCategory('Hardware'));
+    expect(must(dashboard).hasFilters).toBe(true);
+    expect(must(dashboard).periodRows.every((r) => r.category === 'Hardware')).toBe(true);
   });
 });
 
 describe('ChartCard', () => {
-  const table = { columns: [{ key: 'label', label: 'Month', numeric: false }, { key: 'value', label: 'Revenue', format: (v) => `$${v}` }], rows: [{ label: 'Jan', value: 5 }, { label: 'Feb', value: 7 }] };
+  const table: TableSpec<{ label: string; value: number }> = { columns: [{ key: 'label', label: 'Month', numeric: false }, { key: 'value', label: 'Revenue', format: (v) => `$${v}` }], rows: [{ label: 'Jan', value: 5 }, { label: 'Feb', value: 7 }] };
   it('switches between the chart and an accessible table of the same numbers', async () => {
     render(<ChartCard title="Revenue" subtitle="Monthly" summary="Revenue went up." table={table}><div>the chart</div></ChartCard>);
     expect(screen.getByRole('heading', { name: 'Revenue' })).toBeTruthy();

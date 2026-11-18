@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { createApi } from '../../src/api/mockApi';
 import { DashboardProvider } from '../../src/context/DashboardContext';
 import OverviewScreen from '../../src/screens/OverviewScreen';
+import { must } from '../helpers';
 
 const setup = () =>
   render(
@@ -31,7 +32,7 @@ describe('OverviewScreen', () => {
     await screen.findByRole('heading', { name: 'Revenue, profit and trend' });
     expect(container.querySelectorAll('.recharts-wrapper').length).toBe(2);
     expect(container.querySelector('.recharts-legend-wrapper')?.textContent).toMatch(/3-month average/);
-    const insights = screen.getByRole('heading', { name: 'Insights' }).closest('section');
+    const insights = must(screen.getByRole('heading', { name: 'Insights' }).closest('section'), 'the insights section');
     expect(within(insights).getByText(/Best month/)).toBeTruthy();
     expect(within(insights).getByText(/Top region/)).toBeTruthy();
   });
@@ -39,7 +40,7 @@ describe('OverviewScreen', () => {
   it('switches a chart to its table view', async () => {
     setup();
     await screen.findByRole('heading', { name: 'Cumulative revenue' });
-    await userEvent.click(screen.getAllByRole('button', { name: /table view/i })[0]);
+    await userEvent.click(must(screen.getAllByRole('button', { name: /table view/i })[0]));
     expect(await screen.findByRole('table', { name: /cumulative revenue/i })).toBeTruthy();
   });
 });
