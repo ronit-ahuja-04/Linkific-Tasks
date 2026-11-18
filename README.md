@@ -2,7 +2,7 @@
 
 **Author:** Ronit Ahuja
 **Programme:** Linkific internship, Month 1 (training phase)
-**Status:** Days 1–16 delivered
+**Status:** Days 1–16 and 18 delivered
 
 One repository, one folder per training day. Days 1–3 are small standalone deliverables. From Day 5 onward the work compounds into a single product, **HackHQ**, a control room for a 24-hour hackathon, rebuilt each day around the concept being taught.
 
@@ -57,6 +57,7 @@ Backend services, authentication against a real server, and any library the day'
 | 14  | Recharts                                 | SalesPulse: a Recharts dashboard                                 | [PRD](Day-14/Day14_PRD.md) · [Report](Day-14/DAY14_REPORT.md) · [Chart guide](Day-14/CHART_CHOICE_GUIDE.md)        |
 | 15  | Authentication, JWT, OAuth               | FlowLane with GitHub sign-in, issue import and a JWT-checking API | [README](Day-15/flowlane-auth/README.md) · [PRD](Day-15/Day15_PRD.md) · [Report](Day-15/DAY15_REPORT.md)          |
 | 16  | Firebase: Storage and real-time          | FlowLane with image uploads, a live dashboard and a setup guide  | [README](Day-16/flowlane-firebase/README.md) · [PRD](Day-16/Day16_PRD.md) · [Report](Day-16/DAY16_REPORT.md)       |
+| 18  | TypeScript for React                     | A TypeScript workbook, and SalesPulse converted to strict TypeScript with zero `any` | [Workbook](Day-18/ts-basics/README.md) · [SalesPulse TS](Day-18/salespulse-ts/README.md) · [PRD](Day-18/Day18_PRD.md) |
 
 ---
 

@@ -1,115 +1,112 @@
-# SalesPulse: a Recharts dashboard
+# SalesPulse in TypeScript
 
-A React dashboard that turns mock sales and user data into **7 chart types** with Recharts: line, bar, pie, area, composed, scatter and radar. It has interactive tooltips, legends, filters, zoom (Brush), synchronized charts, click-to-drill-down, a pretend API with loading and error states, light and dark themes, and phone-width layouts. Everything is mock data from a seeded generator, so every load (and every test) sees the same business.
+**Day 18 project (part B):** Linkific Month 1 Training
+**Author:** Ronit Ahuja
+**Stack:** TypeScript 5.9 (strict), React 19, Vite, Recharts 3, Vitest, Testing Library, Playwright, oxlint
+**Starting point:** Day 14 `salespulse` (a Recharts dashboard), copied and migrated file by file. The behaviour, styling and tests are the same; only the types are new.
+**Part A:** the TypeScript workbook, with every fundamental shown and tested, is in [`../ts-basics`](../ts-basics/README.md).
+**PRD:** [`../Day18_PRD.md`](../Day18_PRD.md)
+
+## Run
 
 ```bash
+cd Day-18/salespulse-ts
 npm install
-npm run dev          # http://localhost:5173
-npm test             # unit and component tests (Vitest)
-npm run test:e2e     # browser tests (Playwright, Chrome)
-npm run test:e2e:prod  # the same browser tests against the production bundle
+npm run dev            # http://localhost:5173
+npm run typecheck      # tsc: strict, zero errors
+npm run lint
+npm test               # 67 unit and component tests
+npm run test:e2e       # 27 browser tests (Chrome), including axe WCAG 2.1 AA
+npm run escapes        # counts any / type assertions / @ts- comments in src/ (fails on any `any`)
+npm run errors         # regenerates compile-errors.md from the real compiler output
+npm run build          # type-checks, then builds
 ```
 
-## What is on each tab
+## The brief, item by item
 
-| Tab | Charts | Recharts features shown |
-|---|---|---|
-| **Overview** | KPI cards, **AreaChart** (cumulative revenue), **ComposedChart** (bars + area + line) | gradient fill, `ReferenceLine`, `ReferenceDot` with a label, mixing `Bar` + `Area` + `Line` on one axis |
-| **Sales** | **BarChart** (stacked or grouped, by region or category), **LineChart** with zoom | `LabelList`, click events on bars, `Brush` (controlled), `ReferenceLine` at the visible average, custom bar `shape` |
-| **Users** | **LineChart**, **BarChart**, **LineChart**, three charts hovering as one | `syncId`, shared zoom, `ReferenceArea`, a custom tooltip with rich content |
-| **Revenue** | **PieChart** (donut) with drill-down, **BarChart** (vertical), **AreaChart** sparkline | `innerRadius`, `paddingAngle`, custom `label`, click on a slice, custom slice `shape` |
-| **Explore** | **ScatterChart** (price vs units, bubble size = revenue), **RadarChart** (6 measures) | `XAxis`/`YAxis`/`ZAxis`, log scale, pinning a point, `PolarGrid`, `PolarAngleAxis`, `PolarRadiusAxis` |
-
-One filter row sits above everything: **period** (3, 6, 12 or 24 months), **region**, **category**. Every chart, number and table below it uses the same filtered data, so the numbers always agree.
-
-## Recharts basics, as used here
-
-**Data format.** Recharts wants an array of flat objects, one per x position: `[{ label: 'Jan 26', revenue: 120000, profit: 60000 }, ...]`. Each series says which key it reads with `dataKey`. All the reshaping (monthly totals, one column per region, weekly roll-ups, radar axes) lives in [src/lib/metrics.js](src/lib/metrics.js) as plain tested functions, so the chart components stay short.
-
-**Composing a chart.** A chart is a wrapper (`LineChart`, `BarChart`, ...) with parts inside it. Order does not matter much; what is in the list is what is drawn:
-
-```jsx
-<ResponsiveContainer width="100%" height={320}>
-  <LineChart data={rows}>
-    <CartesianGrid vertical={false} />   {/* the grid */}
-    <XAxis dataKey="label" />             {/* the x axis reads rows[i].label */}
-    <YAxis />
-    <Tooltip />                           {/* the hover box */}
-    <Legend />                            {/* the key */}
-    <Line dataKey="revenue" />            {/* one line per series */}
-  </LineChart>
-</ResponsiveContainer>
-```
-
-**ResponsiveContainer** measures its parent and gives the chart that width and height, which is how the charts shrink on a phone. It needs a parent with a width. [ResponsiveChart](src/charts/ResponsiveChart.jsx) wraps it and sets `initialDimension`, which is what it assumes before the first measurement (without it a chart draws nothing in a test, and flashes empty in a browser).
-
-| Component | What it does |
+| Deliverable | Result |
 |---|---|
-| `XAxis`, `YAxis` | Axes. `tickFormatter` formats ticks (`$1.2M`); `type="number"` and `scale="log"` for numeric axes |
-| `ZAxis` | A third dimension for scatter: here, bubble size |
-| `CartesianGrid` | The grid lines |
-| `Tooltip` | The hover box. `content={<MyTooltip />}` replaces it with your own |
-| `Legend` | The key. Click handling is possible, but see the accessibility notes below |
-| `Label`, `LabelList` | Text on a chart. `label={{ value: 'Units sold' }}` on an axis; `LabelList` prints a value on every mark |
-| `Brush` | A draggable range slider under a chart, used to zoom |
-| `ReferenceLine`, `ReferenceDot`, `ReferenceArea` | A line, a point, or a shaded band at a data position (an average, a peak, the busiest week) |
-| `Cell` | Per-slice or per-bar styling (deprecated in 3.x: a `shape` function does the same) |
+| React app fully typed | All 30 files in `src/` are `.ts` or `.tsx` (19 `.tsx`, about 3,000 lines), plus every test, browser spec and config file. `allowJs` is **off**: a JavaScript file can no longer be added by accident |
+| At least 10 typed components | 26 function components, all typed (list below) |
+| Interfaces for all props | Every component's props are typed: 14 named `…Props` interfaces and a few small inline types for one-prop components (`{ children: ReactNode }`) |
+| Typed state and hooks | `useState<Range>`, `useState<WithAll<Region>>`, `useState<Zoom \| null>`, `useRef<HTMLDivElement>`, `useReducer` with a union of actions, and the custom hooks `useDashboardData` and `useChartMotion` with explicit return types |
+| Typed API responses | `DashboardApi`, `DashboardResponse`, and a generic `simulateRequest<T>` in `api/mockApi.ts` |
+| No `any` (or minimal) | **Zero `any`** in `src/` and in `test/` (checked by `npm run escapes`, and the linter forbids it). One type assertion in the whole app (see below) |
+| README explaining the benefits of TypeScript | This file, with examples from this migration, and `../ts-basics/README.md` |
 
-## Interactive features
+The 26 components: `App`, `FilterBar`, `Tabs` with `Tabs.List`, `Tabs.Tab` and `Tabs.Panel`, `ToastViewport` and `ToastItem`, `ChartCard`, `DataTable`, `ChartTooltip`, `ResponsiveChart`, the five screens (`OverviewScreen`, `SalesScreen`, `UsersScreen`, `RevenueScreen`, `ExploreScreen`), `MonthDetails`, `UsersTooltip`, `PieTooltip`, `ProductTooltip`, `Kpi`, `Segmented`, and the three providers (`DashboardProvider`, `ThemeProvider`, `ToastProvider`).
 
-- **Custom tooltip** ([ChartTooltip](src/charts/ChartTooltip.jsx)): lists every series at the hovered position, bold value first and name after, each keyed by a short coloured stroke. The Users tooltip adds the weekday, sessions per visitor and conversion.
-- **Click events:** click a bar (Sales), a pie slice (Revenue) or a scatter point (Explore). Each has a keyboard route too (a select or a list of buttons), because a click-only chart is unusable without a mouse.
-- **Brush zoom:** drag the handles under a chart. In Users the same range crops all three charts.
-- **Synchronized charts:** `syncId` makes hovering one chart show the tooltip at the same x on the others.
-- **Dynamic data:** changing the period asks the mock API again ([src/api/mockApi.js](src/api/mockApi.js)). The old charts stay on screen, faded, while the new data loads (no skeleton, no jump). Region and category filter data already in the browser, so they are instant. A failed request shows a message with **Try again** and keeps the last good charts (open `/?fail=1` to see it).
-- **Animations:** Recharts animates marks by default. [useChartMotion](src/charts/useChartMotion.js) turns them off for people who ask their system for reduced motion.
-- **Table view:** every chart has a button that swaps it for a real `<table>` of the same numbers.
-
-## Data visualization concepts applied
-
-These are the rules the charts follow, and why.
-
-1. **Pick the chart from the question, not the other way round.** Trend over time: line or area. Compare categories: bars. Parts of a whole: a pie works only for a few slices. Relationship between two numbers: scatter. Several measures of a few things at once: radar. [CHART_CHOICE_GUIDE.md](../CHART_CHOICE_GUIDE.md) has the full list.
-2. **One axis per chart.** Two y-scales in one chart let an author make any two lines look related, so the composed chart puts revenue, profit and its average on the same dollar axis, and conversion rate (a percentage) has its own chart.
-3. **Colour follows the entity, never the rank.** Europe is the same colour on every tab, whichever filter is on. The four colours are a colour-blind-safe order, checked with a validator (the worst neighbouring pair is far enough apart for the common kinds of colour blindness, in light and dark). Dark mode uses its own steps, not an inversion.
-4. **Colour is never the only signal.** Legends name every series; the donut has percentages and a button list with the exact values; KPI changes carry a sign, an arrow and words; every chart has a table view. In light mode two of the four colours are lighter than 3:1 against the page, which is exactly why the labels and tables are required.
-5. **Bars start at zero.** Bar length is the data, so a cut axis lies. Lines may zoom (the Brush does it) because position, not length, carries the meaning.
-6. **Thin marks, quiet grid.** Horizontal gridlines only, no tick marks, thin lines (2px), rounded bar tops, a 2px gap between stacked segments, dots hidden until hover.
-7. **Label selectively.** A value on every point is clutter: the stacked bars print their total only when there are 6 months or fewer; the composed chart labels only the peak; the area chart labels only its end.
-8. **Say what the chart says.** Each chart card has a hidden one-sentence summary for screen readers ("Revenue rose from X to Y"), and a visible subtitle that names the unit and the period.
-9. **Honest radar.** Six different measures cannot share a scale, so each is scaled 0 to 100 and the scaling is explained next to the chart (revenue and orders as a share of the best category; growth mapped so 50 is flat). The table under it has the real numbers.
-10. **A donut is the weakest chart here.** It is kept because the task asks for a pie, but with 4 slices at most, direct percentages, a gap between slices, and the same numbers in a button list and a table.
-
-## Things Recharts 3 does that are worth knowing
-
-- **`Cell` and `activeShape` on `Pie` are deprecated and `activeIndex` is gone.** Highlighting a selected slice is done with the `shape` prop and your own selection state.
-- **The legend is sorted alphabetically by default** (`itemSorter="value"`). Set `itemSorter={null}` to keep series order, otherwise "Asia-Pacific" appears before "North America" while the colours follow the data order.
-- **The built-in legend is not keyboard accessible.** The radar chart uses its own legend buttons (`aria-pressed`) to show and hide a series.
-- **A `Brush` keeps its own indexes.** When the data length changes (daily vs weekly) a stale brush draws `NaN` positions and the browser logs errors. Remounting the chart with a `key` fixes it. A browser test caught this.
-- **A chart re-animates when its container is resized**, including when a full-page screenshot resizes the window; screenshots are taken with reduced motion on.
-- **`<ResponsiveContainer>` needs `initialDimension` in tests** (jsdom has no layout) or it renders nothing.
-- **A `<Label content>` inside a `Pie` drew in the wrong place** in my build (3.10.1: the text landed at the top left and the number was missing). The total in the donut hole is now plain HTML laid over the chart's centre.
-- **CSS variables work inside SVG attributes** (`stroke="var(--series-1)"`), which is how one chart repaints for light and dark with no re-render.
-
-## Project layout
+## What the migration did to the code
 
 ```
-src/data/       seeded mock data: 24 months of sales (288 rows), 365 days of users, 30 products, scores
-src/api/        pretend REST API: delay, cancel, failure
-src/lib/        metrics.js: every reshaping and number format, pure and tested
-src/context/    DashboardContext (filters + data), ThemeContext, ToastContext
-src/hooks/      useDashboardData (loading, refreshing, error without setState-in-effect)
-src/charts/     shared: ChartCard (+ table view), ChartTooltip, ResponsiveChart, theme, useChartMotion
-src/screens/    the five tabs, each with its own stylesheet
-test/           unit and component tests      e2e/  Playwright tests
+src/types.ts                 the domain model in one place: Region, Category (derived from the data lists),
+                             SalesRow, UsersRow, Product, Score, DashboardResponse, DashboardApi, the metric shapes
+src/lib/createStrictContext  a generic that replaces five copies of "null default + guarded hook"
+src/lib/guards.ts            type guards for values that arrive as plain strings or unknown
+src/lib/typed.ts             record(): the only type assertion in the app
 ```
 
-## Testing
+TypeScript features used, and where:
 
-- **Unit and component (Vitest):** the data generator, the API (including cancel and failure), every metric function checked against totals computed independently, the dashboard context (a region filter makes no new request; a period change keeps the old charts; failure keeps the last good data), the shared chart pieces, and each tab.
-- **Browser (Playwright, Chrome):** every tab, all chart types drawn, filters, refetch, the error banner, bar/slice/point clicks, Brush zoom, synchronized tooltips, theme, keyboard tabs, and no horizontal scroll at phone width. Every test **fails on any console error or warning**.
-- **Accessibility:** axe-core WCAG 2.1 AA on every tab in light and dark: zero violations.
+| Feature | Where |
+|---|---|
+| Types derived from data, so the two can not drift | `REGIONS = [...] as const` and `type Region = (typeof REGIONS)[number]`; `Range` from `RANGES` |
+| Union and literal types | `WithAll<Region>` (a region or `'All'`), `Granularity`, `Dimension`, `ToastType` |
+| Discriminated unions | the toast reducer's actions (`add`, `dismiss`, `clear`) |
+| Generics | `createStrictContext<T>`, `simulateRequest<T>`, `Segmented<T extends string>`, `ChartCard<Row>`, `splitPeriods<T>`, `monthlyByName<N extends string>` |
+| Constraints and `keyof` | `sum(rows, key)` accepts only keys whose value is a number; table column keys must be fields of the row |
+| Mapped types | `ColumnByKey<Row>`: one column shape per field, so `format` receives that field's own type |
+| Overloads | `monthlyBy(rows, 'region')` returns region columns, `'category'` returns category columns |
+| `unknown` and type guards | thrown values in `useDashboardData`; Recharts' loosely typed tooltip payloads (`toSlice`, `toProduct`, `toUsersPoint`); a `<select>`'s string value (`isRegionFilter`) |
+| Utility types | `Pick`, `Omit`, `Record`, `ComponentPropsWithoutRef` |
+| React types | `ReactNode`, `ChangeEvent`, `KeyboardEvent`, `MouseEvent`, `LucideIcon`, props `extends Omit<ComponentPropsWithoutRef<'button'>, 'value'>` |
 
-## Bundle size
+## What TypeScript found
 
-The production JavaScript is about 215 kB gzipped; most of it is Recharts (and its D3 helpers). It is a dashboard library: for one small chart, a lighter option is worth considering.
+Every item here was reported by the compiler during this migration, not written in advance. The first four came from turning the checks on harder as the work went on.
+
+1. **Nine array reads that might be missing** (`noUncheckedIndexedAccess`). The season factor in the data generator, the first element of a week, and the first and last visible month in two screens each assumed an element existed. Each is now handled (a default, or a check) instead of relying on the data happening to be there.
+2. **A filter that accepted anything.** `setRegion(event.target.value)` took whatever string the `<select>` held. Now the value goes through `isRegionFilter` and only a real `Region` (or `'All'`) is accepted.
+3. **A value the old code read but Recharts does not promise.** The scatter chart's custom shape destructured `fill` from props. It worked because Recharts passes it, but it is not in Recharts' types. The colour now comes from the product's category, which is where it was set anyway.
+4. **Optional values treated as always present.** A pie label read `midAngle` (optional in Recharts' types), which would have drawn a label at `NaN` for a slice without an angle; the brush's start and end indexes are optional too.
+5. **Tooltip data typed as `any` by the library.** Recharts types a tooltip entry's `.payload` as `any`, and a series' `dataKey` can even be a function. The app now says what it expects (`toSlice`, `toProduct`, `toUsersPoint`, built from `unknown`), and a tooltip that is handed something else renders nothing instead of crashing.
+6. **A comparison that could never be true.** The browser-test fixture compared a console message's type with `'verbose'`, which Playwright's types do not list. I kept the behaviour (it may be a Chrome-only value) and widened the type deliberately.
+
+`compile-errors.md` is generated by `npm run errors` and lists 13 deliberate mistakes against this app's own API with the exact message the compiler gives for each. For example, `filterSales(sales, { region: 'Europ' })` is rejected with *Did you mean '"Europe"'?*, `dashboard.setRange(5)` with *not assignable to '3 | 24 | 12 | 6'*, and a table column with the key `'revnue'` with *not assignable to '"value" | "label"'*.
+
+## Escape hatches (the honest count)
+
+`npm run escapes` reads the real syntax tree (it does not just search for the word "any"):
+
+| In `src/` | Count |
+|---|---|
+| `any` | 0 |
+| `@ts-ignore`, `@ts-expect-error`, `@ts-nocheck` | 0 |
+| non-null assertions (`x!`) | 0 |
+| type assertions (`x as T`) | **1**: `record()` in `src/lib/typed.ts` |
+
+`record(names, valueOf)` builds an object with one key per name. `Object.fromEntries` can only promise `{ [key: string]: V }`; the function knows the keys are exactly `names`, so it says so once, in one named place, instead of at every use. `as const` is not counted (it narrows, it does not override).
+
+In `test/` there is one `@ts-expect-error` per deliberate mistake (that is the point of those lines), and a helper `must()` that fails a test with a clear message when a value is missing, instead of using `!`.
+
+## Settings
+
+`tsconfig.json`: `strict`, `noUncheckedIndexedAccess`, `noImplicitOverride`, `noFallthroughCasesInSwitch`, `verbatimModuleSyntax`, `isolatedModules`, and `allowJs: false`. The workbook README explains each option. The migration used `allowJs: true` until the last JavaScript file was converted, so the build stayed green after every pull request.
+
+## Tests
+
+| Layer | Result |
+|---|---|
+| `tsc` | zero errors over `src`, `test`, `e2e` and the three config files |
+| Unit and component | 67 tests in 10 files (Day 14's 58, plus tests for `createStrictContext` and the toast reducer, and the typed-mistakes file) |
+| Browser (Chrome) | 27 tests, unchanged from Day 14, including axe WCAG 2.1 AA on every tab in light and dark |
+| Lint | clean, with `typescript/no-explicit-any` as an error |
+| Build | `tsc --noEmit && vite build` passes |
+
+## Differences from the plan, and limits
+
+- The plan mentioned a discriminated union for the dashboard's load state (`idle | loading | error | ready`). I kept the existing flags (`loading`, `refreshing`, `error`) because five screens and several tests read them, and a union would have changed all of them for no new safety. The flags are computed from three facts, so they can not disagree.
+- Types are erased at run time. The mock API's data is generated in the browser, so it is typed by construction; a real API's JSON would need validating at the edge (the workbook shows `fetchJson<T>` and why `as T` there is an assumption).
+- `JSON.parse` in one test helper returns untyped data, so that helper states its expected shape (`ProbeState`) in one place.
+- Recharts' types are loose in places (`payload: any`, optional geometry props). The guards above narrow them; they check the shape rather than prove it.
+- Only Chrome was tested, as in Day 14.
