@@ -10,7 +10,10 @@ import { api, createApi } from './api/mockApi';
 // The API is pretend, so it can be told to fail: open the page with ?fail=1 to see the error banner and Try again
 const demoApi = new URLSearchParams(window.location.search).has('fail') ? createApi({ failTimes: 1 }) : api;
 
-createRoot(document.getElementById('root')).render(
+const container = document.getElementById('root');
+if (!container) throw new Error('index.html has no #root element to render into.');
+
+createRoot(container).render(
   <StrictMode>
     <ThemeProvider>
       <ToastProvider>

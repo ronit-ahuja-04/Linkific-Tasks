@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { ResponsiveContainer } from 'recharts';
 
 /**
@@ -6,7 +7,13 @@ import { ResponsiveContainer } from 'recharts';
  * you choose. `initialDimension` is what it assumes before the first measurement: without it the
  * chart renders nothing in a test (jsdom has no layout) and flashes empty in the browser.
  */
-export default function ResponsiveChart({ height = 320, children }) {
+interface ResponsiveChartProps {
+  height?: number;
+  /** exactly one Recharts chart element */
+  children: ReactElement;
+}
+
+export default function ResponsiveChart({ height = 320, children }: ResponsiveChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height} initialDimension={{ width: 720, height }}>
       {children}

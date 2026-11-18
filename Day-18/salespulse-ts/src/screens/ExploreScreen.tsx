@@ -1,22 +1,41 @@
 import { useMemo, useState } from 'react';
+import type { ScatterShapeProps } from 'recharts';
 import { CartesianGrid, Legend, PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, Scatter, ScatterChart, Tooltip, XAxis, YAxis, ZAxis } from 'recharts';
 import { Pin, PinOff } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
 import { CATEGORIES } from '../data/generate';
-import ChartCard, { DataTable } from '../charts/ChartCard';
+import ChartCard, { DataTable, type TableSpec } from '../charts/ChartCard';
 import ChartTooltip from '../charts/ChartTooltip';
 import ResponsiveChart from '../charts/ResponsiveChart';
 import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, LEGEND_PROPS, categoryColor } from '../charts/theme';
 import { useChartMotion } from '../charts/useChartMotion';
+import { isCategory } from '../lib/guards';
+import { numberField, stringField } from '../lib/guards';
 import { formatCompact, formatMoney, formatPercent, radarData } from '../lib/metrics';
+import type { Category, Product, RadarRaw } from '../types';
 import './explore.css';
 
 const PRICE_TICKS = [10, 30, 100, 300, 1000, 3000, 10000];
 
 /** Tooltip for a scatter point: Recharts hands us the hovered point's original row in payload[0].payload */
-function ProductTooltip({ active, payload }) {
-  const p = active ? payload?.[0]?.payload : null;
-  if (!p?.name) return null;
+/** Recharts types a tooltip entry's `.payload` as `any`; this turns it into a real Product, or says it is not one */
+function toProduct(value: unknown): Product | null {
+  const id = stringField(value, 'id');
+  const name = stringField(value, 'name');
+  const category = stringField(value, 'category');
+  const price = numberField(value, 'price');
+  const units = numberField(value, 'units');
+  const revenue = numberField(value, 'revenue');
+  const rating = numberField(value, 'rating');
+  if (id === undefined || !name || category === undefined || !isCategory(category) || price === undefined || units === undefined || revenue === undefined || rating === undefined) {
+    return null;
+  }
+  return { id, name, category, price, units, revenue, rating };
+}
+
+function ProductTooltip({ active, payload }: { active?: boolean; payload?: readonly { payload?: unknown }[] }) {
+  const p = active ? toProduct(payload?.[0]?.payload) : null;
+  if (!p) return null;
   return (
     <div className="chart-tooltip" role="status">
       <p className="chart-tooltip-title">{p.name}</p>
@@ -37,7 +56,7 @@ export default function ExploreScreen() {
   const motion = useChartMotion();
   const [logScale, setLogScale] = useState(false);
   const [pinnedId, setPinnedId] = useState('');
-  const [hidden, setHidden] = useState(() => new Set());
+  const [hidden, setHidden] = useState<Set<Category>>(() => new Set());
 
   const byRevenue = useMemo(() => [...products].sort((a, b) => b.revenue - a.revenue), [products]);
   const radar = useMemo(() => radarData(periodRows, scores, { region }), [periodRows, scores, region]);
@@ -51,10 +70,11 @@ export default function ExploreScreen() {
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   // A log axis cannot include 0, so its domain starts just under the cheapest product.
-  const xDomain = logScale ? [Math.max(1, Math.floor(minPrice * 0.7)), Math.ceil(maxPrice * 1.3)] : [0, 'auto'];
-  const xTicks = logScale ? PRICE_TICKS.filter((t) => t >= xDomain[0] && t <= xDomain[1]) : undefined;
+  const logDomain: [number, number] = [Math.max(1, Math.floor(minPrice * 0.7)), Math.ceil(maxPrice * 1.3)];
+  const xDomain: [number, number | 'auto'] = logScale ? logDomain : [0, 'auto'];
+  const xTicks = logScale ? PRICE_TICKS.filter((t) => t >= logDomain[0] && t <= logDomain[1]) : undefined;
 
-  const toggleSeries = (name) =>
+  const toggleSeries = (name: Category) =>
     setHidden((prev) => {
       const next = new Set(prev);
       if (next.has(name)) next.delete(name);
@@ -67,12 +87,16 @@ export default function ExploreScreen() {
   // CUSTOM SHAPE: Recharts gives each point cx/cy (centre) and size (area from the ZAxis range).
   // We draw a faded circle with a surface stroke, a bigger invisible circle as a generous click
   // target, and an extra ring on the pinned product.
-  const renderPoint = ({ cx, cy, size, fill, payload }) => {
+  const renderPoint = ({ cx, cy, size, payload }: ScatterShapeProps) => {
+    const id = stringField(payload, 'id') ?? '';
+    // the colour follows the product's category, the same colour its <Scatter> series was given
+    const group = stringField(payload, 'category') ?? '';
+    const fill = isCategory(group) ? categoryColor(group) : 'var(--series-1)';
     if (cx == null || cy == null) return <g />;
-    const r = Math.sqrt(size / Math.PI);
-    const isPinned = payload.id === pinnedId;
+    const r = Math.sqrt((size ?? 0) / Math.PI);
+    const isPinned = id === pinnedId;
     return (
-      <g className="explore-point" onClick={() => setPinnedId(payload.id)}>
+      <g className="explore-point" onClick={() => setPinnedId(id)}>
         <circle cx={cx} cy={cy} r={Math.max(r + 8, 14)} fill="transparent" />
         {isPinned && <circle cx={cx} cy={cy} r={r + 5} fill="none" stroke="var(--text-primary)" strokeWidth={2} />}
         <circle cx={cx} cy={cy} r={isPinned ? r + 2 : r} fill={fill} fillOpacity={0.75} stroke="var(--bg-surface)" strokeWidth={2} />
@@ -80,7 +104,7 @@ export default function ExploreScreen() {
     );
   };
 
-  const scatterTable = {
+  const scatterTable: TableSpec<Product> = {
     columns: [
       { key: 'name', label: 'Product', numeric: false },
       { key: 'category', label: 'Category', numeric: false },
@@ -91,7 +115,7 @@ export default function ExploreScreen() {
     ],
     rows: byRevenue,
   };
-  const radarTable = {
+  const radarTable: TableSpec<RadarRaw> = {
     columns: [
       { key: 'category', label: 'Category', numeric: false },
       { key: 'revenue', label: 'Revenue', format: formatMoney },
@@ -213,7 +237,7 @@ export default function ExploreScreen() {
             <PolarAngleAxis dataKey="axis" tick={{ fill: 'var(--text-secondary)', fontSize: 12 }} />
             {/* The radius axis runs 0 to 100 because every measure was scaled to that range. */}
             <PolarRadiusAxis angle={30} domain={[0, 100]} ticks={[0, 50, 100]} tick={AXIS_TICK} axisLine={false} />
-            <Tooltip content={<ChartTooltip formatValue={(v) => `${v} / 100`} title={(label) => label} />} />
+            <Tooltip content={<ChartTooltip formatValue={(v) => `${v} / 100`} title={(label) => String(label ?? '')} />} />
             {/* Hidden series are simply not rendered. */}
             {shown.map((c) => (
               <Radar key={c} name={c} dataKey={c} stroke={categoryColor(c)} fill={categoryColor(c)} fillOpacity={0.25} strokeWidth={2} {...motion} />

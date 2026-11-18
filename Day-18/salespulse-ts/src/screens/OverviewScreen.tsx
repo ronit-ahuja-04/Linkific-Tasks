@@ -2,16 +2,35 @@ import { useId } from 'react';
 import { Area, AreaChart, Bar, CartesianGrid, ComposedChart, Legend, Line, ReferenceDot, ReferenceLine, Tooltip, XAxis, YAxis } from 'recharts';
 import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 import { useDashboard } from '../context/DashboardContext';
-import ChartCard from '../charts/ChartCard';
+import ChartCard, { type TableSpec } from '../charts/ChartCard';
 import ChartTooltip from '../charts/ChartTooltip';
 import ResponsiveChart from '../charts/ResponsiveChart';
 import { useChartMotion } from '../charts/useChartMotion';
 import { AXIS_LINE, AXIS_TICK, CHART_MARGIN, GRID_STROKE, LEGEND_PROPS, seriesColor } from '../charts/theme';
 import { formatCompactMoney, formatMoney, formatPercent, totalsBy } from '../lib/metrics';
+import type { MonthlyPoint } from '../types';
 import './overview.css';
 
 /** One KPI card. The change always has a sign, an arrow icon AND words, so it never relies on colour alone. */
-function Kpi({ label, value, change, unit = '%', months }) {
+interface KpiProps {
+  label: string;
+  value: string;
+  /** the change against the previous period; null or missing when there is no previous period */
+  change: number | null | undefined;
+  /** '%' for a percent change, 'pp' for percentage points */
+  unit?: '%' | 'pp';
+  months: number;
+}
+
+/** One point of the running-total chart */
+interface CumulativePoint {
+  label: string;
+  month: string;
+  revenue: number;
+  cumulative: number;
+}
+
+function Kpi({ label, value, change, unit = '%', months }: KpiProps) {
   let note = <span className="overview-kpi-none">No earlier period</span>;
   if (change !== null && change !== undefined) {
     const tone = change > 0 ? 'up' : change < 0 ? 'down' : 'flat';
@@ -38,12 +57,12 @@ export default function OverviewScreen() {
   const { ready, kpi, periodSeries, periodRows, range, refreshing } = useDashboard();
   const motion = useChartMotion();
   const gradientId = `overview-fill-${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
-  if (!ready) return null;
+  if (!ready || !kpi) return null;
 
   const period = `Last ${range} months`;
 
   // Running total: each month adds its revenue to everything before it.
-  const cumulative = periodSeries.map((m, i) => ({
+  const cumulative: CumulativePoint[] = periodSeries.map((m, i) => ({
     label: m.label,
     month: m.month,
     revenue: m.revenue,
@@ -51,16 +70,16 @@ export default function OverviewScreen() {
   }));
   const lastPoint = cumulative[cumulative.length - 1];
   const halfway = cumulative.length >= 4 ? cumulative[Math.floor(cumulative.length / 2)] : null;
-  const peak = periodSeries.reduce((best, m) => (!best || m.revenue > best.revenue ? m : best), null);
+  const peak = periodSeries.reduce<MonthlyPoint | null>((best, m) => (!best || m.revenue > best.revenue ? m : best), null);
 
   // Insights: plain text computed from the same data.
   const best = peak;
-  const worst = periodSeries.reduce((low, m) => (!low || m.revenue < low.revenue ? m : low), null);
+  const worst = periodSeries.reduce<MonthlyPoint | null>((low, m) => (!low || m.revenue < low.revenue ? m : low), null);
   const averageMonth = periodSeries.length ? kpi.revenue / periodSeries.length : 0;
   const topRegion = totalsBy(periodRows, 'region')[0];
   const topCategory = totalsBy(periodRows, 'category')[0];
 
-  const cumulativeTable = {
+  const cumulativeTable: TableSpec<CumulativePoint> = {
     columns: [
       { key: 'label', label: 'Month' },
       { key: 'revenue', label: 'Monthly revenue', format: formatMoney },
@@ -68,7 +87,7 @@ export default function OverviewScreen() {
     ],
     rows: cumulative,
   };
-  const composedTable = {
+  const composedTable: TableSpec<MonthlyPoint> = {
     columns: [
       { key: 'label', label: 'Month' },
       { key: 'revenue', label: 'Revenue', format: formatMoney },
@@ -148,7 +167,7 @@ export default function OverviewScreen() {
 
         <section className="overview-insights" aria-labelledby="overview-insights-heading">
           <h3 id="overview-insights-heading">Insights</h3>
-          {periodSeries.length === 0 ? (
+          {periodSeries.length === 0 || !best || !worst ? (
             <p>No sales match this selection.</p>
           ) : (
             <ul>

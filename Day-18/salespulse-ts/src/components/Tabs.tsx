@@ -1,4 +1,7 @@
-import { createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  createContext, useCallback, useContext, useEffect, useId, useLayoutEffect, useMemo, useRef, useState,
+  type ComponentPropsWithoutRef, type KeyboardEvent, type ReactNode,
+} from 'react';
 
 /**
  * COMPOUND COMPONENTS: Tabs is a family of components that only make sense together.
@@ -24,18 +27,34 @@ import { createContext, useCallback, useContext, useEffect, useId, useLayoutEffe
  * and keyboard support (Left, Right, Home and End move between tabs; only the open tab is in the
  * Tab key order).
  */
-const TabsContext = createContext(null);
+interface TabsContextValue {
+  /** the value of the open tab */
+  value: string | undefined;
+  select: (next: string) => void;
+  /** prefix for the ids that tie each tab to its panel */
+  baseId: string;
+}
+const TabsContext = createContext<TabsContextValue | null>(null);
 
 /** Custom hook for the parts: fails with a clear message when a part is used outside <Tabs> */
-function useTabsContext(part) {
+function useTabsContext(part: string): TabsContextValue {
   const context = useContext(TabsContext);
   if (context === null) throw new Error(`<${part}> must be rendered inside <Tabs>.`);
   return context;
 }
 
-export function Tabs({ value, defaultValue, onChange, children }) {
+interface TabsProps {
+  /** controlled: the open tab, owned by the parent */
+  value?: string;
+  /** uncontrolled: the tab that starts open; Tabs keeps its own state */
+  defaultValue?: string;
+  onChange?: (next: string) => void;
+  children: ReactNode;
+}
+
+export function Tabs({ value, defaultValue, onChange, children }: TabsProps) {
   const isControlled = value !== undefined;
-  const [internalValue, setInternalValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState<string | undefined>(defaultValue);
   const current = isControlled ? value : internalValue;
   const baseId = useId();
 
@@ -46,7 +65,7 @@ export function Tabs({ value, defaultValue, onChange, children }) {
   }, [onChange]);
 
   const select = useCallback(
-    (next) => {
+    (next: string) => {
       if (!isControlled) setInternalValue(next);
       onChangeRef.current?.(next);
     },
@@ -58,17 +77,18 @@ export function Tabs({ value, defaultValue, onChange, children }) {
   return <TabsContext.Provider value={context}>{children}</TabsContext.Provider>;
 }
 
-function TabList({ children, className = '', ...props }) {
+type TabListProps = ComponentPropsWithoutRef<'div'>;
+function TabList({ children, className = '', ...props }: TabListProps) {
   const { value } = useTabsContext('Tabs.List');
-  const listRef = useRef(null);
-  const indicatorRef = useRef(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const indicatorRef = useRef<HTMLSpanElement>(null);
 
   // The sliding underline. It is moved by writing straight to the element's style, not through
   // React state, so a tab change costs no extra render. The first placement has no animation, or
   // the line would slide in from the left edge when the page loads.
   const placeIndicator = useCallback(() => {
     const indicator = indicatorRef.current;
-    const active = listRef.current?.querySelector('[role="tab"][aria-selected="true"]');
+    const active = listRef.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]');
     if (!indicator || !active) return;
     indicator.style.width = `${active.offsetWidth}px`;
     indicator.style.transform = `translateX(${active.offsetLeft}px)`;
@@ -87,19 +107,23 @@ function TabList({ children, className = '', ...props }) {
     return () => observer.disconnect();
   }, [placeIndicator]);
 
-  const handleKeyDown = (event) => {
-    const tabs = [...listRef.current.querySelectorAll('[role="tab"]:not([disabled])')];
-    const index = tabs.indexOf(document.activeElement);
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const list = listRef.current;
+    if (!list) return;
+    const tabs = [...list.querySelectorAll<HTMLElement>('[role="tab"]:not([disabled])')];
+    const index = tabs.findIndex((tab) => tab === document.activeElement);
     if (index === -1) return;
-    let next;
+    let next: number;
     if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
     else if (event.key === 'ArrowLeft') next = (index - 1 + tabs.length) % tabs.length;
     else if (event.key === 'Home') next = 0;
     else if (event.key === 'End') next = tabs.length - 1;
     else return;
     event.preventDefault();
-    tabs[next].focus();
-    tabs[next].click(); // automatic activation: the focused tab opens
+    const target = tabs[next];
+    if (!target) return;
+    target.focus();
+    target.click(); // automatic activation: the focused tab opens
   };
 
   return (
@@ -110,7 +134,10 @@ function TabList({ children, className = '', ...props }) {
   );
 }
 
-function Tab({ value, children, className = '', disabled = false, ...props }) {
+interface TabProps extends Omit<ComponentPropsWithoutRef<'button'>, 'value'> {
+  value: string;
+}
+function Tab({ value, children, className = '', disabled = false, ...props }: TabProps) {
   const { value: current, select, baseId } = useTabsContext('Tabs.Tab');
   const active = current === value;
   return (
@@ -131,7 +158,12 @@ function Tab({ value, children, className = '', disabled = false, ...props }) {
   );
 }
 
-function TabPanel({ value, children, keepMounted = false, className = 'tab-panel', ...props }) {
+interface TabPanelProps extends Omit<ComponentPropsWithoutRef<'div'>, 'id' | 'hidden'> {
+  value: string;
+  /** keep a closed panel in the page (hidden) instead of removing it */
+  keepMounted?: boolean;
+}
+function TabPanel({ value, children, keepMounted = false, className = 'tab-panel', ...props }: TabPanelProps) {
   const { value: current, baseId } = useTabsContext('Tabs.Panel');
   const active = current === value;
   if (!active && !keepMounted) return null; // closed panels are not rendered at all

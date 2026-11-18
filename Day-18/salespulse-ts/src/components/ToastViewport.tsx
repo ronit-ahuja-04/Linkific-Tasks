@@ -1,15 +1,20 @@
 import { useEffect, useRef, useState } from 'react';
-import { AlertCircle, CheckCircle2, Info, X } from 'lucide-react';
-import { useToast, useToasts } from '../context/ToastContext';
+import { AlertCircle, CheckCircle2, Info, X, type LucideIcon } from 'lucide-react';
+import { useToast, useToasts, type Toast, type ToastType } from '../context/ToastContext';
 
-const ICONS = { success: CheckCircle2, error: AlertCircle, info: Info };
+const ICONS: Record<ToastType, LucideIcon> = { success: CheckCircle2, error: AlertCircle, info: Info };
 const EXIT_MS = 220; // matches the CSS exit animation
 
-function ToastItem({ toast, onDismiss }) {
+interface ToastItemProps {
+  toast: Toast;
+  onDismiss: () => void;
+}
+
+function ToastItem({ toast, onDismiss }: ToastItemProps) {
   const [paused, setPaused] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const remaining = useRef(toast.duration);
-  const Icon = ICONS[toast.type] ?? Info;
+  const Icon = ICONS[toast.type];
 
   // Auto-dismiss. Hovering or focusing the toast pauses the countdown, and it resumes with the
   // time that was left (the cleanup subtracts the time already used).
@@ -60,7 +65,7 @@ function ToastItem({ toast, onDismiss }) {
 export default function ToastViewport() {
   const toasts = useToasts();
   const { dismiss } = useToast();
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   // Publish the stack's height as a CSS variable. The older notification toasts (invitations,
   // assignments) live in the same corner and use it to sit above this stack instead of under it.

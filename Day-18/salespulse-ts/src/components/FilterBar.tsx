@@ -1,6 +1,7 @@
 import { RotateCcw } from 'lucide-react';
 import { RANGES, useDashboard } from '../context/DashboardContext';
 import { CATEGORIES, REGIONS } from '../data/generate';
+import { isCategoryFilter, isRegionFilter } from '../lib/guards';
 import { ALL } from '../lib/metrics';
 
 /**
@@ -25,14 +26,14 @@ export default function FilterBar() {
         </fieldset>
         <label className="filter-group">
           <span className="filter-label">Region</span>
-          <select value={region} onChange={(e) => setRegion(e.target.value)}>
+          <select value={region} onChange={(e) => { if (isRegionFilter(e.target.value)) setRegion(e.target.value); }}>
             <option value={ALL}>All regions</option>
             {REGIONS.map((r) => <option key={r} value={r}>{r}</option>)}
           </select>
         </label>
         <label className="filter-group">
           <span className="filter-label">Category</span>
-          <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <select value={category} onChange={(e) => { if (isCategoryFilter(e.target.value)) setCategory(e.target.value); }}>
             <option value={ALL}>All categories</option>
             {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
