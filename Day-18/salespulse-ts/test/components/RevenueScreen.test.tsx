@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { createApi } from '../../src/api/mockApi';
 import { DashboardProvider } from '../../src/context/DashboardContext';
 import RevenueScreen from '../../src/screens/RevenueScreen';
+import { must } from '../helpers';
 
 const setup = async () => {
   render(
@@ -28,7 +29,7 @@ describe('RevenueScreen', () => {
   it('selects a slice from the legend and shows the category split', async () => {
     await setup();
     const group = screen.getByRole('group', { name: /select a region/i });
-    const first = within(group).getAllByRole('button')[0];
+    const first = must(within(group).getAllByRole('button')[0]);
     await userEvent.click(first);
     expect(first.getAttribute('aria-pressed')).toBe('true');
     expect(screen.queryByText('Select a slice to drill down')).toBeNull();
@@ -39,7 +40,7 @@ describe('RevenueScreen', () => {
 
   it('selects by clicking a slice and switches to Category', async () => {
     await setup();
-    await userEvent.click(document.querySelector('.recharts-pie-sector'));
+    await userEvent.click(must(document.querySelector('.recharts-pie-sector'), 'a pie slice'));
     expect(screen.queryByText('Select a slice to drill down')).toBeNull();
     await userEvent.click(screen.getByRole('button', { name: 'Category' }));
     expect(await screen.findByRole('heading', { name: 'Revenue by category' })).toBeTruthy();
@@ -48,7 +49,7 @@ describe('RevenueScreen', () => {
 
   it('offers a table view', async () => {
     await setup();
-    await userEvent.click(screen.getAllByRole('button', { name: 'Table view' })[0]);
+    await userEvent.click(must(screen.getAllByRole('button', { name: 'Table view' })[0]));
     expect(screen.getByRole('table', { name: /revenue by region: data/i })).toBeTruthy();
   });
 });

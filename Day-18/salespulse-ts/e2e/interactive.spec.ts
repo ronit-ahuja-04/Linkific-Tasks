@@ -1,6 +1,7 @@
-import { test, expect, open } from './fixtures';
+import type { Page } from '@playwright/test';
+import { test, expect, open, boxOf } from './fixtures';
 
-const settle = (page) => page.waitForTimeout(1000); // chart animations
+const settle = (page: Page) => page.waitForTimeout(1000); // chart animations
 
 test('Sales: clicking a bar inspects that month; the menu and Clear agree', async ({ page }) => {
   await open(page, 'Sales');
@@ -32,7 +33,7 @@ test('Sales: the Brush zooms the line chart and Reset zoom restores it', async (
   await expect(reset).toBeDisabled();
   const handle = page.locator('.recharts-brush-traveller').first();
   await handle.scrollIntoViewIfNeeded(); // it sits below the first screen: the mouse must be over it
-  const box = await handle.boundingBox();
+  const box = await boxOf(handle);
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + 300, box.y + box.height / 2, { steps: 8 });
@@ -47,7 +48,7 @@ test('Users: the three charts are synchronized and the granularity switches', as
   await open(page, 'Users');
   await settle(page);
   const first = page.locator('.recharts-wrapper').first();
-  const box = await first.boundingBox();
+  const box = await boxOf(first);
   await page.mouse.move(box.x + box.width * 0.6, box.y + box.height / 2);
   await expect(page.locator('.chart-tooltip')).toHaveCount(3); // one tooltip per synchronized chart
   await page.getByRole('button', { name: 'Daily' }).click();

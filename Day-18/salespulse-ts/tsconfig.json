@@ -5,20 +5,19 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
     "noEmit": true,
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
 
     "strict": true,
+    "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "noFallthroughCasesInSwitch": true,
 
-    // MIGRATION SETTINGS (M1 to M4): JavaScript files still exist and are not type-checked yet.
-    // M5 turns allowJs off and adds noUncheckedIndexedAccess.
-    "allowJs": true,
-    "checkJs": false
+    // Migration finished: every file under src/, test/ and e2e/ is TypeScript, so JavaScript is no longer allowed in.
+    "allowJs": false
   },
-  "include": ["src", "test"]
+  "include": ["src", "test", "e2e", "vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
 }

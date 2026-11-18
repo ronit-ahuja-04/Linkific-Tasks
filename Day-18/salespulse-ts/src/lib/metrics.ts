@@ -23,7 +23,7 @@ export const dayLabel = (date: DayKey): string => `${MONTH_NAMES[Number(date.sli
 
 const round = (n: number, digits = 0): number => Math.round(n * 10 ** digits) / 10 ** digits;
 /** Add up one numeric field of a list of rows: `sum(rows, 'revenue')`. `K` can only be a key whose value is a number. */
-const sum = <T>(rows: readonly T[], key: { [K in keyof T]: T[K] extends number ? K : never }[keyof T]): number =>
+export const sum = <T>(rows: readonly T[], key: { [K in keyof T]: T[K] extends number ? K : never }[keyof T]): number =>
   rows.reduce((total, row) => total + Number(row[key]), 0);
 
 /** Number formats shared by every chart, axis and tooltip */
@@ -172,9 +172,11 @@ export function weeklyUsers(daily: readonly DailyUsers[]): DailyUsers[] {
   const weeks: DailyUsers[] = [];
   for (let i = 0; i < daily.length; i += 7) {
     const block = daily.slice(i, i + 7);
+    const [first] = block;
+    if (!first) break; // a slice that starts inside the array always has a first element; this tells the compiler so
     weeks.push({
-      date: block[0].date,
-      label: dayLabel(block[0].date),
+      date: first.date,
+      label: dayLabel(first.date),
       visitors: sum(block, 'visitors'),
       sessions: sum(block, 'sessions'),
       signups: sum(block, 'signups'),

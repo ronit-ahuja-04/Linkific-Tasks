@@ -92,9 +92,12 @@ export default function SalesScreen() {
   const end = zoom.length === count ? Math.max(start, Math.min(zoom.end, count - 1)) : Math.max(0, count - 1);
   const visible = periodSeries.slice(start, end + 1);
   const average = visible.length ? visible.reduce((t, m) => t + m.revenue, 0) / visible.length : 0;
-  const zoomText = visible.length
-    ? `Showing ${visible[0].label} to ${visible[visible.length - 1].label} (${visible.length} ${visible.length === 1 ? 'month' : 'months'})`
-    : 'No months to show';
+  const firstVisible = visible[0];
+  const lastVisible = visible[visible.length - 1];
+  const zoomText =
+    firstVisible && lastVisible
+      ? `Showing ${firstVisible.label} to ${lastVisible.label} (${visible.length} ${visible.length === 1 ? 'month' : 'months'})`
+      : 'No months to show';
 
   const grandTotal = barData.reduce((t, m) => t + m.total, 0);
   const barSummary = `Revenue by month for the last ${barData.length} months, split by ${split}, ${stacked ? 'stacked' : 'grouped'}. Total ${formatMoney(grandTotal)}.`;

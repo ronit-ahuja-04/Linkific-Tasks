@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { createApi } from '../../src/api/mockApi';
 import { DashboardProvider } from '../../src/context/DashboardContext';
 import UsersScreen from '../../src/screens/UsersScreen';
+import { must } from '../helpers';
 
 const setup = () =>
   render(
@@ -37,7 +38,7 @@ describe('UsersScreen', () => {
   it('offers a table view for a chart', async () => {
     const user = userEvent.setup();
     setup();
-    const card = (await screen.findByRole('heading', { name: 'Sign-ups' })).closest('section');
+    const card = must((await screen.findByRole('heading', { name: 'Sign-ups' })).closest('section'), 'the chart card');
     await user.click(within(card).getByRole('button', { name: /Table view/ }));
     expect(within(card).getByRole('table')).toBeTruthy();
     expect(within(card).getAllByRole('row').length).toBeGreaterThan(2);
