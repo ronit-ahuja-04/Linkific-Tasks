@@ -1,0 +1,8 @@
+{
+  "plugins": ["typescript", "react"],
+  "rules": {
+    "typescript/no-explicit-any": "error",
+    "typescript/ban-ts-comment": "off",
+    "no-unused-vars": "error"
+  }
+}
