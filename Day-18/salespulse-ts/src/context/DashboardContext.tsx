@@ -1,6 +1,8 @@
-import { createContext, useContext, useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { api as defaultApi } from '../api/mockApi';
 import { useDashboardData } from '../hooks/useDashboardData';
+import { createStrictContext } from '../lib/createStrictContext';
+import type { Category, DashboardApi, DailyUsers, Kpis, MonthlyPoint, Product, Region, SalesRow, Score, WithAll } from '../types';
 import { ALL, currentRows, dailyUsers, filterProducts, filterSales, filterUsers, kpis, monthlySeries } from '../lib/metrics';
 
 /**
@@ -15,17 +17,52 @@ import { ALL, currentRows, dailyUsers, filterProducts, filterSales, filterUsers,
  *   region    'All' or one region     (filters in the browser: instant)
  *   category  'All' or one category   (filters in the browser: instant)
  */
-const DashboardContext = createContext(null);
-export const RANGES = [3, 6, 12, 24];
+export const RANGES = [3, 6, 12, 24] as const;
+export type Range = (typeof RANGES)[number];
 
-export function DashboardProvider({ children, api = defaultApi, initialRange = 12 }) {
-  const [selectedRange, setRange] = useState(initialRange);
-  const [region, setRegion] = useState(ALL);
-  const [category, setCategory] = useState(ALL);
+/** Everything a chart can read from the dashboard */
+export interface DashboardValue {
+  range: number;
+  selectedRange: Range;
+  setRange: (range: Range) => void;
+  region: WithAll<Region>;
+  setRegion: (region: WithAll<Region>) => void;
+  category: WithAll<Category>;
+  setCategory: (category: WithAll<Category>) => void;
+  loading: boolean;
+  refreshing: boolean;
+  error: string | null;
+  retry: () => void;
+  ready: boolean;
+  rows: SalesRow[];
+  periodRows: SalesRow[];
+  series: MonthlyPoint[];
+  periodSeries: MonthlyPoint[];
+  kpi: Kpis | null;
+  users: DailyUsers[];
+  products: readonly Product[];
+  scores: readonly Score[];
+  hasFilters: boolean;
+  reset: () => void;
+}
+
+const [DashboardContext, useDashboard] = createStrictContext<DashboardValue>('useDashboard', 'DashboardProvider');
+export { useDashboard };
+
+interface DashboardProviderProps {
+  children: ReactNode;
+  api?: DashboardApi;
+  initialRange?: Range;
+}
+
+export function DashboardProvider({ children, api = defaultApi, initialRange = 12 }: DashboardProviderProps) {
+  const [selectedRange, setRange] = useState<Range>(initialRange);
+  const [region, setRegion] = useState<WithAll<Region>>(ALL);
+  const [category, setCategory] = useState<WithAll<Category>>(ALL);
   const { data, loading, refreshing, error, retry } = useDashboardData(api, selectedRange);
   const range = data?.months ?? selectedRange;
 
-  const value = useMemo(() => {
+  const value = useMemo((): DashboardValue => {
     const filters = { region, category };
     const rows = data ? filterSales(data.sales, filters) : []; // the period AND the one before it
     const series = monthlySeries(rows);
@@ -49,10 +86,4 @@ export function DashboardProvider({ children, api = defaultApi, initialRange = 1
   }, [data, range, selectedRange, region, category, loading, refreshing, error, retry]);
 
   return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
-}
-
-export function useDashboard() {
-  const context = useContext(DashboardContext);
-  if (context === null) throw new Error('useDashboard must be used inside a <DashboardProvider>.');
-  return context;
 }
