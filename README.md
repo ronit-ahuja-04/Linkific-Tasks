@@ -58,6 +58,7 @@ Backend services, authentication against a real server, and any library the day'
 | 15  | Authentication, JWT, OAuth               | FlowLane with GitHub sign-in, issue import and a JWT-checking API | [README](Day-15/flowlane-auth/README.md) · [PRD](Day-15/Day15_PRD.md) · [Report](Day-15/DAY15_REPORT.md)          |
 | 16  | Firebase: Storage and real-time          | FlowLane with image uploads, a live dashboard and a setup guide  | [README](Day-16/flowlane-firebase/README.md) · [PRD](Day-16/Day16_PRD.md) · [Report](Day-16/DAY16_REPORT.md)       |
 | 18  | TypeScript for React                     | A TypeScript workbook, and SalesPulse converted to strict TypeScript with zero `any` | [Workbook](Day-18/ts-basics/README.md) · [SalesPulse TS](Day-18/salespulse-ts/README.md) · [PRD](Day-18/Day18_PRD.md) |
+| 19  | Advanced TypeScript, typed Redux         | An advanced-TypeScript workbook, and SalesPulse on a fully typed Redux Toolkit store | [Workbook](Day-19/ts-advanced/README.md) · [SalesPulse](Day-19/salespulse-ts-adv/README.md) · [PRD](Day-19/Day19_PRD.md) |
 
 ---
 
