@@ -5,12 +5,16 @@
 // the explanation written next to the directive. The result is compile-errors.md.
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, relative } from 'node:path';
 
 const TMP = '.tmp-errors';
 rmSync(TMP, { recursive: true, force: true });
 mkdirSync(join(TMP, 'test'), { recursive: true });
 cpSync('src', join(TMP, 'src'), { recursive: true });
+cpSync('test', join(TMP, 'test'), { recursive: true }); // helpers and setup files too, so the copied tests can import them
+
+/** every *.test.ts(x) under test/, including sub-folders */
+const testFiles = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? testFiles(join(dir, e.name)) : /\.test\.tsx?$/.test(e.name) ? [join(dir, e.name)] : []));
 writeFileSync(
   join(TMP, 'tsconfig.json'),
   JSON.stringify({ extends: '../tsconfig.json', compilerOptions: { noUnusedLocals: false, noUnusedParameters: false }, include: ['src', 'test'] }),
@@ -18,8 +22,9 @@ writeFileSync(
 
 // explanations[file][lineNumber] = text written after the directive
 const explanations = {};
-for (const name of readdirSync('test').filter((f) => /\.test\.tsx?$/.test(f))) {
-  const lines = readFileSync(join('test', name), 'utf8').split('\n');
+for (const path of testFiles('test')) {
+  const name = relative('test', path);
+  const lines = readFileSync(path, 'utf8').split('\n');
   explanations[name] = {};
   const out = lines.map((line, i) => {
     const match = line.match(/\/\/ @ts-expect-error\s*(.*)$/);
@@ -27,6 +32,7 @@ for (const name of readdirSync('test').filter((f) => /\.test\.tsx?$/.test(f))) {
     explanations[name][i + 2] = (match[1] ?? '').trim(); // the directive applies to the NEXT line (1-based: i + 2)
     return line.replace(/\/\/ @ts-expect-error.*$/, '');
   });
+  mkdirSync(dirname(join(TMP, 'test', name)), { recursive: true });
   writeFileSync(join(TMP, 'test', name), out.join('\n'));
 }
 

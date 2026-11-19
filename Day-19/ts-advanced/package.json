@@ -1,0 +1,32 @@
+{
+  "name": "ts-advanced",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "test": "vitest run",
+    "errors": "node scripts/show-errors.mjs",
+    "check": "npm run typecheck && npm run lint && npm test",
+    "emit": "tsc --noEmit false --outDir dist --rootDir src --project tsconfig.emit.json"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.15.0",
+    "axios": "^1.21.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-redux": "^9.3.1"
+  },
+  "devDependencies": {
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.10",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "jsdom": "^29.1.1",
+    "oxlint": "^1.93.0",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.12"
+  }
+}
