@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "oxc", "typescript"],
+  "ignorePatterns": ["dist/", "e2e/", "scripts/"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "typescript/no-explicit-any": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "overrides": [
+    { "files": ["test/**"], "rules": { "react/globals": "off", "react/immutability": "off" } },
+    { "files": ["src/context/**"], "rules": { "react/only-export-components": "off" } }
+  ]
+}
