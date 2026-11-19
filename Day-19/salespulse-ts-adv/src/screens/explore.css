@@ -1,0 +1,22 @@
+/* Explore tab: tokens only */
+.explore-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.explore-check { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); cursor: pointer; min-height: 24px; }
+.explore-check input { width: 16px; height: 16px; accent-color: var(--accent-strong); }
+.explore-select { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-secondary); }
+.explore-select select { font: inherit; font-size: 13px; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-surface); color: var(--text-primary); max-width: 200px; }
+.explore-point { cursor: pointer; }
+.explore-pinned { margin-top: 12px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-sunken); }
+.explore-pinned-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.explore-pinned h4 { font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.explore-swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.explore-pinned dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px 16px; margin-top: 8px; }
+.explore-pinned dt { font-size: 12px; color: var(--text-muted); }
+.explore-pinned dd { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+.explore-hint { margin-top: 12px; color: var(--text-secondary); font-size: 13px; }
+.explore-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 0; padding: 0; list-style: none; }
+.explore-legend .btn { min-height: 32px; }
+.explore-legend .btn[aria-pressed='false'] { color: var(--text-muted); text-decoration: line-through; }
+.explore-legend .btn[aria-pressed='false'] .explore-swatch { opacity: 0.35; }
+.explore-note { margin-top: 12px; font-size: 13px; color: var(--text-secondary); }
+.explore-note strong { color: var(--text-primary); }
+.explore-note + .table-wrap { margin-top: 8px; }
