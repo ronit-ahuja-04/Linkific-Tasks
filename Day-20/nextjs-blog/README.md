@@ -1,36 +1,190 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dispatch: a Next.js blog on the App Router
 
-## Getting Started
+**Day 20 project:** Linkific Month 1 Training
+**Author:** Ronit Ahuja
+**Stack:** Next.js 16.4.6 (App Router, Turbopack, **Cache Components**), React 19.3, TypeScript (strict), Vitest, Playwright, axe
+**PRD:** [`../Day20_PRD.md`](../Day20_PRD.md)
 
-First, run the development server:
+Dispatch is a small blog about Next.js, built to use every concept in the Day 20 brief on something real: file-based routing, dynamic routes, server and client components, server-side data fetching, the four rendering strategies, image and font optimisation, SEO metadata and route handlers.
+
+## Run
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd Day-20/nextjs-blog
+npm install
+npm run dev            # http://localhost:3000
+npm run build && npm start   # the production server (caching and ISR only behave like this in a production build)
+npm run typecheck      # next typegen + tsc, strict
+npm run lint
+npm test               # 17 unit tests (Markdown reader, post validation, content integrity)
+npm run test:e2e       # 37 browser tests against a production build (uses your installed Chrome)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`next/font` downloads its fonts at build time, so the first `npm run build` needs a network connection. After that the site serves them itself.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Important: this is not the Next.js of most tutorials
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project uses Next.js **16.4.6**, whose `create-next-app` turns on **Cache Components**. That changes how caching and rendering are written. Most tutorials (including the "Next.js 14" ones in the brief) show the older model. I read the documentation that ships inside the package (`node_modules/next/dist/docs`) before writing code, because several things differ:
 
-## Learn More
+| Older tutorials | This version |
+|---|---|
+| `export const revalidate = 60` on a page | `'use cache'` + `cacheLife({ revalidate: 60 })` on a function or component |
+| `export const dynamic = 'force-dynamic'` | an uncached component inside `<Suspense>`, after `await connection()` (or `cookies()`) |
+| `fetch(url, { cache: 'force-cache' })` | `'use cache'` on the function that fetches |
+| `fetch(url, { next: { revalidate } })` | `cacheLife` |
+| `unstable_cache` | `'use cache'` |
+| `error.tsx` receives `reset` | `error.tsx` receives **`retry`** |
+| a route is either static or dynamic | static and dynamic are decided **per component** inside one page |
 
-To learn more about Next.js, take a look at the following resources:
+## What is Next.js, and why use it
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+React is a library for components. Next.js is a **full-stack React framework** around it: it decides routing, where code runs, how data is fetched and how the build is optimised.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| | Create React App / plain Vite | Next.js |
+|---|---|---|
+| Routing | add a library | folders under `app/` |
+| First paint | empty HTML, then the browser runs a large bundle | HTML rendered on the server, then hydrated |
+| SEO | crawlers that skip JavaScript see an empty page | the article text is in the HTML (a test checks this) |
+| Data | fetch in effects after load | `await` in a Server Component, before the HTML is sent |
+| Backend | a separate server | route handlers (`route.ts`) in the same project |
+| Images, fonts | manual | `next/image`, `next/font` |
+| Maintenance | Create React App is no longer maintained | actively developed |
 
-## Deploy on Vercel
+Performance benefits seen here: static HTML for most pages, JavaScript only for the four small client components, resized WebP images, self-hosted fonts, prefetched links.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+content/posts/*.md             the six posts (front matter + Markdown)
+public/covers/*.png            cover images (generated by scripts/make-covers.mjs)
+src/
+  app/                         the routes (every folder with a page.tsx is a URL)
+    layout.tsx                 root layout: fonts, default metadata, header, footer
+    page.tsx                   /
+    blog/page.tsx              /blog             (?tag= filter)
+    blog/loading.tsx           skeleton while /blog streams
+    blog/[slug]/page.tsx       /blog/<slug>      dynamic route
+    blog/[slug]/loading.tsx    skeleton for one post
+    blog/[slug]/not-found.tsx  "post not found"
+    (marketing)/layout.tsx     route group: a layout with no URL segment
+    (marketing)/about/         /about
+    (marketing)/contact/       /contact
+    rendering/page.tsx         /rendering        SSG, ISR, SSR and CSR side by side
+    broken/page.tsx            /broken           throws on purpose
+    api/posts/route.ts         GET /api/posts
+    api/posts/[slug]/route.ts  GET /api/posts/<slug>
+    api/time/route.ts          GET /api/time
+    error.tsx  not-found.tsx   app-wide error boundary and 404
+    sitemap.ts  robots.ts      /sitemap.xml, /robots.txt
+  components/                  Server: Markdown, PostCard, Skeletons   Client: NavLink, LikeButton, Disclosure, ClientClock
+  lib/                         markdown.ts, parse-post.ts (pure, tested), posts.ts (cached data), site.ts, types.ts
+```
+
+`src/` holds the code; `app/` inside it is the **App Router**. Only files named `page`, `route`, `layout`, `loading`, `error`, `not-found`, `template`, `default` (and metadata files like `sitemap`) are special: everything else in a route folder stays private, so components can sit next to the route that uses them.
+
+## File-based routing
+
+| Concept | Where | URL |
+|---|---|---|
+| `page.tsx` makes a page | `app/blog/page.tsx` | `/blog` |
+| Nested route (folder in a folder) | `app/api/posts/[slug]/route.ts` | `/api/posts/<slug>` |
+| Dynamic route `[slug]` | `app/blog/[slug]/page.tsx` | `/blog/what-is-nextjs`, any slug |
+| Route group `(name)` | `app/(marketing)/about/page.tsx` | `/about` (the group is not in the URL; a test checks `/marketing/about` is a 404) |
+| Layout | `app/layout.tsx`, `app/(marketing)/layout.tsx` | wraps the segment and keeps its state across navigations |
+| Loading state | `app/blog/loading.tsx`, `app/blog/[slug]/loading.tsx` | shown at once while the segment streams |
+| Error state | `app/error.tsx` (try `/broken`) | catches render errors, offers `retry` |
+| Not found | `app/not-found.tsx`, `app/blog/[slug]/not-found.tsx` | 404 pages |
+| `Link` | the header, cards, filters | client-side navigation, prefetching, no full reload (a test sets a marker on `window` and checks it survives) |
+
+In this version `params` and `searchParams` are **Promises**: `const { slug } = await props.params`. Their types come from generated helpers, `PageProps<'/blog/[slug]'>` and `LayoutProps<'/'>`, so a typo in a route string is a compile error.
+
+## Server Components and Client Components
+
+Everything is a **Server Component** unless a file starts with `'use client'`. Server Components can be `async`, read files or databases directly, keep secrets on the server, and send **no JavaScript** to the browser.
+
+| Component | Kind | Why |
+|---|---|---|
+| `Markdown`, `PostCard`, `Skeletons`, every page and layout | Server | no state, no handlers |
+| `NavLink` | Client | needs `usePathname()` |
+| `LikeButton` | Client | `useState` and a click handler |
+| `Disclosure` | Client | `useState` |
+| `ClientClock` | Client | `useEffect` + `fetch` in the browser |
+
+**Composition:** a Client Component cannot import a Server Component, but it can receive one as `children`. `Disclosure` is a client shell around an author box that was rendered on the server (`blog/[slug]/page.tsx`). The rule of thumb used here: keep client components small and at the leaves, so the page stays server-rendered.
+
+## Data fetching
+
+`src/lib/posts.ts` is the data layer. It starts with `'use cache'`, so every exported function is cached:
+
+```ts
+export async function getPost(slug: string): Promise<Post | null> {
+  cacheLife('days');
+  cacheTag('posts', `post:${slug}`);
+  return (await readAll()).find((post) => post.slug === slug) ?? null;
+}
+```
+
+- **Server-side, in async components:** `await getPost(slug)` inside the page. No loading state in the component, no `useEffect`.
+- **Caching:** reading Markdown files is async work; cached, it is done at build time and becomes part of the static shell. `cacheLife('days')` sets the lifetime; `cacheTag` lets `revalidateTag('posts')` refresh it after an edit.
+- **Streaming and Suspense:** `/blog` reads `?tag=` (only known when a request arrives), so the list is inside `<Suspense>`: the heading is sent immediately and the list streams in. `/rendering` streams a deliberately slow server panel.
+- **Errors:** a bad Markdown file throws a `PostFormatError` naming the file and field and **fails the build**; a missing post calls `notFound()`; a thrown render error is caught by `error.tsx`.
+- **Validation:** `parsePost` checks every front-matter field (the same idea as the typed guards from Day 19).
+
+## Rendering: SSG, SSR, ISR, CSR
+
+The `/rendering` page prints the time each part was produced. Reload it and watch which stamps move. **The four strategies are real code and tested.**
+
+| Strategy | What it is | How it is written here | What you see |
+|---|---|---|---|
+| **SSG** (static) | built once at build time | `'use cache'` + `cacheLife('max')`, and `generateStaticParams` for the posts | the stamp never changes |
+| **ISR** (incremental) | built ahead, rebuilt in the background after a lifetime | `'use cache'` + `cacheLife({ revalidate: 15 })` | changes at most every 15 s; the visitor who triggers the rebuild still sees the old copy (a test waits 16 s and checks this) |
+| **SSR** (server) | built on every request | an uncached component in `<Suspense>`, after `await connection()` | changes on every reload; the fallback is in the first bytes of HTML |
+| **CSR** (client) | the browser builds it | a Client Component that calls `fetch('/api/time')` in `useEffect` | changes on every reload; **not** in the HTML (a test checks the raw HTML has only the placeholder) |
+
+**When to use which:** SSG for content that changes with a deploy (docs, posts). ISR for content that changes now and then (a product list). SSR for personal or always-fresh data (a dashboard, a cart). CSR for interactive widgets that crawlers do not need.
+
+**What is different from older Next.js:** a page is no longer "static" or "dynamic" as a whole. `/blog/[slug]` shows it: the build output marks it *Partial Prerender*, with six paths prerendered; `/rendering` is static for two panels and request-time for two. Build output of this project:
+
+```
+┌ ○ /                         static, rebuilt after 1 day
+├ ○ /about
+├ ○ /api/posts                static JSON
+├ ƒ /api/posts/[slug]         dynamic (reads params at request time)
+├ ƒ /api/time                 dynamic
+├ ◐ /blog                     partial prerender (static heading, streamed list)
+├ ◐ /blog/[slug]              partial prerender; 6 posts built ahead
+├ ◐ /broken
+├ ○ /contact
+├ ◐ /rendering                revalidate 15s
+├ ○ /robots.txt
+└ ○ /sitemap.xml
+```
+
+## Next.js features
+
+| Feature | Where | Evidence |
+|---|---|---|
+| **Image optimisation** (`next/image`) | `PostCard`, post page | served as resized **WebP** through `/_next/image`; less than a third of the PNG's size; `width`/`height` reserve space (no layout shift); `sizes` picks the right file; `priority` on the main image, lazy loading below the fold (tests) |
+| **Font optimisation** (`next/font/google`) | `layout.tsx` | Inter, Fraunces and JetBrains Mono, downloaded at build time and self-hosted; a test records every network request and finds only `localhost` |
+| **Metadata and SEO** | `layout.tsx`, every page, `generateMetadata` in `[slug]` | title template, description, canonical URL, Open Graph (`article` with published time, tags, image), Twitter card, JSON-LD `BlogPosting`, `sitemap.ts`, `robots.ts`; all asserted in tests |
+| **`Link`** | everywhere | client-side navigation; the current page gets `aria-current` |
+| **Route handlers** | `app/api/**/route.ts` | `GET /api/posts` (static JSON), `GET /api/posts/[slug]` (dynamic segment, JSON 404), `GET /api/time` (`no-store`) |
+
+## Typing
+
+TypeScript strict. Route props come from generated types (`PageProps`, `LayoutProps`, `RouteContext`), the Markdown reader returns discriminated unions (`Block`, `Inline`) that components `switch` over exhaustively (a missing case fails to compile), and front matter is narrowed from `string | string[]` with checks, not casts. The only assertions are in tests and one `response.json()` in `ClientClock`.
+
+## Tests
+
+- **17 unit tests (Vitest):** front-matter and Markdown parsing, an XSS check (script text in a post is escaped), post validation errors that name the file and field, date formatting, and an integrity test over the real `content/` folder (unique slugs, real dates, every cover exists and has alt text).
+- **37 browser tests (Playwright, production build, Chrome):** routing and layouts, filter via URL, route group, 404 status, the dynamic route and sitemap crawl, client components, server HTML contains the article, image optimisation, metadata and JSON-LD, self-hosted fonts, error boundary, all four rendering strategies including the 16-second ISR rebuild, route handlers, and **axe WCAG 2.1 AA on six pages in light and dark mode (12 tests)**.
+
+## Limits and honest notes
+
+- **An unknown post address returns HTTP 200, not 404.** The page shell is already streaming when `notFound()` runs, so Next.js keeps status 200, renders the not-found UI and adds `<meta name="robots" content="noindex">`. That is how Cache Components behaves (documented in the `not-found.js` reference); search engines treat it as a "soft 404". Addresses that match no route at all get a real 404 (tested).
+- **No database or CMS.** Posts are Markdown files read from disk and cached; the API for the CSR demo is `/api/time`. A like count is local to the page view.
+- **Built for a Node server (`next start`).** I did not deploy it (to Vercel or elsewhere), so the ISR behaviour is verified locally, not on a CDN.
+- **The ISR test takes about 18 seconds**, because it has to wait out the 15 second lifetime.
+- **`SITE.url` defaults to `http://localhost:3000`.** Set `NEXT_PUBLIC_SITE_URL` in production or canonical and Open Graph URLs will point at localhost.
+- **Only Chrome was tested.**
+- **I did not write the Next.js 14 style (`revalidate`, `force-dynamic`) variants.** The README table above maps them to this version; running them would need `cacheComponents` turned off.
