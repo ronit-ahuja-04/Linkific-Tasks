@@ -7,9 +7,19 @@
 //
 // Days you already logged are skipped, so running it twice is safe.
 import { readFileSync } from 'node:fs';
-import { createClient } from '@supabase/supabase-js';
+
+// supabase-js needs Node 22+ outside the browser (it relies on the built-in WebSocket)
+if (Number(process.versions.node.split('.')[0]) < 22) {
+  console.error(`This script needs Node.js 22 or newer (this is ${process.version}). Run \`nvm use\` in this folder, or use /opt/homebrew/bin/node.`);
+  process.exit(1);
+}
+const { createClient } = await import('@supabase/supabase-js');
 
 const email = process.argv[2]?.toLowerCase();
+if (email?.endsWith('@example.com')) {
+  console.error('Replace YOUR-EMAIL@example.com with the email you registered with on the live site.');
+  process.exit(1);
+}
 const { SUPABASE_URL: url, SUPABASE_SERVICE_ROLE_KEY: key } = process.env;
 if (!email || !url || !key) {
   console.error('Usage: SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/import-days.mjs you@example.com');
