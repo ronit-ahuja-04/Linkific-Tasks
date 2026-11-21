@@ -1,13 +1,32 @@
-import { CLASS_INFO, CLASSES } from '@/lib/game';
+import { connection } from 'next/server';
+import { Suspense } from 'react';
+import QuestApp from '@/components/QuestApp';
+import { computeStats } from '@/lib/game';
+import { listCharacters, listMentorBadges, listQuests } from '@/lib/server/db';
+import { buildCharacterView } from '@/lib/view';
 
-/** Placeholder until milestone M4 builds the real pages: shows that the game rules load. */
+/**
+ * PROGRESS PREVIEW of the character screen: real database, real game rules, the new design.
+ * The data is read and turned into plain view models on the server; QuestApp (a Client Component) only animates.
+ */
 export default function Home() {
   return (
-    <main style={{ maxWidth: 640, margin: '48px auto', padding: '0 20px', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>Intern Quest</h1>
-      <p>Your internship logbook as a role-playing game. The game rules and the database are in place; the pages arrive in milestone M4.</p>
-      <h2>Classes</h2>
-      <ul>{CLASSES.map((c) => <li key={c}><strong>{CLASS_INFO[c].label}</strong>: {CLASS_INFO[c].motto}</li>)}</ul>
-    </main>
+    <Suspense fallback={<p style={{ padding: 24, fontFamily: 'system-ui' }}>Loading the guild…</p>}>
+      <Characters />
+    </Suspense>
   );
+}
+
+async function Characters() {
+  await connection(); // read the database per request, so the preview always shows the current data
+  const today = new Date().toISOString().slice(0, 10);
+  const characters = await listCharacters();
+  const views = await Promise.all(
+    characters.map(async (c) => {
+      const [quests, mentorBadges] = await Promise.all([listQuests(c.userId), listMentorBadges(c.userId)]);
+      return { xp: computeStats(c.class, quests).totalXp, view: buildCharacterView(c, quests, mentorBadges, today) };
+    }),
+  );
+  views.sort((a, b) => b.xp - a.xp); // highest level first
+  return <QuestApp characters={views.map((v) => v.view)} />;
 }
