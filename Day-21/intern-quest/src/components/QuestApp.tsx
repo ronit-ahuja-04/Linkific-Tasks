@@ -4,6 +4,7 @@ import { AnimatePresence, MotionConfig, animate, motion, useInView } from 'motio
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PipMood } from '@/lib/game';
 import type { CharacterView } from '@/lib/view';
+import Link from 'next/link';
 import Pip from './Pip';
 
 /**
@@ -50,15 +51,15 @@ export default function QuestApp({ characters, account }: { characters: Characte
     <MotionConfig reducedMotion="user">
       <motion.div className="screen" initial={false} animate={{ backgroundColor: theme.bg, color: theme.text }} transition={{ duration: 0.6, ease: 'easeInOut' }}>
         <header className="topbar">
-          <span className="wordmark">Intern Quest</span>
-          <nav className="switcher" aria-label="Choose a character">
+          <Link href="/" className="wordmark">Intern Quest</Link>
+          {characters.length > 1 ? <nav className="switcher" aria-label="Choose a character">
             {characters.map((c, i) => (
               <button key={c.handle} type="button" onClick={() => choose(i)} aria-pressed={i === active}>
                 {i === active && <motion.span layoutId="switcher-pill" className="switcher-pill" transition={spring} />}
                 <span className="switcher-label">{c.name}</span>
               </button>
             ))}
-          </nav>
+          </nav> : <span />}
           <div className="pills">
             <span className="pill" title="Total XP">⚡ <CountUp value={character.totalXp} /> XP</span>
             <span className="pill" title="Longest streak">🔥 {character.streak} days</span>
@@ -79,7 +80,7 @@ export default function QuestApp({ characters, account }: { characters: Characte
                 <div className="pip-column">
                   <motion.button type="button" className="pip-button" onClick={poke} whileTap={{ scale: 0.94 }}
                     aria-label={`Pip is ${MOOD_WORD[character.pip.mood]}. Click to hear about another quest.`}>
-                    <Pip stage={character.pip.stage} mood={character.pip.mood} hop={hop} />
+                    <Pip stage={character.pip.stage} mood={character.pip.mood} hop={hop} tint={character.pip.tint} accessory={character.pip.accessory} />
                   </motion.button>
                   <p className="hint">Pip is {MOOD_WORD[character.pip.mood]} · click Pip to hear about another quest</p>
                 </div>

@@ -13,16 +13,26 @@ import type { PipMood, PipStage } from '@/lib/game';
  * ask for reduced motion (see <MotionConfig reducedMotion="user"> in the app screen).
  */
 const INK = '#2A1E3B';
-const BODY = '#FFF7EC';
+
+/** Pip's look, chosen in the character editor (stored as avatar.colour and avatar.accessory) */
+export const PIP_TINTS = ['#FFF7EC', '#DFF7E8', '#DDEEFF', '#FFE4D6', '#EDE4FF', '#FFF6C8', '#FFE0EA', '#ECEAE6'] as const;
+export const PIP_TINT_NAMES = ['Cream', 'Mint', 'Sky', 'Peach', 'Lilac', 'Lemon', 'Rose', 'Stone'] as const;
+export const PIP_ACCESSORIES = ['None', 'Glasses', 'Scarf', 'Bow', 'Headphones', 'Freckles'] as const;
+const tintOf = (n: number): string => PIP_TINTS[((n % PIP_TINTS.length) + PIP_TINTS.length) % PIP_TINTS.length] ?? PIP_TINTS[0];
 
 interface PipProps {
   stage: PipStage;
   mood: PipMood;
   /** changes on every tap: Pip hops */
   hop: number;
+  /** index into PIP_TINTS */
+  tint?: number;
+  /** index into PIP_ACCESSORIES */
+  accessory?: number;
 }
 
-export default function Pip({ stage, mood, hop }: PipProps) {
+export default function Pip({ stage, mood, hop, tint = 0, accessory = 0 }: PipProps) {
+  const body = tintOf(tint);
   const jump = useAnimationControls();
   useEffect(() => {
     if (hop === 0) return;
@@ -45,11 +55,13 @@ export default function Pip({ stage, mood, hop }: PipProps) {
           {mood === 'fired_up' && <Flames />}
           {(stage === 'sprite' || stage === 'guardian') && <Wings fast={mood === 'fired_up' || mood === 'proud'} />}
 
-          {stage === 'egg' ? <EggBody /> : <BlobBody big={stage === 'guardian'} />}
+          {accessory === 4 && <Headphones back />}
+          {stage === 'egg' ? <EggBody fill={body} /> : <BlobBody big={stage === 'guardian'} fill={body} />}
           {stage !== 'egg' && <Sprout />}
           {stage === 'guardian' && <Crown />}
 
           <Face mood={mood} />
+          <Accessory kind={accessory} />
         </motion.g>
       </motion.g>
 
@@ -59,20 +71,20 @@ export default function Pip({ stage, mood, hop }: PipProps) {
   );
 }
 
-function BlobBody({ big }: { big: boolean }) {
+function BlobBody({ big, fill }: { big: boolean; fill: string }) {
   const s = big ? 1.06 : 1;
   return (
     <g transform={`translate(100 120) scale(${s}) translate(-100 -120)`}>
-      <path d="M100 52 C146 52 168 92 166 132 C164 170 136 188 100 188 C64 188 36 170 34 132 C32 92 54 52 100 52 Z" fill={BODY} stroke={INK} strokeWidth="5" />
+      <path d="M100 52 C146 52 168 92 166 132 C164 170 136 188 100 188 C64 188 36 170 34 132 C32 92 54 52 100 52 Z" fill={fill} stroke={INK} strokeWidth="5" />
       <path d="M60 100 C62 84 74 70 90 64" stroke="#fff" strokeWidth="7" strokeLinecap="round" fill="none" opacity="0.9" />
     </g>
   );
 }
 
-function EggBody() {
+function EggBody({ fill }: { fill: string }) {
   return (
     <g>
-      <path d="M100 48 C140 48 160 108 160 140 C160 172 134 190 100 190 C66 190 40 172 40 140 C40 108 60 48 100 48 Z" fill={BODY} stroke={INK} strokeWidth="5" />
+      <path d="M100 48 C140 48 160 108 160 140 C160 172 134 190 100 190 C66 190 40 172 40 140 C40 108 60 48 100 48 Z" fill={fill} stroke={INK} strokeWidth="5" />
       {/* the crack Pip is peeking through */}
       <path d="M44 118 L62 108 L76 122 L92 106 L108 122 L124 106 L140 122 L156 112" stroke={INK} strokeWidth="4" fill="none" strokeLinejoin="round" />
       <path d="M68 70 C74 60 84 54 94 52" stroke="#fff" strokeWidth="6" strokeLinecap="round" fill="none" />
@@ -207,6 +219,55 @@ function Flames() {
       ))}
     </>
   );
+}
+
+function Headphones({ back = false }: { back?: boolean }) {
+  // drawn in two parts: the band behind the head, the ear cups in front
+  if (back) return <path d="M40 120 Q38 38 100 36 Q162 38 160 120" stroke={INK} strokeWidth="8" fill="none" strokeLinecap="round" />;
+  return (
+    <g>
+      <rect x="26" y="104" width="22" height="36" rx="10" fill="#6C4DF5" stroke={INK} strokeWidth="4" />
+      <rect x="152" y="104" width="22" height="36" rx="10" fill="#6C4DF5" stroke={INK} strokeWidth="4" />
+    </g>
+  );
+}
+
+function Accessory({ kind }: { kind: number }) {
+  switch (kind) {
+    case 1: // glasses
+      return (
+        <g fill="rgba(255,255,255,0.25)" stroke={INK} strokeWidth="4">
+          <circle cx="78" cy="122" r="17" />
+          <circle cx="122" cy="122" r="17" />
+          <path d="M95 120 Q100 116 105 120" fill="none" />
+        </g>
+      );
+    case 2: // scarf
+      return (
+        <g stroke={INK} strokeWidth="4" strokeLinejoin="round">
+          <path d="M46 162 Q100 184 154 162 L152 178 Q100 198 48 178 Z" fill="#E5484D" />
+          <path d="M126 180 L140 206 L118 204 Z" fill="#E5484D" />
+        </g>
+      );
+    case 3: // bow
+      return (
+        <g stroke={INK} strokeWidth="4" strokeLinejoin="round" fill="#FF6FA5">
+          <path d="M140 70 L122 58 L124 84 Z" />
+          <path d="M140 70 L158 58 L156 84 Z" />
+          <circle cx="140" cy="71" r="5" />
+        </g>
+      );
+    case 4:
+      return <Headphones />;
+    case 5: // freckles
+      return (
+        <g fill="#C9785A">
+          {[[56, 136], [64, 140], [58, 146], [136, 136], [144, 140], [142, 146]].map(([x, y]) => <circle key={`${x}-${y}`} cx={x} cy={y} r="2.4" />)}
+        </g>
+      );
+    default:
+      return null;
+  }
 }
 
 /** A five-pointed star path centred on (cx, cy) */
