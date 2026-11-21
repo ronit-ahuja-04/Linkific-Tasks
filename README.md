@@ -57,9 +57,11 @@ Backend services, authentication against a real server, and any library the day'
 | 14  | Recharts                                 | SalesPulse: a Recharts dashboard                                 | [PRD](Day-14/Day14_PRD.md) · [Report](Day-14/DAY14_REPORT.md) · [Chart guide](Day-14/CHART_CHOICE_GUIDE.md)        |
 | 15  | Authentication, JWT, OAuth               | FlowLane with GitHub sign-in, issue import and a JWT-checking API | [README](Day-15/flowlane-auth/README.md) · [PRD](Day-15/Day15_PRD.md) · [Report](Day-15/DAY15_REPORT.md)          |
 | 16  | Firebase: Storage and real-time          | FlowLane with image uploads, a live dashboard and a setup guide  | [README](Day-16/flowlane-firebase/README.md) · [PRD](Day-16/Day16_PRD.md) · [Report](Day-16/DAY16_REPORT.md)       |
+| 17  | Supabase                                 | Huddle: a team workspace on Supabase (Postgres, Auth, Row Level Security, Realtime, Storage) | [README](Day-17/huddle/README.md) · [PRD](Day-17/Day17_PRD.md) |
 | 18  | TypeScript for React                     | A TypeScript workbook, and SalesPulse converted to strict TypeScript with zero `any` | [Workbook](Day-18/ts-basics/README.md) · [SalesPulse TS](Day-18/salespulse-ts/README.md) · [PRD](Day-18/Day18_PRD.md) |
 | 19  | Advanced TypeScript, typed Redux         | An advanced-TypeScript workbook, and SalesPulse on a fully typed Redux Toolkit store | [Workbook](Day-19/ts-advanced/README.md) · [SalesPulse](Day-19/salespulse-ts-adv/README.md) · [PRD](Day-19/Day19_PRD.md) |
 | 20  | Next.js fundamentals                     | Dispatch: a Next.js App Router blog with SSG, ISR, SSR and CSR shown live | [README](Day-20/nextjs-blog/README.md) · [PRD](Day-20/Day20_PRD.md) |
+| 21  | Next.js advanced and deployment          | Intern Quest: the internship logbook as an RPG, with NextAuth, API routes, proxy.ts, Supabase, deployed on Vercel ([live](https://intern-quest-smoky.vercel.app)) | [README](Day-21/intern-quest/README.md) · [Deployment guide](Day-21/intern-quest/docs/DEPLOYMENT.md) · [PRD](Day-21/Day21_PRD.md) |
 
 ---
 
