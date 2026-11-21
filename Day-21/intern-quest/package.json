@@ -1,0 +1,36 @@
+{
+  "name": "intern-quest",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --project unit",
+    "test:db": "vitest run --project db",
+    "db:start": "supabase start -x studio,imgproxy,vector,logflare,edge-runtime,supavisor,postgres-meta,realtime,storage-api,inbucket",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "env:local": "node scripts/write-env.mjs",
+    "check": "npm run typecheck && npm run lint && npm test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
+    "next": "16.4.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "postgres": "^3.4.9",
+    "supabase": "^3.2.0",
+    "typescript": "^5",
+    "vitest": "^4.1.12"
+  }
+}
