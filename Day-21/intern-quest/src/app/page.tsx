@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { connection } from 'next/server';
 import { Suspense } from 'react';
 import Pip from '@/components/Pip';
 import HeroPip from '@/components/landing/HeroPip';
@@ -14,11 +15,11 @@ export const metadata: Metadata = {
 };
 
 /**
- * The home page. Everything except the sign-in buttons comes from the cache (the board is a `use cache` read tagged
- * `guild`), so the page is part of the static shell; the buttons depend on the session and stream in.
+ * The home page. The text is static. The leaderboard is read at REQUEST time (then cached: `use cache`, tag `guild`),
+ * not at build time, so building the app never needs the database or its secrets (a Docker image or a preview build
+ * can be made without them). The sign-in buttons depend on the session and stream in too.
  */
-export default async function Home() {
-  const board = await getGuildBoard();
+export default function Home() {
   return (
     <div className="home">
       <header className="home-bar">
@@ -52,27 +53,39 @@ export default async function Home() {
       <section className="home-board" aria-labelledby="board-title">
         <h2 id="board-title">The Guild hall</h2>
         <p className="home-lede">Every public adventurer, by XP.</p>
-        {board.length === 0 ? <p className="card empty">No public adventurers yet. Be the first.</p> : (
-          <ol className="board">
-            {board.map((entry, i) => (
-              <li key={entry.handle}>
-                <Link href={`/c/${entry.handle}`} className="card board-card">
-                  <span className="board-rank">#{i + 1}</span>
-                  <span className="board-pip" aria-hidden="true"><Pip stage={entry.stage} mood="happy" hop={0} tint={entry.tint} accessory={entry.accessory} /></span>
-                  <span className="board-main">
-                    <strong>{entry.displayName}</strong>
-                    <span className="muted">@{entry.handle} · {entry.classLabel}</span>
-                    <span className="board-level">Level {entry.level} {entry.title}</span>
-                  </span>
-                  <span className="board-xp">{entry.totalXp.toLocaleString('en-US')} XP<small>{entry.questCount} quests{entry.topSkill ? ` · ${entry.topSkill}` : ''}</small></span>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        )}
+        <Suspense fallback={<p className="home-lede">Gathering the guild…</p>}>
+          <Board />
+        </Suspense>
       </section>
 
       <footer className="home-foot">Intern Quest is a Linkific training project. Pip is drawn in SVG; no AI writes its lines.</footer>
     </div>
+  );
+}
+
+async function Board() {
+  await connection(); // request time, not build time: see the comment on Home
+  const board = await getGuildBoard();
+  return (
+    <>
+        {board.length === 0 ? <p className="card empty">No public adventurers yet. Be the first.</p> : (
+        <ol className="board">
+          {board.map((entry, i) => (
+            <li key={entry.handle}>
+              <Link href={`/c/${entry.handle}`} className="card board-card">
+                <span className="board-rank">#{i + 1}</span>
+                <span className="board-pip" aria-hidden="true"><Pip stage={entry.stage} mood="happy" hop={0} tint={entry.tint} accessory={entry.accessory} /></span>
+                <span className="board-main">
+                  <strong>{entry.displayName}</strong>
+                  <span className="muted">@{entry.handle} · {entry.classLabel}</span>
+                  <span className="board-level">Level {entry.level} {entry.title}</span>
+                </span>
+                <span className="board-xp">{entry.totalXp.toLocaleString('en-US')} XP<small>{entry.questCount} quests{entry.topSkill ? ` · ${entry.topSkill}` : ''}</small></span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      )}
+    </>
   );
 }
