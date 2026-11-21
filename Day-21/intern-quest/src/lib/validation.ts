@@ -198,3 +198,34 @@ export function parseBadge(input: unknown): Parsed<BadgeBody> {
   const icon = read.text('icon', { min: 1, max: 8, fallback: '🏅' });
   return read.result({ handle, name, note, icon });
 }
+
+export interface RegistrationBody {
+  email: string;
+  password: string;
+  name: string;
+}
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+/**
+ * Registration. The password is 10 to 72 BYTES: bcrypt ignores everything after byte 72, so a longer password would
+ * silently be cut, and the limit is in bytes (an emoji is 4), not characters.
+ */
+export function parseRegistration(input: unknown): Parsed<RegistrationBody> {
+  if (!isRecord(input)) return notAnObject();
+  const read = new Reader(input);
+  const email = read.text('email', { min: 1, max: 254 }).toLowerCase();
+  if (!read.errors.email && !EMAIL.test(email)) read.errors.email = 'email must be an email address';
+  const name = read.text('name', { min: 1, max: 60 });
+  const rawPassword = input.password;
+  let password = '';
+  if (typeof rawPassword !== 'string') read.errors.password = 'password must be text';
+  else if (rawPassword.length < 10) read.errors.password = 'password must be at least 10 characters';
+  else if (new TextEncoder().encode(rawPassword).length > 72) read.errors.password = 'password must be at most 72 bytes';
+  else password = rawPassword; // never trimmed: spaces are part of a password
+  return read.result({ email, password, name });
+}
+
+/** Only same-site paths are allowed as a post-login destination (stops "open redirect" phishing links) */
+export function safeNext(value: unknown, fallback = '/'): string {
+  return typeof value === 'string' && value.startsWith('/') && !value.startsWith('//') && !value.startsWith('/\\') ? value : fallback;
+}

@@ -1,6 +1,7 @@
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import QuestApp from '@/components/QuestApp';
+import Account from '@/components/auth/Account';
 import { computeStats } from '@/lib/game';
 import { listCharacters, listMentorBadges, listQuests } from '@/lib/server/db';
 import { buildCharacterView } from '@/lib/view';
@@ -28,5 +29,5 @@ async function Characters() {
     }),
   );
   views.sort((a, b) => b.xp - a.xp); // highest level first
-  return <QuestApp characters={views.map((v) => v.view)} />;
+  return <QuestApp characters={views.map((v) => v.view)} account={<Account />} />;
 }

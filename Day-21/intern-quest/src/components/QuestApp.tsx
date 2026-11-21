@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, MotionConfig, animate, motion, useInView } from 'motion/react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PipMood } from '@/lib/game';
 import type { CharacterView } from '@/lib/view';
 import Pip from './Pip';
@@ -28,7 +28,7 @@ const MOOD_WORD: Record<PipMood, string> = { happy: 'happy', proud: 'proud', wor
 
 const spring = { type: 'spring', stiffness: 260, damping: 24 } as const;
 
-export default function QuestApp({ characters }: { characters: CharacterView[] }) {
+export default function QuestApp({ characters, account }: { characters: CharacterView[]; account?: ReactNode }) {
   const [active, setActive] = useState(0);
   const [lineIndex, setLineIndex] = useState(0);
   const [hop, setHop] = useState(0);
@@ -62,6 +62,7 @@ export default function QuestApp({ characters }: { characters: CharacterView[] }
           <div className="pills">
             <span className="pill" title="Total XP">⚡ <CountUp value={character.totalXp} /> XP</span>
             <span className="pill" title="Longest streak">🔥 {character.streak} days</span>
+            {account}
           </div>
         </header>
 

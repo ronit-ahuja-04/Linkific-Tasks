@@ -24,7 +24,7 @@ export async function createPeople(): Promise<void> {
 }
 
 export async function removePeople(): Promise<void> {
-  await sql`delete from public.users where email like '%@test.invalid'`;
+  await sql`delete from public.users where email like '%@test.invalid' or email like '%@users.noreply.github.com'`;
 }
 
 // ---------------------------------------------------------------- calling route handlers directly
