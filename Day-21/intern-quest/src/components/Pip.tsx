@@ -7,6 +7,8 @@ import type { PipMood, PipStage } from '@/lib/game';
 /**
  * Pip, drawn as SVG and animated with Motion. One body; the STAGE adds parts (a sprout, wings, a crown) and the
  * MOOD changes the eyes, brows and mouth and adds an effect (sparkles, floating z's, flames).
+ * Pivot points (originX / originY) are fractions of each shape's OWN box: Motion measures SVG transforms from the
+ * element's bounding box (transform-box: fill-box), so page coordinates like '122px' would pivot far off the shape.
  * Animations are transform and opacity only (cheap for the browser), and Motion turns them off for visitors who
  * ask for reduced motion (see <MotionConfig reducedMotion="user"> in the app screen).
  */
@@ -34,11 +36,11 @@ export default function Pip({ stage, mood, hop }: PipProps) {
       <motion.ellipse cx="100" cy="196" rx="52" ry="8" fill={INK} opacity={0.18}
         animate={{ scaleX: sleepy ? [1, 1.04, 1] : [1, 0.82, 1] }} transition={{ duration: sleepy ? 3.6 : 2.4, repeat: Infinity, ease: 'easeInOut' }} />
 
-      <motion.g animate={jump} style={{ originX: '100px', originY: '190px' }}>
+      <motion.g animate={jump} style={{ originX: 0.5, originY: 1 }}>
         <motion.g
           animate={sleepy ? { scale: [1, 1.03, 1] } : { y: [0, -10, 0] }}
           transition={{ duration: sleepy ? 3.6 : 2.4, repeat: Infinity, ease: 'easeInOut' }}
-          style={{ originX: '100px', originY: '190px' }}
+          style={{ originX: 0.5, originY: 1 }}
         >
           {mood === 'fired_up' && <Flames />}
           {(stage === 'sprite' || stage === 'guardian') && <Wings fast={mood === 'fired_up' || mood === 'proud'} />}
@@ -80,7 +82,7 @@ function EggBody() {
 
 function Sprout() {
   return (
-    <motion.g animate={{ rotate: [-6, 6, -6] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }} style={{ originX: '100px', originY: '54px' }}>
+    <motion.g animate={{ rotate: [-6, 6, -6] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }} style={{ originX: 0.5, originY: 1 }}>
       <path d="M100 54 C100 44 101 36 104 28" stroke={INK} strokeWidth="4" fill="none" strokeLinecap="round" />
       <path d="M104 30 C110 16 128 14 134 20 C128 32 114 36 104 30 Z" fill="#3DBE6B" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
       <path d="M102 34 C92 24 76 26 72 32 C80 42 94 42 102 34 Z" fill="#59D987" stroke={INK} strokeWidth="4" strokeLinejoin="round" />
@@ -93,9 +95,9 @@ function Wings({ fast }: { fast: boolean }) {
   return (
     <>
       <motion.path d="M40 116 C14 96 6 120 14 136 C22 150 38 142 44 134 Z" fill="#CFE6FF" stroke={INK} strokeWidth="4" strokeLinejoin="round"
-        animate={{ rotate: [0, -16, 0] }} transition={flap} style={{ originX: '44px', originY: '128px' }} />
+        animate={{ rotate: [0, -16, 0] }} transition={flap} style={{ originX: 1, originY: 0.6 }} />
       <motion.path d="M160 116 C186 96 194 120 186 136 C178 150 162 142 156 134 Z" fill="#CFE6FF" stroke={INK} strokeWidth="4" strokeLinejoin="round"
-        animate={{ rotate: [0, 16, 0] }} transition={flap} style={{ originX: '156px', originY: '128px' }} />
+        animate={{ rotate: [0, 16, 0] }} transition={flap} style={{ originX: 0, originY: 0.6 }} />
     </>
   );
 }
@@ -113,11 +115,11 @@ function Eye({ x, mood }: { x: number; mood: PipMood }) {
   if (mood === 'proud') {
     return (
       <motion.path d={star(x, 122, 13, 6)} fill="#FFC531" stroke={INK} strokeWidth="3.5" strokeLinejoin="round"
-        animate={{ rotate: [0, 18, 0], scale: [1, 1.12, 1] }} transition={{ duration: 1.6, repeat: Infinity }} style={{ originX: `${x}px`, originY: '122px' }} />
+        animate={{ rotate: [0, 18, 0], scale: [1, 1.12, 1] }} transition={{ duration: 1.6, repeat: Infinity }} style={{ originX: 0.5, originY: 0.5 }} />
     );
   }
   return (
-    <motion.g animate={{ scaleY: [1, 1, 0.1, 1] }} transition={{ duration: 3.8, times: [0, 0.92, 0.96, 1], repeat: Infinity }} style={{ originX: `${x}px`, originY: '122px' }}>
+    <motion.g animate={{ scaleY: [1, 1, 0.1, 1] }} transition={{ duration: 3.8, times: [0, 0.92, 0.96, 1], repeat: Infinity }} style={{ originX: 0.5, originY: 0.5 }}>
       <ellipse cx={x} cy="122" rx="9" ry={mood === 'fired_up' ? 10 : 12} fill={INK} />
       <circle cx={x + 3} cy="117" r="3.2" fill="#fff" />
     </motion.g>
@@ -177,7 +179,7 @@ function Sparkles() {
     <>
       {spots.map(([x, y, delay]) => (
         <motion.path key={`${x}-${y}`} d={star(x, y, 9, 3.5)} fill="#FFD54A" stroke={INK} strokeWidth="2.5"
-          animate={{ scale: [0, 1.1, 0], opacity: [0, 1, 0], rotate: [0, 45] }} transition={{ duration: 1.8, repeat: Infinity, delay }} style={{ originX: `${x}px`, originY: `${y}px` }} />
+          animate={{ scale: [0, 1.1, 0], opacity: [0, 1, 0], rotate: [0, 45] }} transition={{ duration: 1.8, repeat: Infinity, delay }} style={{ originX: 0.5, originY: 0.5 }} />
       ))}
     </>
   );
@@ -201,7 +203,7 @@ function Flames() {
     <>
       {[[46, 0], [154, 0.25]].map(([x, delay]) => (
         <motion.path key={x} d={`M${x} 104 C${x - 14} 84 ${x - 4} 66 ${x} 54 C${x + 6} 70 ${x + 16} 82 ${x} 104 Z`} fill="#FFB020" stroke={INK} strokeWidth="3.5" strokeLinejoin="round"
-          animate={{ scaleY: [1, 1.18, 0.94, 1], opacity: [0.9, 1, 0.85, 0.9] }} transition={{ duration: 0.7, repeat: Infinity, delay }} style={{ originX: `${x}px`, originY: '104px' }} />
+          animate={{ scaleY: [1, 1.18, 0.94, 1], opacity: [0.9, 1, 0.85, 0.9] }} transition={{ duration: 0.7, repeat: Infinity, delay }} style={{ originX: 0.5, originY: 1 }} />
       ))}
     </>
   );

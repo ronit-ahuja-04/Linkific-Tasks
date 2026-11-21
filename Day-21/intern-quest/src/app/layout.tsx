@@ -13,7 +13,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    // suppressHydrationWarning: browser extensions (e.g. job-application helpers) add attributes to <html> before
+    // React loads. This ignores attribute differences on this one element only; children are still checked.
+    <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );
