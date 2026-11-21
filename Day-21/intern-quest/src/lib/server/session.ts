@@ -1,4 +1,5 @@
 import 'server-only';
+import { connection } from 'next/server';
 import { auth } from '@/auth';
 
 /** Who is making the request, as the API needs to know it */
@@ -10,10 +11,13 @@ export interface SessionUser {
 }
 
 /**
- * The signed-in user, or null. Reads the NextAuth session cookie (which also makes every caller request-time work,
- * so a protected answer is never prerendered at build time). The API tests replace this one function.
+ * The signed-in user, or null. The API tests replace this one function.
+ * `connection()` first: this is request-time work by nature (it reads the session cookie, and NextAuth uses random
+ * values while handling it). Without it, Next.js logged "unstable value crypto.getRandomValues() while prerendering"
+ * on every signed-in page in production (found in the Vercel logs, not in tests: the pages still rendered).
  */
 export async function currentUser(): Promise<SessionUser | null> {
+  await connection();
   const session = await auth();
   const user = session?.user;
   if (!user?.id) return null;

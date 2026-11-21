@@ -28,9 +28,21 @@ if (!email || !url || !key) {
 const db = createClient(url, key, { auth: { persistSession: false } });
 
 const { data: user, error: userError } = await db.from('users').select('id').eq('email', email).maybeSingle();
-if (userError || !user) throw new Error(`No account with the email ${email}. Register on the site first.`);
+if (userError) {
+  // most often the wrong key: the publishable (public) key is refused by design
+  console.error(`The database refused the query: ${userError.message}`);
+  console.error('Check the key: it must be the SECRET key (sb_secret_…) or the legacy service_role key, not the publishable one.');
+  process.exit(1);
+}
+if (!user) {
+  console.error(`No account with the email ${email}. Register on the site first (and check the spelling).`);
+  process.exit(1);
+}
 const { data: character } = await db.from('characters').select('handle').eq('user_id', user.id).maybeSingle();
-if (!character) throw new Error('That account has no character yet. Create it on the site first.');
+if (!character) {
+  console.error('That account has no character yet. Create it on the site first.');
+  process.exit(1);
+}
 
 const { data: existing } = await db.from('quests').select('day').eq('user_id', user.id);
 const taken = new Set((existing ?? []).map((q) => q.day));
