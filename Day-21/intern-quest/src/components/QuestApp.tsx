@@ -1,6 +1,7 @@
 'use client';
 
-import { AnimatePresence, MotionConfig, animate, motion, useInView } from 'motion/react';
+import { AnimatePresence, m, useInView, useReducedMotion } from 'motion/react';
+import { countUp } from '@/lib/count-up';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PipMood } from '@/lib/game';
 import type { CharacterView } from '@/lib/view';
@@ -30,6 +31,8 @@ const MOOD_WORD: Record<PipMood, string> = { happy: 'happy', proud: 'proud', wor
 const spring = { type: 'spring', stiffness: 260, damping: 24 } as const;
 
 export default function QuestApp({ characters, account }: { characters: CharacterView[]; account?: ReactNode }) {
+  // "Reduce motion" turned on: skip entrance animations, show the final state at once
+  const reduce = useReducedMotion();
   const [active, setActive] = useState(0);
   const [lineIndex, setLineIndex] = useState(0);
   const [hop, setHop] = useState(0);
@@ -47,15 +50,16 @@ export default function QuestApp({ characters, account }: { characters: Characte
     setLineIndex((n) => n + 1);
   };
 
+  // the colours are set directly too: the animation engine loads a moment later (LazyMotion), and the page must
+  // never render without its background in the meantime
   return (
-    <MotionConfig reducedMotion="user">
-      <motion.div className="screen" initial={false} animate={{ backgroundColor: theme.bg, color: theme.text }} transition={{ duration: 0.6, ease: 'easeInOut' }}>
+      <m.div className="screen" style={{ backgroundColor: theme.bg, color: theme.text }} initial={false} animate={{ backgroundColor: theme.bg, color: theme.text }} transition={{ duration: 0.6, ease: 'easeInOut' }}>
         <header className="topbar">
           <Link href="/" className="wordmark">Intern Quest</Link>
           {characters.length > 1 ? <nav className="switcher" aria-label="Choose a character">
             {characters.map((c, i) => (
               <button key={c.handle} type="button" onClick={() => choose(i)} aria-pressed={i === active}>
-                {i === active && <motion.span layoutId="switcher-pill" className="switcher-pill" transition={spring} />}
+                {i === active && <m.span layoutId="switcher-pill" className="switcher-pill" transition={spring} />}
                 <span className="switcher-label">{c.name}</span>
               </button>
             ))}
@@ -69,8 +73,8 @@ export default function QuestApp({ characters, account }: { characters: Characte
 
         <div className="board">
           <AnimatePresence mode="wait">
-            <motion.section key={character.handle} className="hero"
-              initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={spring}>
+            <m.section key={character.handle} className="hero"
+              initial={reduce ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={spring}>
               <h1>
                 {character.name} is a <span style={{ color: theme.accent }}>level {character.level} {character.title}.</span>
               </h1>
@@ -78,38 +82,39 @@ export default function QuestApp({ characters, account }: { characters: Characte
 
               <div className="stage">
                 <div className="pip-column">
-                  <motion.button type="button" className="pip-button" onClick={poke} whileTap={{ scale: 0.94 }}
+                  <m.button type="button" className="pip-button" onClick={poke} whileTap={{ scale: 0.94 }}
                     aria-label={`Pip is ${MOOD_WORD[character.pip.mood]}. Click to hear about another quest.`}>
                     <Pip stage={character.pip.stage} mood={character.pip.mood} hop={hop} tint={character.pip.tint} accessory={character.pip.accessory} />
-                  </motion.button>
+                  </m.button>
                   <p className="hint">Pip is {MOOD_WORD[character.pip.mood]} · click Pip to hear about another quest</p>
                 </div>
                 <AnimatePresence mode="wait">
                   {line && (
-                    <motion.div key={`${character.handle}-${lineIndex}`} className="bubble" role="status" aria-live="polite"
-                      initial={{ opacity: 0, scale: 0.6, x: -16 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.85 }}
+                    <m.div key={`${character.handle}-${lineIndex}`} className="bubble" role="status" aria-live="polite"
+                      initial={reduce ? false : { opacity: 0, scale: 0.6, x: -16 }} animate={{ opacity: 1, scale: 1, x: 0 }} exit={{ opacity: 0, scale: 0.85 }}
                       transition={{ type: 'spring', stiffness: 420, damping: 22 }}>
                       {line.line}
                       <span className="bubble-meta">Day {line.day} · {line.title}</span>
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>
-            </motion.section>
+            </m.section>
           </AnimatePresence>
 
           <AnimatePresence mode="wait">
-            <motion.div key={character.handle} className="cards" initial={{ opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={spring}>
+            <m.div key={character.handle} className="cards" initial={reduce ? false : { opacity: 0, x: 40 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -24 }} transition={spring}>
               <Sheet character={character} />
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
-      </motion.div>
-    </MotionConfig>
+      </m.div>
   );
 }
 
 function Sheet({ character }: { character: CharacterView }) {
+  // "Reduce motion" turned on: skip entrance animations, show the final state at once
+  const reduce = useReducedMotion();
   return (
     <>
       <section className="card level-card">
@@ -123,7 +128,7 @@ function Sheet({ character }: { character: CharacterView }) {
             <span className="muted">{character.into.toLocaleString('en-US')} / {character.span.toLocaleString('en-US')} XP to level {character.level + 1}</span>
           </div>
           <div className="xpbar" role="progressbar" aria-valuemin={0} aria-valuemax={character.span} aria-valuenow={character.into} aria-label="XP to the next level">
-            <motion.div className="xpfill" initial={{ width: 0 }} animate={{ width: `${Math.round(character.fraction * 100)}%` }} transition={{ type: 'spring', stiffness: 60, damping: 16, delay: 0.25 }} />
+            <m.div className="xpfill" initial={reduce ? false : { width: 0 }} animate={{ width: `${Math.round(character.fraction * 100)}%` }} transition={{ type: 'spring', stiffness: 60, damping: 16, delay: 0.25 }} />
           </div>
           <div className="level-facts">
             <span><b><CountUp value={character.totalXp} /></b> XP total</span>
@@ -140,7 +145,7 @@ function Sheet({ character }: { character: CharacterView }) {
             <li key={s.label}>
               <span className="skill-name">{s.label}</span>
               <span className="skill-track">
-                <motion.span className="skill-fill" initial={{ scaleX: 0 }} animate={{ scaleX: s.fraction }} transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.3 + i * 0.07 }} />
+                <m.span className="skill-fill" initial={reduce ? false : { scaleX: 0 }} animate={{ scaleX: s.fraction }} transition={{ type: 'spring', stiffness: 90, damping: 18, delay: 0.3 + i * 0.07 }} />
               </span>
               <span className="skill-lv">Lv {s.level}</span>
             </li>
@@ -152,13 +157,13 @@ function Sheet({ character }: { character: CharacterView }) {
         <h2>Badges <span className="count">{character.badges.length}</span></h2>
         <ul className="badges">
           {character.badges.map((b, i) => (
-            <motion.li key={b.name} className={b.mentor ? 'mentor' : ''} title={`${b.name}: ${b.description}`}
-              initial={{ scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} whileHover={{ y: -4, rotate: -4 }}
+            <m.li key={b.name} className={b.mentor ? 'mentor' : ''} title={`${b.name}: ${b.description}`}
+              initial={reduce ? false : { scale: 0, rotate: -20 }} animate={{ scale: 1, rotate: 0 }} whileHover={{ y: -4, rotate: -4 }}
               transition={{ type: 'spring', stiffness: 380, damping: 16, delay: 0.4 + i * 0.06 }}>
               <span className="medal" aria-hidden="true">{b.icon}</span>
               <span className="badge-name">{b.name}</span>
               <span className="badge-day">{b.mentor ? 'mentor' : `day ${b.day}`}</span>
-            </motion.li>
+            </m.li>
           ))}
         </ul>
       </section>
@@ -172,12 +177,12 @@ function Sheet({ character }: { character: CharacterView }) {
             </thead>
             <tbody>
               {character.quests.map((q, i) => (
-                <motion.tr key={q.day} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.35 + Math.min(i, 8) * 0.04 }}>
+                <m.tr key={q.day} initial={reduce ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ ...spring, delay: 0.35 + Math.min(i, 8) * 0.04 }}>
                   <td className="q-day">{q.day}</td>
                   <td className="q-title">{q.title}{q.blockers && <span className="q-blocker" title={q.blockers}> · blocked</span>}</td>
                   <td><span className={`q-diff ${q.difficulty}`}>{q.difficulty}</span></td>
                   <td className="q-xp num">+{q.xp}</td>
-                </motion.tr>
+                </m.tr>
               ))}
             </tbody>
           </table>
@@ -193,16 +198,10 @@ function CountUp({ value }: { value: number }) {
   const inView = useInView(ref, { once: true });
   const shown = useRef(0);
   useEffect(() => {
-    if (!inView) return;
-    const controls = animate(shown.current, value, {
-      duration: 1.1,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (n) => {
-        shown.current = n;
-        if (ref.current) ref.current.textContent = Math.round(n).toLocaleString('en-US');
-      },
-    });
-    return () => controls.stop();
+    if (!inView || !ref.current) return;
+    const stop = countUp(ref.current, value, { from: shown.current });
+    shown.current = value;
+    return stop;
   }, [value, inView]);
   return <span ref={ref}>{value.toLocaleString('en-US')}</span>;
 }

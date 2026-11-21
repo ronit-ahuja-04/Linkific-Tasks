@@ -119,16 +119,16 @@ test.describe('the public character sheet', () => {
 
     const visitor = await browser.newPage();
     await visitor.goto(`/c/${handle}`);
-    await expect(visitor.getByRole('heading', { level: 1 })).toContainText('Quest Tester is a level');
-    await expect(visitor.locator('.quests').getByText('Out loud')).toBeVisible();
+    await expect(visible(visitor.getByRole('heading', { level: 1 }))).toContainText('Quest Tester is a level');
+    await expect(visible(visitor.locator('.quests')).getByText('Out loud')).toBeVisible();
     await expect(visitor.getByText('Secret side quest')).toHaveCount(0);
     // both quests count: normal (100) on React, a Mage home skill (+10%) = 110; day 2 also has the streak bonus:
     // 100 x 1.1 = 110, then +10% = 121. 110 + 121 = 231 XP, although only one quest is listed
-    await expect(visitor.locator('.level-facts')).toContainText('231 XP total');
+    await expect(visible(visitor.locator('.level-facts'))).toContainText('231 XP total');
 
     await visitor.goto(`/@${handle}`);
     await expect(visitor).toHaveURL(`/@${handle}`);
-    await expect(visitor.getByRole('heading', { level: 1 })).toContainText('Quest Tester');
+    await expect(visible(visitor.getByRole('heading', { level: 1 }))).toContainText('Quest Tester');
   });
 });
 
@@ -175,6 +175,6 @@ test.describe('mentors', () => {
     await expect(visible(mentor.locator('.notice'))).toContainText('Rising star');
 
     await page.goto(`/c/${handle}`);
-    await expect(page.locator('.badges')).toContainText('Rising star');
+    await expect(visible(page.locator('.badges'))).toContainText('Rising star');
   });
 });

@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { auth } from '@/auth';
+import { getToken } from 'next-auth/jwt';
+import { NextResponse, type NextRequest } from 'next/server';
 import { HANDLE_PATTERN } from '@/lib/validation';
 
 /**
@@ -11,9 +11,11 @@ import { HANDLE_PATTERN } from '@/lib/validation';
  *   4. mentor gate           /guild for a non-mentor -> /journal with a notice
  *   5. security headers      on every response
  *
- * `auth(...)` decodes the session cookie (a JWT signed with AUTH_SECRET) without touching the database, which is why
- * these checks are cheap enough to run here. They are OPTIMISTIC: every page, API route and server action checks the
- * session again, because a proxy can be skipped (a matcher change, a direct server-action POST).
+ * `getToken` decrypts the session cookie (a JWT encrypted with AUTH_SECRET) without touching the database, which is
+ * why these checks are cheap enough to run here, and it only READS the cookie. (NextAuth's `auth(...)` proxy wrapper
+ * re-issues the cookie on every request; a request still in flight when you signed out then wrote the session back,
+ * signing you in again. The browser tests caught that under load.) The checks are OPTIMISTIC: every page, API route
+ * and server action checks the session again, because a proxy can be skipped (a matcher change, a server-action POST).
  */
 const PROTECTED = ['/journal', '/character', '/guild'];
 const isUnder = (path: string, base: string): boolean => path === base || path.startsWith(`${base}/`);
@@ -25,11 +27,13 @@ const SECURITY_HEADERS: Record<string, string> = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
 };
 
-export default auth((request) => {
+export default async function proxy(request: NextRequest) {
   const started = performance.now();
   const requestId = crypto.randomUUID();
   const { pathname, search } = request.nextUrl;
-  const session = request.auth;
+  // on https the cookie is named __Secure-authjs.session-token; on http (local) authjs.session-token
+  const token = await getToken({ req: request, secret: process.env.AUTH_SECRET, secureCookie: request.nextUrl.protocol === 'https:' });
+  const session = token?.uid ? { user: { id: token.uid, role: token.role ?? 'intern' } } : null;
   let decision = 'next';
   let response: NextResponse;
 
@@ -58,7 +62,7 @@ export default auth((request) => {
   // one structured line per request: easy to grep locally, easy to search in Vercel's logs
   console.log(JSON.stringify({ at: 'proxy', id: requestId, method: request.method, path: pathname, user: session?.user.id ?? null, decision, ms: Math.round((performance.now() - started) * 10) / 10 }));
   return response;
-});
+}
 
 export const config = {
   // everything except Next's static files, image optimisation and the icon (they need no session, headers or logs)

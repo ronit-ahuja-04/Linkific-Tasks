@@ -1,8 +1,10 @@
 import { expect, type Page } from '@playwright/test';
 
 /**
- * Shared steps. Note `.filter({ visible: true })`: Next.js keeps pages you leave alive but hidden (React <Activity>),
- * so a hidden copy of an earlier page can still be in the DOM. Tests act only on what the user can see.
+ * Shared steps. Note `.filter({ visible: true })`: hidden copies of elements can be in the DOM for two reasons:
+ *   - Next.js keeps pages you leave alive but hidden (React <Activity>);
+ *   - while a page streams, React holds arriving content in a hidden placeholder before swapping it in.
+ * Tests act only on what the user can actually see.
  */
 export const unique = (prefix = 'e2e') => `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
 export const visible = <T extends { filter: (o: { visible: boolean }) => T }>(locator: T): T => locator.filter({ visible: true });
@@ -10,19 +12,19 @@ export const visible = <T extends { filter: (o: { visible: boolean }) => T }>(lo
 export async function registerNew(page: Page, name = 'E2E Hero'): Promise<string> {
   const email = `${unique()}@test.invalid`;
   await page.goto('/register');
-  await page.getByLabel('Name').fill(name);
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill('a long test password');
-  await page.getByRole('button', { name: 'Start your quest' }).click();
+  await visible(page.getByLabel('Name')).fill(name);
+  await visible(page.getByLabel('Email')).fill(email);
+  await visible(page.getByLabel('Password')).fill('a long test password');
+  await visible(page.getByRole('button', { name: 'Start your quest' })).click();
   await page.waitForURL('/');
   return email;
 }
 
 export async function signInAs(page: Page, email: string, password = 'demo-password-123'): Promise<void> {
   await page.goto('/login');
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await visible(page.getByLabel('Email')).fill(email);
+  await visible(page.getByLabel('Password')).fill(password);
+  await visible(page.getByRole('button', { name: 'Sign in' })).click();
   await page.waitForURL('/');
 }
 

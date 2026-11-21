@@ -64,7 +64,7 @@ describe('POST /api/quests', () => {
   it('refreshes the cached character sheet and the Guild hall', async () => {
     signIn(people.one);
     await create(quest(2));
-    expect(vi.mocked(revalidateTag).mock.calls).toEqual([['character:tester-one', 'max'], ['guild', 'max']]);
+    expect(vi.mocked(revalidateTag).mock.calls).toEqual([['character:tester-one', { expire: 0 }], ['guild', { expire: 0 }]]);
   });
 
   it('409 for a day already logged', async () => {
