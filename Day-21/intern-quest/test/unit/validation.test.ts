@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isIsoDate, isUuid, parseBadge, parseCharacter, parseNote, parseQuest } from '@/lib/validation';
+import { isIsoDate, isUuid, parseBadge, parseCharacter, parseNote, parseQuest, parseRegistration, safeNext } from '@/lib/validation';
 
 const goodQuest = { day: 3, date: '2026-11-21', title: 'Tame the API', skills: ['backend', 'testing'] };
 
@@ -86,5 +86,33 @@ describe('small checks', () => {
   it('isUuid', () => {
     expect(isUuid('00000000-0000-4000-8000-000000000001')).toBe(true);
     expect(isUuid('1; drop table quests')).toBe(false);
+  });
+});
+
+
+describe('parseRegistration', () => {
+  const good = { email: 'Ada@Example.com', password: 'correct horse battery', name: 'Ada' };
+  it('accepts a registration and lower-cases the email; the password is kept exactly (spaces included)', () => {
+    expect(parseRegistration({ ...good, password: '  spaces count  ' })).toEqual({ ok: true, value: { email: 'ada@example.com', password: '  spaces count  ', name: 'Ada' } });
+  });
+  it('passwords are 10 characters to 72 BYTES (bcrypt ignores the rest)', () => {
+    expect(parseRegistration({ ...good, password: 'nine-char' }).ok).toBe(false);
+    expect(parseRegistration({ ...good, password: 'a'.repeat(72) }).ok).toBe(true);
+    expect(parseRegistration({ ...good, password: 'a'.repeat(73) }).ok).toBe(false);
+    expect(parseRegistration({ ...good, password: '🔒'.repeat(19) }).ok).toBe(false); // 19 characters but 76 bytes
+  });
+  it('rejects a bad email and a missing name', () => {
+    const parsed = parseRegistration({ ...good, email: 'not-an-email', name: ' ' });
+    expect(parsed.ok ? [] : Object.keys(parsed.errors).sort()).toEqual(['email', 'name']);
+  });
+});
+
+describe('safeNext (no open redirects after sign-in)', () => {
+  it('keeps same-site paths', () => {
+    expect(safeNext('/journal')).toBe('/journal');
+    expect(safeNext('/c/ronit?tab=badges')).toBe('/c/ronit?tab=badges');
+  });
+  it('replaces anything that could leave the site', () => {
+    for (const evil of ['https://evil.example', '//evil.example', '/\\evil.example', 'javascript:alert(1)', '', undefined, 42]) expect(safeNext(evil), String(evil)).toBe('/');
   });
 });

@@ -1,6 +1,7 @@
 import 'server-only';
-import { createClient, type PostgrestError, type SupabaseClient } from '@supabase/supabase-js';
-import type { Database, Json, Tables } from './database.types';
+import type { PostgrestError } from '@supabase/supabase-js';
+import { db } from './client';
+import type { Json, Tables } from './database.types';
 import type { CharacterClass, Difficulty, Skill } from '@/lib/game';
 import type { AvatarChoice, CharacterBody, QuestBody } from '@/lib/validation';
 
@@ -9,16 +10,6 @@ import type { AvatarChoice, CharacterBody, QuestBody } from '@/lib/validation';
  * so the service key (which bypasses Row Level Security) can never reach the browser bundle.
  * Every function maps snake_case rows to camelCase objects, so the rest of the app never sees column names.
  */
-let cached: SupabaseClient<Database> | null = null;
-function db() {
-  if (cached) return cached;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) throw new Error('SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must be set (run `npm run env:local`).');
-  cached = createClient<Database>(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
-  return cached;
-}
-
 /** A database error the API can explain: a duplicate, a broken rule, or something unexpected */
 export class DbError extends Error {
   constructor(readonly kind: 'conflict' | 'invalid' | 'unexpected', message: string) {
@@ -26,7 +17,7 @@ export class DbError extends Error {
     this.name = 'DbError';
   }
 }
-function fail(error: PostgrestError, action: string): never {
+export function fail(error: PostgrestError, action: string): never {
   // Postgres error codes: 23505 unique_violation, 23514 check_violation, 23503 foreign_key_violation
   if (error.code === '23505') throw new DbError('conflict', `${action}: that already exists`);
   if (error.code === '23514' || error.code === '22P02') throw new DbError('invalid', `${action}: a value breaks a database rule`);

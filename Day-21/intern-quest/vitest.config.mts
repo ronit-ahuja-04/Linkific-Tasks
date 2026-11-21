@@ -17,7 +17,7 @@ export default defineConfig({
       // pure functions: no database, run anywhere
       { resolve: { alias }, test: { name: 'unit', include: ['test/unit/**/*.test.{ts,tsx}'], environment: 'node' } },
       // need the local Supabase stack (npm run db:start): the schema, and the API route handlers against it
-      { resolve: { alias }, test: { name: 'integration', include: ['test/db/**/*.test.ts', 'test/api/**/*.test.ts'], environment: 'node', fileParallelism: false, env: localEnv } },
+      { resolve: { alias }, test: { name: 'integration', server: { deps: { inline: ['next-auth', '@auth/core'] } }, include: ['test/db/**/*.test.ts', 'test/api/**/*.test.ts'], environment: 'node', fileParallelism: false, env: localEnv } },
     ],
   },
 });
