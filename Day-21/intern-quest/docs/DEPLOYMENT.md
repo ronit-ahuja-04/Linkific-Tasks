@@ -23,10 +23,33 @@ Order matters: database first, then Vercel (which gives you the site's address),
      npx supabase db push
      ```
      `db push` applies `supabase/migrations/` only. The seed is **not** applied, on purpose: its demo accounts have a published password.
-   - or **SQL editor**: paste `supabase/migrations/20261121000000_intern_quest.sql` and run it.
-3. Project Settings → **API**: copy the **Project URL** and the **service_role** key. The service key bypasses Row Level Security, so it goes only into Vercel's server-side settings. Never into chat, a commit, or a `NEXT_PUBLIC_` variable.
+   - or **SQL editor**: paste and run each file in `supabase/migrations/`, **in order**:
+     `20261121000000_intern_quest.sql` (the schema), then `20261122000000_explicit_grants.sql`.
+     The second one matters: newer Supabase cloud projects no longer grant new tables to the server role
+     automatically, and without it every page that reads the database fails with *permission denied for table …*.
+3. Project Settings → **API Keys**: copy the **Project URL** and the **secret key** (`sb_secret_…`; the legacy `service_role` key works too, the *publishable* key does not). The service key bypasses Row Level Security, so it goes only into Vercel's server-side settings. Never into chat, a commit, or a `NEXT_PUBLIC_` variable.
 
 ## 2. The app (Vercel)
+
+Either in the dashboard, or with the CLI (this is how the live site was set up):
+
+```bash
+vercel login
+vercel project add intern-quest
+vercel project update intern-quest --root-directory Day-21/intern-quest --framework nextjs --node-version 22.x --yes
+cd ~/Desktop/Linkific-Tasks
+vercel link --yes --project intern-quest
+vercel env add SUPABASE_URL production
+vercel deploy --prod
+```
+
+The `vercel link` is run in the **repository root**; add the rest of the variables in the table below the same way.
+
+CLI deploys must run from the **repository root**, because the project's Root Directory is `Day-21/intern-quest`
+(deploying from inside that folder fails with *Root Directory does not exist*). The root `.vercelignore` makes the
+upload contain only this app.
+
+In the dashboard instead:
 
 1. vercel.com → **Add New → Project** → import the GitHub repository `Linkific-Tasks`.
 2. **Root Directory: `Day-21/intern-quest`** (the repository holds every day; this is the one app to deploy). Framework: Next.js (detected).
@@ -46,7 +69,7 @@ Order matters: database first, then Vercel (which gives you the site's address),
 
 What happens from then on:
 
-- **Every push to `main`** deploys production; **every pull request** gets its own preview URL (posted on the PR).
+- Once the repository is connected (Vercel → Account Settings → Authentication → connect GitHub, then `vercel git connect` or the project's Git settings): **every push to `main`** deploys production, and **every pull request** gets its own preview URL (posted on the PR).
 - `vercel.json` has an `ignoreCommand` (`git diff --quiet HEAD^ HEAD -- .`): a push that does not touch `Day-21/intern-quest` (another day's work) does not rebuild this app.
 - The build needs **no** database access or secrets (the leaderboard and sitemap are read at request time, then cached), so a build can not fail because the database is down.
 - `src/instrumentation.ts` checks the settings when a server starts. On the production deployment (`VERCEL_ENV=production`) it refuses to start with a missing secret, a short `AUTH_SECRET`, a local database URL, the demo mentor code, or no `NEXT_PUBLIC_SITE_URL`, and the error names the setting.
@@ -66,16 +89,19 @@ What happens from then on:
 Register on the live site, create your character, then import the real Days 1 to 20 of this repository into your account:
 
 ```bash
-SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… node scripts/import-days.mjs you@example.com
+cd Day-21/intern-quest
+read -s "KEY?Secret key: " && SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=$KEY node scripts/import-days.mjs you@example.com; unset KEY
 ```
 
-Type the two values in your own terminal. Days you already logged are skipped.
+Needs **Node 22+** (supabase-js uses the built-in WebSocket; on a Mac with an older nvm default, `/opt/homebrew/bin/node` works). `read -s` keeps the key off the screen and out of your shell history. Days you already logged are skipped; a refused query (usually the wrong key) is reported as such.
 
 ## 5. A custom domain (optional)
 
 Vercel → Settings → **Domains** → add `quest.example.com`, then create the DNS record Vercel shows (a `CNAME` to `cname.vercel-dns.com` for a subdomain, or an `A` record for an apex domain) at your registrar. HTTPS is issued automatically. Then update `NEXT_PUBLIC_SITE_URL` and the GitHub app's URLs to the new domain, and redeploy.
 
 ## 6. Check the live site
+
+The live site was checked this way after deployment (15 automated read-only checks, plus the steps below by hand).
 
 - [ ] `/` shows the Guild hall; `/robots.txt` and `/sitemap.xml` use the real domain
 - [ ] register → create a character → log a quest → the reward screen appears
