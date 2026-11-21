@@ -1,3 +1,5 @@
+import { Analytics } from '@vercel/analytics/next';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { Fredoka, Nunito } from 'next/font/google';
 import MotionProvider from '@/components/MotionProvider';
@@ -25,6 +27,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <body>
         <MotionProvider>{children}</MotionProvider>
+        {/* Vercel Analytics (page views) and Speed Insights (Core Web Vitals from real visitors). Both send data only
+            when the site runs on Vercel with the features switched on; locally they do nothing. */}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
