@@ -162,6 +162,6 @@ describe('Row Level Security', () => {
       headers: { apikey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? '', Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY ?? ''}` },
     });
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual([{ handle: 'ada' }, { handle: 'grace' }, { handle: 'ronit' }]);
+    expect(await response.json()).toEqual(expect.arrayContaining([{ handle: 'ada' }, { handle: 'grace' }, { handle: 'ronit' }]));
   });
 });

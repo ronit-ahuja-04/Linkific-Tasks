@@ -8,7 +8,7 @@ insert into public.users (id, email, name, role, password_hash) values
   ('00000000-0000-4000-8000-000000000009', 'mentor@example.com', 'Maya (mentor)', 'mentor', extensions.crypt('demo-password-123', extensions.gen_salt('bf', 10)));
 
 insert into public.characters (user_id, handle, display_name, bio, class, avatar) values
-  ('00000000-0000-4000-8000-000000000001', 'ronit', 'Ronit', 'Linkific intern. Twenty days from HTML to a deployed Next.js app.', 'fullstack_ranger', '{"skin": 2, "hair": 1, "colour": 0, "accessory": 1}'),
+  ('00000000-0000-4000-8000-000000000001', 'ronit', 'Ronit', 'Linkific intern. Twenty days from a first HTML page to Next.js.', 'fullstack_ranger', '{"skin": 2, "hair": 1, "colour": 0, "accessory": 1}'),
   ('00000000-0000-4000-8000-000000000002', 'ada', 'Ada', 'Writes the first program, then the tests for it.', 'frontend_mage', '{"skin": 0, "hair": 3, "colour": 4, "accessory": 2}'),
   ('00000000-0000-4000-8000-000000000003', 'grace', 'Grace', 'Found the bug. It was a moth.', 'backend_knight', '{"skin": 1, "hair": 2, "colour": 2, "accessory": 0}');
 
