@@ -106,3 +106,13 @@ export async function setRole(id: string, role: Role): Promise<void> {
   const { error } = await db().from('users').update({ role }).eq('id', id);
   if (error) fail(error, 'Changing the role');
 }
+
+export type RedeemResult = 'promoted' | 'already-mentor' | 'missing' | 'wrong';
+/** Shared by POST /api/mentor and the character page's form: check the code, then promote */
+export async function redeemInviteCode(user: { id: string; role: Role }, code: string): Promise<RedeemResult> {
+  if (user.role === 'mentor') return 'already-mentor';
+  if (!code) return 'missing';
+  if (!inviteCodeMatches(code, process.env.MENTOR_INVITE_CODE)) return 'wrong';
+  await setRole(user.id, 'mentor');
+  return 'promoted';
+}

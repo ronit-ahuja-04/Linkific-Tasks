@@ -196,3 +196,51 @@ export async function deleteMentorBadge(id: string): Promise<void> {
   const { error } = await db().from('badges').delete().eq('id', id);
   if (error) fail(error, 'Deleting the badge');
 }
+
+// ---------------------------------------------------------------- the Guild hall (mentors)
+
+export interface GuildQuest {
+  id: string;
+  day: number;
+  date: string;
+  title: string;
+  body: string;
+  blockers: string;
+  difficulty: Difficulty;
+  skills: Skill[];
+  prLinks: string[];
+  createdAt: string;
+  handle: string;
+  displayName: string;
+  class: CharacterClass;
+}
+
+/** The newest published, public quests from public characters: what a mentor reviews */
+export async function listRecentPublicQuests(limit = 30): Promise<GuildQuest[]> {
+  const { data, error } = await db()
+    .from('quests')
+    .select('id, day, date, title, body, blockers, difficulty, skills, pr_links, created_at, characters!inner(handle, display_name, class, is_public)')
+    .eq('status', 'published')
+    .eq('is_public', true)
+    .eq('characters.is_public', true)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) fail(error, 'Loading the guild feed');
+  return data.map((q) => ({
+    id: q.id, day: q.day, date: q.date, title: q.title, body: q.body, blockers: q.blockers, difficulty: q.difficulty, skills: q.skills,
+    prLinks: q.pr_links, createdAt: q.created_at, handle: q.characters.handle, displayName: q.characters.display_name, class: q.characters.class,
+  }));
+}
+
+/** Notes for many quests in one query, grouped by quest id */
+export async function listNotesFor(questIds: readonly string[]): Promise<Map<string, Note[]>> {
+  const grouped = new Map<string, Note[]>();
+  if (questIds.length === 0) return grouped;
+  const { data, error } = await db().from('notes').select('id, quest_id, author_id, body, created_at, users(name)').in('quest_id', [...questIds]).order('created_at');
+  if (error) fail(error, 'Loading notes');
+  for (const row of data) {
+    const note = toNote(row);
+    grouped.set(note.questId, [...(grouped.get(note.questId) ?? []), note]);
+  }
+  return grouped;
+}

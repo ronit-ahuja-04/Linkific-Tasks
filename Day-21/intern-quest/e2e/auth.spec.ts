@@ -1,17 +1,7 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { registerNew } from './helpers';
 
-const unique = () => `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@test.invalid`;
 
-async function registerNew(page: Page, name = 'E2E Hero') {
-  const email = unique();
-  await page.goto('/register');
-  await page.getByLabel('Name').fill(name);
-  await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill('a long test password');
-  await page.getByRole('button', { name: 'Start your quest' }).click();
-  await page.waitForURL('/');
-  return email;
-}
 
 test.describe('email and password', () => {
   test('register signs you in; the session carries your id and the intern role', async ({ page }) => {
@@ -75,8 +65,9 @@ test.describe('email and password', () => {
 test.describe('redirects', () => {
   test('a signed-in visitor to /login goes straight to ?next', async ({ page }) => {
     await registerNew(page);
-    await page.goto('/login?next=/register');
-    await page.waitForURL('/register');
+    // (not ?next=/register: that page also redirects signed-in visitors, onwards to /)
+    await page.goto('/login?next=/journal');
+    await page.waitForURL('/journal');
   });
 
   test('?next can not send you off the site after signing in', async ({ page }) => {
@@ -122,6 +113,7 @@ test.describe('the API sees the session', () => {
     expect((await page.request.post('/api/mentor', { data: { code: 'demo-mentor' } })).status()).toBe(200);
 
     await page.getByRole('button', { name: 'Sign out' }).click();
+    await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible(); // wait until the sign-out has finished
     await page.goto('/login');
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password').fill('a long test password');
