@@ -1,33 +1,78 @@
-import { connection } from 'next/server';
+import type { Metadata } from 'next';
+import Link from 'next/link';
 import { Suspense } from 'react';
-import QuestApp from '@/components/QuestApp';
-import Account from '@/components/auth/Account';
-import { computeStats } from '@/lib/game';
-import { listCharacters, listMentorBadges, listQuests } from '@/lib/server/db';
-import { buildCharacterView } from '@/lib/view';
+import Pip from '@/components/Pip';
+import HeroPip from '@/components/landing/HeroPip';
+import HomeCta from '@/components/landing/HomeCta';
+import { getGuildBoard } from '@/lib/server/public';
+import { SITE } from '@/lib/site';
+
+export const metadata: Metadata = {
+  title: { absolute: `${SITE.name}: your internship as a role-playing game` },
+  description: SITE.description,
+  alternates: { canonical: '/' },
+};
 
 /**
- * PROGRESS PREVIEW of the character screen: real database, real game rules, the new design.
- * The data is read and turned into plain view models on the server; QuestApp (a Client Component) only animates.
+ * The home page. Everything except the sign-in buttons comes from the cache (the board is a `use cache` read tagged
+ * `guild`), so the page is part of the static shell; the buttons depend on the session and stream in.
  */
-export default function Home() {
+export default async function Home() {
+  const board = await getGuildBoard();
   return (
-    <Suspense fallback={<p style={{ padding: 24, fontFamily: 'system-ui' }}>Loading the guild…</p>}>
-      <Characters />
-    </Suspense>
-  );
-}
+    <div className="home">
+      <header className="home-bar">
+        <Link href="/" className="wordmark">Intern Quest</Link>
+        <Suspense fallback={<div className="home-cta" />}>
+          <HomeCta />
+        </Suspense>
+      </header>
 
-async function Characters() {
-  await connection(); // read the database per request, so the preview always shows the current data
-  const today = new Date().toISOString().slice(0, 10);
-  const characters = await listCharacters();
-  const views = await Promise.all(
-    characters.map(async (c) => {
-      const [quests, mentorBadges] = await Promise.all([listQuests(c.userId), listMentorBadges(c.userId)]);
-      return { xp: computeStats(c.class, quests).totalXp, view: buildCharacterView(c, quests, mentorBadges, today) };
-    }),
+      <section className="home-hero">
+        <div>
+          <h1>Your internship, <span>as a role-playing game.</span></h1>
+          <p className="home-lede">Log what you build each day. Every entry is a quest that earns XP for the skills you used. Level up, earn badges, and raise Pip from an egg to a guardian.</p>
+          <div className="home-actions">
+            <Link href="/register" className="big-button big-light">Start your quest</Link>
+            <Link href="/c/ronit" className="ghost-button ghost-light">See a real character</Link>
+          </div>
+        </div>
+        <HeroPip />
+      </section>
+
+      <section className="home-steps" aria-labelledby="how-title">
+        <h2 id="how-title" className="sr-only">How it works</h2>
+        <ol>
+          <li className="card"><span className="step">1</span><h3>Log a quest</h3><p>What you did, the skills you used, your pull requests, and any blockers.</p></li>
+          <li className="card"><span className="step">2</span><h3>Earn XP and level up</h3><p>Harder quests, linked PRs and daily streaks earn more. Each skill levels up on its own.</p></li>
+          <li className="card"><span className="step">3</span><h3>Raise Pip</h3><p>Your sidekick reacts to every quest, worries about blockers, and grows as you do.</p></li>
+        </ol>
+      </section>
+
+      <section className="home-board" aria-labelledby="board-title">
+        <h2 id="board-title">The Guild hall</h2>
+        <p className="home-lede">Every public adventurer, by XP.</p>
+        {board.length === 0 ? <p className="card empty">No public adventurers yet. Be the first.</p> : (
+          <ol className="board">
+            {board.map((entry, i) => (
+              <li key={entry.handle}>
+                <Link href={`/c/${entry.handle}`} className="card board-card">
+                  <span className="board-rank">#{i + 1}</span>
+                  <span className="board-pip" aria-hidden="true"><Pip stage={entry.stage} mood="happy" hop={0} tint={entry.tint} accessory={entry.accessory} /></span>
+                  <span className="board-main">
+                    <strong>{entry.displayName}</strong>
+                    <span className="muted">@{entry.handle} · {entry.classLabel}</span>
+                    <span className="board-level">Level {entry.level} {entry.title}</span>
+                  </span>
+                  <span className="board-xp">{entry.totalXp.toLocaleString('en-US')} XP<small>{entry.questCount} quests{entry.topSkill ? ` · ${entry.topSkill}` : ''}</small></span>
+                </Link>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      <footer className="home-foot">Intern Quest is a Linkific training project. Pip is drawn in SVG; no AI writes its lines.</footer>
+    </div>
   );
-  views.sort((a, b) => b.xp - a.xp); // highest level first
-  return <QuestApp characters={views.map((v) => v.view)} account={<Account />} />;
 }

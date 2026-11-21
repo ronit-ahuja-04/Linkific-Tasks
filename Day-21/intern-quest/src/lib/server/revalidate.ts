@@ -2,9 +2,12 @@ import 'server-only';
 import { revalidateTag } from 'next/cache';
 
 /**
- * Cache tags. The public pages (milestone 5) cache a character sheet under `character:<handle>` and the Guild hall
- * under `guild`. After any write the API marks those stale; with the 'max' profile the next visitor gets the old
- * page instantly while the new one is built in the background.
+ * Cache tags. The public pages cache a character sheet under `character:<handle>` and the Guild hall board under
+ * `guild` (see public.ts). After any write the API expires those entries.
+ *
+ * `{ expire: 0 }` rather than the 'max' profile: with 'max' the next visitor is served the OLD page while a new one is
+ * built, so you would click "See my sheet" right after publishing and not find your quest. Route handlers can not use
+ * `updateTag` (Server Actions only), so an immediate expiry is the documented choice here.
  */
 export const tags = {
   character: (handle: string) => `character:${handle}`,
@@ -12,6 +15,6 @@ export const tags = {
 } as const;
 
 export function refreshCharacter(handle: string): void {
-  revalidateTag(tags.character(handle), 'max');
-  revalidateTag(tags.guild, 'max');
+  revalidateTag(tags.character(handle), { expire: 0 });
+  revalidateTag(tags.guild, { expire: 0 });
 }
