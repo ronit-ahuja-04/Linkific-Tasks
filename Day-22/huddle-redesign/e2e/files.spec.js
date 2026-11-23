@@ -38,7 +38,8 @@ test.describe('files (Supabase Storage)', () => {
     await signUpUI(page, newUser('big'));
     await navLink(page, 'Files').click();
     await page.getByLabel('Choose files to upload').setInputFiles({ name: 'huge.bin', mimeType: 'application/octet-stream', buffer: Buffer.alloc(11 * 1024 * 1024) });
-    await expect(page.getByRole('alert').first()).toContainText(/10/);
+    await expect(page.getByRole('region', { name: 'Notifications' })).toContainText(/10/); // the error toast is shown...
+    await expect(page.locator('[aria-live="assertive"]')).toContainText(/10/); // ...and announced at once (Day 22: an always-present live region)
     await expect(page.getByTestId('file-row')).toHaveCount(0);
   });
 

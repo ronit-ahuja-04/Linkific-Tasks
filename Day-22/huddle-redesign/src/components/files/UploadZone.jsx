@@ -33,6 +33,7 @@ export default function UploadZone({ onFiles, busy, notes, noteId, onNoteChange 
           multiple
           className="sr-only"
           aria-label="Choose files to upload"
+          aria-hidden="true"
           tabIndex={-1}
           disabled={busy}
           onChange={(e) => { pick(e.target.files); e.target.value = ''; }}

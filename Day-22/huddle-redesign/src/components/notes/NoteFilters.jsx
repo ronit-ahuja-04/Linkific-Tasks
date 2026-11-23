@@ -23,34 +23,7 @@ export default function NoteFilters({ filters, tags, onApply, panelOpen, panelId
 
   return (
     <div className="notes-filters">
-      <div className="notes-quick" role="group" aria-label="Show">
-        {SCOPES.map(([value, label]) => (
-          <button key={value} type="button" className="chip" aria-pressed={filters.scope === value} onClick={() => onApply({ ...filters, scope: value })}>
-            {label}
-          </button>
-        ))}
-        <span className="notes-quick-divider" aria-hidden="true" />
-        <button type="button" className="chip" aria-pressed={filters.pinnedOnly} onClick={() => onApply({ ...filters, pinnedOnly: !filters.pinnedOnly })}>
-          <Pin size={14} aria-hidden="true" />Pinned
-        </button>
-      </div>
-
-      {chips.length > 0 && (
-        <ul className="notes-active" aria-label="Active filters">
-          {chips.map((chip) => (
-            <li key={chip.key} className="chip">
-              {chip.label}
-              <button type="button" className="chip-remove" aria-label={`Remove filter: ${chip.label}`} onClick={() => onApply({ ...filters, [chip.key]: DEFAULT_FILTERS[chip.key] })}>
-                <X size={14} aria-hidden="true" />
-              </button>
-            </li>
-          ))}
-          <li>
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onApply({ ...DEFAULT_FILTERS, scope: filters.scope, pinnedOnly: filters.pinnedOnly })}>Clear these</button>
-          </li>
-        </ul>
-      )}
-
+      {/* the panel comes first: a disclosure's content follows its button ("More filters", just above) in the tab order */}
       {panelOpen && (
         <form id={panelId} className="notes-panel card" aria-label="More filters" onSubmit={(event) => { event.preventDefault(); onApply({ ...draft, scope: filters.scope, pinnedOnly: filters.pinnedOnly }); }}>
           <div className="notes-panel-fields">
@@ -90,6 +63,34 @@ export default function NoteFilters({ filters, tags, onApply, panelOpen, panelId
           </div>
         </form>
       )}
+      <div className="notes-quick" role="group" aria-label="Show">
+        {SCOPES.map(([value, label]) => (
+          <button key={value} type="button" className="chip" aria-pressed={filters.scope === value} onClick={() => onApply({ ...filters, scope: value })}>
+            {label}
+          </button>
+        ))}
+        <span className="notes-quick-divider" aria-hidden="true" />
+        <button type="button" className="chip" aria-pressed={filters.pinnedOnly} onClick={() => onApply({ ...filters, pinnedOnly: !filters.pinnedOnly })}>
+          <Pin size={14} aria-hidden="true" />Pinned
+        </button>
+      </div>
+
+      {chips.length > 0 && (
+        <ul className="notes-active" aria-label="Active filters">
+          {chips.map((chip) => (
+            <li key={chip.key} className="chip">
+              {chip.label}
+              <button type="button" className="chip-remove" aria-label={`Remove filter: ${chip.label}`} onClick={() => onApply({ ...filters, [chip.key]: DEFAULT_FILTERS[chip.key] })}>
+                <X size={14} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+          <li>
+            <button type="button" className="btn btn-ghost btn-sm" onClick={() => onApply({ ...DEFAULT_FILTERS, scope: filters.scope, pinnedOnly: filters.pinnedOnly })}>Clear these</button>
+          </li>
+        </ul>
+      )}
+
     </div>
   );
 }

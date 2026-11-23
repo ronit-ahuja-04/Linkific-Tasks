@@ -7,6 +7,7 @@ import { ToastProvider } from '../src/context/ToastContext';
 import { EXAMPLES } from '../src/lib/lab/examples';
 import LabPage from '../src/pages/LabPage';
 import { createFakeClient } from './helpers/notes-fake';
+import { expectToast } from './helpers/toast';
 
 function setup(respond) {
   const fake = createFakeClient();
@@ -83,6 +84,6 @@ describe('LabPage', () => {
     const fake = setup();
     await user.click(screen.getByRole('button', { name: 'Remove leftover scratch notes' }));
     expect(fake.calls[0].ops).toContainEqual(['like', 'title', 'lab-scratch-%']);
-    expect(await screen.findByText('Scratch notes removed')).toBeTruthy();
+    await expectToast('Scratch notes removed');
   });
 });

@@ -53,7 +53,7 @@ export default function AvatarEditor() {
       <div className="profile-avatar-row">
         <Avatar profile={profile} size={96} />
         <div className="profile-avatar-actions">
-          <input ref={inputRef} id="avatar-file" type="file" className="sr-only" accept="image/png,image/jpeg,image/webp,image/gif" onChange={onPick} disabled={busy} aria-label="Choose a profile picture" />
+          <input ref={inputRef} id="avatar-file" type="file" className="sr-only" tabIndex={-1} aria-hidden="true" accept="image/png,image/jpeg,image/webp,image/gif" onChange={onPick} disabled={busy} aria-label="Choose a profile picture" />
           <button type="button" className="btn" onClick={() => inputRef.current?.click()} disabled={busy}>{busy ? 'Working…' : 'Choose picture'}</button>
           {profile?.avatar_path && <button type="button" className="btn btn-danger" onClick={onRemove} disabled={busy}>Remove picture</button>}
           <p className="field-hint">PNG, JPEG, WebP or GIF, up to {AVATAR_MAX_BYTES / (1024 * 1024)} MiB.</p>
