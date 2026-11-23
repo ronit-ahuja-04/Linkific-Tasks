@@ -219,6 +219,7 @@ input[type='checkbox'], input[type='radio'] { accent-color: var(--color-primary)
 
 /* ---------- Empty state: say what is missing, why it matters, and the one thing to do next ---------- */
 .empty-state { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-2); padding: var(--space-8) var(--space-4); }
+.empty-state-compact { padding: var(--space-4) var(--space-2); }
 .empty-state-icon { display: grid; place-items: center; width: 3rem; height: 3rem; margin-bottom: var(--space-2); border-radius: var(--radius-full); background: var(--color-bg-subtle); color: var(--color-text-secondary); }
 .empty-state-title { font-size: var(--text-md); font-weight: var(--weight-semibold); }
 .empty-state-text { color: var(--color-text-secondary); font-size: var(--text-sm); max-width: 40ch; }

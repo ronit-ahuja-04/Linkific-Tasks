@@ -45,6 +45,27 @@ export function mergeRooms(members = [], unread = []) {
     .sort((a, b) => b.unread - a.unread || a.name.localeCompare(b.name));
 }
 
+/** What needs me: my unread @mentions, newest first (the same rows the bell lists) */
+export function loadUnreadMentions(client, limit = 3) {
+  return client
+    .from('notifications')
+    .select('id, room_id, message, created_at, rooms(name)')
+    .is('read_at', null)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+}
+
+/** A person as people know them: the full name, else the username */
+export function displayName(person, fallback = 'someone') {
+  return person?.full_name?.trim() || person?.username || fallback;
+}
+
+/** "Ada" for a greeting */
+export function firstName(profile) {
+  const full = profile?.full_name?.trim();
+  return full ? full.split(/\s+/)[0] : profile?.username || 'there';
+}
+
 /** "Good morning" etc. The hour is passed in so the function stays pure */
 export function greeting(hour) {
   if (hour < 5) return 'Working late';
