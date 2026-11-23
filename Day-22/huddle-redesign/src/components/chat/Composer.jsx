@@ -123,7 +123,7 @@ export default function Composer({ onSend, onTyping, textareaRef }) {
             </ul>
           ) : null}
         </div>
-        <input ref={fileInput} type="file" className="sr-only" tabIndex={-1} aria-label="Attach a file" onChange={chooseFile} />
+        <input ref={fileInput} type="file" className="sr-only" tabIndex={-1} aria-hidden="true" aria-label="Attach a file" onChange={chooseFile} />
         <button type="button" className="icon-btn" aria-label="Attach a file" onClick={() => fileInput.current?.click()} disabled={sending}><Paperclip size={18} aria-hidden="true" /></button>
         <button type="submit" className="btn btn-primary chat-send" disabled={sending || (!text.trim() && !file)}><Send size={16} aria-hidden="true" /> <span className="chat-send-label">{sending ? 'Sending...' : 'Send'}</span></button>
       </div>

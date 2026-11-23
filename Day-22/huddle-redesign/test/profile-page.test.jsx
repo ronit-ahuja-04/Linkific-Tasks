@@ -4,6 +4,7 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ProfilePage from '../src/pages/ProfilePage';
 import { PROFILE, USER, fakeAuth, fakeClient, renderWithAuth } from './helpers/auth';
+import { expectToast } from './helpers/toast';
 
 function setup(overrides = {}, clientOpts = {}) {
   const client = fakeClient({ tables: { profiles: { data: { ...PROFILE }, error: null } }, ...clientOpts });
@@ -38,7 +39,7 @@ describe('ProfilePage', () => {
     expect(client.queries[0].table).toBe('profiles');
     expect(calls[0][1]).toMatchObject({ bio: 'New bio', username: 'ada', full_name: 'Ada Lovelace' });
     expect(calls[1]).toEqual(['eq', 'id', 'u-1']);
-    expect(await screen.findByText('Profile saved')).toBeTruthy();
+    await expectToast('Profile saved');
   });
   it('maps 23505 to "That username is taken"', async () => {
     const user = userEvent.setup();
@@ -107,7 +108,7 @@ describe('ProfilePage', () => {
     await user.type(screen.getByLabelText('Confirm new password'), 'another-pass');
     await user.click(screen.getByRole('button', { name: 'Change password' }));
     expect(auth.updatePassword).toHaveBeenCalledWith('another-pass');
-    expect(await screen.findByText('Password changed')).toBeTruthy();
+    await expectToast('Password changed');
     expect(screen.getByLabelText('New password')).toHaveValue('');
   });
   it('does not change the password when they differ', async () => {

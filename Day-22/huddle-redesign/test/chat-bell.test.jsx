@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import NotificationBell from '../src/components/NotificationBell';
 import { Wrapper, makeFakeClient } from './helpers/chat.jsx';
+import { expectToast } from './helpers/toast';
 
 const note = (id, over = {}) => ({ id, type: 'mention', room_id: 'r1', message_id: id, message: `hey @ada ${id}`, created_at: '2026-11-17T10:00:00Z', read_at: null, rooms: { name: 'General' }, ...over });
 
@@ -51,7 +52,7 @@ describe('NotificationBell', () => {
     const channel = await channelOf(client);
     act(() => channel.emitChange('INSERT', { new: note(9, { message: 'ping @ada now' }) }));
     expect(await screen.findByRole('button', { name: 'Notifications, 1 unread' })).toBeTruthy();
-    expect(screen.getByText(/New mention: ping @ada now/)).toBeTruthy();
+    await expectToast(/New mention: ping @ada now/);
   });
 
   it('recounts on a live UPDATE (read in another tab)', async () => {

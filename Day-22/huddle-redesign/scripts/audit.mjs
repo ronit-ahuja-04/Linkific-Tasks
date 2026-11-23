@@ -96,7 +96,7 @@ for (const target of PAGES) {
   await page.waitForTimeout(300);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   const smallTargets = await page.evaluate(() => [...document.querySelectorAll('a, button, input, select, textarea, [tabindex="0"]')]
-    .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 24 || r.height < 24) && !(el.tagName === 'A' && el.closest('p, li')); })
+    .filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && (r.width < 24 || r.height < 24) && !(el.tagName === 'A' && el.closest('p, li')) && !el.closest('[aria-hidden="true"]'); }) // (M5: hidden from assistive tech and not focusable = not a target)
     .map((el) => `${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') || el.textContent || '').trim().slice(0, 24)}" ${Math.round(el.getBoundingClientRect().width)}×${Math.round(el.getBoundingClientRect().height)}`));
 
   lines.push(`## ${target.name} (\`${target.path}\`)`, '');

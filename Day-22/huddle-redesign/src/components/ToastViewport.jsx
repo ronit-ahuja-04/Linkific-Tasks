@@ -33,8 +33,7 @@ function ToastItem({ toast, onDismiss }) {
   return (
     <div
       className={`snack snack--${toast.type}${leaving ? ' snack--leaving' : ''}`}
-      // errors interrupt a screen reader (alert); everything else waits its turn (status)
-      role={toast.type === 'error' ? 'alert' : 'status'}
+      // no live role here: the text is announced by the viewport's always-present live regions (see below)
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
@@ -81,11 +80,23 @@ export default function ToastViewport() {
     };
   }, []);
 
+  // Announcements. A live region that is created together with its text is often NOT read (screen readers watch
+  // regions that already exist), so two regions are always in the page and the newest message is put inside.
+  // Errors interrupt (assertive); everything else waits its turn (polite). The span's key is the toast id, so the
+  // same message twice ("Saved", "Saved") is a new node and is read again.
+  const latest = toasts.at(-1);
+  const polite = latest && latest.type !== 'error' ? latest : null;
+  const assertive = latest && latest.type === 'error' ? latest : null;
+
   return (
-    <div ref={ref} className="snack-viewport" role="region" aria-label="Notifications">
-      {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
-      ))}
-    </div>
+    <>
+      <div className="sr-only" aria-live="polite" aria-atomic="true">{polite ? <span key={polite.id}>{polite.message}</span> : null}</div>
+      <div className="sr-only" aria-live="assertive" aria-atomic="true">{assertive ? <span key={assertive.id}>{assertive.message}</span> : null}</div>
+      <div ref={ref} className="snack-viewport" role="region" aria-label="Notifications">
+        {toasts.map((toast) => (
+          <ToastItem key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
+        ))}
+      </div>
+    </>
   );
 }

@@ -7,6 +7,7 @@ import { AuthContext } from '../src/auth/AuthContext';
 import { ToastProvider } from '../src/context/ToastContext';
 import FilesPage from '../src/pages/FilesPage';
 import { makeClient } from './helpers/files';
+import { expectToast } from './helpers/toast';
 
 const FILES = [
   { id: 'f1', name: 'photo.png', mime: 'image/png', size: 2048, path: 'u1/a-photo.png', created_at: '2026-11-17T10:00:00Z', note: { id: 'n1', title: 'Launch plan' } },
@@ -74,7 +75,7 @@ describe('FilesPage', () => {
     const big = new File(['x'], 'big.bin');
     Object.defineProperty(big, 'size', { value: 11 * 1024 * 1024 });
     await user.upload(screen.getByLabelText('Choose files to upload'), big);
-    expect((await screen.findByText(/big.bin.*limit is 10.0 MB/)).textContent).toMatch(/11.0 MB/);
+    expect((await expectToast(/big.bin.*limit is 10.0 MB/)).textContent).toMatch(/11.0 MB/);
     expect(client.storageBucket.upload).not.toHaveBeenCalled();
   });
 
@@ -84,7 +85,7 @@ describe('FilesPage', () => {
     await screen.findAllByTestId('file-row');
     client.from.mockImplementation(() => makeClient({ tables: { files: { data: null, error: { message: 'row-level security' } } } }).from('files'));
     await user.upload(screen.getByLabelText('Choose files to upload'), new File(['hello'], 'x.txt', { type: 'text/plain' }));
-    expect(await screen.findByText(/x.txt: You are not allowed/)).toBeTruthy();
+    await expectToast(/x.txt: You are not allowed/);
     expect(client.storageBucket.remove).toHaveBeenCalledTimes(1);
   });
 
@@ -107,7 +108,7 @@ describe('FilesPage', () => {
     setup({ bucket: { download: vi.fn(async () => ({ data: null, error: { message: 'Object not found' } })) } });
     const rows = await screen.findAllByTestId('file-row');
     await user.click(within(rows[0]).getByRole('button', { name: /Download/ }));
-    expect(await screen.findByText(/Download failed: Object not found/)).toBeTruthy();
+    await expectToast(/Download failed: Object not found/);
   });
 
   it('deletes after confirmation: storage first, then the row, then removes it from the list', async () => {
@@ -179,7 +180,7 @@ describe('share link', () => {
     setup({ bucket: { createSignedUrl: vi.fn(async () => ({ data: null, error: { message: 'Object not found' } })) } });
     const rows = await screen.findAllByTestId('file-row');
     await user.click(within(rows[0]).getByRole('button', { name: /Share link/ }));
-    expect(await screen.findByText(/Could not create a link: Object not found/)).toBeTruthy();
+    await expectToast(/Could not create a link: Object not found/);
     expect(within(rows[0]).queryByTestId('countdown')).toBeNull();
   });
 });
