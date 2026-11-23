@@ -8,6 +8,14 @@ import ForgotPasswordPage from '../src/pages/auth/ForgotPasswordPage';
 import { fakeAuth, renderWithAuth } from './helpers/auth';
 
 describe('LoginPage', () => {
+  it('explains why you were signed out when the server ended the session (and says nothing otherwise)', () => {
+    const { unmount } = renderWithAuth(<LoginPage />, { auth: fakeAuth({ sessionEnded: true }) });
+    expect(screen.getByRole('status').textContent).toMatch(/server no longer knows this session/);
+    unmount();
+    renderWithAuth(<LoginPage />);
+    expect(screen.queryByText(/server no longer knows this session/)).toBeNull();
+  });
+
   it('signs in with email and password', async () => {
     const user = userEvent.setup();
     const { auth } = renderWithAuth(<LoginPage />);

@@ -16,7 +16,7 @@ import { friendlyAuthError, validateEmail } from '../../lib/profiles';
  * PublicOnlyRoute guard sends the user on to the page they wanted.
  */
 export default function LoginPage() {
-  const { signIn, signInWithMagicLink } = useAuth();
+  const { signIn, signInWithMagicLink, sessionEnded } = useAuth(); // sessionEnded: the server ended your last session (AuthContext)
   const location = useLocation();
   const [params] = useSearchParams();
   const urlError = params.get('error_description') || params.get('error');
@@ -66,7 +66,11 @@ export default function LoginPage() {
 
   return (
     <AuthShell title="Sign in" subtitle="Welcome back to Huddle." footer={<p className="muted">New here? <Link to="/register">Create an account</Link></p>}>
-      {redirected && <p className="alert alert-info" role="status">Please sign in to continue.</p>}
+      {sessionEnded ? (
+        <p className="alert alert-info" role="status">You were signed out: the server no longer knows this session (you signed out on all devices, or the account was deleted). Sign in again, or create a new account.</p>
+      ) : redirected ? (
+        <p className="alert alert-info" role="status">Please sign in to continue.</p>
+      ) : null}
       {urlError && <p className="alert alert-error" role="alert">{urlError}</p>}
       <OAuthButtons onError={setError} />
       <form className="form" onSubmit={onSubmit} noValidate>

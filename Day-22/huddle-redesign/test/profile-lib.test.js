@@ -11,6 +11,9 @@ describe('friendlyProfileError', () => {
     expect(friendlyProfileError({ code: '23514', message: 'violates check constraint "profiles_username_check"' })).toMatch(/3 to 24/);
     expect(friendlyProfileError({ code: '23514', message: 'profiles_bio_check' })).toMatch(/280/);
   });
+  it('PGRST116 (an update that matched no row) means the account is gone: says so, in words', () => {
+    expect(friendlyProfileError({ code: 'PGRST116', message: 'Cannot coerce the result to a single JSON object' })).toMatch(/account could not be found.*sign in again/i);
+  });
   it('passes other messages through', () => {
     expect(friendlyProfileError({ code: '99', message: 'oops' })).toBe('oops');
   });

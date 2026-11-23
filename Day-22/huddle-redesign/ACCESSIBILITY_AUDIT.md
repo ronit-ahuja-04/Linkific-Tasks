@@ -2,7 +2,7 @@
 
 **Scope:** every page of the app (sign-in, dashboard, chat, notes, files, profile, Query lab), light and dark theme, desktop and phone.
 **Standard:** WCAG 2.2, level AA.
-**Status:** complete (M5). Baseline written in M1, before the redesign; every finding below is fixed, explained or closed. One manual step remains for a person: the VoiceOver pass ([docs/VOICEOVER_CHECK.md](docs/VOICEOVER_CHECK.md)).
+**Status:** complete (M5). Baseline written in M1, before the redesign; every finding below is fixed, explained or closed (14 after a later fix). One manual step remains for a person: the VoiceOver pass ([docs/VOICEOVER_CHECK.md](docs/VOICEOVER_CHECK.md)).
 
 ## How it was checked
 
@@ -43,6 +43,7 @@
 | A-10 | Hidden file inputs measure 1×1 px | none: their visible labels are the targets | Not an issue | Files, Profile, Chat | script false positive, recorded so it is not "found" again | none | Closed |
 | A-12 | The same hidden file inputs WERE in the accessibility tree: a screen reader met two "Attach a file" buttons in the composer (one of them invisible) | 4.1.2 Name, Role, Value (A), 1.3.1 | Moderate | Chat, Files, Profile | ARIA snapshot (M5) | Hide the real input from assistive technology; the visible button opens it | **Fixed (M5)**: `aria-hidden="true"` and `tabIndex={-1}` on the three inputs; the snapshot test asserts one "Attach a file" button |
 | A-13 | Toasts were announced by giving each new toast `role="status"`/`alert`; a live region created together with its text is often not read (VoiceOver especially) | 4.1.3 Status Messages (AA) | Moderate | Every toast | code review (M5) | Live regions that are always present; put the message inside | **Fixed (M5)**: `ToastViewport` has a polite and an assertive region; unit tests check every toast is both shown and in a live region; `e2e/keyboard-aria.spec.js` checks "Note created" in the browser |
+| A-14 | A session the server had ended (account deleted, or "sign out of all devices" elsewhere) was only noticed at the next reload; until then the page acted signed in and showed PostgREST's raw "Cannot coerce the result to a single JSON object" | 3.3.1 Error Identification (A), 3.3.3 Error Suggestion (AA) | Moderate | Every signed-in page | found in use after a local `supabase db reset` deleted an open account | Ask the Auth server again on returning to the tab and after a "no such row" error; say why on the sign-in page; map PGRST116 to words | **Fixed**: `AuthContext` (`confirmSession`, `sessionEnded`), `friendlyProfileError`; unit tests, `e2e/auth.spec.js`, and reproduced by deleting a user in the database with its tab open |
 
 Pre-existing, not accessibility: one unit test (`files-page.test.jsx`, the share-link countdown) failed now and then in the full parallel run, in Day 17 as well. **Fixed in M2**: the test advanced the fake clock before the countdown's interval existed; it now waits for it (15 of 15 runs under load).
 
