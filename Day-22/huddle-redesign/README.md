@@ -18,7 +18,7 @@ Day 17 built Huddle fast to learn Supabase; styling was an afterthought. Day 22 
 |---|---|
 | A redesigned application | this folder: every page, light and dark, desktop and phone ([gallery](docs/GALLERY.md)) |
 | Figma file for one component (optional) | skipped by choice: the design source is code. The living style guide at **`/styleguide`** renders every token and component from the real CSS, in both themes ([screenshot](docs/screenshots/styleguide-light.jpg)) |
-| Accessibility audit with fixes | [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md): 13 findings with WCAG criterion, severity, fix and how it is verified; measurements [before](docs/audit/before.md) and [after](docs/audit/after.md) |
+| Accessibility audit with fixes | [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md): 14 findings with WCAG criterion, severity, fix and how it is verified; measurements [before](docs/audit/before.md) and [after](docs/audit/after.md) |
 | Colour palette and typography documentation | [DESIGN.md](DESIGN.md), and [docs/contrast.md](docs/contrast.md) (every colour pair, generated) |
 | Before/after screenshots | [docs/GALLERY.md](docs/GALLERY.md): 20 views, same pages, same data, same sizes, taken by [a script](scripts/screenshots.mjs) |
 | README explaining the design decisions | this file |
@@ -51,7 +51,7 @@ The full system (every token, why it exists, how to add one) is in [DESIGN.md](D
 
 ## Accessibility
 
-Huddle already passed axe's WCAG 2.1 rules on Day 17; the real problems were in the 2.2 rules and in what only a person or a script measuring the page finds. The [audit](ACCESSIBILITY_AUDIT.md) lists 13 findings, each fixed (or closed as a false positive) and each covered by a test:
+Huddle already passed axe's WCAG 2.1 rules on Day 17; the real problems were in the 2.2 rules and in what only a person or a script measuring the page finds. The [audit](ACCESSIBILITY_AUDIT.md) lists 14 findings, each fixed (or closed as a false positive) and each covered by a test:
 
 | | Day 17 design | Now |
 |---|---|---|
@@ -163,9 +163,9 @@ node scripts/screenshots.mjs after        # the 20 gallery views; run npm run db
 ## Tests
 
 ```bash
-npm test                 # 304 unit and component tests (fake supabase client), including the contrast gate
+npm test                 # 310 unit and component tests (fake supabase client), including the contrast gate
 npm run db:test          # 77 pgTAP assertions inside the real database
-npm run test:e2e         # 74 browser tests against the real local stack
+npm run test:e2e         # 75 browser tests against the real local stack
 npm run lint
 ```
 
@@ -182,6 +182,7 @@ npm run lint
 - **Screen readers met two "Attach a file" buttons**: the hidden file input was in the accessibility tree. Now `aria-hidden`.
 - **Toasts were not reliably announced**: a live region created together with its text is often not read. They now go through live regions that are always on the page.
 - **Hidden screen-reader text widened the page on phones**: absolutely positioned `.sr-only` text escaped a scrolling table. The scroller is now `position: relative`.
+- **A session the server had ended was only noticed at the next reload.** After the account was deleted (a local `supabase db reset` did it to a real sign-up), the page still acted signed in and the avatar upload showed PostgREST's raw "Cannot coerce the result to a single JSON object". The app now asks the Auth server again when you come back to the tab and after a "no such row" error, signs out, and the sign-in page says why. (Day 17's start-up check had only worked because supabase-js signs out by itself for one of the two cases.)
 - **A Day 17 test failed now and then**: it advanced a fake clock before the countdown's timer existed. It now waits for it.
 
 ## Limits

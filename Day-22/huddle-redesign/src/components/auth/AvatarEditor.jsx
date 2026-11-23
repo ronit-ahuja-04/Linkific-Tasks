@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useAuth } from '../../auth/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import Avatar from '../Avatar';
-import { AVATAR_MAX_BYTES, removeAvatar, uploadAvatar, validateAvatarFile } from '../../lib/profiles';
+import { AVATAR_MAX_BYTES, friendlyProfileError, removeAvatar, uploadAvatar, validateAvatarFile } from '../../lib/profiles';
 
 /**
  * AVATAR: the picture is a FILE in Storage (public bucket 'avatars', path <my id>/avatar-<time>.<ext>) and the
@@ -10,7 +10,7 @@ import { AVATAR_MAX_BYTES, removeAvatar, uploadAvatar, validateAvatarFile } from
  * built locally: no request, no signature, anyone with the link can load the image.
  */
 export default function AvatarEditor() {
-  const { client, user, profile, refreshProfile } = useAuth();
+  const { client, user, profile, refreshProfile, recheckSession } = useAuth();
   const toast = useToast();
   const inputRef = useRef(null);
   const [busy, setBusy] = useState(false);
@@ -27,7 +27,8 @@ export default function AvatarEditor() {
     const { error: uploadError } = await uploadAvatar(client, { userId: user.id, file, oldPath: profile?.avatar_path, stamp: Date.now() });
     if (uploadError) {
       setBusy(false);
-      return setError(uploadError.message || 'Could not upload the picture.');
+      if (uploadError.code === 'PGRST116') recheckSession?.(); // no profile row: is this session still a real user?
+      return setError(friendlyProfileError(uploadError) || 'Could not upload the picture.');
     }
     await refreshProfile();
     setBusy(false);
@@ -40,7 +41,8 @@ export default function AvatarEditor() {
     const { error: removeError } = await removeAvatar(client, { userId: user.id, path: profile?.avatar_path });
     if (removeError) {
       setBusy(false);
-      return setError(removeError.message || 'Could not remove the picture.');
+      if (removeError.code === 'PGRST116') recheckSession?.();
+      return setError(friendlyProfileError(removeError) || 'Could not remove the picture.');
     }
     await refreshProfile();
     setBusy(false);

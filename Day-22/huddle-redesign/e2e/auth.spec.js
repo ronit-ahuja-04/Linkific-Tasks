@@ -154,4 +154,21 @@ test.describe('profile', () => {
     await expect(phone).toHaveURL(/\/login/);
     await phone.close();
   });
+
+  test('a session ended while its tab sat open is noticed on returning to the tab, and the sign-in page says why', async ({ page, browser }) => {
+    // Day 22: found when a local `supabase db reset` deleted an account whose tab was open; the app kept acting
+    // signed in until a reload. "Sign out of all devices" elsewhere ends the session on the server the same way.
+    const user = newUser('returning');
+    await clientFor(user, { signUp: true });
+    const laptop = await browser.newPage();
+    await signInUI(laptop, user);
+    await signInUI(page, user);
+    await navLink(page, 'Profile').click();
+    await page.getByRole('button', { name: /all devices/i }).click();
+    await expect(page).toHaveURL(/\/login/);
+    await laptop.evaluate(() => window.dispatchEvent(new Event('focus'))); // coming back to the tab, no reload
+    await expect(laptop).toHaveURL(/\/login/);
+    await expect(laptop.getByText(/server no longer knows this session/)).toBeVisible();
+    await laptop.close();
+  });
 });

@@ -5,7 +5,7 @@ import { BIO_MAX, NAME_MAX, friendlyProfileError, updateProfile, validateUsernam
 
 /** Edit full name, username and bio: one `.update()` on my own row (RLS only lets me touch it) */
 export default function ProfileForm() {
-  const { client, user, profile, refreshProfile } = useAuth();
+  const { client, user, profile, refreshProfile, recheckSession } = useAuth();
   const toast = useToast();
   const [form, setForm] = useState({ fullName: profile?.full_name ?? '', username: profile?.username ?? '', bio: profile?.bio ?? '' });
   const [errors, setErrors] = useState({});
@@ -25,6 +25,7 @@ export default function ProfileForm() {
     if (saveError) {
       setBusy(false);
       const text = friendlyProfileError(saveError);
+      if (saveError.code === 'PGRST116') recheckSession?.(); // no profile row: is this session still a real user?
       // a taken username belongs next to the field it is about
       if (saveError.code === '23505' || saveError.code === '23514') setErrors({ username: text });
       else setError(text);

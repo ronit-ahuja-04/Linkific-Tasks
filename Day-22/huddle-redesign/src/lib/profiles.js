@@ -38,6 +38,9 @@ export function friendlyProfileError(error) {
     return `Check your input: usernames are ${USERNAME_RULE_SHORT}; the name up to ${NAME_MAX} and the bio up to ${BIO_MAX} characters.`;
   }
   if (error.code === '42501') return 'You are not allowed to change this profile.';
+  // PostgREST's "Cannot coerce the result to a single JSON object": the update matched no row, i.e. there is no
+  // profile for this session any more (the account was deleted while you were signed in)
+  if (error.code === 'PGRST116') return 'Your account could not be found on the server, so nothing was saved. Please sign in again.';
   return error.message || 'Could not save your profile.';
 }
 
