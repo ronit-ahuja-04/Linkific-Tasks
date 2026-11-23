@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { act, render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { AuthContext } from '../src/auth/AuthContext';
@@ -13,7 +14,7 @@ const note = (patch) => ({
   owner: { username: 'ada', full_name: 'Ada', avatar_path: null }, note_tags: [{ tags: { id: 't1', name: 'work' } }], ...patch,
 });
 
-function setup({ notes = [note()], count } = {}) {
+function setup({ notes = [note()], count, state } = {}) {
   const fake = createFakeClient();
   fake.respond = (call) => {
     if (call.rpc === 'search_notes') {
@@ -28,7 +29,7 @@ function setup({ notes = [note()], count } = {}) {
   const value = { client: fake, user: { id: 'me' }, profile: { id: 'me', username: 'ada' } };
   const utils = render(
     <AuthContext.Provider value={value}>
-      <ToastProvider><NotesPage /></ToastProvider>
+      <ToastProvider><MemoryRouter initialEntries={[{ pathname: '/notes', state }]}><NotesPage /></MemoryRouter></ToastProvider>
     </AuthContext.Provider>
   );
   return { fake, ...utils };
@@ -54,15 +55,26 @@ describe('NotesPage', () => {
     expect(screen.queryByRole('button', { name: /Edit My plan/ })).toBeNull();
   });
 
-  it('shows an empty state', async () => {
+  it('shows "No notes yet" with no filters, and "No notes match" (with a way out) when filtered', async () => {
+    const user = userEvent.setup();
     setup({ notes: [] });
-    expect(await screen.findByText(/No notes match/)).toBeTruthy();
+    expect(await screen.findByRole('heading', { name: 'No notes yet' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Write a note' })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Mine' }));
+    expect(await screen.findByRole('heading', { name: 'No notes match' })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Clear all filters' }));
+    expect(screen.getByRole('button', { name: 'All' }).getAttribute('aria-pressed')).toBe('true');
+  });
+
+  it('opens the new-note form straight away when the dashboard asks for it', async () => {
+    setup({ state: { compose: true } });
+    expect(await screen.findByRole('form', { name: 'New note' })).toBeTruthy();
   });
 
   it('shows an error from the list query', async () => {
     const fake = createFakeClient();
     fake.respond = (call) => (call.table === 'notes' ? { data: null, error: { code: '42501', message: 'x' } } : { data: [], error: null });
-    render(<AuthContext.Provider value={{ client: fake, user: { id: 'me' } }}><ToastProvider><NotesPage /></ToastProvider></AuthContext.Provider>);
+    render(<AuthContext.Provider value={{ client: fake, user: { id: 'me' } }}><ToastProvider><MemoryRouter><NotesPage /></MemoryRouter></ToastProvider></AuthContext.Provider>);
     expect((await screen.findByRole('alert')).textContent).toMatch(/not allowed/);
   });
 
@@ -76,20 +88,31 @@ describe('NotesPage', () => {
     expect(await screen.findByText('Page 2 of 3')).toBeTruthy();
   });
 
-  it('applies the filters to the query and returns to page 1', async () => {
+  it('quick chips apply at once; "More filters" applies on submit; active filters show as removable chips', async () => {
     const user = userEvent.setup();
     const { fake } = setup();
     await screen.findByText('My plan');
-    await user.selectOptions(screen.getByLabelText('Show'), 'team');
+    const lastQuery = () => fake.callsFor('notes').filter((c) => fake.hasOp(c, 'range')).at(-1);
+    await user.click(screen.getByRole('button', { name: 'Team' }));
+    await user.click(screen.getByRole('button', { name: 'Pinned' }));
+    expect(screen.getByRole('button', { name: 'Team' }).getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Pinned' }).getAttribute('aria-pressed')).toBe('true');
+    const more = screen.getByRole('button', { name: /More filters/ });
+    expect(more.getAttribute('aria-expanded')).toBe('false');
+    await user.click(more);
+    expect(more.getAttribute('aria-expanded')).toBe('true');
     await user.type(screen.getByLabelText('Name contains'), 'plan');
-    await user.click(screen.getByLabelText('Pinned only'));
     await user.click(screen.getByRole('button', { name: 'Apply filters' }));
     await waitFor(() => {
-      const last = fake.callsFor('notes').filter((c) => fake.hasOp(c, 'range')).at(-1);
-      expect(last.ops).toContainEqual(['eq', 'visibility', 'team']);
-      expect(last.ops).toContainEqual(['ilike', 'title', '%plan%']);
-      expect(last.ops).toContainEqual(['eq', 'pinned', true]);
+      expect(lastQuery().ops).toContainEqual(['eq', 'visibility', 'team']);
+      expect(lastQuery().ops).toContainEqual(['ilike', 'title', '%plan%']);
+      expect(lastQuery().ops).toContainEqual(['eq', 'pinned', true]);
     });
+    // the panel filter is now a chip, and the button says how many are active
+    expect(screen.getByRole('button', { name: /More filters, 1 active/ })).toBeTruthy();
+    await user.click(screen.getByRole('button', { name: 'Remove filter: Name: plan' }));
+    await waitFor(() => expect(lastQuery().ops.some((op) => op[0] === 'ilike')).toBe(false));
+    expect(lastQuery().ops).toContainEqual(['eq', 'visibility', 'team']); // the other filters stay
   });
 
   it('creates a note and its tags', async () => {

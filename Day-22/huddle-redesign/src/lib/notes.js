@@ -48,6 +48,21 @@ export function mapNoteError(error) {
 
 export const DEFAULT_FILTERS = { scope: 'all', title: '', priorityAbove: '', priorityBelow: '', pinnedOnly: false, since: '', tagId: '' };
 
+/** Is any filter different from the default? (decides between "No notes yet" and "No notes match") */
+export const isFiltered = (filters) => Object.keys(DEFAULT_FILTERS).some((key) => filters[key] !== DEFAULT_FILTERS[key]);
+
+/** The filters a person set in the panel, as chips: [{ key, label }] (the quick chips are not repeated here) */
+export function panelFilterChips(filters, tags = []) {
+  const chips = [];
+  if (filters.title) chips.push({ key: 'title', label: `Name: ${filters.title}` });
+  if (filters.priorityAbove !== '') chips.push({ key: 'priorityAbove', label: `Priority above ${filters.priorityAbove}` });
+  if (filters.priorityBelow !== '') chips.push({ key: 'priorityBelow', label: `Priority below ${filters.priorityBelow}` });
+  if (filters.since) chips.push({ key: 'since', label: `Since ${filters.since}` });
+  if (filters.tagId) chips.push({ key: 'tagId', label: `Tag: #${tags.find((t) => String(t.id) === String(filters.tagId))?.name ?? 'tag'}` });
+  return chips;
+}
+
+
 /**
  * The list query. Every filter you pick adds one call to the chain, and each call is a WHERE condition:
  *   .eq('owner_id', me)      ->  where owner_id = 'me'

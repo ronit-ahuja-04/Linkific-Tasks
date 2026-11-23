@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Radio } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
+import { NotebookPen, Plus, Radio, Search, SearchX, SlidersHorizontal } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import { useToast } from '../context/ToastContext';
 import NoteCard from '../components/notes/NoteCard';
 import NoteFilters from '../components/notes/NoteFilters';
 import NoteForm from '../components/notes/NoteForm';
 import SearchResults from '../components/notes/SearchResults';
+import CountBadge from '../components/ui/CountBadge';
+import EmptyState from '../components/ui/EmptyState';
+import PageHeader from '../components/ui/PageHeader';
+import UnderTheHood from '../components/ui/UnderTheHood';
 import {
-  DEFAULT_FILTERS, PAGE_SIZE, createNote, deleteNote, flattenTags, getNote, listNotes, listTags, mapNoteError,
-  searchNotes, setNoteTags, subscribeToNotes, updateNote,
+  DEFAULT_FILTERS, PAGE_SIZE, createNote, deleteNote, flattenTags, getNote, isFiltered, listNotes, listTags, mapNoteError,
+  panelFilterChips, searchNotes, setNoteTags, subscribeToNotes, updateNote,
 } from '../lib/notes';
 import '../styles/notes.css';
+
+const SCOPE_TITLES = { all: 'All notes', mine: 'My notes', team: 'Team notes', private: 'Private notes' };
 
 export default function NotesPage() {
   const { client, user } = useAuth();
@@ -22,7 +29,9 @@ export default function NotesPage() {
   const [reloadKey, setReloadKey] = useState(0);
   const [result, setResult] = useState({ key: '', data: [], count: 0, error: null });
   const [tags, setTags] = useState([]);
-  const [editing, setEditing] = useState(null); // null | 'new' | a note
+  const location = useLocation();
+  const [editing, setEditing] = useState(() => (location.state?.compose ? 'new' : null)); // null | 'new' | a note ("Write a note" on the dashboard opens it)
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
   const [busy, setBusy] = useState(false);
   const [announce, setAnnounce] = useState('');
@@ -121,42 +130,42 @@ export default function NotesPage() {
   const searching = Boolean(searchTerm);
   const searchLoading = searching && searchResult.term !== searchTerm;
 
+  const panelChips = panelFilterChips(filters, tags);
+
   return (
     <div className="notes-page">
-      <div className="notes-title-row">
-        <div>
-          <h1 className="page-title">Notes</h1>
-          <p className="page-sub">Yours and your team's. Row Level Security decides which ones you can see.</p>
-        </div>
-        <span className={`notes-live notes-live-${live}`} role="status">
-          <Radio size={14} aria-hidden="true" /> {live === 'live' ? 'Live' : live === 'connecting' ? 'Connecting...' : 'Offline'}
-        </span>
-      </div>
+      <PageHeader
+        title="Notes"
+        description="Yours, and the ones your team shares."
+        actions={
+          <>
+            <span className={`notes-live notes-live-${live}`} role="status">
+              <Radio size={14} aria-hidden="true" /> {live === 'live' ? 'Live' : live === 'connecting' ? 'Connecting...' : 'Offline'}
+            </span>
+            <button type="button" ref={newButtonRef} className="btn btn-primary" onClick={() => setEditing('new')} disabled={editing === 'new'}>
+              <Plus size={16} aria-hidden="true" /> New note
+            </button>
+          </>
+        }
+      />
 
-      <details className="notes-how card">
-        <summary>How this page works (the supabase-js calls)</summary>
-        <ul>
-          <li><code>from('notes').select('*, owner:profiles(...), note_tags(tags(...))', {'{ count: \'exact\' }'})</code>: one request, three tables joined by PostgREST.</li>
-          <li><code>.eq() .gt() .lt() .gte() .ilike()</code> become <code>WHERE</code> conditions; <code>.order()</code> becomes <code>ORDER BY</code>; <code>.range(0, 5)</code> becomes <code>LIMIT 6 OFFSET 0</code>.</li>
-          <li><code>insert([...]).select().single()</code>, <code>update(...).eq('id', id)</code>, <code>delete().eq('id', id)</code>: RLS only lets you change your own notes.</li>
-          <li><code>rpc('search_notes', {'{ q }'})</code>: full-text search in a database function; matches come back wrapped in [[ ]] and are shown with {'<mark>'}.</li>
-          <li><code>channel().on('postgres_changes', ...)</code>: Realtime pushes row changes (only rows RLS lets you read) so the list refreshes by itself.</li>
-        </ul>
-      </details>
-
-      <form className="notes-search" role="search" onSubmit={submitSearch}>
-        <div className="field notes-search-field">
-          <label htmlFor="notes-search-input">Full-text search</label>
-          <input id="notes-search-input" type="search" className="input" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder='Try: meeting -budget, or "launch plan"' />
-        </div>
-        <button type="submit" className="btn btn-primary">Search</button>
-        {searching && <button type="button" className="btn" onClick={() => { setSearchInput(''); setSearchTerm(''); }}>Clear search</button>}
-      </form>
-
+      {/* One toolbar: search and filters side by side (they were two separate panels) */}
       <div className="notes-toolbar">
-        <button type="button" ref={newButtonRef} className="btn btn-primary" onClick={() => setEditing('new')} disabled={editing === 'new'}>
-          <Plus size={16} aria-hidden="true" /> New note
-        </button>
+        <form className="notes-search" role="search" onSubmit={submitSearch}>
+          <label htmlFor="notes-search-input" className="sr-only">Full-text search</label>
+          <span className="notes-search-box">
+            <Search size={16} aria-hidden="true" />
+            <input id="notes-search-input" type="search" className="input" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} placeholder='Search notes, e.g. launch -budget' />
+          </span>
+          <button type="submit" className="btn">Search</button>
+          {searching && <button type="button" className="btn btn-ghost" onClick={() => { setSearchInput(''); setSearchTerm(''); }}>Clear search</button>}
+        </form>
+        {!searching && (
+          <button type="button" className="btn" aria-expanded={filtersOpen} aria-controls="notes-more-filters" onClick={() => setFiltersOpen((open) => !open)}>
+            <SlidersHorizontal size={16} aria-hidden="true" />More filters
+            <CountBadge count={panelChips.length} label={`, ${panelChips.length} active`} />
+          </button>
+        )}
       </div>
 
       {editing && (
@@ -165,26 +174,39 @@ export default function NotesPage() {
 
       {searching ? (
         <section aria-labelledby="notes-heading">
-          <h2 id="notes-heading" tabIndex={-1} ref={headingRef} className="notes-heading">Search results for "{searchTerm}"</h2>
+          <h2 id="notes-heading" tabIndex={-1} ref={headingRef} className="notes-heading">Search results for &ldquo;{searchTerm}&rdquo;</h2>
           <div aria-live="polite" className="notes-status">
             {searchLoading ? 'Searching...' : searchResult.error ? '' : `${searchResult.data.length} result${searchResult.data.length === 1 ? '' : 's'}`}
           </div>
           {searchResult.term === searchTerm && searchResult.error && <p className="alert alert-error" role="alert">{mapNoteError(searchResult.error)}</p>}
-          {!searchLoading && !searchResult.error && searchResult.data.length === 0 && <p className="muted notes-empty">Nothing matches. Search looks at titles and bodies, with stemming ("plans" finds "plan").</p>}
+          {!searchLoading && !searchResult.error && searchResult.data.length === 0 && (
+            <EmptyState compact icon={<SearchX size={20} />} title="Nothing matches">
+              Search looks at titles and bodies, with stemming (&ldquo;plans&rdquo; finds &ldquo;plan&rdquo;). Use -word to leave a word out.
+            </EmptyState>
+          )}
           {!searchLoading && <SearchResults results={searchResult.data} userId={userId} onEdit={editFromSearch} />}
         </section>
       ) : (
         <>
-          <NoteFilters key={JSON.stringify(filters)} filters={filters} tags={tags} onApply={applyFilters} />
+          <NoteFilters key={JSON.stringify(filters)} filters={filters} tags={tags} onApply={applyFilters} panelOpen={filtersOpen} panelId="notes-more-filters" />
           <section aria-labelledby="notes-heading" aria-busy={loading}>
-            <h2 id="notes-heading" tabIndex={-1} ref={headingRef} className="notes-heading">All notes</h2>
-            <div aria-live="polite" className="notes-status">
+            <div className="notes-list-head">
+              {/* visible: focus comes back here after saving or deleting, and focus must be seen */}
+              <h2 id="notes-heading" tabIndex={-1} ref={headingRef} className="notes-heading">{SCOPE_TITLES[filters.scope] ?? 'All notes'}</h2>
+              <div aria-live="polite" className="notes-status">
               {loading && result.key === '' ? 'Loading notes...' : result.error ? '' : result.count === 0 ? '' : `Showing ${firstShown} to ${lastShown} of ${result.count} notes`}
+              </div>
             </div>
             {result.error && <p className="alert alert-error" role="alert">{mapNoteError(result.error)}</p>}
-            {!loading && !result.error && result.count === 0 && (
-              <p className="muted notes-empty">No notes match. Create one, or relax the filters.</p>
-            )}
+            {!loading && !result.error && result.count === 0 && (isFiltered(filters) ? (
+              <EmptyState compact icon={<SearchX size={20} />} title="No notes match" action={<button type="button" className="btn btn-sm" onClick={() => applyFilters(DEFAULT_FILTERS)}>Clear all filters</button>}>
+                Try another filter, or clear them all.
+              </EmptyState>
+            ) : (
+              <EmptyState compact icon={<NotebookPen size={20} />} title="No notes yet" action={<button type="button" className="btn btn-primary btn-sm" onClick={() => setEditing('new')}>Write a note</button>}>
+                Notes you write, and notes your team shares, show up here.
+              </EmptyState>
+            ))}
             <ul className={`notes-grid${loading ? ' notes-loading' : ''}`}>
               {result.data.map((note) => (
                 <NoteCard
@@ -210,6 +232,16 @@ export default function NotesPage() {
           </section>
         </>
       )}
+
+      <UnderTheHood>
+        <ul>
+          <li><code>from(&apos;notes&apos;).select(&apos;*, owner:profiles(...), note_tags(tags(...))&apos;, &#123; count: &apos;exact&apos; &#125;)</code>: one request, three tables joined by PostgREST.</li>
+          <li><code>.eq() .gt() .lt() .gte() .ilike()</code> become <code>WHERE</code> conditions; <code>.order()</code> becomes <code>ORDER BY</code>; <code>.range(0, 5)</code> becomes <code>LIMIT 6 OFFSET 0</code>.</li>
+          <li><code>insert([...]).select().single()</code>, <code>update(...).eq(&apos;id&apos;, id)</code>, <code>delete().eq(&apos;id&apos;, id)</code>: RLS only lets you change your own notes.</li>
+          <li><code>rpc(&apos;search_notes&apos;, &#123; q &#125;)</code>: full-text search in a database function; matches come back wrapped in [[ ]] and are shown with <code>&lt;mark&gt;</code>.</li>
+          <li><code>channel().on(&apos;postgres_changes&apos;, ...)</code>: Realtime pushes row changes (only rows RLS lets you read) so the list refreshes by itself.</li>
+        </ul>
+      </UnderTheHood>
       <p className="sr-only" role="status" aria-live="polite">{announce}</p>
     </div>
   );
