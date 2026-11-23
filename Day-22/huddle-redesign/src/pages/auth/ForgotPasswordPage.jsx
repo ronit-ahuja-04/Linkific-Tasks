@@ -18,6 +18,7 @@ export default function ForgotPasswordPage() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     const problem = validateEmail(email);
     setError(problem);
     if (problem) return;
@@ -40,7 +41,7 @@ export default function ForgotPasswordPage() {
             <input id="forgot-email" type="email" className="input" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} aria-invalid={error ? 'true' : undefined} aria-describedby={error ? 'forgot-email-error' : undefined} required />
             {error && <p id="forgot-email-error" className="field-error" role="alert">{error}</p>}
           </div>
-          <button type="submit" className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
+          <button type="submit" className="btn btn-primary btn-block" aria-disabled={busy || undefined}>{busy ? 'Sending…' : 'Send reset link'}</button>
         </form>
       )}
     </AuthShell>

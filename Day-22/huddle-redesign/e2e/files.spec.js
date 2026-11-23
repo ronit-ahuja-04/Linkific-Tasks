@@ -50,6 +50,7 @@ test.describe('files (Supabase Storage)', () => {
     await navLink(page, 'Files').click();
     await page.getByLabel('Choose files to upload').setInputFiles({ name: 'secret.txt', mimeType: 'text/plain', buffer: Buffer.from('s') });
     await expect(page.getByTestId('file-row').filter({ hasText: 'secret.txt' })).toBeVisible();
+    await page.getByText('Under the hood: storage calls, and public vs private buckets').click(); // the demo lives in the collapsed panel since Day 22
     await page.getByRole('button', { name: /try to open it without a signature/i }).click();
     await expect(page.getByTestId('private-result')).toContainText(/refused|400|404/i);
     await page.getByRole('button', { name: /open my avatar without signing in/i }).click();

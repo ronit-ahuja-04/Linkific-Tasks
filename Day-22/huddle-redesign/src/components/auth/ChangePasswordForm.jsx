@@ -16,6 +16,7 @@ export default function ChangePasswordForm() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     setError('');
     const next = { password: validatePassword(password), confirm: password !== confirm ? 'The passwords do not match.' : '' };
     setErrors(next);
@@ -37,7 +38,7 @@ export default function ChangePasswordForm() {
       <PasswordField label="New password" name="new-password" value={password} onChange={setPassword} autoComplete="new-password" error={errors.password} showStrength />
       <PasswordField label="Confirm new password" name="confirm-password" value={confirm} onChange={setConfirm} autoComplete="new-password" error={errors.confirm} />
       {error && <p className="alert alert-error" role="alert">{error}</p>}
-      <div><button type="submit" className="btn" disabled={busy}>{busy ? 'Saving…' : 'Change password'}</button></div>
+      <div><button type="submit" className="btn" aria-disabled={busy || undefined}>{busy ? 'Saving…' : 'Change password'}</button></div>
     </form>
   );
 }

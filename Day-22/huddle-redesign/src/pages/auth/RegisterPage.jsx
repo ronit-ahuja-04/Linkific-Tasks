@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import UnderTheHood from '../../components/ui/UnderTheHood';
 import AuthShell from '../../components/auth/AuthShell';
 import OAuthButtons from '../../components/auth/OAuthButtons';
 import PasswordField from '../../components/auth/PasswordField';
@@ -23,6 +24,7 @@ export default function RegisterPage() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     const next = {
       email: validateEmail(form.email),
       password: validatePassword(form.password),
@@ -67,16 +69,15 @@ export default function RegisterPage() {
           <input id="reg-name" name="fullName" className="input" autoComplete="name" maxLength={80} value={form.fullName} onChange={(e) => set('fullName')(e.target.value)} />
         </div>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
-        <button type="submit" className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Creating account…' : 'Create account'}</button>
+        <button type="submit" className="btn btn-primary btn-block" aria-disabled={busy || undefined}>{busy ? 'Creating account…' : 'Create account'}</button>
       </form>
-      <details className="auth-how">
-        <summary>How this works</summary>
+      <UnderTheHood>
         <ul>
           <li><code>supabase.auth.signUp({'{ email, password, options: { data: { username } } }'})</code> inserts a row in <code>auth.users</code>.</li>
           <li>A database trigger (<code>handle_new_user</code>) then creates your <code>profiles</code> row with the same id.</li>
           <li>Passwords are stored as bcrypt hashes by Supabase Auth; the app never sees them again.</li>
         </ul>
-      </details>
+      </UnderTheHood>
     </AuthShell>
   );
 }

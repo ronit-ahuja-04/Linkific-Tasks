@@ -4,7 +4,10 @@ import { runExample, runRealtimeDemo } from '../../lib/lab/examples';
 import ResultView from './ResultView';
 
 /** One runnable example: the supabase-js code, the SQL it becomes, a Run button and the live result */
-export default function LabExample({ example, ctx }) {
+const SAID = { rows: 'returned rows', empty: 'returned no rows', skipped: 'was skipped', error: 'failed', bad: 'gave an unexpected result' };
+
+/** One runnable example. `onDone(message)` tells the page what to announce (the page has the one live region). */
+export default function LabExample({ example, ctx, onDone }) {
   const [running, setRunning] = useState(false);
   const [outcome, setOutcome] = useState(null);
   const [events, setEvents] = useState(null);
@@ -19,8 +22,12 @@ export default function LabExample({ example, ctx }) {
       const { events: seen, error } = await runRealtimeDemo(ctx, { onEvent: (entry) => setEvents((list) => [...list, entry]) });
       setEvents(seen);
       setRtError(error ? error.message : '');
+      onDone?.(`${example.title}: ${error ? 'failed' : `${seen.length} events arrived`}. The result is below its Run button.`);
     } else {
-      setOutcome(await runExample(example, ctx));
+      const result = await runExample(example, ctx);
+      setOutcome(result);
+      const said = result?.status === 'error' && result.ok ? 'was refused by the database, as expected' : SAID[result?.status] ?? 'finished';
+      onDone?.(`${example.title} ${said}. The result is below its Run button.`);
     }
     setRunning(false);
   };
@@ -28,24 +35,24 @@ export default function LabExample({ example, ctx }) {
   return (
     <article className="lab-example card" aria-labelledby={`lab-${example.id}-title`}>
       <header className="lab-example-head">
-        <h3 id={`lab-${example.id}-title`}>{example.title}</h3>
+        <h2 id={`lab-${example.id}-title`} className="lab-title">{example.title}</h2>
         {example.mutates && <span className="badge">writes a scratch note, then cleans up</span>}
       </header>
       <p className="lab-explain">{example.explain}</p>
       <div className="lab-code-grid">
         <div>
-          <h4>supabase-js</h4>
+          <h3 className="lab-code-title">supabase-js</h3>
           <pre className="lab-code" tabIndex={0} aria-label={`Code for ${example.title}`}><code>{example.code}</code></pre>
         </div>
         <div>
-          <h4>{isRealtime ? 'Behind the scenes' : 'The SQL it becomes'}</h4>
+          <h3 className="lab-code-title">{isRealtime ? 'Behind the scenes' : 'The SQL it becomes'}</h3>
           <pre className="lab-code" tabIndex={0} aria-label={`SQL for ${example.title}`}><code>{example.sql}</code></pre>
         </div>
       </div>
       <button type="button" className="btn btn-primary btn-sm lab-run" onClick={run} disabled={running} aria-label={`Run ${example.title}`}>
         <Play size={14} aria-hidden="true" /> {running ? 'Running...' : 'Run'}
       </button>
-      <div aria-live="polite">
+      <div>
         {isRealtime ? (
           events && (
             <div className="lab-result">

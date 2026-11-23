@@ -295,7 +295,7 @@ export default function StyleguidePage() {
             </ul>
           </Section>
 
-          <Section id="sg-space" title="Spacing and layout" intro="A 4px base and eight steps; nothing in the app uses a space that is not on this list. Layout is a 12-column grid, written mobile first: one column on a phone, then 640, 960 and 1280px breakpoints.">
+          <Section id="sg-space" title="Spacing and layout" intro="A 4px base and eight steps: every gap, margin and padding in the app comes from this list (only 1–3px hairlines and borders are written directly). Layout is a 12-column grid, written mobile first: one column on a phone, then 640, 960 and 1280px breakpoints.">
             <ul className="sg-spacing">
               {SPACING.map(([token, px, use]) => (
                 <li key={token}>

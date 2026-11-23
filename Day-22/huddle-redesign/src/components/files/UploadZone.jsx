@@ -14,7 +14,7 @@ export default function UploadZone({ onFiles, busy, notes, noteId, onNoteChange 
 
   return (
     <section className="card files-upload" aria-labelledby="files-upload-title">
-      <h2 id="files-upload-title" className="files-h2">Upload a file</h2>
+      <h2 id="files-upload-title" className="card-title files-h2">Upload a file</h2>
       <div
         className={`files-drop${dragging ? ' is-dragging' : ''}`}
         onDragOver={(e) => { e.preventDefault(); setDragging(true); }}

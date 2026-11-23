@@ -4,6 +4,8 @@ import AccountPanel from '../components/auth/AccountPanel';
 import AvatarEditor from '../components/auth/AvatarEditor';
 import ChangePasswordForm from '../components/auth/ChangePasswordForm';
 import ProfileForm from '../components/auth/ProfileForm';
+import PageHeader from '../components/ui/PageHeader';
+import UnderTheHood from '../components/ui/UnderTheHood';
 import '../styles/profile.css';
 
 export default function ProfilePage() {
@@ -13,8 +15,7 @@ export default function ProfilePage() {
   }, []);
   return (
     <div className="profile-page">
-      <h1 className="page-title">Profile</h1>
-      <p className="page-sub">How teammates see you, and how you sign in.</p>
+      <PageHeader title="Profile" description="How teammates see you, and how you sign in." />
       {!profile ? (
         <p className="muted" role="status">Loading your profile…</p>
       ) : (
@@ -26,15 +27,14 @@ export default function ProfilePage() {
           <div className="card profile-card"><ChangePasswordForm /></div>
         </div>
       )}
-      <details className="card profile-how">
-        <summary>How this works</summary>
+      <UnderTheHood>
         <ul>
-          <li><code>supabase.from('profiles').update({'{ full_name, username, bio }'}).eq('id', me)</code> is <code>UPDATE profiles SET ... WHERE id = me</code>; a policy also requires <code>id = auth.uid()</code>.</li>
+          <li><code>from(&apos;profiles&apos;).update(&#123; full_name, username, bio &#125;).eq(&apos;id&apos;, me)</code> is <code>UPDATE profiles SET ... WHERE id = me</code>; a policy also requires <code>id = auth.uid()</code>.</li>
           <li>A duplicate username comes back as Postgres error <code>23505</code>; a badly formatted one as <code>23514</code> (CHECK constraint).</li>
-          <li><code>supabase.storage.from('avatars').upload(path, file)</code> stores the picture; <code>getPublicUrl(path)</code> builds its URL because the bucket is public.</li>
-          <li><code>supabase.auth.updateUser({'{ password }'})</code> changes the password; <code>signOut({'{ scope: \'global\' }'})</code> revokes all sessions.</li>
+          <li><code>storage.from(&apos;avatars&apos;).upload(path, file)</code> stores the picture; <code>getPublicUrl(path)</code> builds its URL because the bucket is public.</li>
+          <li><code>auth.updateUser(&#123; password &#125;)</code> changes the password; <code>signOut(&#123; scope: &apos;global&apos; &#125;)</code> revokes all sessions.</li>
         </ul>
-      </details>
+      </UnderTheHood>
     </div>
   );
 }

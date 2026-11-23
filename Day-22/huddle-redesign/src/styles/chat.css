@@ -105,12 +105,12 @@
 .bell { position: relative; }
 .bell-btn { position: relative; }
 /* the bell's count is amber: unread mentions are the one thing Huddle calls "needs you" */
-.bell-count { position: absolute; top: -4px; right: -4px; min-width: 18px; padding: 0 4px; border-radius: var(--radius-full); background: var(--color-attention); color: var(--color-on-attention); font-size: 11px; font-weight: var(--weight-bold); line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
-.bell-panel { position: absolute; right: 0; top: calc(100% + 8px); width: min(360px, 92vw); z-index: 1500; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-md); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.bell-count { position: absolute; top: -4px; right: -4px; min-width: 18px; padding: 0 var(--space-1); border-radius: var(--radius-full); background: var(--color-attention); color: var(--color-on-attention); font-size: 11px; font-weight: var(--weight-bold); line-height: 18px; text-align: center; font-variant-numeric: tabular-nums; }
+.bell-panel { position: absolute; right: 0; top: calc(100% + 8px); width: min(360px, 92vw); z-index: 1500; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 12px; box-shadow: var(--shadow-md); padding: var(--space-3); display: flex; flex-direction: column; gap: var(--space-2); }
 .bell-head { display: flex; justify-content: space-between; align-items: center; }
-.bell-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; max-height: 320px; overflow-y: auto; }
-.bell-list a { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 8px; text-decoration: none; color: var(--color-text); }
+.bell-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-1); max-height: 320px; overflow-y: auto; }
+.bell-list a { display: flex; flex-direction: column; gap: 2px; padding: var(--space-2) var(--space-2); border-radius: 8px; text-decoration: none; color: var(--color-text); }
 .bell-list a:hover { background: var(--color-bg-subtle); }
 .bell-list .is-unread a { border-left: 3px solid var(--color-primary); }
-.bell-room { font-size: 13px; font-weight: 600; }
-.bell-msg { font-size: 14px; color: var(--color-text-secondary); overflow-wrap: anywhere; }
+.bell-room { font-size: var(--text-sm); font-weight: 600; }
+.bell-msg { font-size: var(--text-sm); color: var(--color-text-secondary); overflow-wrap: anywhere; }
