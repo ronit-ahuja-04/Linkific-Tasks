@@ -1,37 +1,79 @@
-> **Day 22 (in progress):** this folder is a copy of Day 17's Huddle being redesigned. See [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) and [docs/UX_REVIEW.md](docs/UX_REVIEW.md). The design system is in place: tokens in [src/styles/tokens.css](src/styles/tokens.css), the living style guide at `/styleguide` (`npm run dev`, then http://localhost:5177/styleguide), and every colour pair checked by `npm run contrast` ([docs/contrast.md](docs/contrast.md)). The text below is still Day 17's README; it is rewritten at the end of the redesign.
+# Huddle, redesigned
 
-# Huddle: a team workspace on Supabase
-
-**Day 17 project:** Linkific Month 1 Training
+**Day 22 project:** Linkific Month 1 Training · UI/UX design principles for developers
 **Author:** Ronit Ahuja
-**Stack:** React 19, Vite, supabase-js, a local Supabase stack (PostgreSQL 17, GoTrue Auth, PostgREST, Realtime, Storage), Vitest, Testing Library, pgTAP, Playwright
-**PRD:** [Day17_PRD.md](../Day17_PRD.md)
-**Comparison:** [FIREBASE_VS_SUPABASE.md](../FIREBASE_VS_SUPABASE.md)
+**Based on:** [Day 17's Huddle](../../Day-17/huddle) (a team workspace on Supabase), copied here and redesigned; the database, the API calls and the features are unchanged.
+**Stack:** React 19, Vite, supabase-js, local Supabase; Inter and JetBrains Mono (self-hosted); Vitest, Playwright, axe-core, pgTAP
+**PRD:** [Day22_PRD.md](../Day22_PRD.md) · **Design system:** [DESIGN.md](DESIGN.md) · **Accessibility audit:** [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) · **Before/after:** [docs/GALLERY.md](docs/GALLERY.md)
 
-Huddle is a small team workspace: chat rooms, notes with full-text search, file sharing, a profile page and a dashboard. It exists to use every part of Supabase for real, and every page says which supabase-js call or SQL feature it is showing.
+Day 17 built Huddle fast to learn Supabase; styling was an afterthought. Day 22 redesigns it with real design principles, makes it accessible to WCAG 2.2 AA, and backs every claim with evidence a script produced: contrast ratios, screenshots, measurements and tests.
 
-| Task from the brief | Where it is |
+| Before (Day 17) | After (Day 22) |
 |---|---|
-| Supabase project, client, environment variables | `src/lib/supabase.js`, `.env`, `supabase/config.toml` |
-| Email and password, magic link, OAuth (Google, GitHub), password reset | `src/auth/AuthContext.jsx`, `src/pages/auth/` |
-| Tables, relations, constraints, indexes | `supabase/migrations/` |
-| Row Level Security (35 policies) | `supabase/migrations/` (every table has RLS on) |
-| CRUD with filters, ordering, limit and ranges | Notes page, `src/lib/notes.js`, the Query lab |
-| Realtime (changes, typing, presence) | Chat page, Notes ("live" badge), `src/components/chat/useRoomChannel.js` |
-| Storage (public and private buckets, signed URLs) | Files page, Profile picture, chat attachments |
-| RPC, full-text search, computed columns, triggers | `search_notes`, `unread_counts`, `workspace_stats`; generated `fts` and `slug` columns; five triggers |
-| Firebase vs Supabase | [FIREBASE_VS_SUPABASE.md](../FIREBASE_VS_SUPABASE.md) |
+| ![Dashboard before](docs/screenshots/before/dashboard-light.jpg) | ![Dashboard after](docs/screenshots/after/dashboard-light.jpg) |
+
+## What the brief asked for, and where it is
+
+| Deliverable | Where |
+|---|---|
+| A redesigned application | this folder: every page, light and dark, desktop and phone ([gallery](docs/GALLERY.md)) |
+| Figma file for one component (optional) | skipped by choice: the design source is code. The living style guide at **`/styleguide`** renders every token and component from the real CSS, in both themes ([screenshot](docs/screenshots/styleguide-light.jpg)) |
+| Accessibility audit with fixes | [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md): 13 findings with WCAG criterion, severity, fix and how it is verified; measurements [before](docs/audit/before.md) and [after](docs/audit/after.md) |
+| Colour palette and typography documentation | [DESIGN.md](DESIGN.md), and [docs/contrast.md](docs/contrast.md) (every colour pair, generated) |
+| Before/after screenshots | [docs/GALLERY.md](docs/GALLERY.md): 20 views, same pages, same data, same sizes, taken by [a script](scripts/screenshots.mjs) |
+| README explaining the design decisions | this file |
+
+## Design decisions, principle by principle
+
+| Principle | The problem on Day 17 | What changed |
+|---|---|---|
+| **Visual hierarchy** | Developer explanations ("How this page works") competed with the product on every page; five equal stat tiles; one size for everything | One `h1` per page in the same place; the explanations are collapsed in one "Under the hood" panel at the end of each page; the dashboard leads with what needs you, and the numbers became a quiet list |
+| **Contrast** | Every list item an underlined link; no difference between primary and secondary actions | One primary button per view; secondary, ghost and danger buttons; links underlined only in running text; every text pair at least 4.5:1, measured ([contrast](docs/contrast.md)) |
+| **Alignment** | Cards of uneven height left holes; ad-hoc pixel values | A 4 px spacing grid with eight steps, a 12-column layout, equal-height cards with their footers on the bottom edge |
+| **Proximity** | Notes: six filters in a big panel, search far from "New note"; the chat room list floated loose | One toolbar (search + More filters), quick filter chips that apply at once, the active filters as removable chips; rooms as one list with their unread count on the row |
+| **Repetition** | Every page laid out differently | The same page header, row pattern, empty state and "Under the hood" panel everywhere; one sidebar |
+| **White space** | Dense blocks, no maximum line length | Generous card padding (16 px phone, 24 px desktop), 70-character lines, 24 px between cards |
+| **Colour** | One green plus greys; nothing said "this needs you" | Green stays the brand; warm greys do the work; one **amber accent**, kept for mentions and "needs you", so it keeps its pull; status colours for success, warning, danger, info; a real dark theme |
+| **Typography** | System font at ad-hoc sizes | **Inter** (built for screens; `cv05` so l, I and 1 differ) and **JetBrains Mono** for code; a 1.25 type scale (12 to 39 px) in rem |
+| **Reading patterns** | The useful information was not where the eye lands | Dashboard laid out for an **F-pattern** (Needs you top left); sign-in a **Z-pattern** split (brand, pitch, then the form and its button) |
+| **Mobile first** | On a phone the header wrapped into three rows before any content | One 56 px bar with a Menu button; the sidebar becomes a disclosure panel; chat becomes two screens (rooms, conversation) |
+
+The full system (every token, why it exists, how to add one) is in [DESIGN.md](DESIGN.md).
+
+## The redesign, page by page
+
+- **App shell:** a sticky sidebar on wide screens (pages, my rooms with live unread counts, developer tools, me); a one-row bar with a disclosure menu on phones; skip link; focus moves to the new page's heading on every page change.
+- **Dashboard:** "Needs you" (unread mentions with a quote, rooms with new messages, or "all caught up"), recent team notes and my files with names and relative times, a quiet "Workspace" list, "Start something".
+- **Chat:** `/chat` is a room browser (search, your rooms, public rooms, New room); a room is a full-width conversation, oldest first, grouped by author, with the composer at the bottom and an About / Online now panel.
+- **Notes:** search and More filters in one toolbar; chips for All / Mine / Team / Private / Pinned; equal-height cards; "No notes yet" and "No notes match" are different states.
+- **Files, Profile, Query lab:** the same header, cards and panel; the bucket demo and the SQL notes live under the hood.
+- **Sign-in, register, reset:** a split layout, the pitch on brand green and the form on the right; one line above the form on a phone.
+
+## Accessibility
+
+Huddle already passed axe's WCAG 2.1 rules on Day 17; the real problems were in the 2.2 rules and in what only a person or a script measuring the page finds. The [audit](ACCESSIBILITY_AUDIT.md) lists 13 findings, each fixed (or closed as a false positive) and each covered by a test:
+
+| | Day 17 design | Now |
+|---|---|---|
+| axe, WCAG 2.2 AA, light and dark | 1 rule failing (chat) | **0**, also with a room, forms, filters and the notification panel open |
+| Sideways scrolling at 320 px | Files | **none** (every page tested) |
+| Targets under 24×24 px | links 23 px, checkboxes 16 px | **none** |
+| Tab stops before the content on a phone | 11 | **4** |
+| Focus after a failed sign-in / after choosing a page | lost / left on the link | stays on the button / the new page's heading |
+| Colour pairs checked | none | **68, all AA** |
+
+Also tested: text at 200%, `prefers-reduced-motion`, keyboard-only flows, and ARIA snapshots of the accessibility tree. **Not yet done:** a VoiceOver pass by a person ([script](docs/VOICEOVER_CHECK.md)); NVDA and JAWS (Windows) were not tried.
 
 ## Run it (local Supabase, no account needed)
 
 You need Node 20+, Docker (Docker Desktop, or Colima on a Mac) and about 4 GB of memory for the containers.
 
 ```bash
-cd Day-17/huddle
+cd Day-22/huddle-redesign
 npm install
 npm run db:start      # starts Postgres, Auth, REST, Realtime, Storage and a mail catcher; applies the migrations and the seed
 npm run env:local     # writes .env with the local API URL and the public anon key
-npm run dev           # http://localhost:5176
+npm run dev           # http://localhost:5177 (the style guide: /styleguide)
 ```
 
 - The demo accounts are `ada@example.com` and `grace@example.com`, password `demo-password-123` (they exist only in the local seed).
@@ -59,7 +101,7 @@ The buttons appear only when the server has the provider enabled (the app reads 
 
 **Not verified here:** a real Google or GitHub sign-in (it needs your own OAuth app). The flow up to the provider redirect, and the callback handling, are tested; the provider's own consent screen is not.
 
-## How it works
+## How it works (the Supabase side, unchanged from Day 17)
 
 ```
 Browser (React + supabase-js)  ──HTTP──►  Kong gateway ──► GoTrue   (sign-up, sign-in, magic link, OAuth)  issues a JWT
@@ -109,47 +151,41 @@ Two tricks to know: policies are written `(select auth.uid())` so Postgres evalu
 
 The RPCs are `security invoker`: they run with the caller's rights, so RLS still applies inside them (a search never returns someone's private note).
 
-## The pages
 
-- **Dashboard:** numbers from `rpc('workspace_stats')`, my rooms, recent notes and files.
-- **Chat:** public and private rooms, live messages (`postgres_changes`), typing indicators (Broadcast), who is online (Presence), edit and delete, `@mentions`, file attachments, unread badges. A bell in the header lists notifications, also live.
-- **Notes:** create, edit, delete; tags (many to many); visibility `private` or `team`; filters (`eq`, `gt`, `lt`, `ilike`, `order`, `range` pagination); full-text search that understands word forms (`run` finds `running`) and operators (`-word`, `"exact phrase"`); a live badge when a teammate's team note arrives.
-- **Files:** upload (10 MiB limit, types checked by the bucket), download, delete, and **signed URLs** with an expiry and a countdown; two demos show a public URL opening and a private one being refused.
-- **Query lab:** 34 runnable examples of the supabase-js calls with the SQL they become, including RLS demos that show what RLS filtered out. The writes only touch your own notes titled `lab-scratch-...` and delete them right after (a button removes any leftovers).
-- **Profile:** name, username, bio, avatar upload (public bucket), change password, **sign out on all devices**, linked sign-in methods.
+## Scripts (Day 22)
+
+```bash
+npm run contrast                          # every token pair, light and dark, against WCAG AA; writes docs/contrast.md; exits 1 on a failure
+node scripts/audit.mjs after              # axe + the measurements axe does not make; writes docs/audit/after.md (dev server running)
+node scripts/screenshots.mjs after        # the 20 gallery views; run npm run db:reset first so the data matches
+```
 
 ## Tests
 
 ```bash
-npm test                 # 256 unit and component tests (fake supabase client)
+npm test                 # 304 unit and component tests (fake supabase client), including the contrast gate
 npm run db:test          # 77 pgTAP assertions inside the real database
-npm run test:e2e         # 49 browser tests against the real local stack
-npm run test:e2e:prod    # the same against the production bundle
+npm run test:e2e         # 74 browser tests against the real local stack
 npm run lint
 ```
 
 | Layer | What |
 |---|---|
-| Unit / component (Vitest, Testing Library) | auth context and guards, every page and component with a fake client, the query builders, error mapping, escaping of `like` input |
-| Database (pgTAP) | policies from the point of view of several users and of `anon`, triggers, constraints, RPCs, storage policies |
-| Browser (Playwright, Chrome) | sign-up creates a profile, magic link and password reset through the mail catcher, two browsers chatting live, unread badges, notes CRUD and search, uploads and signed URLs, the Query lab, axe WCAG 2.1 AA on every page in light and dark, no horizontal scroll at 375 px, and **15 attacks that call the API directly with the anon key or another user's token** and must be refused |
+| Unit / component | every page and component, the shell (landmarks, menu, focus after navigation), the design tokens (every pair passes AA; no raw colours outside `tokens.css`; every token the style guide shows exists), toasts are shown **and** announced |
+| Database (pgTAP) | policies for several users and `anon`, triggers, constraints, RPCs, storage policies |
+| Browser (Playwright, Chrome) | everything from Day 17 (two browsers chatting live, notes, uploads, 15 direct API attacks that must be refused) plus: axe WCAG 2.2 AA on every page and on states behind a click in both themes, tab order with a visible focus ring on every stop, the skip link, the phone menu, 320 px reflow, text at 200%, reduced motion, keyboard-only flows, ARIA snapshots, the style guide |
 
-The browser tests run against the real stack, not mocks, so they found problems unit tests cannot: see below.
+## Problems the redesign found (and fixed)
 
-## Bugs the tests found
+- **Chat looked newest-first, but was not.** The list was built oldest first; the seed inserted its messages in one statement, so they shared a timestamp, and the query had no tie-breaker. Fixed with `.order('id')` and realistic seed times.
+- **Focus was lost after a failed sign-in.** The submit button was `disabled` while busy, and disabling the focused element sends focus to `<body>`. Buttons now stay focusable (`aria-disabled`) with a guard against double submits.
+- **Screen readers met two "Attach a file" buttons**: the hidden file input was in the accessibility tree. Now `aria-hidden`.
+- **Toasts were not reliably announced**: a live region created together with its text is often not read. They now go through live regions that are always on the page.
+- **Hidden screen-reader text widened the page on phones**: absolutely positioned `.sr-only` text escaped a scrolling table. The scroller is now `position: relative`.
+- **A Day 17 test failed now and then**: it advanced a fake clock before the countdown's timer existed. It now waits for it.
 
-- **"My files" showed other people's files.** The policies let room members read files attached to messages (so a room can download them). Policies are combined with OR, so `select * from files` returned those too. The list now filters by `owner_id` explicitly: RLS says what you **may** see, the query still has to say what you **want**.
-- **Sign out on all devices left the other device signed in.** The access token (a JWT) stays valid until it expires. The app now checks `getUser()` (a server call) after `getSession()` and drops a session the server no longer knows.
-- **Unread badges went stale** when two messages arrived together. Counting locally was replaced by asking the database (`unread_counts`) and using only the newest answer; the count is also refreshed when the channel (re)connects.
-- **The Query lab and Profile pages scrolled sideways on a phone** (a long code line widened a grid column).
-- **Chrome offered to save the new password under the wrong user:** the password forms carry a hidden username field.
-- Supabase's default limits (2 emails an hour, 30 sign-ups per 5 minutes) would break the tests, so `config.toml` raises them for local use only.
+## Limits
 
-## Limits and what is not done
-
-- Real Google and GitHub sign-in are unverified (need your own OAuth apps); the cloud project path is documented but was not run, only the local stack.
-- Only Chrome was tested, and no real phone (the 375 px check is a Chrome viewport).
-- Realtime `postgres_changes` is not guaranteed delivery: if a client is offline it misses events. The app refetches on (re)connect where it matters (unread counts) and the lists refetch when you open them.
-- File deletion removes the Storage object and the row in two calls, not one transaction.
-- There is no Edge Function, no email templates and no rate limiting beyond Supabase's defaults.
-- The seed users and the relaxed rate limits are for local development only.
+- The VoiceOver pass is written but not yet run; only Chrome was tested, and no real phone (the phone checks are Chrome viewports).
+- No Figma file (the brief made it optional; the style guide is the design reference).
+- Day 17's limits still apply: OAuth providers unverified, Realtime is not guaranteed delivery, file deletion is two calls, local seed and relaxed rate limits only.
