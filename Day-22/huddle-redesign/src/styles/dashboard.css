@@ -12,22 +12,6 @@
 /* "All notes" and friends: at least 24px tall (WCAG 2.5.8) */
 .dash-view-all { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--text-sm); font-weight: var(--weight-medium); }
 
-/* List rows. The title link stretches over the whole row (::after), so the row is one big target
-   while the link's accessible name stays just the title. */
-.dash-rows { list-style: none; margin: 0; padding: 0; }
-.dash-row { position: relative; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) 0; min-width: 0; }
-.dash-rows > .dash-row + .dash-row { border-top: 1px solid var(--color-border); }
-.dash-row:first-child { padding-top: 0; }
-.dash-row:last-child { padding-bottom: 0; }
-.dash-row-icon { display: grid; place-items: center; width: 2rem; height: 2rem; flex-shrink: 0; border-radius: var(--radius-full); background: var(--color-bg-subtle); color: var(--color-text-secondary); }
-.dash-row-icon[data-tone='attention'] { background: var(--color-attention-subtle); color: var(--color-attention-text); }
-.dash-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.dash-row-link { color: var(--color-text); font-weight: var(--weight-medium); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dash-row-link::after { content: ''; position: absolute; inset: 0; }
-.dash-row:hover .dash-row-link { color: var(--color-primary-text); text-decoration: underline; }
-.dash-row-meta { font-size: var(--text-sm); color: var(--color-text-secondary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.dash-row-time { position: relative; z-index: 1; flex-shrink: 0; font-size: var(--text-xs); color: var(--color-text-secondary); }
-
 .dash-loading { display: flex; flex-direction: column; gap: var(--space-3); }
 .dash-loading .skeleton { height: 1rem; }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { firstName, greeting, loadMyRooms, loadRecentFiles, loadStats, loadTeamNotes, loadUnreadMentions } from '../lib/dashboard';
-import { DashboardUnderTheHood, FILES_EMPTY, NeedsYou, NOTES_EMPTY, Panel, QuickActions, RecentFiles, TeamNotes, WorkspaceNumbers } from '../components/dashboard/Panels';
+import { DashboardUnderTheHood, FilesEmpty, NeedsYou, NotesEmpty, Panel, QuickActions, RecentFiles, TeamNotes, WorkspaceNumbers } from '../components/dashboard/Panels';
 import PageHeader from '../components/ui/PageHeader';
 import '../styles/dashboard.css';
 
@@ -50,10 +50,10 @@ export default function DashboardPage() {
       <div className="grid-12 dash-layout">
         <div className="span-8 dash-col">
           <NeedsYou state={needsState} mentionCount={Number(stats.data?.unread_mentions ?? mentions.data?.length ?? 0)} mentions={mentions.data ?? []} rooms={rooms.data} />
-          <Panel id="dash-team" title="Recent team notes" to="/notes" linkText="All notes" state={team.state} error={team.error} count={team.data?.length ?? 0} empty={NOTES_EMPTY}>
+          <Panel id="dash-team" title="Recent team notes" to="/notes" linkText="All notes" state={team.state} error={team.error} count={team.data?.length ?? 0} empty={<NotesEmpty />}>
             <TeamNotes notes={team.data ?? []} />
           </Panel>
-          <Panel id="dash-files" title="My recent files" to="/files" linkText="All files" state={files.state} error={files.error} count={files.data?.length ?? 0} empty={FILES_EMPTY}>
+          <Panel id="dash-files" title="My recent files" to="/files" linkText="All files" state={files.state} error={files.error} count={files.data?.length ?? 0} empty={<FilesEmpty />}>
             <RecentFiles files={files.data ?? []} />
           </Panel>
         </div>

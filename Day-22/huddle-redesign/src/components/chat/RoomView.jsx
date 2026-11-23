@@ -1,5 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, Hash, Lock, MessagesSquare } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
+import { continuesGroup } from '../../lib/format';
+import EmptyState from '../ui/EmptyState';
+import UnderTheHood from '../ui/UnderTheHood';
 import {
   applyChange, deleteMessage, discardAttachment, editMessage, fetchMessage, fetchMessages, friendlyError, markRoomRead,
   sendMessage, uploadAttachment, upsertMessage,
@@ -8,7 +13,12 @@ import Composer from './Composer';
 import MessageItem from './MessageItem';
 import { useRoomChannel } from './useRoomChannel';
 
-/** The right-hand side: one room's messages, live. The parent gives it key={roomId} so state resets per room. */
+/**
+ * One room, live. The parent gives it key={roomId} so state resets per room.
+ * The conversation is oldest first and stays scrolled to the newest message; the composer sits under it.
+ * The log is a <div role="log"> around an <ol>: the list keeps its list semantics (audit A-1) and new messages
+ * are announced politely.
+ */
 export default function RoomView({ room, onRead }) {
   const { client, user, profile } = useAuth();
   const [messages, setMessages] = useState([]);
@@ -142,49 +152,75 @@ export default function RoomView({ room, onRead }) {
   const others = typing.map((p) => p.username).filter(Boolean);
   const typingText = others.length === 0 ? '' : others.length === 1 ? `${others[0]} is typing...` : `${others.join(', ')} are typing...`;
 
+  const Icon = room.is_private ? Lock : Hash;
   return (
-    <section className="chat-room" aria-labelledby="room-title">
-      <header className="chat-room-head">
-        <div>
-          <h2 id="room-title">{room.is_private ? 'Private: ' : '#'}{room.name}</h2>
-          {room.topic ? <p className="muted">{room.topic}</p> : null}
+    <div className="chat-room-page">
+      <header className="chat-room-header">
+        <Link to="/chat" className="chat-back"><ArrowLeft size={16} aria-hidden="true" />All rooms</Link>
+        <div className="chat-room-title-row">
+          <h1 id="room-title" className="chat-room-title">
+            <Icon size={22} aria-hidden="true" />
+            <span>{room.name}</span>
+            {room.is_private ? <span className="sr-only"> (private room)</span> : null}
+          </h1>
+          <span className="chat-online-count" aria-hidden="true"><span className="chat-dot" />{online.length || 1} online</span>
         </div>
-        <p className="chat-online" aria-live="polite">
-          <span className="chat-dot" aria-hidden="true" />
-          Online now: {online.length ? online.join(', ') : 'just you'}
-        </p>
+        {room.topic ? <p className="chat-topic">{room.topic}</p> : null}
       </header>
 
-      <details className="chat-how">
-        <summary>How this works</summary>
-        <ul>
-          <li><code>from('messages').select('*, author:profiles(...)').eq('room_id', id).order('created_at', {'{ ascending: false }'}).limit(50)</code>: the latest page, with an embedded relationship.</li>
-          <li><code>.lt('created_at', oldest)</code>: "Load earlier" asks for the page before the oldest message.</li>
-          <li><code>channel('room:id').on('postgres_changes', ...)</code>: Postgres pushes new, edited and deleted messages.</li>
-          <li><code>channel.send({'{ type: \'broadcast\' }'})</code> and <code>channel.track()</code>: typing and who is online, never stored in the database.</li>
-        </ul>
-      </details>
+      <div className="chat-room-body">
+        <section className="chat-conversation" aria-labelledby="room-title">
+          {status === 'loading' ? <p className="muted chat-pad" role="status">Loading messages...</p> : null}
+          {status === 'error' ? <p role="alert" className="alert alert-error chat-pad">{error}</p> : null}
+          {status === 'ready' ? (
+            <>
+              {error ? <p role="alert" className="alert alert-error">{error}</p> : null}
+              <div className="chat-scroll" ref={listRef} onScroll={onScroll}>
+                {hasMore ? (
+                  <button type="button" className="btn btn-sm chat-earlier" onClick={loadEarlier} disabled={loadingMore}>{loadingMore ? 'Loading...' : 'Load earlier messages'}</button>
+                ) : null}
+                {messages.length === 0 ? (
+                  <EmptyState compact headingLevel={2} icon={<MessagesSquare size={20} />} title="No messages yet">
+                    Say hello: the first message starts the conversation.
+                  </EmptyState>
+                ) : null}
+                <div className="chat-log" role="log" aria-label="Messages" aria-live="polite">
+                  <ol className="chat-messages">
+                    {messages.map((m, i) => (
+                      <MessageItem key={m.id} message={m} mine={m.user_id === userId} grouped={continuesGroup(m, messages[i - 1])} onEdit={edit} onDelete={remove} />
+                    ))}
+                  </ol>
+                </div>
+              </div>
+              <p className="chat-typing" aria-live="polite">{typingText}</p>
+              <Composer onSend={send} onTyping={notifyTyping} textareaRef={textareaRef} />
+            </>
+          ) : null}
+        </section>
 
-      {status === 'loading' ? <p className="muted chat-pad" role="status">Loading messages...</p> : null}
-      {status === 'error' ? <p role="alert" className="alert alert-error">{error}</p> : null}
-      {status === 'ready' ? (
-        <>
-          {error ? <p role="alert" className="alert alert-error">{error}</p> : null}
-          <div className="chat-scroll" ref={listRef} onScroll={onScroll}>
-            {hasMore ? (
-              <button type="button" className="btn btn-sm chat-earlier" onClick={loadEarlier} disabled={loadingMore}>{loadingMore ? 'Loading...' : 'Load earlier messages'}</button>
-            ) : null}
-            {messages.length === 0 ? <p className="muted chat-pad">No messages yet. Say hello!</p> : null}
-            <ul className="chat-messages" role="log" aria-label="Messages" aria-live="polite">
-              {messages.map((m) => (
-                <MessageItem key={m.id} message={m} mine={m.user_id === userId} onEdit={edit} onDelete={remove} />
-              ))}
-            </ul>
+        <aside className="chat-details" aria-label="About this room">
+          <div className="card chat-details-card">
+            <h2 className="chat-details-title">About</h2>
+            <p className="chat-details-text">{room.topic || 'No topic yet.'}</p>
+            <p className="chat-details-text">{room.is_private ? 'Private: only members can find and read it.' : 'Public: anyone in the workspace can join.'}</p>
           </div>
-          <p className="chat-typing muted" aria-live="polite">{typingText}</p>
-          <Composer onSend={send} onTyping={notifyTyping} textareaRef={textareaRef} />
-        </>
-      ) : null}
-    </section>
+          <div className="card chat-details-card">
+            <h2 className="chat-details-title">Online now</h2>
+            <p className="chat-online" aria-live="polite">
+              <span className="chat-dot" aria-hidden="true" />
+              Online now: {online.length ? online.join(', ') : 'just you'}
+            </p>
+          </div>
+          <UnderTheHood>
+            <ul>
+              <li><code>from(&apos;messages&apos;).select(&apos;*, author:profiles(...)&apos;).eq(&apos;room_id&apos;, id).order(&apos;created_at&apos;, desc).order(&apos;id&apos;, desc).limit(50)</code>: the newest page with the author embedded, shown oldest first. The <code>id</code> order breaks ties between messages sent in the same instant.</li>
+              <li><code>.lt(&apos;created_at&apos;, oldest)</code>: &quot;Load earlier&quot; asks for the page before the oldest message.</li>
+              <li><code>channel(&apos;room:id&apos;).on(&apos;postgres_changes&apos;, ...)</code>: Postgres pushes new, edited and deleted messages.</li>
+              <li><code>channel.send(&#123; type: &apos;broadcast&apos; &#125;)</code> and <code>channel.track()</code>: typing and who is online, never stored in the database.</li>
+            </ul>
+          </UnderTheHood>
+        </aside>
+      </div>
+    </div>
   );
 }

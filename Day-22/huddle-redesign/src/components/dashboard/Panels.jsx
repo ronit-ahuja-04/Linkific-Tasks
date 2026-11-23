@@ -36,13 +36,13 @@ export function Panel({ id, title, to, linkText, state, error, empty, count = 0,
 /** One row: an icon, a title that is the link (it stretches over the whole row), a line of detail, a time */
 function Row({ icon, tone, to, title, meta, time }) {
   return (
-    <li className="dash-row">
-      <span className="dash-row-icon" data-tone={tone} aria-hidden="true">{icon}</span>
-      <span className="dash-row-main">
-        <Link to={to} className="dash-row-link">{title}</Link>
-        {meta ? <span className="dash-row-meta">{meta}</span> : null}
+    <li className="row">
+      <span className="row-icon" data-tone={tone} aria-hidden="true">{icon}</span>
+      <span className="row-main">
+        <Link to={to} className="row-link">{title}</Link>
+        {meta ? <span className="row-meta">{meta}</span> : null}
       </span>
-      {time ? <RelativeTime className="dash-row-time" date={time} /> : null}
+      {time ? <RelativeTime className="row-end" date={time} /> : null}
     </li>
   );
 }
@@ -65,7 +65,7 @@ export function NeedsYou({ state, mentionCount, mentions, rooms }) {
         <p className="dash-caught-up"><CircleCheck size={18} aria-hidden="true" />You are all caught up. New mentions and messages show up here.</p>
       )}
       {state === 'ready' && waiting > 0 && (
-        <ul className="dash-rows">
+        <ul className="rows rows-flush">
           {mentions.map((n) => (
             <Row key={n.id} icon={<AtSign size={16} />} tone="attention" to={`/chat/${n.room_id}`} title={`Mention in #${n.rooms?.name ?? 'a room'}`} meta={n.message} time={n.created_at} />
           ))}
@@ -89,7 +89,7 @@ export function NeedsYou({ state, mentionCount, mentions, rooms }) {
 
 export function TeamNotes({ notes }) {
   return (
-    <ul className="dash-rows">
+    <ul className="rows rows-flush">
       {notes.map((n) => (
         <Row key={n.id} icon={<NotebookPen size={16} />} to="/notes" title={n.title} meta={`by ${displayName(n.author)}`} time={n.updated_at} />
       ))}
@@ -99,7 +99,7 @@ export function TeamNotes({ notes }) {
 
 export function RecentFiles({ files }) {
   return (
-    <ul className="dash-rows">
+    <ul className="rows rows-flush">
       {files.map((f) => (
         <Row key={f.id} icon={<FileText size={16} />} to="/files" title={f.name} meta={formatBytes(f.size)} time={f.created_at} />
       ))}
@@ -107,16 +107,20 @@ export function RecentFiles({ files }) {
   );
 }
 
-export const NOTES_EMPTY = (
+export function NotesEmpty() {
+  return (
   <EmptyState compact icon={<NotebookPen size={20} />} title="No team notes yet" action={<Link className="btn btn-sm" to="/notes" state={{ compose: true }}>Write a note</Link>}>
     Notes shared with the team show up here.
   </EmptyState>
-);
-export const FILES_EMPTY = (
+  );
+}
+export function FilesEmpty() {
+  return (
   <EmptyState compact icon={<FolderOpen size={20} />} title="No files yet" action={<Link className="btn btn-sm" to="/files">Upload a file</Link>}>
     Files you upload show up here, newest first.
   </EmptyState>
-);
+  );
+}
 
 /** The Day 17 stat tiles, demoted to one quiet list: useful, but not what you came to the page for */
 export function WorkspaceNumbers({ stats, error }) {

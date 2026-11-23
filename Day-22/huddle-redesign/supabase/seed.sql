@@ -30,12 +30,15 @@ begin
   insert into public.rooms (name, topic, is_private, created_by) values ('Leads',   'Only the leads',         true,  ada)  returning id into leads;
   insert into public.room_members (room_id, user_id, role) values (general, grace, 'member');
 
-  insert into public.messages (room_id, user_id, body) values
-    (general, ada,   'Welcome to Huddle! Say hi, share notes, drop files.'),
-    (general, grace, 'Hi Ada. I wrote up the release checklist in my notes, shared with the team.'),
-    (general, ada,   '@grace thanks, I will read it before the standup.'),
-    (random_room, grace, 'Anyone tried full-text search in Postgres yet? It is quietly excellent.'),
-    (leads, ada, 'Private room: only members can read this. That is row level security at work.');
+  -- Day 22: explicit, staggered times. One INSERT gives every row the same now(), and equal timestamps have no
+  -- order of their own: the conversation could come back in any order.
+  insert into public.messages (room_id, user_id, body, created_at) values
+    (general, ada,   'Welcome to Huddle! Say hi, share notes, drop files.', now() - interval '3 hours'),
+    (general, grace, 'Hi Ada. I wrote up the release checklist in my notes, shared with the team.', now() - interval '47 minutes'),
+    (general, grace, 'It covers the migration and the realtime demo.', now() - interval '46 minutes'),
+    (general, ada,   '@grace thanks, I will read it before the standup.', now() - interval '12 minutes'),
+    (random_room, grace, 'Anyone tried full-text search in Postgres yet? It is quietly excellent.', now() - interval '1 day'),
+    (leads, ada, 'Private room: only members can read this. That is row level security at work.', now() - interval '2 days');
 
   insert into public.notes (owner_id, title, body, visibility, pinned, priority)
   values (ada, 'Standup agenda', 'Review the release checklist. Decide who owns the Postgres migration. Plan the realtime demo.', 'team', true, 3)

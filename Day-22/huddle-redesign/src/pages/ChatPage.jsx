@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Plus } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
 import NewRoomForm from '../components/chat/NewRoomForm';
 import RoomList from '../components/chat/RoomList';
 import RoomView from '../components/chat/RoomView';
+import PageHeader from '../components/ui/PageHeader';
+import UnderTheHood from '../components/ui/UnderTheHood';
 import { fetchUnreadCounts, friendlyError, listRooms } from '../lib/chat';
 import '../styles/chat.css';
 
+/**
+ * CHAT, two screens on one route:
+ *  - /chat: the room browser (search, my rooms with unread counts, public rooms to join, New room)
+ *  - /chat/:roomId: one conversation, full width; the sidebar already lists my rooms, so no second list here.
+ * On a phone these are naturally two screens, with "All rooms" to go back.
+ */
 export default function ChatPage() {
   const { client, user } = useAuth();
   const { roomId } = useParams();
@@ -15,10 +24,9 @@ export default function ChatPage() {
   const [unread, setUnread] = useState({}); // { roomId: count } for rooms I belong to
   const [status, setStatus] = useState('loading');
   const [error, setError] = useState('');
-
-  useEffect(() => {
-    document.title = 'Chat - Huddle';
-  }, []);
+  const location = useLocation();
+  const [creating, setCreating] = useState(() => Boolean(location.state?.newRoom)); // "Start a room" on the dashboard
+  const [query, setQuery] = useState('');
 
   // rooms (RLS filters them) + unread counts (rpc), in parallel
   useEffect(() => {
@@ -80,31 +88,63 @@ export default function ChatPage() {
   };
 
   const room = rooms.find((r) => r.id === roomId);
-  // a badge only makes sense for the rooms I am NOT looking at
-  const badges = roomId ? { ...unread, [roomId]: 0 } : unread; // (the room's own live messages are marked read as they arrive)
+
+  useEffect(() => {
+    document.title = room ? `${room.name} · Chat · Huddle` : 'Chat · Huddle';
+  }, [room]);
+
+  if (roomId) {
+    if (room) return <RoomView key={room.id} room={room} onRead={markedRead} />;
+    return (
+      <div className="chat-room-page">
+        <Link to="/chat" className="chat-back"><ArrowLeft size={16} aria-hidden="true" />All rooms</Link>
+        {status === 'loading' ? <p className="muted" role="status">Loading the room...</p> : null}
+        {status === 'error' ? <p role="alert" className="alert alert-error">{error}</p> : null}
+        {status === 'ready' ? (
+          <>
+            <h1>Room not found</h1>
+            <p role="alert" className="alert alert-warning">That room does not exist, or you cannot see it.</p>
+          </>
+        ) : null}
+      </div>
+    );
+  }
 
   return (
-    <div className="chat-layout">
-      <aside className="chat-side" aria-label="Rooms">
-        <h1 className="page-title chat-title">Chat</h1>
-        {status === 'loading' ? <p className="muted" role="status">Loading rooms...</p> : null}
-        {status === 'error' ? <p role="alert" className="alert alert-error">{error}</p> : null}
-        {status === 'ready' ? <RoomList rooms={rooms} unread={badges} activeId={roomId} /> : null}
-        <NewRoomForm onCreated={created} />
-        <details className="chat-how">
-          <summary>How this works</summary>
-          <ul>
-            <li><code>from('rooms').select()</code>: RLS returns public rooms and my private ones, no filter needed.</li>
-            <li><code>rpc('unread_counts')</code>: a SQL function counting messages after my last read.</li>
-            <li><code>rpc('mark_room_read')</code>: opening a room joins it and resets its badge.</li>
-          </ul>
-        </details>
-      </aside>
-      <div className="chat-main">
-        {status === 'ready' && !roomId ? <p className="muted chat-pad">Pick a room on the left, or create one.</p> : null}
-        {status === 'ready' && roomId && !room ? <p role="alert" className="alert alert-warning">That room does not exist, or you cannot see it.</p> : null}
-        {room ? <RoomView key={room.id} room={room} onRead={markedRead} /> : null}
+    <div className="chat-browser">
+      <PageHeader
+        title="Chat"
+        description="Rooms you are in, and public rooms you can join."
+        actions={
+          <button type="button" className="btn btn-primary" aria-expanded={creating} aria-controls="new-room" onClick={() => setCreating((open) => !open)}>
+            <Plus size={16} aria-hidden="true" />New room
+          </button>
+        }
+      />
+      {creating ? (
+        <section id="new-room" className="card chat-new" aria-labelledby="new-room-title">
+          <h2 id="new-room-title" className="card-title">Create a room</h2>
+          <NewRoomForm onCreated={created} onCancel={() => setCreating(false)} />
+        </section>
+      ) : null}
+
+      <div className="field chat-search">
+        <label htmlFor="room-search">Find a room</label>
+        <input id="room-search" className="input" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Name or topic" autoComplete="off" />
       </div>
+
+      {status === 'loading' ? <p className="muted" role="status">Loading rooms...</p> : null}
+      {status === 'error' ? <p role="alert" className="alert alert-error">{error}</p> : null}
+      {status === 'ready' ? <RoomList rooms={rooms} unread={unread} query={query} /> : null}
+
+      <UnderTheHood>
+        <ul>
+          <li><code>from(&apos;rooms&apos;).select()</code>: Row Level Security returns public rooms and my private ones, no filter needed.</li>
+          <li><code>rpc(&apos;unread_counts&apos;)</code>: a SQL function counting messages after my last read.</li>
+          <li><code>rpc(&apos;mark_room_read&apos;)</code>: opening a room joins it and resets its count.</li>
+          <li>One Realtime channel on <code>messages</code> INSERT (no filter: RLS decides what reaches me) refreshes the counts.</li>
+        </ul>
+      </UnderTheHood>
     </div>
   );
 }
