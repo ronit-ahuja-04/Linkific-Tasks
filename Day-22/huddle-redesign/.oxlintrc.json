@@ -1,0 +1,43 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "oxc"
+  ],
+  "ignorePatterns": [
+    "dist/",
+    "e2e/",
+    "scripts/",
+    "supabase/"
+  ],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "test/**"
+      ],
+      "rules": {
+        "react/globals": "off",
+        "react/immutability": "off",
+        "react/only-export-components": "off"
+      }
+    },
+    {
+      "files": [
+        "src/context/**",
+        "src/auth/**"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
+  ]
+}
