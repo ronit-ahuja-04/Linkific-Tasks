@@ -10,12 +10,15 @@ const ThemeStateContext = createContext(null);
 const ThemeActionsContext = createContext(null);
 const STORAGE_KEY = 'huddle-theme';
 
+/** A saved choice wins; with none, follow the operating system (the same rule as the inline script in index.html) */
 const readStoredTheme = () => {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'dark' ? 'dark' : 'light';
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === 'dark' || stored === 'light') return stored;
   } catch {
-    return 'light';
+    /* storage blocked: fall through to the system setting */
   }
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 const storeTheme = (mode) => {
   try {

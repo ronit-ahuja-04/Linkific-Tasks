@@ -1,4 +1,4 @@
-> **Day 22 (in progress):** this folder is a copy of Day 17's Huddle being redesigned. See [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) and [docs/UX_REVIEW.md](docs/UX_REVIEW.md). The text below is still Day 17's README; it is rewritten at the end of the redesign.
+> **Day 22 (in progress):** this folder is a copy of Day 17's Huddle being redesigned. See [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) and [docs/UX_REVIEW.md](docs/UX_REVIEW.md). The design system is in place: tokens in [src/styles/tokens.css](src/styles/tokens.css), the living style guide at `/styleguide` (`npm run dev`, then http://localhost:5177/styleguide), and every colour pair checked by `npm run contrast` ([docs/contrast.md](docs/contrast.md)). The text below is still Day 17's README; it is rewritten at the end of the redesign.
 
 # Huddle: a team workspace on Supabase
 

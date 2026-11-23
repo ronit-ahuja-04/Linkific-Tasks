@@ -144,10 +144,15 @@ describe('share link', () => {
     const rows = await screen.findAllByTestId('file-row');
     const row = rows[1];
     await user.selectOptions(within(row).getByLabelText(/Link expires after/), '60');
+    const intervals = vi.spyOn(globalThis, 'setInterval');
     await user.click(within(row).getByRole('button', { name: /Share link/ }));
     expect(client.storageBucket.createSignedUrl).toHaveBeenCalledWith('u1/b-report.pdf', 60);
     expect(within(row).getByLabelText('Signed URL').value).toBe('http://x/sign/u1/b-report.pdf?t=60');
     expect(within(row).getByTestId('countdown').textContent).toMatch(/^Expires in (1:00|0:59)$/);
+    // user-event clicks outside act(), so the effect that starts the 1-second tick can still be queued here.
+    // Advancing the clock before it exists moved nothing (the Day 17 flake): wait for the tick to be scheduled first.
+    await waitFor(() => expect(intervals.mock.calls.some(([, ms]) => ms === 1000)).toBe(true));
+    intervals.mockRestore();
     act(() => { vi.advanceTimersByTime(5000); });
     // (real time also leaks into the fake clock with shouldAdvanceTime, so a slow machine may be a second further)
     expect(within(row).getByTestId('countdown').textContent).toMatch(/^Expires in 0:5[2-5]$/);

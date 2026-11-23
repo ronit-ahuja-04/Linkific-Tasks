@@ -1,22 +1,22 @@
 /* Sign-in pages: a centred card on the page background. Tokens only. */
-.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--bg-main); }
+.auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; background: var(--color-bg); }
 .auth-card { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 14px; padding: 28px; }
 .auth-brand { align-self: flex-start; }
 .auth-title { font-size: 22px; }
 .auth-sub { margin-top: -8px; }
-.auth-footer { padding-top: 6px; border-top: 1px solid var(--border-color); font-size: 14px; }
+.auth-footer { padding-top: 6px; border-top: 1px solid var(--color-border); font-size: 14px; }
 .auth-password { display: flex; gap: 8px; align-items: center; }
 .auth-eye { flex-shrink: 0; width: 40px; height: 40px; border-radius: 8px; }
 .auth-forgot { font-size: 14px; margin-top: -8px; }
 .auth-oauth { display: flex; flex-direction: column; gap: 8px; }
 .auth-or { text-align: center; font-size: 13px; }
 .auth-meter { display: inline-flex; gap: 3px; margin-right: 8px; vertical-align: middle; }
-.auth-meter-bar { width: 22px; height: 5px; border-radius: 3px; background: var(--border-color); }
-.auth-meter-bar.is-on { background: var(--text-secondary); }
-.auth-meter-bar.auth-meter-1 { background: var(--danger-text); }
-.auth-meter-bar.auth-meter-2 { background: var(--warning-text); }
-.auth-meter-bar.auth-meter-3, .auth-meter-bar.auth-meter-4 { background: var(--success-text); }
-.auth-how { font-size: 13px; color: var(--text-secondary); }
+.auth-meter-bar { width: 22px; height: 5px; border-radius: 3px; background: var(--color-border); }
+.auth-meter-bar.is-on { background: var(--color-text-secondary); }
+.auth-meter-bar.auth-meter-1 { background: var(--color-danger-text); }
+.auth-meter-bar.auth-meter-2 { background: var(--color-warning-text); }
+.auth-meter-bar.auth-meter-3, .auth-meter-bar.auth-meter-4 { background: var(--color-success-text); }
+.auth-how { font-size: 13px; color: var(--color-text-secondary); }
 .auth-how summary { cursor: pointer; }
 .auth-how ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
 @media (max-width: 480px) { .auth-card { padding: 20px; } }

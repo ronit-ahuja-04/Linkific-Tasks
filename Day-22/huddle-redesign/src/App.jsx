@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
 import { ProtectedRoute, PublicOnlyRoute } from './auth/RouteGuards';
@@ -13,6 +14,9 @@ import NotesPage from './pages/NotesPage';
 import FilesPage from './pages/FilesPage';
 import LabPage from './pages/LabPage';
 import ProfilePage from './pages/ProfilePage';
+
+// The living style guide: public, and loaded only when someone opens it
+const StyleguidePage = lazy(() => import('./pages/StyleguidePage'));
 
 function NotFound() {
   return <main className="centered-page"><div className="card"><h1>Page not found</h1><p className="muted">There is nothing at this address.</p><a href="/">Back to Huddle</a></div></main>;
@@ -41,6 +45,7 @@ export default function App() {
       {/* public: the page a magic link, a confirmation email, an OAuth sign-in or a password-reset email returns to */}
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/reset" element={<ResetPasswordPage />} />
+      <Route path="/styleguide" element={<Suspense fallback={null}><StyleguidePage /></Suspense>} />
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route index element={<DashboardPage />} />

@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Huddle: a team workspace on Supabase with chat, notes and files, built with PostgreSQL, Row Level Security, Realtime and Storage." />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="color-scheme" content="light dark" />
     <title>Huddle</title>
+    <script>
+      /* Set the theme before the first paint, so a dark-mode visitor never sees a white flash.
+         Same rule as ThemeContext: a saved choice wins, otherwise follow the system. */
+      (function () {
+        var mode = 'light';
+        try {
+          var saved = localStorage.getItem('huddle-theme');
+          if (saved === 'dark' || saved === 'light') mode = saved;
+          else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) mode = 'dark';
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', mode);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
