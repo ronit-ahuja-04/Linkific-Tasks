@@ -37,7 +37,7 @@ test.describe('two people in a room, live', () => {
     await expect(log(other)).toContainText('hello from A');
     await send(other, 'hi back from B');
     await expect(log(page)).toContainText('hi back from B');
-    await expect(log(page)).toContainText(b.username); // the author came with the message: an embedded relationship
+    await expect(log(page)).toContainText(b.fullName); // the author came with the message (an embedded relationship); shown by name since Day 22
 
     // edit: B sees the new text; delete: it disappears
     await page.getByRole('button', { name: /Edit your message from/ }).click();
@@ -99,7 +99,9 @@ test.describe('two people in a room, live', () => {
     await expect(log(page)).toContainText('two');
     await expect(other.locator('.chat-unread')).toHaveText('2', { timeout: 15000 });
     await other.getByRole('main').getByRole('link', { name: new RegExp(name) }).click();
-    await expect(other.locator('.chat-unread')).toHaveCount(0);
+    await expect(other.getByRole('heading', { level: 1, name: new RegExp(name) })).toBeVisible();
+    // read now: the sidebar's link for the room carries no count
+    await expect(other.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: new RegExp(name) })).not.toContainText('unread');
   });
 
   test('message text is shown as text, never as HTML', async ({ page, other }) => {

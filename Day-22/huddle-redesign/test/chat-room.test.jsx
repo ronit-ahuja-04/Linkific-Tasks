@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StrictMode } from 'react';
 import { describe, expect, it, vi } from 'vitest';
@@ -25,13 +25,12 @@ function setup({ messages = [message(1), message(2)], path = '/chat/r1', strict 
 }
 
 describe('ChatPage: rooms', () => {
-  it('lists rooms with unread badges from the rpc and sets the document title', async () => {
+  it('/chat is the room browser: rooms with unread counts from the rpc, and the document title', async () => {
     const { client } = setup({ path: '/chat' });
-    expect(await screen.findByRole('link', { name: /Random/ })).toBeTruthy();
-    expect(screen.getByLabelText('4 unread')).toBeTruthy();
-    expect(screen.getByLabelText('2 unread')).toBeTruthy();
-    expect(screen.getByText(/Pick a room/)).toBeTruthy();
-    expect(document.title).toMatch(/Chat/);
+    expect(await screen.findByRole('link', { name: /^Random.*4 unread$/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /^General.*2 unread$/ })).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'Chat' })).toBeTruthy();
+    expect(document.title).toBe('Chat · Huddle');
     expect(client.rpcCalls.map((c) => c.name)).toContain('unread_counts');
   });
 
@@ -47,27 +46,49 @@ describe('ChatPage: rooms', () => {
     expect(await screen.findByText(/does not exist, or you cannot see it/)).toBeTruthy();
   });
 
-  it('opening a room loads its messages, marks it read and clears its badge', async () => {
-    const { client } = setup();
+  it('opening a room loads its messages, marks it read and clears its count (seen back in the browser)', async () => {
+    const { client, user } = setup();
     expect(await screen.findByText('message 2')).toBeTruthy();
+    expect(screen.getByRole('heading', { level: 1, name: 'General' })).toBeTruthy(); // the room is the page
+    expect(document.title).toBe('General · Chat · Huddle');
     expect(client.rpcCalls).toContainEqual({ name: 'mark_room_read', args: { p_room: 'r1' } });
-    await waitFor(() => expect(screen.queryByLabelText('2 unread')).toBeNull());
-    expect(screen.getByLabelText('4 unread')).toBeTruthy(); // Random keeps its badge
+    await user.click(screen.getByRole('link', { name: 'All rooms' }));
+    expect(await screen.findByRole('link', { name: /^Random.*4 unread$/ })).toBeTruthy(); // Random keeps its count
+    expect(screen.getByRole('link', { name: 'General' })).toBeTruthy(); // read: no count any more
   });
 
-  it('refreshes the badges from the database when a message arrives in ANOTHER room (unfiltered insert subscription)', async () => {
-    const { client } = setup();
-    await screen.findByText('message 1');
+  it('"New room" opens the form (and the dashboard can ask for it open)', async () => {
+    const { user } = setup({ path: '/chat' });
+    const button = await screen.findByRole('button', { name: 'New room' });
+    expect(button).toHaveAttribute('aria-expanded', 'false');
+    await user.click(button);
+    expect(button).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByLabelText('Room name')).toHaveFocus();
+    await user.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByLabelText('Room name')).toBeNull();
+  });
+
+  it('search narrows the room list', async () => {
+    const { user } = setup({ path: '/chat' });
+    await screen.findByRole('link', { name: /^Random/ });
+    await user.type(screen.getByLabelText('Find a room'), 'rand');
+    expect(screen.getByRole('link', { name: /^Random/ })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: /^General/ })).toBeNull();
+  });
+
+  it('refreshes the counts from the database when a message arrives (unfiltered insert subscription)', async () => {
+    const { client } = setup({ path: '/chat' });
+    await screen.findByRole('link', { name: /^Random/ });
     await waitFor(() => expect(client.channels.find((c) => c.name === 'chat:unread')).toBeTruthy());
     // the database now says 5: the page asks again instead of adding 1 to a local number
     client.replyRpc('unread_counts', { data: [{ room_id: 'r1', unread: 2 }, { room_id: 'r2', unread: 5 }], error: null });
     act(() => client.channels.find((c) => c.name === 'chat:unread').emitChange('INSERT', { new: message(9, { room_id: 'r2' }) }));
-    expect(await screen.findByLabelText('5 unread')).toBeTruthy();
+    expect(await screen.findByRole('link', { name: /^Random.*5 unread$/ })).toBeTruthy();
   });
 
-  it('ignores my own messages for the badges (no refetch)', async () => {
-    const { client } = setup();
-    await screen.findByText('message 1');
+  it('ignores my own messages for the counts (no refetch)', async () => {
+    const { client } = setup({ path: '/chat' });
+    await screen.findByRole('link', { name: /^Random/ });
     await waitFor(() => expect(client.channels.find((c) => c.name === 'chat:unread')).toBeTruthy());
     const count = () => client.rpcCalls.filter((c) => c.name === 'unread_counts').length;
     const before = count();
@@ -81,9 +102,15 @@ describe('ChatPage: messages', () => {
   it('shows the last page oldest first with the embedded author', async () => {
     setup();
     await screen.findByText('message 1');
-    const items = screen.getAllByRole('listitem').filter((li) => li.className.includes('chat-message'));
+    // A-1: the log keeps a real list inside it, and the items are oldest first
+    const log = screen.getByRole('log', { name: 'Messages' });
+    const items = within(within(log).getByRole('list')).getAllByRole('listitem');
     expect(items.map((li) => li.textContent)).toEqual([expect.stringContaining('message 1'), expect.stringContaining('message 2')]);
-    expect(screen.getAllByText('@grace').length).toBe(2);
+    // grouping: the second message (same author, a second later) shows no second name, but still says who wrote it
+    expect(within(items[0]).getByText('Grace Hopper').tagName).toBe('STRONG');
+    expect(items[1]).toHaveAttribute('data-grouped');
+    expect(within(items[1]).queryByRole('img')).toBeNull();
+    expect(items[1].querySelector('.sr-only').textContent).toMatch(/^Grace Hopper, /);
   });
 
   it('shows an empty state', async () => {
@@ -204,7 +231,7 @@ describe('ChatPage: realtime', () => {
       : { data: [], error: null }));
     await act(async () => channel.emitChange('INSERT', { new: { id: 4, room_id: 'r1', user_id: 'u-new', body: 'hi from new', created_at: '2026-11-17T10:30:00Z' } }));
     expect(await screen.findByText('hi from new')).toBeTruthy();
-    expect(screen.getByText('@linus')).toBeTruthy();
+    expect(screen.getByText('Linus').tagName).toBe('STRONG'); // a new author starts a new group: name shown
   });
 
   it('applies live UPDATE and DELETE events', async () => {

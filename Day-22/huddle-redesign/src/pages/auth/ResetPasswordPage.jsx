@@ -40,6 +40,7 @@ export default function ResetPasswordPage() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     const next = { password: validatePassword(password), confirm: password !== confirm ? 'The passwords do not match.' : '' };
     setErrors(next);
     setError('');
@@ -76,7 +77,7 @@ export default function ResetPasswordPage() {
         <PasswordField label="New password" name="new-password" value={password} onChange={setPassword} autoComplete="new-password" error={errors.password} showStrength />
         <PasswordField label="Confirm new password" name="confirm-password" value={confirm} onChange={setConfirm} autoComplete="new-password" error={errors.confirm} />
         {error && <p className="alert alert-error" role="alert">{error}</p>}
-        <button type="submit" className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Saving…' : 'Update password'}</button>
+        <button type="submit" className="btn btn-primary btn-block" aria-disabled={busy || undefined}>{busy ? 'Saving…' : 'Update password'}</button>
       </form>
     </AuthShell>
   );

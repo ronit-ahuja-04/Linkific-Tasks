@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../auth/AuthContext';
+import UnderTheHood from '../../components/ui/UnderTheHood';
 import AuthShell from '../../components/auth/AuthShell';
 import OAuthButtons from '../../components/auth/OAuthButtons';
 import PasswordField from '../../components/auth/PasswordField';
@@ -30,6 +31,7 @@ export default function LoginPage() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     const problem = validateEmail(email);
     setEmailError(problem);
     setError('');
@@ -42,6 +44,7 @@ export default function LoginPage() {
   }
 
   async function onMagicLink() {
+    if (busy) return;
     const problem = validateEmail(email);
     setEmailError(problem);
     setError('');
@@ -75,17 +78,16 @@ export default function LoginPage() {
         <PasswordField value={password} onChange={setPassword} autoComplete="current-password" required={false} />
         <p className="auth-forgot"><Link to="/forgot-password">Forgot your password?</Link></p>
         {error && <p className="alert alert-error" role="alert">{error}</p>}
-        <button type="submit" className="btn btn-primary btn-block" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
-        <button type="button" className="btn btn-block" onClick={onMagicLink} disabled={busy}>Email me a magic link</button>
+        <button type="submit" className="btn btn-primary btn-block" aria-disabled={busy || undefined}>{busy ? 'Signing in…' : 'Sign in'}</button>
+        <button type="button" className="btn btn-block" onClick={onMagicLink} aria-disabled={busy || undefined}>Email me a magic link</button>
       </form>
-      <details className="auth-how">
-        <summary>How this works</summary>
+      <UnderTheHood>
         <ul>
           <li><code>supabase.auth.signInWithPassword({'{ email, password }'})</code> checks the password hash in <code>auth.users</code> and returns a session (a JWT valid for 1 hour plus a refresh token).</li>
           <li><code>supabase.auth.signInWithOtp({'{ email }'})</code> emails a one-time link. Locally the email lands in Mailpit (port 54324).</li>
           <li>The JWT is sent with every request; Row Level Security reads the user id from it as <code>auth.uid()</code>.</li>
         </ul>
-      </details>
+      </UnderTheHood>
     </AuthShell>
   );
 }

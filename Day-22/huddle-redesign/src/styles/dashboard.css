@@ -1,12 +1,30 @@
-.dash-tiles { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.dash-tile { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--color-text); padding: 16px; }
-.dash-tile:hover { background: var(--color-bg-subtle); }
-.dash-tile-value { font-size: 30px; font-weight: 800; line-height: 1.1; }
-.dash-tile-label { font-size: 13px; color: var(--color-text-secondary); }
-.dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
-.dash-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
-.dash-h2 { font-size: 17px; }
-.dash-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.dash-room { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-.dash-unread { background: var(--color-attention-subtle); color: var(--color-attention-text); border-color: transparent; }
-.dash-demo { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+/* Dashboard: an F-pattern. Left column = what you came for, right column = secondary. Tokens only. */
+.dash-layout { align-items: start; margin-bottom: var(--space-6); }
+.dash-col { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+@media (min-width: 60em) { .dash-col { gap: var(--space-6); } }
+
+/* "Needs you": an amber edge only while something is waiting, so the colour keeps its meaning */
+.dash-needs[data-waiting] { box-shadow: inset 3px 0 0 var(--color-attention), var(--shadow-xs); }
+.dash-caught-up { display: flex; align-items: center; gap: var(--space-2); color: var(--color-text-secondary); }
+.dash-caught-up svg { color: var(--color-success-text); flex-shrink: 0; }
+.dash-more { margin-top: var(--space-2); font-size: var(--text-sm); color: var(--color-text-secondary); }
+
+/* "All notes" and friends: at least 24px tall (WCAG 2.5.8) */
+.dash-view-all { display: inline-flex; align-items: center; min-height: var(--target-min); font-size: var(--text-sm); font-weight: var(--weight-medium); }
+
+.dash-loading { display: flex; flex-direction: column; gap: var(--space-3); }
+.dash-loading .skeleton { height: 1rem; }
+
+/* The numbers: label left, figure right, figures in tabular digits so they line up */
+.dash-numbers-title { margin-bottom: var(--space-3); }
+.dash-stats { margin: 0; }
+.dash-stat { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border); }
+.dash-stat:last-child { border-bottom: 0; padding-bottom: 0; }
+.dash-stat dt { font-size: var(--text-sm); }
+.dash-stat dt a { color: var(--color-text-secondary); text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
+.dash-stat dt a:hover { color: var(--color-text); text-decoration: underline; }
+.dash-stat dd { margin: 0; font-size: var(--text-lg); font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; }
+.dash-actions { display: flex; flex-direction: column; gap: var(--space-2); }
+.dash-actions .btn { justify-content: flex-start; }
+
+.dash-demo { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: var(--space-2); }

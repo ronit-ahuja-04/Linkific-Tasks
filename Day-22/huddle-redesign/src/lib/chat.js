@@ -70,6 +70,7 @@ export async function fetchMessages(client, roomId, { before = null, limit = PAG
     .select(MESSAGE_SELECT)
     .eq('room_id', roomId) // WHERE room_id = '...'
     .order('created_at', { ascending: false }) // ORDER BY created_at DESC
+    .order('id', { ascending: false }) // , id DESC: messages with the same timestamp still come back in the order they were sent
     .limit(limit); // LIMIT 50
   if (before) query = query.lt('created_at', before); // AND created_at < '...'
   const { data, error } = await query;

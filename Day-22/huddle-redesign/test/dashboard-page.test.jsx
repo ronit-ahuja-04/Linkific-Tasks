@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 import { AuthContext } from '../src/auth/AuthContext';
 import DashboardPage from '../src/pages/DashboardPage';
-import { greeting, loadMyRooms, loadStats, loadTeamNotes, mergeRooms } from '../src/lib/dashboard';
+import { displayName, firstName, greeting, loadMyRooms, loadStats, loadTeamNotes, loadUnreadMentions, mergeRooms } from '../src/lib/dashboard';
 import { makeClient } from './helpers/files';
 
 const STATS = { my_notes: 3, team_notes: 7, rooms: 4, messages_today: 12, unread_mentions: 2 };
@@ -14,6 +14,7 @@ const MEMBERS = [
   { room_id: 'r2', rooms: { id: 'r2', name: 'Leads', is_private: true } },
 ];
 const UNREAD = [{ room_id: 'r2', unread: 3 }];
+const MENTIONS = [{ id: 'n1', room_id: 'r1', message: 'grace: @ada can you check the release list?', created_at: '2026-11-17T11:00:00Z', rooms: { name: 'General' } }];
 
 function opts(over = {}) {
   return {
@@ -21,6 +22,7 @@ function opts(over = {}) {
       notes: { data: TEAM, error: null },
       files: { data: [{ id: 'f1', name: 'plan.pdf', size: 2048, mime: 'application/pdf', created_at: '2026-11-17T09:00:00Z' }], error: null },
       room_members: { data: MEMBERS, error: null },
+      notifications: { data: MENTIONS, error: null },
     },
     rpcs: { workspace_stats: { data: STATS, error: null }, unread_counts: { data: UNREAD, error: null } },
     ...over,
@@ -64,11 +66,29 @@ describe('dashboard lib', () => {
   });
 });
 
+describe('dashboard lib (Day 22 additions)', () => {
+  it('asks only for unread mentions, newest first', () => {
+    const client = makeClient();
+    loadUnreadMentions(client, 3);
+    const calls = client.log.map((c) => [c.method, ...c.args]);
+    expect(calls).toContainEqual(['is', 'read_at', null]);
+    expect(calls).toContainEqual(['order', 'created_at', { ascending: false }]);
+    expect(calls).toContainEqual(['limit', 3]);
+  });
+  it('names people the way people know them', () => {
+    expect(displayName({ full_name: 'Grace Hopper', username: 'grace' })).toBe('Grace Hopper');
+    expect(displayName({ full_name: '  ', username: 'grace' })).toBe('grace');
+    expect(displayName(null)).toBe('someone');
+    expect(firstName({ full_name: 'Ada Lovelace', username: 'ada' })).toBe('Ada');
+    expect(firstName({ username: 'ada' })).toBe('ada');
+  });
+});
+
 describe('DashboardPage', () => {
-  it('shows the greeting, the five stat tiles and the title', async () => {
+  it('greets by first name, and shows the five workspace numbers', async () => {
     setup();
     expect(document.title).toBe('Dashboard · Huddle');
-    expect((await screen.findByRole('heading', { level: 1 })).textContent).toMatch(/Ada Lovelace/);
+    expect((await screen.findByRole('heading', { level: 1 })).textContent).toMatch(/, Ada$/);
     expect(await screen.findByText('Release checklist')).toBeTruthy();
     expect(screen.getByTestId('stat-my_notes').textContent).toBe('3');
     expect(screen.getByTestId('stat-team_notes').textContent).toBe('7');
@@ -77,27 +97,47 @@ describe('DashboardPage', () => {
     expect(screen.getByTestId('stat-unread_mentions').textContent).toBe('2');
   });
 
-  it('lists team notes with the author, my files and rooms with unread counts', async () => {
+  it('lists team notes with the author and a relative time, and my files', async () => {
     setup();
     expect(await screen.findByText(/by grace/)).toBeTruthy();
+    const note = screen.getByRole('link', { name: 'Release checklist' });
+    expect(note.closest('li').querySelector('time').getAttribute('dateTime')).toBe('2026-11-17T10:00:00.000Z');
     expect(screen.getByRole('link', { name: 'plan.pdf' }).getAttribute('href')).toBe('/files');
-    const leads = screen.getByRole('link', { name: /Private: Leads/ });
-    expect(leads.getAttribute('href')).toBe('/chat/r2');
-    expect(within(leads.closest('li')).getByText('3 unread')).toBeTruthy();
-    expect(within(screen.getByRole('link', { name: /# General/ }).closest('li')).queryByText(/unread/)).toBeNull();
   });
 
-  it('explains what each page demonstrates', async () => {
+  it('"Needs you": unread mentions first, then rooms with new messages; quiet rooms are not listed', async () => {
     setup();
-    const section = (await screen.findByRole('heading', { name: 'What this app demonstrates' })).closest('section');
-    for (const name of ['Chat', 'Notes', 'Files', 'Profile', 'Query lab']) expect(within(section).getByRole('link', { name })).toBeTruthy();
+    const needs = (await screen.findByRole('heading', { name: 'Needs you' })).closest('section');
+    const mention = await within(needs).findByRole('link', { name: 'Mention in #General' });
+    expect(mention.getAttribute('href')).toBe('/chat/r1');
+    expect(within(needs).getByText(/can you check the release list/)).toBeTruthy();
+    const leads = within(needs).getByRole('link', { name: /^Leads/ });
+    expect(leads.textContent).toBe('Leads (private)'); // the lock icon is decoration; the word is for screen readers
+    expect(leads.getAttribute('href')).toBe('/chat/r2');
+    expect(within(leads.closest('li')).getByText('3 new messages')).toBeTruthy();
+    expect(within(needs).queryByRole('link', { name: /^General/ })).toBeNull(); // no unread messages there
+    expect(within(needs).getByText('2 unread mentions')).toBeTruthy(); // the amber count, in words for screen readers
+    expect(within(needs).getByText('1 more in the notification bell.')).toBeTruthy(); // 2 unread, 1 listed
+  });
+
+  it('says "all caught up" when nothing is waiting', async () => {
+    setup(opts({ tables: { notes: { data: [], error: null }, files: { data: [], error: null }, room_members: { data: MEMBERS, error: null }, notifications: { data: [], error: null } }, rpcs: { workspace_stats: { data: { ...STATS, unread_mentions: 0 }, error: null }, unread_counts: { data: [], error: null } } }));
+    expect(await screen.findByText(/You are all caught up/)).toBeTruthy();
+  });
+
+  it('keeps what the app demonstrates, collapsed under the hood', async () => {
+    setup();
+    const details = screen.getByText('Under the hood: what this app demonstrates').closest('details');
+    expect(details.open).toBe(false);
+    for (const name of ['Chat', 'Notes', 'Files', 'Profile', 'Query lab']) expect(within(details).getByRole('link', { name })).toBeTruthy();
   });
 
   it('shows empty states', async () => {
     setup(opts({ tables: { notes: { data: [], error: null }, files: { data: [], error: null }, room_members: { data: [], error: null } }, rpcs: { workspace_stats: { data: STATS, error: null }, unread_counts: { data: [], error: null } } }));
     expect(await screen.findByText(/No team notes yet/)).toBeTruthy();
     expect(screen.getByText(/No files yet/)).toBeTruthy();
-    expect(screen.getByText(/not in any room/)).toBeTruthy();
+    const filesPanel = screen.getByRole('heading', { name: 'My recent files' }).closest('section');
+    expect(within(filesPanel).getByRole('link', { name: 'Upload a file' }).getAttribute('href')).toBe('/files'); // an empty state offers the next step
   });
 
   it('shows an error for the stats without breaking the other sections', async () => {

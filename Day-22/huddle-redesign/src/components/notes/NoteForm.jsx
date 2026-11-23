@@ -48,7 +48,7 @@ export default function NoteForm({ note, onSave, onCancel }) {
         <div className="field">
           <label htmlFor={`${id}-prio`}>Priority</label>
           <select id={`${id}-prio`} value={priority} onChange={(e) => setPriority(Number(e.target.value))}>
-            {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}</option>)}
+            {[0, 1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n === 0 ? 'None' : n === 5 ? '5 (highest)' : n}</option>)}
           </select>
         </div>
         <label className="checkbox notes-pinned"><input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} /> Pinned</label>

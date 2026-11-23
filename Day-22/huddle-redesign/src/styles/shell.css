@@ -81,7 +81,12 @@
 
 /* ---------- 960px and wider: the sidebar ---------- */
 @media (min-width: 60em) {
-  .shell { display: grid; grid-template-columns: var(--sidebar-width) minmax(0, 1fr); }
+  .shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    /* the sidebar's tint and edge continue down the column, past the sticky panel (long pages, full-page screenshots) */
+    background: linear-gradient(to right, var(--color-bg-subtle) calc(var(--sidebar-width) - 1px), var(--color-border) calc(var(--sidebar-width) - 1px) var(--sidebar-width), transparent var(--sidebar-width));
+  }
   .shell-sidebar {
     display: flex;
     flex-direction: column;

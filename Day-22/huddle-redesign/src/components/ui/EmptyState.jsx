@@ -4,10 +4,10 @@
  *     Notes you write, or that your team shares, show up here.
  *   </EmptyState>
  */
-export default function EmptyState({ icon, title, children, action, headingLevel = 3 }) {
+export default function EmptyState({ icon, title, children, action, headingLevel = 3, compact = false }) {
   const Heading = `h${headingLevel}`;
   return (
-    <div className="empty-state">
+    <div className={`empty-state${compact ? ' empty-state-compact' : ''}`}>
       {icon && <span className="empty-state-icon" aria-hidden="true">{icon}</span>}
       <Heading className="empty-state-title">{title}</Heading>
       {children && <p className="empty-state-text">{children}</p>}

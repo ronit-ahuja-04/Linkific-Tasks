@@ -1,15 +1,16 @@
-.profile-page { max-width: 900px; }
-.profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
-.profile-card { display: flex; flex-direction: column; gap: 14px; }
-.profile-h2 { font-size: 17px; margin-bottom: 10px; }
-.profile-avatar-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
-.profile-avatar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.profile-avatar .alert { margin-top: 12px; }
-.profile-facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; margin: 0 0 14px; font-size: 14px; }
+.profile-page { max-width: 60rem; }
+.profile-page .uth { margin-top: var(--space-8); }
+.profile-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(19rem, 100%), 1fr)); gap: var(--space-6); align-items: start; }
+.profile-card { display: flex; flex-direction: column; gap: var(--space-3); }
+.profile-h2 { font-size: var(--text-lg); margin-bottom: var(--space-3); }
+.profile-avatar-row { display: flex; gap: var(--space-4); align-items: center; flex-wrap: wrap; }
+.profile-avatar-actions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); }
+.profile-avatar .alert { margin-top: var(--space-3); }
+.profile-facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-3); margin: 0 0 var(--space-3); font-size: var(--text-sm); }
 .profile-facts dt { color: var(--color-text-secondary); }
 .profile-facts dd { margin: 0; overflow-wrap: anywhere; }
-.profile-provider { margin-right: 6px; }
-.profile-signout { display: flex; gap: 8px; flex-wrap: wrap; }
-.profile-how { margin-top: 16px; font-size: 14px; }
+.profile-provider { margin-right: var(--space-1); }
+.profile-signout { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+.profile-how { margin-top: var(--space-4); font-size: var(--text-sm); }
 .profile-how summary { cursor: pointer; font-weight: 500; }
-.profile-how ul { margin: 10px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; color: var(--color-text-secondary); }
+.profile-how ul { margin: var(--space-2) 0 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: var(--space-1); color: var(--color-text-secondary); }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Download, Link2, Trash2, FileText, Copy } from 'lucide-react';
 import { EXPIRY_OPTIONS, formatBytes, formatCountdown, isImage } from '../../lib/files';
+import RelativeTime from '../ui/RelativeTime';
 
 /** One file: preview, facts, and the actions. `actions` are async functions from the page. */
 export default function FileRow({ file, previewUrl, actions, busy }) {
@@ -35,16 +36,16 @@ export default function FileRow({ file, previewUrl, actions, busy }) {
       <div className="files-info">
         <p className="files-name">{file.name}</p>
         <p className="files-meta">
-          {formatBytes(file.size)} · {file.mime || 'unknown type'} · {new Date(file.created_at).toLocaleDateString()}
+          {formatBytes(file.size)} · {file.mime || 'unknown type'} · <RelativeTime date={file.created_at} />
           {file.note?.title && <> · <span className="badge">Note: {file.note.title}</span></>}
         </p>
 
         <div className="files-actions">
-          <button type="button" className="btn btn-sm" disabled={busy} onClick={() => actions.download(file)}>
+          <button type="button" className="btn btn-sm btn-ghost" disabled={busy} onClick={() => actions.download(file)}>
             <Download size={14} aria-hidden="true" /> Download
           </button>
           <label className="sr-only" htmlFor={`exp-${file.id}`}>Link expires after, for {file.name}</label>
-          <select id={`exp-${file.id}`} className="files-expiry" value={seconds} onChange={(e) => setSeconds(Number(e.target.value))}>
+          <select id={`exp-${file.id}`} className="files-expiry input-sm" value={seconds} onChange={(e) => setSeconds(Number(e.target.value))}>
             {EXPIRY_OPTIONS.map((o) => <option key={o.seconds} value={o.seconds}>Expires in {o.label}</option>)}
           </select>
           <button type="button" className="btn btn-sm" disabled={busy} onClick={makeLink}>
@@ -56,7 +57,7 @@ export default function FileRow({ file, previewUrl, actions, busy }) {
               <button type="button" className="btn btn-sm" onClick={() => setConfirming(false)}>Cancel</button>
             </>
           ) : (
-            <button type="button" className="btn btn-sm btn-danger" disabled={busy} onClick={() => setConfirming(true)} aria-label={`Delete ${file.name}`}>
+            <button type="button" className="btn btn-sm btn-ghost files-delete" disabled={busy} onClick={() => setConfirming(true)} aria-label={`Delete ${file.name}`}>
               <Trash2 size={14} aria-hidden="true" /> Delete
             </button>
           )}

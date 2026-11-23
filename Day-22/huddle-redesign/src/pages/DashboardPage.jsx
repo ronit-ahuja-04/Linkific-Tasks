@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../auth/AuthContext';
-import { greeting, loadMyRooms, loadRecentFiles, loadStats, loadTeamNotes } from '../lib/dashboard';
-import { Demonstrates, MyRooms, Panel, RecentFiles, StatTiles, TeamNotes } from '../components/dashboard/Panels';
+import { firstName, greeting, loadMyRooms, loadRecentFiles, loadStats, loadTeamNotes, loadUnreadMentions } from '../lib/dashboard';
+import { DashboardUnderTheHood, FilesEmpty, NeedsYou, NotesEmpty, Panel, QuickActions, RecentFiles, TeamNotes, WorkspaceNumbers } from '../components/dashboard/Panels';
+import PageHeader from '../components/ui/PageHeader';
 import '../styles/dashboard.css';
 
 const INITIAL = { state: 'loading', data: null, error: '' };
@@ -21,6 +22,10 @@ function useQuery(run, deps) {
   return result;
 }
 
+/**
+ * THE DASHBOARD, laid out for an F-shaped scan: the eye starts top left, so "Needs you" is there; it then runs
+ * down the left column (team notes, my files); the right column holds what is useful but secondary.
+ */
 export default function DashboardPage() {
   const { client, user, profile } = useAuth();
   const userId = user?.id;
@@ -30,30 +35,35 @@ export default function DashboardPage() {
   const team = useQuery(() => loadTeamNotes(client), [client]);
   const files = useQuery(() => loadRecentFiles(client, userId), [client, userId]);
   const rooms = useQuery(() => loadMyRooms(client, userId), [client, userId]);
+  const mentions = useQuery(() => loadUnreadMentions(client), [client]);
 
-  // The hour is read once, in an initializer (not during every render)
+  // The hour and the date are read once, in initializers (not during every render)
   const [hello] = useState(() => greeting(new Date().getHours()));
-  const name = profile?.full_name || profile?.username || 'there';
+  const [today] = useState(() => new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date()));
+
+  const needsState = [rooms, mentions].some((q) => q.state === 'loading') ? 'loading' : 'ready';
 
   return (
     <div className="dash-page">
-      <h1 className="page-title">{hello}, {name}</h1>
-      <p className="page-sub">Here is what is happening in your workspace.</p>
+      <PageHeader title={`${hello}, ${firstName(profile)}`} description={today} />
 
-      <StatTiles stats={stats.data} error={stats.state === 'error' ? stats.error : ''} />
-
-      <div className="dash-grid">
-        <Panel id="dash-team" title="Recent team notes" to="/notes" linkText="All notes" state={team.state} error={team.error} count={team.data?.length ?? 0} empty="No team notes yet. Share one from the Notes page.">
-          {team.state === 'ready' ? <TeamNotes notes={team.data ?? []} /> : null}
-        </Panel>
-        <Panel id="dash-rooms" title="My rooms" to="/chat" linkText="Open chat" state={rooms.state} error={rooms.error} count={rooms.data?.length ?? 0} empty="You are not in any room yet.">
-          {rooms.state === 'ready' ? <MyRooms rooms={rooms.data ?? []} /> : null}
-        </Panel>
-        <Panel id="dash-files" title="My recent files" to="/files" linkText="All files" state={files.state} error={files.error} count={files.data?.length ?? 0} empty="No files yet. Upload one on the Files page.">
-          {files.state === 'ready' ? <RecentFiles files={files.data ?? []} /> : null}
-        </Panel>
-        <Demonstrates />
+      <div className="grid-12 dash-layout">
+        <div className="span-8 dash-col">
+          <NeedsYou state={needsState} mentionCount={Number(stats.data?.unread_mentions ?? mentions.data?.length ?? 0)} mentions={mentions.data ?? []} rooms={rooms.data} />
+          <Panel id="dash-team" title="Recent team notes" to="/notes" linkText="All notes" state={team.state} error={team.error} count={team.data?.length ?? 0} empty={<NotesEmpty />}>
+            <TeamNotes notes={team.data ?? []} />
+          </Panel>
+          <Panel id="dash-files" title="My recent files" to="/files" linkText="All files" state={files.state} error={files.error} count={files.data?.length ?? 0} empty={<FilesEmpty />}>
+            <RecentFiles files={files.data ?? []} />
+          </Panel>
+        </div>
+        <div className="span-4 dash-col">
+          <WorkspaceNumbers stats={stats.data} error={stats.state === 'error' ? stats.error : ''} />
+          <QuickActions />
+        </div>
       </div>
+
+      <DashboardUnderTheHood />
     </div>
   );
 }

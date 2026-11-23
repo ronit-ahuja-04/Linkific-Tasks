@@ -7,6 +7,10 @@ import BucketsPanel from '../components/files/BucketsPanel';
 import {
   createPreviewUrls, createShareLink, deleteFile, describeError, downloadFile, isImage, listFiles, listMyNotes, uploadFile,
 } from '../lib/files';
+import PageHeader from '../components/ui/PageHeader';
+import EmptyState from '../components/ui/EmptyState';
+import UnderTheHood from '../components/ui/UnderTheHood';
+import { FolderOpen } from 'lucide-react';
 import '../styles/files.css';
 
 export default function FilesPage() {
@@ -95,29 +99,24 @@ export default function FilesPage() {
 
   return (
     <div className="files-page">
-      <h1 className="page-title">Files</h1>
-      <p className="page-sub">Private storage for your attachments, with links that expire.</p>
-
-      <details className="card files-how">
-        <summary>How this works (the supabase-js calls)</summary>
-        <ul>
-          <li><code>supabase.storage.from('attachments').upload(path, file, {'{ upsert: false }'})</code>: send the bytes to a private bucket.</li>
-          <li><code>supabase.from('files').insert(&#123;...&#125;)</code>: save the record (name, size, note). If this fails, the bytes are removed again.</li>
-          <li><code>supabase.from('files').select('*, note:notes(title)')</code>: list my files with the note joined in.</li>
-          <li><code>storage.download(path)</code>: read a private file as me. <code>createSignedUrl(path, seconds)</code>: a temporary link anyone can open.</li>
-          <li><code>storage.remove([path])</code> then <code>from('files').delete().eq('id', id)</code>.</li>
-        </ul>
-      </details>
+      <PageHeader title="Files" description="Private storage for your attachments, with links that expire." />
 
       <UploadZone onFiles={upload} busy={busy} notes={notes} noteId={noteId} onNoteChange={setNoteId} />
       <p className="sr-only" role="status">{status}</p>
       {status && <p className="files-status" aria-hidden="true">{status}</p>}
 
       <section className="card" aria-labelledby="files-list-title">
-        <h2 id="files-list-title" className="files-h2" tabIndex={-1} ref={headingRef}>My files</h2>
-        {state === 'loading' && <p role="status">Loading your files...</p>}
+        <div className="card-header">
+          <h2 id="files-list-title" className="card-title files-h2" tabIndex={-1} ref={headingRef}>My files</h2>
+          {state === 'ready' && files.length > 0 ? <span className="files-count">{files.length} {files.length === 1 ? 'file' : 'files'}</span> : null}
+        </div>
+        {state === 'loading' && <p role="status" className="muted">Loading your files...</p>}
         {state === 'error' && <p className="alert alert-error" role="alert">Could not load files: {loadError}</p>}
-        {state === 'ready' && files.length === 0 && <p className="muted">No files yet. Upload one above.</p>}
+        {state === 'ready' && files.length === 0 && (
+          <EmptyState compact icon={<FolderOpen size={20} />} title="No files yet">
+            Upload one above. Images get a preview, and any file can get a link that expires.
+          </EmptyState>
+        )}
         {state === 'ready' && files.length > 0 && (
           <ul className="files-list">
             {files.map((f) => <FileRow key={f.id} file={f} previewUrl={previews[f.path]} actions={actions} busy={busy} />)}
@@ -125,7 +124,16 @@ export default function FilesPage() {
         )}
       </section>
 
-      <BucketsPanel client={client} profile={profile} userId={userId} sampleFile={files[0]} />
+      <UnderTheHood title="Under the hood: storage calls, and public vs private buckets">
+        <ul>
+          <li><code>storage.from(&apos;attachments&apos;).upload(path, file, &#123; upsert: false &#125;)</code>: send the bytes to a private bucket.</li>
+          <li><code>from(&apos;files&apos;).insert(&#123;...&#125;)</code>: save the record (name, size, note). If this fails, the bytes are removed again.</li>
+          <li><code>from(&apos;files&apos;).select(&apos;*, note:notes(title)&apos;)</code>: list my files with the note joined in.</li>
+          <li><code>storage.download(path)</code>: read a private file as me. <code>createSignedUrl(path, seconds)</code>: a temporary link anyone can open.</li>
+          <li><code>storage.remove([path])</code> then <code>from(&apos;files&apos;).delete().eq(&apos;id&apos;, id)</code>.</li>
+        </ul>
+        <BucketsPanel client={client} profile={profile} userId={userId} sampleFile={files[0]} />
+      </UnderTheHood>
     </div>
   );
 }

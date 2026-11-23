@@ -15,6 +15,7 @@ export default function ProfileForm() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (busy) return; // the button stays focusable while busy (A-4), so guard against a second submit here
     setError('');
     const next = { username: validateUsername(form.username, { required: true }), bio: form.bio.length > BIO_MAX ? `Bio can be at most ${BIO_MAX} characters.` : '' };
     setErrors(next);
@@ -53,7 +54,7 @@ export default function ProfileForm() {
         <p id="profile-bio-msg" className={errors.bio ? 'field-error' : 'field-hint'} role={errors.bio ? 'alert' : undefined}>{errors.bio || `${form.bio.length} / ${BIO_MAX}`}</p>
       </div>
       {error && <p className="alert alert-error" role="alert">{error}</p>}
-      <div><button type="submit" className="btn btn-primary" disabled={busy}>{busy ? 'Saving…' : 'Save profile'}</button></div>
+      <div><button type="submit" className="btn btn-primary" aria-disabled={busy || undefined}>{busy ? 'Saving…' : 'Save profile'}</button></div>
     </form>
   );
 }

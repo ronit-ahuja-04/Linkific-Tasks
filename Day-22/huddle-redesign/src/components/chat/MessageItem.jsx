@@ -3,6 +3,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import Avatar from '../Avatar';
 import Attachment from './Attachment';
 import { MAX_BODY, splitMentions } from '../../lib/chat';
+import { fullDateTime, messageTime } from '../../lib/format';
 
 function Body({ text }) {
   // text only: a message is data from other users, so it is never put into the page as HTML
@@ -13,14 +14,20 @@ function Body({ text }) {
   );
 }
 
-export default function MessageItem({ message, mine, onEdit, onDelete }) {
+/**
+ * One message. `grouped` = the same person wrote the message above a moment ago: no second avatar and name
+ * (less noise), but screen readers still hear who wrote it and when.
+ */
+export default function MessageItem({ message, mine, grouped = false, onEdit, onDelete }) {
   const [mode, setMode] = useState('view'); // view | edit | confirm
   const [draft, setDraft] = useState(message.body);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const editRef = useRef(null);
-  const name = message.author?.username ?? 'someone';
+  const name = message.author?.full_name?.trim() || message.author?.username || 'someone';
   const time = new Date(message.created_at);
+  const shortTime = messageTime(time);
+  const edited = message.edited_at ? <span className="badge">edited</span> : null;
 
   useEffect(() => {
     if (mode === 'edit') editRef.current?.focus();
@@ -47,15 +54,22 @@ export default function MessageItem({ message, mine, onEdit, onDelete }) {
   };
 
   return (
-    <li className="chat-message" data-mine={mine || undefined}>
-      <Avatar profile={message.author} size={32} />
+    <li className="chat-message" data-mine={mine || undefined} data-grouped={grouped || undefined}>
+      {grouped ? (
+        <time className="chat-gutter-time" dateTime={message.created_at} title={fullDateTime(time)} aria-hidden="true">{shortTime}</time>
+      ) : (
+        <Avatar profile={message.author} size={32} />
+      )}
       <div className="chat-message-main">
-        <div className="chat-message-head">
-          <strong>{message.author?.full_name || name}</strong>
-          <span className="muted">@{name}</span>
-          <time className="muted" dateTime={message.created_at}>{time.toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}</time>
-          {message.edited_at ? <span className="badge">edited</span> : null}
-        </div>
+        {grouped ? (
+          <span className="sr-only">{name}, {shortTime}: </span>
+        ) : (
+          <div className="chat-message-head">
+            <strong className="chat-author">{name}</strong>
+            <time dateTime={message.created_at} title={fullDateTime(time)}>{shortTime}</time>
+            {edited}
+          </div>
+        )}
         {mode === 'edit' ? (
           <form className="chat-edit" onSubmit={save}>
             <label className="sr-only" htmlFor={`edit-${message.id}`}>Edit message</label>
@@ -69,6 +83,7 @@ export default function MessageItem({ message, mine, onEdit, onDelete }) {
         ) : (
           <Body text={message.body} />
         )}
+        {grouped ? edited : null}
         {message.attachment ? <Attachment file={message.attachment} /> : null}
         {error ? <p role="alert" className="field-error">{error}</p> : null}
         {mine && mode === 'view' ? (

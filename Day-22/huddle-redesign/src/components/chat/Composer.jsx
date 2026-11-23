@@ -108,7 +108,7 @@ export default function Composer({ onSend, onTyping, textareaRef }) {
           <label className="sr-only" htmlFor="chat-input">Message</label>
           <textarea
             id="chat-input" ref={textareaRef} rows={2} maxLength={MAX_BODY} value={text} onChange={change} onKeyDown={keyDown}
-            placeholder="Write a message. Enter to send, Shift+Enter for a new line, @ to mention"
+            placeholder="Write a message, @ to mention someone" aria-describedby="chat-hint"
             role="combobox" aria-expanded={suggestions.length > 0} aria-controls="chat-mentions" aria-autocomplete="list"
             aria-activedescendant={suggestions.length ? `mention-${active}` : undefined}
           />
@@ -125,8 +125,9 @@ export default function Composer({ onSend, onTyping, textareaRef }) {
         </div>
         <input ref={fileInput} type="file" className="sr-only" tabIndex={-1} aria-label="Attach a file" onChange={chooseFile} />
         <button type="button" className="icon-btn" aria-label="Attach a file" onClick={() => fileInput.current?.click()} disabled={sending}><Paperclip size={18} aria-hidden="true" /></button>
-        <button type="submit" className="btn btn-primary" disabled={sending || (!text.trim() && !file)}><Send size={16} aria-hidden="true" /> {sending ? 'Sending...' : 'Send'}</button>
+        <button type="submit" className="btn btn-primary chat-send" disabled={sending || (!text.trim() && !file)}><Send size={16} aria-hidden="true" /> <span className="chat-send-label">{sending ? 'Sending...' : 'Send'}</span></button>
       </div>
+      <p id="chat-hint" className="chat-hint">Enter sends. Shift+Enter starts a new line.</p>
     </form>
   );
 }
