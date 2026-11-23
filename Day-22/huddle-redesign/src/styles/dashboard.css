@@ -1,12 +1,12 @@
 .dash-tiles { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.dash-tile { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--text-primary); padding: 16px; }
-.dash-tile:hover { background: var(--bg-sunken); }
+.dash-tile { display: flex; flex-direction: column; gap: 2px; text-decoration: none; color: var(--color-text); padding: 16px; }
+.dash-tile:hover { background: var(--color-bg-subtle); }
 .dash-tile-value { font-size: 30px; font-weight: 800; line-height: 1.1; }
-.dash-tile-label { font-size: 13px; color: var(--text-secondary); }
+.dash-tile-label { font-size: 13px; color: var(--color-text-secondary); }
 .dash-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; align-items: start; }
 .dash-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
 .dash-h2 { font-size: 17px; }
 .dash-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .dash-room { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-.dash-unread { background: var(--info-bg); color: var(--info-text); border-color: var(--info-text); }
+.dash-unread { background: var(--color-attention-subtle); color: var(--color-attention-text); border-color: transparent; }
 .dash-demo { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 8px; font-size: 14px; }

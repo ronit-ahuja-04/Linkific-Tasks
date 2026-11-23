@@ -1,0 +1,271 @@
+/* =====================================================================================================
+   HUDDLE DESIGN TOKENS (Day 22)
+   Two layers:
+     1. Primitives: the raw scales (green, warm grey, amber, red, blue). Never used by components directly.
+     2. Semantic tokens: what a colour is FOR (--color-text, --color-primary, --color-attention...). Components
+        use only these, so a theme is just a different mapping from purpose to primitive.
+   Every text/background pair is checked against WCAG 2.2 AA by `npm run contrast` and by the unit tests
+   (pairs listed in src/lib/contrast.js). DESIGN.md explains every choice.
+
+   Themes are scoped by [data-theme], not only :root, so a part of the page can show the other theme
+   (the /styleguide page renders light and dark side by side this way).
+   ===================================================================================================== */
+
+/* ---------- 1. Primitives ---------- */
+:root {
+  /* Green: Huddle's brand. 500 is the Day 17 brand colour, kept so Huddle still looks like Huddle. */
+  --green-50: #ecf8f2;
+  --green-100: #d3f0e2;
+  --green-200: #a6e3c8;
+  --green-300: #6fd0a9;
+  --green-400: #3fbe8e;
+  --green-500: #0e9f6e;
+  --green-600: #0c8763;
+  --green-700: #0b6b54;
+  --green-800: #0a5544;
+  --green-900: #11352b;
+  --green-950: #0a2219;
+
+  /* Warm grey: neutrals with a little yellow in them, so the greys sit calmly next to green (cool blue-greys clash) */
+  --neutral-0: #ffffff;
+  --neutral-25: #fbfaf8;
+  --neutral-50: #f4f2ef;
+  --neutral-100: #eeece8;
+  --neutral-200: #e2dfda;
+  --neutral-300: #ccc8c1;
+  --neutral-400: #a9a39c;
+  --neutral-500: #857f78;
+  --neutral-600: #5f5a54;
+  --neutral-700: #45413c;
+  --neutral-800: #2e2b28;
+  --neutral-850: #262421;
+  --neutral-900: #1c1b19;
+  --neutral-925: #181715;
+  --neutral-950: #141312;
+
+  /* Amber: the one accent. Opposite green on the colour wheel's warm side, reserved for "needs you" (mentions, unread). */
+  --amber-50: #fff6e5;
+  --amber-100: #feeacc;
+  --amber-200: #fdd594;
+  --amber-300: #fbbf5c;
+  --amber-400: #f5a524;
+  --amber-500: #dd8a0b;
+  --amber-600: #b86b05;
+  --amber-700: #8a4b00;
+  --amber-800: #6b3a08;
+  --amber-900: #4f2b07;
+  --amber-950: #352812;
+
+  /* Red: errors and destructive actions only */
+  --red-50: #feeeec;
+  --red-100: #fddad5;
+  --red-300: #ff8a7a;
+  --red-500: #c8372a;
+  --red-600: #b42318;
+  --red-700: #8f1c13;
+  --red-900: #3a1c18;
+
+  /* Blue: information, @mentions, and the focus ring (a hue nothing else uses, so focus is never mistaken for state) */
+  --blue-50: #eaf1fe;
+  --blue-200: #b9d1ff;
+  --blue-300: #8ab4ff;
+  --blue-400: #6ea8ff;
+  --blue-600: #2563eb;
+  --blue-700: #1e4fb8;
+  --blue-800: #1e3157;
+  --blue-900: #172742;
+
+  /* ---------- Typography ---------- */
+  /* Inter: designed for screens (tall x-height, open shapes, tabular figures). JetBrains Mono for code in the Query lab. */
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Modular scale, ratio 1.25 (major third) from a 16px base, in rem so it follows the browser's text-size setting */
+  --text-xs: 0.75rem;     /* 12: captions, badges */
+  --text-sm: 0.875rem;    /* 14: UI chrome, labels, meta */
+  --text-md: 1rem;        /* 16: body */
+  --text-lg: 1.25rem;     /* 20: card and section titles */
+  --text-xl: 1.5625rem;   /* 25: page titles on phones */
+  --text-2xl: 1.9375rem;  /* 31: page titles */
+  --text-3xl: 2.4375rem;  /* 39: the sign-in headline */
+
+  --leading-tight: 1.2;   /* headings */
+  --leading-snug: 1.35;   /* UI labels, card titles */
+  --leading-normal: 1.5;  /* body text */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  --tracking-tight: -0.011em; /* large headings: Inter's own recommendation */
+  --tracking-caps: 0.06em;    /* small uppercase labels only */
+  --measure: 70ch;            /* longest comfortable line of body text */
+
+  /* ---------- Spacing: 4px base, 8 steps ---------- */
+  --space-1: 0.25rem;  /* 4 */
+  --space-2: 0.5rem;   /* 8 */
+  --space-3: 0.75rem;  /* 12 */
+  --space-4: 1rem;     /* 16 */
+  --space-6: 1.5rem;   /* 24 */
+  --space-8: 2rem;     /* 32 */
+  --space-12: 3rem;    /* 48 */
+  --space-16: 4rem;    /* 64 */
+
+  /* ---------- Shape ---------- */
+  --radius-sm: 4px;     /* badges inside text, code */
+  --radius-md: 6px;     /* buttons, inputs */
+  --radius-lg: 10px;    /* cards, menus */
+  --radius-full: 999px; /* pills, avatars */
+
+  /* ---------- Layout ---------- */
+  /* Breakpoints (CSS variables can not be used in @media, so they are written as numbers, mobile first):
+     base = phone, 40em = 640px (large phone / small tablet), 60em = 960px (sidebar appears), 80em = 1280px (wide) */
+  --sidebar-width: 15.5rem;
+  --content-max: 75rem;
+  --header-height: 3.5rem;
+  --target-min: 1.5rem; /* WCAG 2.5.8 minimum target, 24px */
+  --target-comfort: 2.5rem; /* our default control height, 40px */
+
+  /* ---------- Motion ---------- */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---------- Layers ---------- */
+  --z-sticky: 50;
+  --z-dropdown: 1000;
+  --z-overlay: 1400;
+  --z-toast: 2000;
+  --z-skip-link: 3000;
+}
+
+/* ---------- 2. Semantic tokens: light ---------- */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces, from back to front */
+  --color-bg: var(--neutral-25);            /* the page */
+  --color-bg-subtle: var(--neutral-50);     /* sidebar, code blocks, wells */
+  --color-surface: var(--neutral-0);        /* cards, inputs */
+  --color-surface-raised: var(--neutral-0); /* menus, popovers, toasts (lifted by shadow) */
+  --color-surface-hover: var(--neutral-100);
+  --color-border: var(--neutral-200);       /* dividers and card edges: decoration, no contrast minimum */
+  --color-border-input: var(--neutral-500); /* edges you must see to use a control: 3:1 (WCAG 1.4.11) */
+
+  /* Text: two levels only. Fewer greys = clearer hierarchy, and both pass AA everywhere. */
+  --color-text: var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-disabled: var(--neutral-400); /* disabled controls are exempt from contrast (WCAG 1.4.3) */
+
+  /* Brand green */
+  --color-brand: var(--green-500);          /* logo, icons, the online dot: never small text */
+  --color-primary: var(--green-700);        /* primary buttons */
+  --color-primary-hover: var(--green-800);
+  --color-on-primary: var(--neutral-0);
+  --color-primary-text: var(--green-700);   /* links and green text */
+  --color-primary-text-hover: var(--green-800);
+  --color-selected: var(--green-50);        /* current nav item, selected row */
+  --color-selected-text: var(--green-800);
+
+  /* Amber accent: attention only */
+  --color-attention: var(--amber-400);
+  --color-on-attention: var(--neutral-900);
+  --color-attention-subtle: var(--amber-50);
+  --color-attention-text: var(--amber-800);
+
+  /* Status */
+  --color-success-text: var(--green-700);
+  --color-success-subtle: var(--green-50);
+  --color-warning-text: var(--amber-700);
+  --color-warning-subtle: var(--amber-50);
+  --color-danger: var(--red-600);
+  --color-on-danger: var(--neutral-0);
+  --color-danger-text: var(--red-600);
+  --color-danger-subtle: var(--red-50);
+  --color-info-text: var(--blue-700);
+  --color-info-subtle: var(--blue-50);
+
+  /* Inline highlights */
+  --color-mention-text: var(--blue-700);
+  --color-mention-bg: var(--blue-50);
+  --color-mark-text: var(--amber-900);
+  --color-mark-bg: var(--amber-200);
+
+  /* Focus: 2px ring, 2px gap, at least 3:1 on every surface */
+  --color-focus: var(--blue-600);
+
+  /* Elevation: soft, warm shadows (tinted with the text colour, not pure black) */
+  --shadow-xs: 0 1px 2px rgb(28 27 25 / 0.06);
+  --shadow-sm: 0 1px 3px rgb(28 27 25 / 0.08), 0 1px 2px rgb(28 27 25 / 0.04);
+  --shadow-md: 0 4px 12px rgb(28 27 25 / 0.08), 0 2px 4px rgb(28 27 25 / 0.04);
+  --shadow-lg: 0 12px 32px rgb(28 27 25 / 0.14), 0 4px 8px rgb(28 27 25 / 0.06);
+}
+
+/* ---------- 2. Semantic tokens: dark ---------- */
+/* Not an inversion: surfaces get LIGHTER as they come forward (there is no shadow to see in the dark),
+   colours are lighter tints so they keep their contrast, and pure white text is avoided (it glares). */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: var(--neutral-950);
+  --color-bg-subtle: var(--neutral-925);
+  --color-surface: var(--neutral-900);
+  --color-surface-raised: var(--neutral-850);
+  --color-surface-hover: var(--neutral-850);
+  --color-border: var(--neutral-800);
+  --color-border-input: var(--neutral-500);
+
+  --color-text: var(--neutral-100);
+  --color-text-secondary: var(--neutral-400);
+  --color-text-disabled: var(--neutral-600);
+
+  --color-brand: var(--green-400);
+  --color-primary: var(--green-700);
+  --color-primary-hover: var(--green-800);
+  --color-on-primary: var(--neutral-0);
+  --color-primary-text: var(--green-300);
+  --color-primary-text-hover: var(--green-200);
+  --color-selected: var(--green-900);
+  --color-selected-text: var(--green-200);
+
+  --color-attention: var(--amber-400);
+  --color-on-attention: var(--neutral-900);
+  --color-attention-subtle: var(--amber-950);
+  --color-attention-text: var(--amber-300);
+
+  --color-success-text: var(--green-300);
+  --color-success-subtle: var(--green-900);
+  --color-warning-text: var(--amber-300);
+  --color-warning-subtle: var(--amber-950);
+  --color-danger: var(--red-500);
+  --color-on-danger: var(--neutral-0);
+  --color-danger-text: var(--red-300);
+  --color-danger-subtle: var(--red-900);
+  --color-info-text: var(--blue-300);
+  --color-info-subtle: var(--blue-900);
+
+  --color-mention-text: var(--blue-200);
+  --color-mention-bg: var(--blue-800);
+  --color-mark-text: var(--amber-100);
+  --color-mark-bg: var(--amber-900);
+
+  --color-focus: var(--blue-400);
+
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 3px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 12px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.03);
+  --shadow-lg: 0 12px 32px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.04);
+}
+
+/* People who asked their system for less motion get none of ours */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-base: 0ms;
+    --duration-slow: 0ms;
+  }
+}
