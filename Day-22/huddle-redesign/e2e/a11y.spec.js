@@ -1,5 +1,5 @@
 import AxeBuilder from '@axe-core/playwright';
-import { test, expect, newUser, signUpUI, navLink } from './fixtures';
+import { test, expect, newUser, signUpUI, navLink, openPage } from './fixtures';
 
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'];
 
@@ -36,8 +36,8 @@ test.describe('accessibility (axe, WCAG 2.1 AA)', () => {
     await page.setViewportSize({ width: 375, height: 800 });
     await signUpUI(page, newUser('mobile'));
     for (const name of ['Dashboard', 'Chat', 'Notes', 'Files', 'Query lab', 'Profile']) {
-      await navLink(page, name).click();
-      await expect(navLink(page, name)).toHaveAttribute('aria-current', 'page');
+      await openPage(page, name); // the navigation is behind the Menu button on a phone
+      await expect(navLink(page, name, { includeHidden: true })).toHaveAttribute('aria-current', 'page'); // the menu has closed again
       await page.waitForLoadState('networkidle');
       await page.waitForTimeout(400); // lazy route chunks: let the new page replace the old one before measuring
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);

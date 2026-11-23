@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, CircleAlert, CircleCheck, FileText, Inbox, Info, Moon, Plus, Search, Sun, Trash2, TriangleAlert, X } from 'lucide-react';
-import { useThemeActions, useThemeState } from '../context/ThemeContext';
+import { Check, CircleAlert, CircleCheck, FileText, Inbox, Info, Plus, Search, Trash2, TriangleAlert, X } from 'lucide-react';
 import { CONTRAST_PAIRS, contrastRatio, formatRatio, toHex } from '../lib/contrast';
 import { RADII, SCALES, SEMANTIC_GROUPS, SHADOWS, SPACING, TYPE_SCALE } from '../lib/designTokens';
 import CountBadge from '../components/ui/CountBadge';
@@ -9,6 +8,7 @@ import EmptyState from '../components/ui/EmptyState';
 import PageHeader from '../components/ui/PageHeader';
 import RelativeTime from '../components/ui/RelativeTime';
 import UnderTheHood from '../components/ui/UnderTheHood';
+import ThemeToggle from '../components/ThemeToggle';
 import '../styles/styleguide.css';
 
 /**
@@ -110,8 +110,6 @@ function ThemePreview({ theme }) {
 }
 
 export default function StyleguidePage() {
-  const { isDark } = useThemeState();
-  const { toggleTheme } = useThemeActions();
   const { lightRef, darkRef, values } = useResolvedColors(COLOR_TOKENS);
   const [pressed, setPressed] = useState({ mine: true, pinned: false, team: false });
   const [removed, setRemoved] = useState(false);
@@ -141,9 +139,7 @@ export default function StyleguidePage() {
         <Link to="/" className="brand"><span className="brand-mark" aria-hidden="true">H</span>Huddle</Link>
         <span className="sg-header-label">Design system</span>
         <span className="header-spacer" />
-        <button type="button" className="icon-btn icon-btn-outline" onClick={toggleTheme} aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}>
-          {isDark ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
-        </button>
+        <ThemeToggle className="icon-btn icon-btn-outline" />
       </header>
 
       <div className="sg-layout">

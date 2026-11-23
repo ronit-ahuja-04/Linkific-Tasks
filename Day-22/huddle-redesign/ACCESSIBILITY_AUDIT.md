@@ -36,14 +36,20 @@
 | A-6 | 27 separate `aria-live` regions, one per example card | 4.1.3 Status Messages (AA), advisory | Minor | Query lab | `docs/audit/before.md` | Announce only the card that ran | Open |
 | A-7 | Stand-alone links "All notes", "Open chat", "All files" are 23 px tall | 2.5.8 Target Size (Minimum) (AA, new in 2.2) | Minor (likely passes through the spacing exception) | Dashboard | `scripts/audit.mjs` at 320 px | At least 24 px targets in the new link style | Open |
 | A-8 | Native checkboxes are 16×16 px | 2.5.8 Target Size (Minimum) (AA) | Minor (label and spacing exceptions) | Notes, Chat | `scripts/audit.mjs` | Larger hit area through the label | Open |
-| A-9 | On a phone, 11 navigation stops come before the content on every page (the skip link makes this pass, but it is tiring) | 2.4.1 Bypass Blocks (A): passes | Advisory | All signed-in pages | `docs/audit/before.md` | Collapsed menu on phones | Open |
+| A-9 | On a phone, 11 navigation stops come before the content on every page (the skip link makes this pass, but it is tiring) | 2.4.1 Bypass Blocks (A): passes | Advisory | All signed-in pages | `docs/audit/before.md` | Collapsed menu on phones | **Fixed (M3)**: on a phone the bar has 4 stops (Menu, Huddle, bell, theme); the navigation is behind the Menu button. `e2e/shell.spec.js` |
+| A-11 | Choosing a page left focus on the link (or on `<body>` when the link disappeared): a screen reader did not hear that the page changed | 2.4.3 Focus Order (A), 4.1.3 | Moderate | Every page change | found while building the shell | Move focus to the new page's `h1` | **Fixed (M3)**: `AppLayout`, tested in `test/app-layout.test.jsx` and `e2e/shell.spec.js` |
 | A-10 | Hidden file inputs measure 1×1 px | none: their visible labels are the targets | Not an issue | Files, Profile, Chat | script false positive, recorded so it is not "found" again | none | Closed |
 
-Pre-existing, not accessibility: one unit test (`files-page.test.jsx`, the share-link countdown) fails now and then in the full parallel run, in Day 17 as well; it passes on its own. Tracked for M5.
+Pre-existing, not accessibility: one unit test (`files-page.test.jsx`, the share-link countdown) failed now and then in the full parallel run, in Day 17 as well. **Fixed in M2**: the test advanced the fake clock before the countdown's interval existed; it now waits for it (15 of 15 runs under load).
+
+### Found and fixed while building the design system and the shell
+
+- **M2:** `.sr-only` text inside a scrolling table escaped the scroller and widened the page on phones (1.4.10). `.table-wrap` is now `position: relative`.
+- **M3:** the phone menu closes when keyboard focus leaves it, so the open panel can never cover the focused element (2.4.11 Focus Not Obscured, new in 2.2). Tested in `e2e/shell.spec.js`.
 
 ## Still to check (M5)
 
 - VoiceOver pass on the redesigned pages (rotor: headings, landmarks, form controls; chat announcements).
 - 200% browser zoom on every page.
-- Keyboard flow of every new component (sidebar, mobile menu, filter chips).
-- Contrast of every token pair, light and dark, by script (`DESIGN.md`).
+- Keyboard flow of the remaining new components (filter chips, the redesigned chat). The sidebar and the phone menu are covered by `e2e/shell.spec.js` (M3).
+- ~~Contrast of every token pair, light and dark, by script~~ done in M2: `npm run contrast`, [docs/contrast.md](docs/contrast.md), 68 of 68 pass.
