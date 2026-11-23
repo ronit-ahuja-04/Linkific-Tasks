@@ -6,7 +6,7 @@ test.describe('sign up, sign in, sign out', () => {
     await signUpUI(page, user);
     await expect(page.getByRole('heading', { level: 1 })).toContainText(user.fullName.split(' ')[0]);
     await expect(page.getByTestId('stat-my_notes')).toBeVisible(); // the dashboard asked the database (rpc) for numbers
-    await expect(page.locator('.app-header')).toContainText(user.username); // the profile row exists: the trigger made it
+    await expect(page.getByRole('navigation', { name: 'Main' })).toContainText(user.username); // the profile row exists: the trigger made it
     await page.getByRole('button', { name: 'Sign out' }).click();
     await expect(page).toHaveURL(/\/login$/);
     await signInUI(page, user);

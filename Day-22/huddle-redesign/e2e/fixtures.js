@@ -97,4 +97,18 @@ export async function signInUI(page, user) {
 }
 
 /** A link in the main navigation (the dashboard has links to the same pages) */
-export const navLink = (page, name) => page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name });
+// exact: the sidebar also lists rooms, and a room called "Chat-room" must not count as the Chat page
+// includeHidden: on a phone the menu closes after a choice, and a role locator skips hidden elements by default
+export const navLink = (page, name, { includeHidden = false } = {}) =>
+  page.getByRole('navigation', { name: 'Main', includeHidden }).getByRole('link', { name, exact: true, includeHidden });
+
+/** Go to a page through the main navigation; on a narrow screen the navigation is behind the Menu button */
+export async function openPage(page, name) {
+  // decided by the window width (the sidebar appears at 960px), not by isVisible(): that does not wait, and right
+  // after signing in the shell may not have rendered yet. getAttribute waits for the button to exist.
+  if ((page.viewportSize()?.width ?? 1360) < 960) {
+    const menu = page.getByRole('button', { name: 'Menu' });
+    if ((await menu.getAttribute('aria-expanded')) !== 'true') await menu.click();
+  }
+  await navLink(page, name).click();
+}

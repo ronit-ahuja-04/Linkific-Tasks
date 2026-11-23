@@ -13,7 +13,7 @@ async function createRoom(page, name, { isPrivate = false } = {}) {
 
 async function joinRoom(page, name) {
   await navLink(page, 'Chat').click();
-  await page.getByRole('link', { name: new RegExp(name) }).click();
+  await page.getByRole('main').getByRole('link', { name: new RegExp(name) }).click(); // the chat page's list (the sidebar lists joined rooms too)
   await expect(page.getByRole('heading', { name: new RegExp(name) })).toBeVisible();
 }
 
@@ -98,7 +98,7 @@ test.describe('two people in a room, live', () => {
     await send(page, 'two');
     await expect(log(page)).toContainText('two');
     await expect(other.locator('.chat-unread')).toHaveText('2', { timeout: 15000 });
-    await other.getByRole('link', { name: new RegExp(name) }).click();
+    await other.getByRole('main').getByRole('link', { name: new RegExp(name) }).click();
     await expect(other.locator('.chat-unread')).toHaveCount(0);
   });
 
