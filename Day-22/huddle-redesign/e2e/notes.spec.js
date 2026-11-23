@@ -77,11 +77,13 @@ test.describe('notes (CRUD against Postgres)', () => {
     expect(await page.locator('article:has-text("Filter note")').count()).toBeLessThanOrEqual(6); // 6 per page (.range)
     await page.getByRole('button', { name: /next/i }).click();
     await expect(page.getByText(/Filter note/).first()).toBeVisible();
+    await page.getByRole('button', { name: /More filters/ }).click(); // the rarer filters sit in a panel since Day 22
     await page.getByLabel('Name contains').fill('Filter note 3');
     await page.getByRole('button', { name: 'Apply filters' }).click();
-    await expect(page.getByText('Filter note 3')).toBeVisible();
-    await expect(page.getByText('Filter note 1', { exact: true })).toHaveCount(0);
-    await expect(page.getByText('Filter note 3', { exact: true })).toHaveCount(1);
+    const cards = page.getByTestId('note-card');
+    await expect(cards.filter({ hasText: 'Filter note 3' })).toHaveCount(1);
+    await expect(cards.filter({ hasText: 'Filter note 1' })).toHaveCount(0);
+    await expect(page.getByRole('list', { name: 'Active filters' })).toContainText('Name: Filter note 3'); // shown as a removable chip
   });
 });
 
