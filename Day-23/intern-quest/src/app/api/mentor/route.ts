@@ -1,4 +1,4 @@
-import { forbidden, ok, problem, readJson, unauthorized } from '@/lib/server/http';
+import { forbidden, ok, problem, readJson, unauthorized, withErrors } from '@/lib/server/http';
 import { currentUser } from '@/lib/server/session';
 import { redeemInviteCode } from '@/lib/server/users';
 
@@ -7,7 +7,7 @@ import { redeemInviteCode } from '@/lib/server/users';
  * The code lives only in the server environment variable MENTOR_INVITE_CODE: it never appears in client code.
  * The session picks up the new role on its next update (the character page's form does that for you) or sign-in.
  */
-export async function POST(request: Request) {
+export const POST = withErrors(async (request: Request) => {
   const user = await currentUser();
   if (!user) return unauthorized();
   const json = await readJson(request);
@@ -22,4 +22,4 @@ export async function POST(request: Request) {
     case 'wrong':
       return forbidden('That invite code is not right.');
   }
-}
+});

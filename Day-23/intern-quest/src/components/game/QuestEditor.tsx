@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import Markdown from '@/components/Markdown';
+import { apiFetch } from '@/lib/api-client';
+import { toAppError } from '@/lib/errors';
 import { DIFFICULTIES, DIFFICULTY_XP, RULES, SKILL_LABELS, SKILLS, type Difficulty, type Skill } from '@/lib/game';
 import type { Reward } from '@/lib/server/quests';
 
@@ -29,11 +31,6 @@ export interface QuestDraft {
   status: 'draft' | 'published';
 }
 
-interface ApiError {
-  error: string;
-  fields?: Record<string, string>;
-}
-const isApiError = (value: unknown): value is ApiError => typeof value === 'object' && value !== null && 'error' in value && typeof value.error === 'string';
 const isSaved = (value: unknown): value is { quest: { id: string }; reward: Reward | null } =>
   typeof value === 'object' && value !== null && 'quest' in value && 'reward' in value;
 
@@ -72,33 +69,35 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
     setErrors({});
     setMessage('');
     const body = { ...draft, status, prLinks: draft.prLinks.map((l) => l.trim()).filter(Boolean) };
-    const response = await fetch(editing ? `/api/quests/${initial.id}` : '/api/quests', {
-      method: editing ? 'PUT' : 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    });
-    const result: unknown = await response.json().catch(() => null);
-    setBusy(false);
-    if (!response.ok) {
-      setErrors(isApiError(result) ? result.fields ?? {} : {});
-      setMessage(isApiError(result) ? result.error : 'Something went wrong. Try again.');
-      return;
+    // apiFetch never leaves this hanging: it has a deadline, and every failure arrives here as an AppError with a
+    // message for people (offline, timeout, the API's own field errors, our outage with a reference)
+    try {
+      const result = await apiFetch(editing ? `/api/quests/${initial.id}` : '/api/quests', { method: editing ? 'PUT' : 'POST', body });
+      if (isSaved(result) && result.reward) {
+        setReward(result.reward); // the celebration; it navigates on close
+        return;
+      }
+      router.push('/journal'); // the destination renders per request, so it is fresh (a refresh() here would re-render THIS page instead)
+    } catch (caught) {
+      const error = toAppError(caught);
+      setErrors(error.fields ?? {});
+      setMessage(error.messageWithReference);
+    } finally {
+      setBusy(false); // always: before Day 23 a network failure skipped this line and "Saving…" stayed forever
     }
-    if (isSaved(result) && result.reward) {
-      setReward(result.reward); // the celebration; it navigates on close
-      return;
-    }
-    router.push('/journal'); // the destination renders per request, so it is fresh (a refresh() here would re-render THIS page instead)
   }
 
   async function remove() {
     setBusy(true);
-    const response = await fetch(`/api/quests/${initial.id}`, { method: 'DELETE' });
-    setBusy(false);
-    dialog.current?.close();
-    if (response.status === 204) {
-      router.push('/journal?notice=deleted'); // the destination renders per request, so it is fresh (a refresh() here would re-render THIS page instead)
-    } else setMessage('Could not delete the quest.');
+    try {
+      await apiFetch(`/api/quests/${initial.id}`, { method: 'DELETE' });
+      router.push('/journal?notice=deleted'); // the destination renders per request, so it is fresh
+    } catch (caught) {
+      setMessage(`Could not delete the quest. ${toAppError(caught).messageWithReference}`);
+    } finally {
+      setBusy(false);
+      dialog.current?.close();
+    }
   }
 
   const err = (field: string) => (errors[field] ? <small className="field-error" id={`${field}-error`}>{errors[field]}</small> : null);

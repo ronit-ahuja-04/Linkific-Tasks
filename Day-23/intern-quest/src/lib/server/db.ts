@@ -10,17 +10,34 @@ import type { AvatarChoice, CharacterBody, QuestBody } from '@/lib/validation';
  * so the service key (which bypasses Row Level Security) can never reach the browser bundle.
  * Every function maps snake_case rows to camelCase objects, so the rest of the app never sees column names.
  */
-/** A database error the API can explain: a duplicate, a broken rule, or something unexpected */
+/**
+ * A database error the API can explain: a duplicate, a broken rule, the database not answering (temporary: the API
+ * says 503, try again), or something unexpected (a bug: 500).
+ */
 export class DbError extends Error {
-  constructor(readonly kind: 'conflict' | 'invalid' | 'unexpected', message: string) {
+  constructor(readonly kind: 'conflict' | 'invalid' | 'unavailable' | 'unexpected', message: string) {
     super(message);
     this.name = 'DbError';
   }
 }
+
+/**
+ * "The database is not answering", as opposed to "the database said no":
+ *   - PGRST000..003: PostgREST could not connect to Postgres, or its pool timed out (it answers 503);
+ *   - no answer at all: postgrest-js turns a failed fetch into { message: "TypeError: fetch failed" }, and our
+ *     deadline into "TimeoutError: …"; connection errors carry their Node code;
+ *   - a gateway in front of the database answering with an HTML error page (502/503/504).
+ */
+const UNAVAILABLE_CODES = /^PGRST00[0-3]$/;
+const UNAVAILABLE_MESSAGE = /fetch failed|TimeoutError|AbortError|ECONNREFUSED|ECONNRESET|ETIMEDOUT|ENOTFOUND|EAI_AGAIN|socket hang up|Bad Gateway|Gateway Time-?out|Service Unavailable/i;
+export const isUnavailable = (error: Pick<PostgrestError, 'code' | 'message'>): boolean =>
+  UNAVAILABLE_CODES.test(error.code ?? '') || UNAVAILABLE_MESSAGE.test(error.message ?? '');
+
 export function fail(error: PostgrestError, action: string): never {
   // Postgres error codes: 23505 unique_violation, 23514 check_violation, 23503 foreign_key_violation
   if (error.code === '23505') throw new DbError('conflict', `${action}: that already exists`);
   if (error.code === '23514' || error.code === '22P02') throw new DbError('invalid', `${action}: a value breaks a database rule`);
+  if (isUnavailable(error)) throw new DbError('unavailable', `${action}: the database did not answer (${error.message})`);
   throw new DbError('unexpected', `${action}: ${error.message}`);
 }
 

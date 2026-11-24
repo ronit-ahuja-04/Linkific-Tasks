@@ -2,6 +2,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { Fredoka, Nunito } from 'next/font/google';
+import ErrorListeners from '@/components/ErrorListeners';
 import MotionProvider from '@/components/MotionProvider';
 import { SITE } from '@/lib/site';
 import './globals.css';
@@ -27,10 +28,16 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="en" className={`${display.variable} ${body.variable}`} suppressHydrationWarning>
       <body>
         <MotionProvider>{children}</MotionProvider>
-        {/* Vercel Analytics (page views) and Speed Insights (Core Web Vitals from real visitors). Both send data only
-            when the site runs on Vercel with the features switched on; locally they do nothing. */}
-        <Analytics />
-        <SpeedInsights />
+        <ErrorListeners />
+        {/* Vercel Analytics (page views) and Speed Insights (Core Web Vitals from real visitors). They load scripts from
+            /_vercel/*, which only exist on Vercel: anywhere else each page logged two console errors (116 in the
+            Day 23 inventory), noise that hid real errors. So they are rendered only when built on Vercel. */}
+        {process.env.VERCEL && (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        )}
       </body>
     </html>
   );
