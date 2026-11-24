@@ -47,7 +47,7 @@ export function canRead(user: SessionUser | null, quest: Quest, character: Chara
   return quest.status === 'published' && quest.isPublic && character?.isPublic === true;
 }
 
-/** Turn an expected database failure into a clear HTTP answer; anything else is a real bug (rethrown: 500) */
+/** Turn an expected database failure into a clear HTTP answer; anything else is rethrown, and withErrors answers it (503 when the database is not answering, 500 for a bug) */
 export function fromDbError(error: unknown, conflictMessage: string): Response {
   if (error instanceof DbError && error.kind === 'conflict') return problem(409, conflictMessage);
   if (error instanceof DbError && error.kind === 'invalid') return problem(400, 'A value breaks a rule. Check the fields and try again.');

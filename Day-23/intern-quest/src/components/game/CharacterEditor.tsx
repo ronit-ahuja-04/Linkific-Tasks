@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActionState, useLayoutEffect, useState, type FormEvent } from 'react';
 import { redeemMentorAction, type MentorState } from '@/app/(game)/character/actions';
+import { apiFetch } from '@/lib/api-client';
+import { toAppError } from '@/lib/errors';
 import { CLASS_INFO, CLASSES, SKILL_LABELS, type CharacterClass } from '@/lib/game';
 
 /** Lazy: the customiser and its live Pip are downloaded only when this page is opened, not with the rest of the app */
@@ -19,8 +21,6 @@ export interface CharacterDraft {
   isPublic: boolean;
 }
 
-const isApiError = (value: unknown): value is { error: string; fields?: Record<string, string> } =>
-  typeof value === 'object' && value !== null && 'error' in value && typeof value.error === 'string';
 
 export default function CharacterEditor({ initial, isNew, role }: { initial: CharacterDraft; isNew: boolean; role: 'intern' | 'mentor' }) {
   const router = useRouter();
@@ -44,15 +44,16 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
     setBusy(true);
     setErrors({});
     setMessage('');
-    const response = await fetch('/api/character', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(draft) });
-    const result: unknown = await response.json().catch(() => null);
-    setBusy(false);
-    if (!response.ok) {
-      setErrors(isApiError(result) ? result.fields ?? {} : {});
-      setMessage(isApiError(result) ? result.error : 'Could not save.');
-      return;
+    try {
+      await apiFetch('/api/character', { method: 'PUT', body: draft });
+      router.push(isNew ? '/journal' : '/character?notice=saved');
+    } catch (caught) {
+      const error = toAppError(caught);
+      setErrors(error.fields ?? {});
+      setMessage(error.messageWithReference);
+    } finally {
+      setBusy(false);
     }
-    router.push(isNew ? '/journal' : '/character?notice=saved');
   }
 
   const err = (field: string) => (errors[field] ? <small className="field-error" id={`${field}-error`}>{errors[field]}</small> : null);

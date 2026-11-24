@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import Markdown from '@/components/Markdown';
+import { apiFetch } from '@/lib/api-client';
+import { toAppError } from '@/lib/errors';
 import { SKILL_LABELS, type Difficulty, type Skill } from '@/lib/game';
 
 export interface FeedItem {
@@ -30,25 +32,32 @@ export default function GuildFeed({ items }: { items: FeedItem[] }) {
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const [status, setStatus] = useState('');
 
+  // Before Day 23 a network failure here threw before any message was set: the mentor saw nothing at all
   async function addNote(id: string) {
     const body = (drafts[id] ?? '').trim();
     if (!body) return;
-    const response = await fetch(`/api/quests/${id}/notes`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body }) });
-    if (response.ok) {
+    try {
+      await apiFetch(`/api/quests/${id}/notes`, { method: 'POST', body: { body } });
       setDrafts((d) => ({ ...d, [id]: '' }));
       setStatus('Note added.');
       router.refresh();
-    } else setStatus('Could not add the note.');
+    } catch (caught) {
+      setStatus(`Could not add the note (it is still in the box). ${toAppError(caught).messageWithReference}`);
+    }
   }
 
   async function award() {
     if (!target) return;
-    const response = await fetch('/api/badges', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ handle: target.handle, ...badge }) });
-    dialog.current?.close();
-    setStatus(response.ok ? `Badge “${badge.name}” awarded to ${target.displayName}.` : 'Could not award the badge.');
-    if (response.ok) {
+    try {
+      await apiFetch('/api/badges', { method: 'POST', body: { handle: target.handle, ...badge } });
+      setStatus(`Badge “${badge.name}” awarded to ${target.displayName}.`);
       setBadge({ name: '', note: '', icon: '🏅' });
       router.refresh();
+    } catch (caught) {
+      // the badge stays filled in: "Award badge" again opens it as it was
+      setStatus(`Could not award the badge. ${toAppError(caught).messageWithReference}`);
+    } finally {
+      dialog.current?.close();
     }
   }
 

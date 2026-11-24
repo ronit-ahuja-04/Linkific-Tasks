@@ -1,6 +1,6 @@
 # Intern Quest
 
-> **Day 23 copy (CORS, error handling and debugging), in progress.** This is Day 21's Intern Quest, copied so that it can be made to fail well. M1 is done: [the error inventory](docs/ERROR_INVENTORY.md) measures what happens today when the network, the database or an address fails (`npm run inventory`). The rest of this README still describes Day 21; it is rewritten at the end of Day 23.
+> **Day 23 copy (CORS, error handling and debugging), in progress.** This is Day 21's Intern Quest, copied so that it can be made to fail well. Done so far: M1, [the error inventory](docs/ERROR_INVENTORY.md), which measures what happens when the network, the database or an address fails (`npm run inventory`); M2, the error foundation: one error model and `apiFetch` (deadlines, offline, retries for reads only), JSON errors from every API route, a 5 s database deadline, and one searchable log line per error (`onRequestError`, `/api/client-errors`). The rest of this README still describes Day 21; it is rewritten at the end of Day 23.
 
 **Your internship logbook as a role-playing game.** Every day you log is a *quest*: it gives XP to the skills you used, your character levels up and earns badges, mentors act as guild masters, and **Pip**, your sidekick, reacts to everything you log.
 

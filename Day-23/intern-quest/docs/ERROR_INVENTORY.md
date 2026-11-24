@@ -51,6 +51,20 @@ Severity: **High** = the user is stuck, misled, or loses the app; **Medium** = t
 | E-12 | Low | **Vague messages.** "Something went wrong. Try again." is the same for our outage (S10) and a broken answer (C3). It gives no reference, and doesn't say whether the work was saved. | C3, S10, S11 | M2/M4 (messages per error kind) |
 | E-13 | Low | **Console noise hides real errors.** Vercel Analytics and Speed Insights load `/_vercel/*` scripts, which exist only on Vercel. Locally every page logs two console errors (116 in this run). | before.md header | M2 (render them only on Vercel) |
 
+## Progress
+
+Re-running the same 33 scenarios after each milestone shows what changed; the final run is published as `errors/after.md`.
+
+**After M2 (error foundation):** E-1, E-2, E-7, E-8 and E-13 are fixed. E-12 is fixed for everything that goes through the API.
+- **C1 to C8:** every failed save, delete, note or badge now ends with a message, and the button works again. Nothing stays "Saving…".
+- **C2 and S13:** a request that never answers stops after 15 s in the browser. A database that never answers stops after 5 s on the server, which answers 503 "can not reach its database… (ref c27688ad)".
+- **S8, S9 and N7:** the API answers in its own JSON shape: a 503 with `Retry-After` for an outage, and a JSON 404 for unknown addresses.
+- **Tracing:** the reference shown to the user ("ref 80defe78") and the digest on Next's error page ("ERROR 426751613") each lead to exactly one JSON line in the server log. That line has the request id, the route, the error kind and a short stack.
+- **Speed:** the database scenarios run twice as fast (2.4 instead of 4.8 minutes), because postgrest-js no longer retries reads three times on the server.
+- **Still open:**
+  - pages (S1–S7), offline sign-in (C9) and the chunk failure (C11) still show Next's generic page, for M3;
+  - blank loading screens (S12) are for M4.
+
 ## CORS today (X1, X2)
 
 There is no CORS configuration, which is right for this API: every route uses the session cookie and is meant for this site only. What the browser does:

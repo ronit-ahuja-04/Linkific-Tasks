@@ -1,5 +1,5 @@
 import { deleteQuest, getCharacterByUser, getQuest, listQuests, updateQuest } from '@/lib/server/db';
-import { forbidden, invalid, noContent, notFound, ok, readJson, unauthorized } from '@/lib/server/http';
+import { forbidden, invalid, noContent, notFound, ok, readJson, unauthorized, withErrors } from '@/lib/server/http';
 import { canRead, fromDbError, rewardFor, toDto } from '@/lib/server/quests';
 import { refreshCharacter } from '@/lib/server/revalidate';
 import { currentUser } from '@/lib/server/session';
@@ -8,7 +8,7 @@ import { isUuid, parseQuest } from '@/lib/validation';
 const NOT_FOUND = 'No such quest.';
 
 /** GET /api/quests/:id   your own quest, or anyone's published public quest */
-export async function GET(_request: Request, ctx: RouteContext<'/api/quests/[id]'>) {
+export const GET = withErrors(async (_request: Request, ctx: RouteContext<'/api/quests/[id]'>) => {
   const { id } = await ctx.params;
   if (!isUuid(id)) return notFound(NOT_FOUND);
   const [user, quest] = await Promise.all([currentUser(), getQuest(id)]);
@@ -16,13 +16,13 @@ export async function GET(_request: Request, ctx: RouteContext<'/api/quests/[id]
   const character = await getCharacterByUser(quest.userId);
   if (!canRead(user, quest, character)) return notFound(NOT_FOUND);
   return ok({ quest: toDto(quest), handle: character?.handle ?? null });
-}
+});
 
 /**
  * PUT /api/quests/:id   replace a quest you own (all fields, as on create).
  * 401 not signed in · 404 no such quest (or not visible to you) · 403 someone else's · 409 the new day is taken
  */
-export async function PUT(request: Request, ctx: RouteContext<'/api/quests/[id]'>) {
+export const PUT = withErrors(async (request: Request, ctx: RouteContext<'/api/quests/[id]'>) => {
   const user = await currentUser();
   if (!user) return unauthorized();
   const { id } = await ctx.params;
@@ -48,10 +48,10 @@ export async function PUT(request: Request, ctx: RouteContext<'/api/quests/[id]'
   } catch (error) {
     return fromDbError(error, `You already logged day ${parsed.value.day}.`);
   }
-}
+});
 
 /** DELETE /api/quests/:id   delete a quest you own. 204 on success. */
-export async function DELETE(_request: Request, ctx: RouteContext<'/api/quests/[id]'>) {
+export const DELETE = withErrors(async (_request: Request, ctx: RouteContext<'/api/quests/[id]'>) => {
   const user = await currentUser();
   if (!user) return unauthorized();
   const { id } = await ctx.params;
@@ -65,4 +65,4 @@ export async function DELETE(_request: Request, ctx: RouteContext<'/api/quests/[
   const character = await getCharacterByUser(user.id);
   if (character) refreshCharacter(character.handle);
   return noContent();
-}
+});
