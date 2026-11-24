@@ -1,4 +1,4 @@
-import { API, withApi } from './config.js';
+import { API, HANDLE, withApi } from './config.js';
 
 // The embed: fetch a public quest card from another origin and show it.
 // Everything from the API is written with textContent, never innerHTML: data from another origin is not trusted HTML.
@@ -53,4 +53,5 @@ document.getElementById('form').addEventListener('submit', (event) => {
   const handle = document.getElementById('handle').value.trim().toLowerCase();
   if (handle) void show(handle);
 });
-void show('ronit');
+document.getElementById('handle').value = HANDLE;
+void show(HANDLE);

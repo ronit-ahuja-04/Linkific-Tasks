@@ -1,7 +1,7 @@
-import { API, withApi } from './config.js';
+import { API, HANDLE, withApi } from './config.js';
 
 // The CORS lab: each case is one cross-origin request with a known outcome, run live in this browser.
-const card = `${API}/api/public/characters/ronit`;
+const card = `${API}/api/public/characters/${encodeURIComponent(HANDLE)}`;
 
 const CASES = [
   {

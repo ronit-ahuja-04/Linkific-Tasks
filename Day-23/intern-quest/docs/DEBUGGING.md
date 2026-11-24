@@ -85,7 +85,18 @@ How to find out **why** something fails, with the tool for each kind of problem.
 
 **Locally:** `npm run dev 2>&1 | tee dev.log`, then `grep 80defe78 dev.log`.
 
-**On Vercel:** open the project's **Logs** and search for the id or digest, or `vercel logs <deployment-url>` from the CLI. One request gives one `proxy` line and, if it failed, one `error` line with the same `id`.
+**On Vercel:** open the project's **Logs** and search for the id or digest, or use the CLI. One request gives one `proxy` line and, if it failed, one `error` (or `client-error`) line with the same `id`.
+
+```bash
+vercel logs --environment production -q <request id or digest> -x
+```
+
+Real output (24 Nov, production). A test error report sent to `/api/client-errors` answered `204` with `x-request-id: c2230e1e-…`, and the search for that id returned:
+
+```text
+{"at":"proxy","id":"c2230e1e-311c-4571-b8b8-e9e7e912eed0","method":"POST","path":"/api/client-errors","user":null,"decision":"next","ms":0.3}
+{"at":"client-error","id":"c2230e1e-311c-4571-b8b8-e9e7e912eed0","user":null,"source":"window","name":"Error","message":"Day 23 production check: client error pipeline","path":"/"}
+```
 
 **Real example (Day 23 inventory, run against the M2 build):**
 1. With the database unavailable, the error page showed **ERROR 426751613**.
@@ -169,13 +180,15 @@ The **Profiler** records a session and shows which components rendered, and why.
 - **Source maps.** `productionBrowserSourceMaps: true` in `next.config.ts` (Day 23) publishes a `.map` next to each chunk. DevTools then shows and steps through the **original** `.tsx` files even on the live site, and maps stack traces back to source.
   - *Trade-off:* it publishes the client source. Here the repository is public anyway. A private codebase would upload the maps to its error tracker instead.
   - Server code is never in them.
+  - **On Vercel** the `.map` files are not public. An anonymous request for one answered **403** (checked 24 Nov). That matches Vercel's protected source maps, which serve them only to signed-in members of the project's team. So to read production code as source in DevTools, be signed in to Vercel in that browser. Locally (`next start`) they are always served.
 - **React error numbers.** Open `https://react.dev/errors/<number>` for the full message, or reproduce in `npm run dev`, where React prints the full message.
 - **Production differences** need a production build. The browser tests always run `next build` + `next start`, because some bugs only exist there. Day 21 example: an "unstable value while prerendering" warning that appeared **only in the Vercel logs**, never in development.
 
 **Try it:**
-1. On the live site, open DevTools → Sources.
-2. Find a page under `webpack://` / `src/`: the original files are there.
-3. Set a breakpoint in `QuestEditor.tsx`, in production.
+1. Run `npm run build && npx next start`, open http://localhost:3000, and open DevTools → Sources.
+2. In the Sources tree, the original files appear under `turbopack:///[project]/src/…`, next to the minified chunks (the build's maps hold 39 of the app's own files).
+3. Set a breakpoint in `QuestEditor.tsx` and publish: it stops in the original code, in a production build.
+4. On the live site, the same works while you are signed in to Vercel (see above).
 
 ## 8. Bugs that only appear sometimes: tests, faults and the inventory
 
