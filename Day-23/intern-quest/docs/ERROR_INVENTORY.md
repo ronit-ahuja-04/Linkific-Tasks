@@ -95,6 +95,15 @@ Re-running the same 33 scenarios after each milestone shows what changed; the fi
   - signing in during an outage now says the problem is ours, "not your password";
   - registering during an outage keeps the form, where before it showed the error screen.
 
+**After M5 (CORS):** see [CORS.md](CORS.md).
+- **Public card API:** `GET /api/public/characters/:handle` is readable from the origins in `CORS_ALLOWED_ORIGINS`, and from nowhere else.
+- **Preflights** are answered in the proxy: 204 for a listed origin, 403 for any other.
+- **The signed-in API** still sends no CORS headers (X1 and X2 are unchanged, on purpose).
+- **A new finding while building the lab, E-14 (High), fixed in M5.**
+  - **The problem:** a "simple" `text/plain` POST from another origin on the same *site* (e.g. `localhost:4000` → `localhost:3000`) is sent without a preflight and carries the session cookie, and `request.json()` parsed it anyway. It would have saved a quest in the user's name, while CORS only hid the answer.
+  - **The fix:** the proxy now refuses every API write whose `Origin` isn't our own (403).
+  - **Where it mattered:** in production, `SameSite=Lax` already kept the cookie off cross-site requests, and `vercel.app` is a public suffix (each app is its own site). So the risk was local, or for any future same-site subdomain.
+
 ## CORS today (X1, X2)
 
 There is no CORS configuration, which is right for this API: every route uses the session cookie and is meant for this site only. What the browser does:

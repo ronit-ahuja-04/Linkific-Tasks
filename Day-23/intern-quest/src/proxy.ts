@@ -1,5 +1,6 @@
 import { getToken } from 'next-auth/jwt';
 import { NextResponse, type NextRequest } from 'next/server';
+import { corsFor, isCrossSiteWrite, parseAllowlist } from '@/lib/cors';
 import { HANDLE_PATTERN } from '@/lib/validation';
 
 /**
@@ -10,6 +11,8 @@ import { HANDLE_PATTERN } from '@/lib/validation';
  *   3. sign-in redirect      /journal, /character, /guild without a session -> /login?next=<where you were going>
  *   4. mentor gate           /guild for a non-mentor -> /journal with a notice
  *   5. security headers      on every response
+ *   6. CORS (Day 23)         /api/public/* only: an origin allowlist from CORS_ALLOWED_ORIGINS; preflights answered here
+ *   7. cross-site writes     (Day 23) an API write from another origin's page is refused (403): CORS alone does not stop it
  *
  * `getToken` decrypts the session cookie (a JWT encrypted with AUTH_SECRET) without touching the database, which is
  * why these checks are cheap enough to run here, and it only READS the cookie. (NextAuth's `auth(...)` proxy wrapper
@@ -17,7 +20,9 @@ import { HANDLE_PATTERN } from '@/lib/validation';
  * signing you in again. The browser tests caught that under load.) The checks are OPTIMISTIC: every page, API route
  * and server action checks the session again, because a proxy can be skipped (a matcher change, a server-action POST).
  */
-const PROTECTED = ['/journal', '/character', '/guild'];
+const PROTECTED = ['/journal', '/character', '/guild', '/me'];
+/** read once per server instance; changing it on Vercel means a redeploy, like any environment variable */
+const CORS_ALLOWLIST = parseAllowlist(process.env.CORS_ALLOWED_ORIGINS);
 const isUnder = (path: string, base: string): boolean => path === base || path.startsWith(`${base}/`);
 
 const SECURITY_HEADERS: Record<string, string> = {
@@ -41,8 +46,17 @@ export default async function proxy(request: NextRequest) {
   const forwarded = new Headers(request.headers);
   forwarded.set('x-request-id', requestId);
 
+  const cors = corsFor(pathname, request.method, request.headers.get('origin'), CORS_ALLOWLIST);
+
   const shortHandle = pathname.startsWith('/@') ? pathname.slice(2).toLowerCase() : null;
-  if (shortHandle !== null && HANDLE_PATTERN.test(shortHandle)) {
+  if (isCrossSiteWrite(pathname, request.method, request.headers.get('origin'), request.nextUrl.origin)) {
+    decision = 'refused cross-site write';
+    response = NextResponse.json({ error: 'Requests that change data are accepted from this site only.' }, { status: 403 });
+  } else if (cors.kind === 'preflight') {
+    // a preflight never reaches the route: 204 with what is allowed, or 403 for an origin not on the list
+    decision = `cors preflight ${cors.status}`;
+    response = new NextResponse(null, { status: cors.status });
+  } else if (shortHandle !== null && HANDLE_PATTERN.test(shortHandle)) {
     decision = `rewrite /c/${shortHandle}`;
     response = NextResponse.rewrite(new URL(`/c/${shortHandle}`, request.url), { request: { headers: forwarded } });
   } else if (PROTECTED.some((base) => isUnder(pathname, base)) && !session?.user) {
@@ -58,6 +72,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   response.headers.set('x-request-id', requestId);
+  if (cors.kind !== 'none') for (const [name, value] of Object.entries(cors.headers)) response.headers.set(name, value);
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) response.headers.set(name, value);
   // one structured line per request: easy to grep locally, easy to search in Vercel's logs
   console.log(JSON.stringify({ at: 'proxy', id: requestId, method: request.method, path: pathname, user: session?.user.id ?? null, decision, ms: Math.round((performance.now() - started) * 10) / 10 }));

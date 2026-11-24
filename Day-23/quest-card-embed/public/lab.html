@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CORS lab</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>CORS lab</h1>
+    <p>This page's origin: <span class="origin" id="origin"></span> · API: <code id="api"></code></p>
+    <p>Each case sends one request from this page to the Intern Quest API, a <strong>different origin</strong>, and shows what
+      JavaScript gets back. Open DevTools first: the <strong>Network</strong> tab shows the requests (including the
+      <code>OPTIONS</code> preflights), and the <strong>Console</strong> says why the browser blocked one.</p>
+    <p id="other-origin"></p>
+    <p><button type="button" id="run-all">Run all cases</button> <a id="home" href="index.html">Back to the card</a></p>
+    <div class="panel" id="cases"></div>
+  </main>
+  <script type="module" src="lab.js"></script>
+</body>
+</html>
