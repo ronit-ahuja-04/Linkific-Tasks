@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import CharacterEditor from '@/components/game/CharacterEditor';
-import AppShell from '@/components/shell/AppShell';
+import Notice from '@/components/shell/Notice';
 import { getCharacterByUser } from '@/lib/server/db';
 import { requireUser } from '@/lib/server/guards';
 
@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: 'Your character', robots: { index: fa
 
 export default function CharacterPage(props: PageProps<'/character'>) {
   return (
-    <Suspense fallback={<div className="shell tone-violet" />}>
+    <Suspense fallback={null}>
       <Character searchParams={props.searchParams} />
     </Suspense>
   );
@@ -27,9 +27,10 @@ async function Character({ searchParams }: Pick<PageProps<'/character'>, 'search
     avatar: { skin: 0, hair: 0, colour: 0, accessory: 0 }, isPublic: true,
   };
   return (
-    <AppShell user={user} handle={character?.handle ?? null} notice={typeof notice === 'string' ? notice : undefined}>
+    <>
+      <Notice code={notice} />
       <CharacterEditor isNew={!character} role={user.role}
         initial={{ handle: initial.handle, displayName: initial.displayName, bio: initial.bio, class: initial.class, avatar: initial.avatar, isPublic: initial.isPublic }} />
-    </AppShell>
+    </>
   );
 }

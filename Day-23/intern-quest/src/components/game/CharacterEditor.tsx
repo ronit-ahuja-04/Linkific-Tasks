@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useActionState, useLayoutEffect, useState, type FormEvent } from 'react';
 import { redeemMentorAction, type MentorState } from '@/app/(game)/character/actions';
+import FormMessage, { problemFrom, type FormProblem } from '@/components/errors/FormMessage';
+import { guardAction } from '@/lib/action-guard';
 import { apiFetch } from '@/lib/api-client';
 import { toAppError } from '@/lib/errors';
 import { CLASS_INFO, CLASSES, SKILL_LABELS, type CharacterClass } from '@/lib/game';
@@ -26,9 +28,10 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
   const router = useRouter();
   const [draft, setDraft] = useState(initial);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState('');
+  const [problem, setProblem] = useState<FormProblem | null>(null);
   const [busy, setBusy] = useState(false);
-  const [mentor, mentorAction, mentorPending] = useActionState<MentorState, FormData>(redeemMentorAction, {});
+  // guarded: offline, the server action's failure becomes a message here instead of an error page
+  const [mentor, mentorAction, mentorPending] = useActionState<MentorState, FormData>(guardAction(redeemMentorAction, (error) => ({ error: error.message })), {});
   const set = <K extends keyof CharacterDraft>(key: K, value: CharacterDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setErrors((e) => (key in e ? Object.fromEntries(Object.entries(e).filter(([field]) => field !== key)) : e));
@@ -36,21 +39,21 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
   // clear stale messages when Next.js hides this page (it stays alive in an <Activity>)
   useLayoutEffect(() => () => {
     setErrors({});
-    setMessage('');
+    setProblem(null);
   }, []);
 
   async function save(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
     setErrors({});
-    setMessage('');
+    setProblem(null);
     try {
       await apiFetch('/api/character', { method: 'PUT', body: draft });
       router.push(isNew ? '/journal' : '/character?notice=saved');
     } catch (caught) {
       const error = toAppError(caught);
       setErrors(error.fields ?? {});
-      setMessage(error.messageWithReference);
+      setProblem(problemFrom(error));
     } finally {
       setBusy(false);
     }
@@ -65,7 +68,7 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
           <h1>{isNew ? 'Create your character' : 'Your character'}</h1>
           <p className="muted">{isNew ? 'Pick a class and dress up Pip. You can change all of it later.' : 'Your handle is your public address: /c/your-handle'}</p>
         </div>
-        {message && <p className="form-error" role="alert">{message}</p>}
+        <FormMessage problem={problem} />
         <div className="editor-grid">
           <div className="card editor-main">
             <div className="two">
@@ -125,6 +128,7 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
                 <input name="code" autoComplete="off" spellCheck={false} />
               </label>
               <button type="submit" className="ghost-button" disabled={mentorPending}>{mentorPending ? 'Checking…' : 'Become a guild master'}</button>
+              {mentor.error && <p className="form-error" role="alert">{mentor.error}</p>}
               {mentor.result === 'wrong' && <p className="form-error" role="alert">That invite code is not right.</p>}
               {mentor.result === 'missing' && <p className="form-error" role="alert">Enter the invite code.</p>}
               {mentor.result === 'promoted' && <p className="form-ok" role="status">Done! Open the <Link href="/guild">Guild hall</Link>.</p>}
