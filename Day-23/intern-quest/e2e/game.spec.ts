@@ -173,7 +173,7 @@ test.describe('mentors', () => {
     await award.getByRole('button', { name: 'Icon 🌟' }).click();
     await award.getByLabel('Name').fill('Rising star');
     await award.getByRole('button', { name: 'Award', exact: true }).click();
-    await expect(visible(mentor.locator('.notice'))).toContainText('Rising star');
+    await expect(mentor.getByTestId('toast-polite')).toContainText('Badge “Rising star” awarded'); // Day 23: a toast
 
     await page.goto(`/c/${handle}`);
     await expect(visible(page.locator('.badges'))).toContainText('Rising star');

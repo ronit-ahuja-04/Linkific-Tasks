@@ -42,7 +42,8 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
   const [tab, setTab] = useState<'write' | 'preview'>('write');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [problem, setProblem] = useState<FormProblem | null>(null);
-  const [busy, setBusy] = useState(false);
+  // what is in progress, so each button can say what it is doing; null = nothing
+  const [busy, setBusy] = useState<null | 'published' | 'draft' | 'delete'>(null);
   const [reward, setReward] = useState<Reward | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
   const editing = Boolean(initial.id);
@@ -67,7 +68,8 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
 
   async function save(status: 'draft' | 'published', event?: FormEvent) {
     event?.preventDefault();
-    setBusy(true);
+    if (busy) return; // the buttons stay focusable while busy (aria-disabled), so a second press is ignored here
+    setBusy(status);
     setErrors({});
     setProblem(null);
     const body = { ...draft, status, prLinks: draft.prLinks.map((l) => l.trim()).filter(Boolean) };
@@ -85,12 +87,13 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
       setErrors(error.fields ?? {});
       setProblem(problemFrom(error));
     } finally {
-      setBusy(false); // always: before Day 23 a network failure skipped this line and "Saving…" stayed forever
+      setBusy(null); // always: before Day 23 a network failure skipped this line and "Saving…" stayed forever
     }
   }
 
   async function remove() {
-    setBusy(true);
+    if (busy) return;
+    setBusy('delete');
     try {
       await apiFetch(`/api/quests/${initial.id}`, { method: 'DELETE' });
       router.push('/journal?notice=deleted'); // the destination renders per request, so it is fresh
@@ -98,7 +101,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
       const error = toAppError(caught);
       setProblem({ message: `Could not delete the quest. ${error.messageWithReference}`, kind: error.kind });
     } finally {
-      setBusy(false);
+      setBusy(null);
       dialog.current?.close();
     }
   }
@@ -201,9 +204,12 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
             </label>
 
             <div className="editor-actions">
-              <button type="submit" className="big-button" disabled={busy}>{busy ? 'Saving…' : editing && initial.status === 'published' ? 'Save changes' : 'Publish quest'}</button>
+              {/* aria-disabled, not disabled: a disabled button loses keyboard focus the moment it is pressed (Day 22) */}
+              <button type="submit" className="big-button" aria-disabled={busy !== null}>
+                {busy === 'published' ? (editing && initial.status === 'published' ? 'Saving changes…' : 'Publishing…') : editing && initial.status === 'published' ? 'Save changes' : 'Publish quest'}
+              </button>
               {(!editing || initial.status === 'draft') && (
-                <button type="button" className="ghost-button" disabled={busy} onClick={() => void save('draft')}>Save as draft</button>
+                <button type="button" className="ghost-button" aria-disabled={busy !== null} onClick={() => void save('draft')}>{busy === 'draft' ? 'Saving draft…' : 'Save as draft'}</button>
               )}
               {editing && <button type="button" className="danger-link" onClick={() => dialog.current?.showModal()}>Delete quest</button>}
             </div>
@@ -216,7 +222,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
         <p>Its XP comes off your character, and Pip forgets it. This can not be undone.</p>
         <div className="confirm-actions">
           <button type="button" className="ghost-button" onClick={() => dialog.current?.close()} autoFocus>Keep it</button>
-          <button type="button" className="danger-button" disabled={busy} onClick={() => void remove()}>Delete</button>
+          <button type="button" className="danger-button" aria-disabled={busy !== null} onClick={() => void remove()}>{busy === 'delete' ? 'Deleting…' : 'Delete'}</button>
         </div>
       </dialog>
 

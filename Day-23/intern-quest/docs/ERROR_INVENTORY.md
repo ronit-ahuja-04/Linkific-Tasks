@@ -84,6 +84,17 @@ Re-running the same 33 scenarios after each milestone shows what changed; the fi
   - The proxy could return a real 404 for addresses that can be judged without data. Here, every not-found case needs a database read.
   - Monitoring should therefore use the log lines, not page status codes.
 
+**After M4 (loading and feedback):** E-9 and E-12 are fixed.
+- **S12:** while a page loads, a **skeleton** in the page's own shape appears at once (it is part of the prerendered HTML), with one "Loading your journal…" status for screen readers. The journal also reads the character, quests and badges **at once**: with 3 s per query, its heading now appears after **3.4 s** instead of 6.4 s.
+- **Busy buttons** say what they are doing ("Publishing…", "Saving draft…", "Deleting…", "Creating…"). They stay focusable (`aria-disabled`), and a second press is ignored.
+- **Guild notes are optimistic:**
+  - a note appears at once as "Sending…";
+  - if it fails, it stays as "**Not sent**" with Retry and Discard (C7), so the text is never lost.
+- **Toasts** carry background results: a note added or not sent, a badge awarded, an uncaught error. Error toasts stay until dismissed. Two live regions, polite and assertive, are always in the page.
+- **Copy review:**
+  - signing in during an outage now says the problem is ours, "not your password";
+  - registering during an outage keeps the form, where before it showed the error screen.
+
 ## CORS today (X1, X2)
 
 There is no CORS configuration, which is right for this API: every route uses the session cookie and is meant for this site only. What the browser does:

@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { E2E_FAULT_PROXY_PORT } from '../playwright.config';
+import { audit } from './axe';
 import { logQuest, newAdventurer, visible } from './helpers';
 
 /**
@@ -8,6 +9,7 @@ import { logQuest, newAdventurer, visible } from './helpers';
  * Runs after every other test, one at a time ('faults' project in playwright.config.ts).
  */
 test.describe.configure({ mode: 'serial' });
+test.use({ reducedMotion: 'reduce' }); // for the axe audits (see a11y.spec.ts)
 
 const dbFault = async (mode: 'pass' | 'unavailable' | 'slow', ms = 0) => {
   await fetch(`http://127.0.0.1:${E2E_FAULT_PROXY_PORT}/__fault?mode=${mode}&ms=${ms}`, { method: 'POST' });
@@ -27,6 +29,7 @@ test('a page that fails keeps the navigation; moving away and back works; Try ag
   await expect(visible(page.locator('.error-ref code'))).toHaveText(/^\d+$/); // the digest, the same id as the server log line
   // the shell is still there and works: it needs no database
   await expect(visible(nav(page).getByRole('link', { name: 'Journal' }))).toHaveAttribute('aria-current', 'page');
+  await audit(page, 'error page in the shell');
   await visible(nav(page).getByRole('link', { name: 'Character' })).click();
   await page.waitForURL('/character');
   await expect(visible(nav(page).getByRole('link', { name: 'Character' }))).toHaveAttribute('aria-current', 'page');
@@ -87,4 +90,31 @@ test('a database slower than the 5 s deadline: the save ends with the outage mes
   await expect(visible(page.locator('.editor .form-error'))).toContainText('can not reach its database', { timeout: 15_000 });
   expect(Date.now() - started).toBeLessThan(12_000);
   await expect(visible(page.getByRole('button', { name: 'Publish quest' }))).toBeEnabled();
+});
+
+test('a slow database: the shell and a skeleton at once, never a blank screen; the journal reads in parallel (E-9)', async ({ page }) => {
+  await newAdventurer(page);
+  await dbFault('slow', 2000);
+  const started = Date.now();
+  await page.goto('/journal', { waitUntil: 'commit' });
+  const skeleton = visible(page.locator('.journal[aria-busy="true"]'));
+  await expect(skeleton).toBeVisible({ timeout: 1500 });
+  await expect(page.getByText('Loading your journal…').first()).toBeAttached(); // streaming can hold a hidden copy too
+  await expect(visible(nav(page).getByRole('link', { name: 'Journal' }))).toBeVisible();
+  await audit(page, 'journal skeleton');
+  await expect(heading(page)).toHaveText('Day 1 awaits.', { timeout: 10_000 });
+  // character, quests and badges at once: one 2 s round trip, not two (before M4: 4 s and more)
+  expect(Date.now() - started).toBeLessThan(3900);
+  await expect(skeleton).toHaveCount(0);
+});
+
+test('registering while the database is down keeps the form and says it is our problem (copy review)', async ({ page }) => {
+  await page.goto('/register');
+  await visible(page.getByLabel('Name')).fill('Outage Olly');
+  await visible(page.getByLabel('Email')).fill(`outage-${Date.now()}@test.invalid`);
+  await visible(page.getByLabel('Password')).fill('a long test password');
+  await dbFault('unavailable');
+  await visible(page.getByRole('button', { name: 'Start your quest' })).click();
+  await expect(visible(page.locator('.auth-error'))).toHaveText('Your account could not be created right now: the problem is on our side. Nothing was saved; try again in a moment.');
+  await expect(visible(page.getByLabel('Name'))).toHaveValue('Outage Olly');
 });

@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import { ShellSkeleton } from '@/components/Skeletons';
 import AppShell from '@/components/shell/AppShell';
 
 /**
@@ -8,7 +9,7 @@ import AppShell from '@/components/shell/AppShell';
  */
 export default function GameLayout({ children }: LayoutProps<'/'>) {
   return (
-    <Suspense fallback={<div className="shell tone-violet" />}>
+    <Suspense fallback={<ShellSkeleton />}>
       <AppShell>{children}</AppShell>
     </Suspense>
   );

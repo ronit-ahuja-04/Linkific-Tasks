@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
+import { SheetSkeleton } from '@/components/Skeletons';
 import QuestApp from '@/components/QuestApp';
 import Account from '@/components/auth/Account';
 import { computeStats, topSkills, SKILL_LABELS } from '@/lib/game';
@@ -39,7 +40,7 @@ export async function generateMetadata(props: PageProps<'/c/[handle]'>): Promise
  */
 export default function CharacterSheetPage(props: PageProps<'/c/[handle]'>) {
   return (
-    <Suspense fallback={<div className="screen" style={{ background: '#6C4DF5', minHeight: '100vh' }} />}>
+    <Suspense fallback={<SheetSkeleton />}>
       <Sheet params={props.params} />
     </Suspense>
   );

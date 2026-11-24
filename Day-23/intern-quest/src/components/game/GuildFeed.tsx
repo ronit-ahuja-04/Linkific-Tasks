@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useRef, useState } from 'react';
+import { useOptimistic, useRef, useState, useTransition } from 'react';
 import Markdown from '@/components/Markdown';
 import { apiFetch } from '@/lib/api-client';
 import { toAppError } from '@/lib/errors';
+import { toast } from '@/lib/toast';
 import { SKILL_LABELS, type Difficulty, type Skill } from '@/lib/game';
 
 export interface FeedItem {
@@ -23,39 +24,62 @@ export interface FeedItem {
 
 const ICONS = ['🏅', '🚀', '🐞', '🧠', '🌟', '🛠️', '📚', '🎯'] as const;
 
-/** The mentor's review feed: leave a note on a quest, or award a badge to its author. Uses the app's own API. */
-export default function GuildFeed({ items }: { items: FeedItem[] }) {
+/**
+ * The mentor's review feed: leave a note on a quest, or award a badge to its author. Uses the app's own API.
+ *
+ * Notes are OPTIMISTIC (React's useOptimistic): a note appears at once, marked "Sending…", while the request runs.
+ * When the server has it, the page data is refreshed and the note is simply there. If it fails, it stays in the list
+ * as "Not sent", with Retry and Discard, so the text is never lost (and a toast says why).
+ * Results go to toasts: the mentor has usually moved on to the next quest by the time the answer arrives.
+ */
+type Note = FeedItem['notes'][number] & { sending?: boolean };
+interface FailedNote { key: string; body: string }
+
+export default function GuildFeed({ items, me }: { items: FeedItem[]; me: string }) {
   const router = useRouter();
   const dialog = useRef<HTMLDialogElement>(null);
   const [target, setTarget] = useState<{ handle: string; displayName: string } | null>(null);
   const [badge, setBadge] = useState({ name: '', note: '', icon: '🏅' });
   const [drafts, setDrafts] = useState<Record<string, string>>({});
-  const [status, setStatus] = useState('');
+  const [failed, setFailed] = useState<Record<string, FailedNote[]>>({});
+  const [, startTransition] = useTransition();
+  const [shown, addOptimistic] = useOptimistic(items, (state: FeedItem[], sent: { questId: string; note: Note }) =>
+    state.map((q) => (q.id === sent.questId ? { ...q, notes: [...q.notes, sent.note] } : q)));
 
-  // Before Day 23 a network failure here threw before any message was set: the mentor saw nothing at all
-  async function addNote(id: string) {
-    const body = (drafts[id] ?? '').trim();
-    if (!body) return;
-    try {
-      await apiFetch(`/api/quests/${id}/notes`, { method: 'POST', body: { body } });
-      setDrafts((d) => ({ ...d, [id]: '' }));
-      setStatus('Note added.');
-      router.refresh();
-    } catch (caught) {
-      setStatus(`Could not add the note (it is still in the box). ${toAppError(caught).messageWithReference}`);
-    }
+  function send(questId: string, body: string) {
+    startTransition(async () => {
+      addOptimistic({ questId, note: { id: `sending-${crypto.randomUUID()}`, authorName: me, body, sending: true } });
+      try {
+        await apiFetch(`/api/quests/${questId}/notes`, { method: 'POST', body: { body } });
+        toast('Note added.', 'success');
+        // still inside the transition: the optimistic note stays until the refreshed list (with the real note) arrives
+        startTransition(() => router.refresh());
+      } catch (caught) {
+        setFailed((f) => ({ ...f, [questId]: [...(f[questId] ?? []), { key: crypto.randomUUID(), body }] }));
+        toast(`Your note was not sent. ${toAppError(caught).messageWithReference}`, 'error');
+      }
+    });
   }
+
+  function addNote(questId: string) {
+    const body = (drafts[questId] ?? '').trim();
+    if (!body) return;
+    setDrafts((d) => ({ ...d, [questId]: '' })); // it is in the list now (sending), not lost
+    send(questId, body);
+  }
+
+  const forget = (questId: string, key: string) => setFailed((f) => ({ ...f, [questId]: (f[questId] ?? []).filter((n) => n.key !== key) }));
 
   async function award() {
     if (!target) return;
     try {
       await apiFetch('/api/badges', { method: 'POST', body: { handle: target.handle, ...badge } });
-      setStatus(`Badge “${badge.name}” awarded to ${target.displayName}.`);
+      toast(`Badge “${badge.name}” awarded to ${target.displayName}.`, 'success');
       setBadge({ name: '', note: '', icon: '🏅' });
       router.refresh();
     } catch (caught) {
       // the badge stays filled in: "Award badge" again opens it as it was
-      setStatus(`Could not award the badge. ${toAppError(caught).messageWithReference}`);
+      toast(`Could not award the badge. ${toAppError(caught).messageWithReference}`, 'error');
     } finally {
       dialog.current?.close();
     }
@@ -63,10 +87,8 @@ export default function GuildFeed({ items }: { items: FeedItem[] }) {
 
   return (
     <>
-      <p className="sr-only" role="status" aria-live="polite">{status}</p>
-      {status && <p className="notice" aria-hidden="true">{status}</p>}
       <ol className="feed">
-        {items.map((q) => (
+        {shown.map((q) => (
           <li key={q.id} className="card feed-item">
             <div className="feed-head">
               <Link href={`/c/${q.handle}`} className="feed-who">{q.displayName} <span className="muted">@{q.handle}</span></Link>
@@ -77,9 +99,20 @@ export default function GuildFeed({ items }: { items: FeedItem[] }) {
             {q.body && <div className="feed-body"><Markdown source={q.body} /></div>}
             {q.blockers && <p className="feed-blocker"><strong>Blocker:</strong> {q.blockers}</p>}
             <p className="qc-skills">{q.skills.map((s) => SKILL_LABELS[s]).join(' · ')}</p>
-            {q.notes.length > 0 && (
+            {(q.notes.length > 0 || (failed[q.id] ?? []).length > 0) && (
               <ul className="notes">
-                {q.notes.map((n) => <li key={n.id}><strong>{n.authorName}:</strong> {n.body}</li>)}
+                {q.notes.map((n: Note) => (
+                  <li key={n.id} className={n.sending ? 'note-pending' : undefined}>
+                    <strong>{n.authorName}:</strong> {n.body}{n.sending && <em>Sending…</em>}
+                  </li>
+                ))}
+                {(failed[q.id] ?? []).map((n) => (
+                  <li key={n.key} className="note-failed">
+                    <strong>{me}:</strong> {n.body}<em>Not sent.</em>
+                    <button type="button" onClick={() => { forget(q.id, n.key); send(q.id, n.body); }} aria-label={`Retry sending your note: ${n.body}`}>Retry</button>
+                    <button type="button" onClick={() => forget(q.id, n.key)} aria-label={`Discard your note: ${n.body}`}>Discard</button>
+                  </li>
+                ))}
               </ul>
             )}
             <div className="feed-actions">

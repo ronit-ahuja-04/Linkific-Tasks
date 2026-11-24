@@ -11,7 +11,7 @@ async function newQuestForm(page: Page, title: string) {
   await visible(page.getByLabel('Title')).fill(title);
   await visible(page.getByRole('button', { name: 'React', exact: true })).click();
 }
-const publish = (page: Page) => visible(page.getByRole('button', { name: /Publish quest|Saving…/ }));
+const publish = (page: Page) => visible(page.getByRole('button', { name: /Publish quest|Publishing…/ }));
 const formError = (page: Page) => visible(page.locator('.editor .form-error'));
 
 test.describe('a failed save never leaves you stuck (E-1, E-2)', () => {
@@ -36,7 +36,7 @@ test.describe('a failed save never leaves you stuck (E-1, E-2)', () => {
     await newQuestForm(page, 'Hanging quest');
     await page.route('**/api/quests', () => { /* never answered */ });
     await publish(page).click();
-    await expect(publish(page)).toHaveText('Saving…');
+    await expect(publish(page)).toHaveText('Publishing…');
     await page.clock.fastForward(15_500);
     await expect(formError(page)).toContainText('took too long to answer');
     await expect(formError(page)).toContainText('It may have been saved anyway: check before sending it again.');
@@ -105,16 +105,67 @@ test.describe('a failed save never leaves you stuck (E-1, E-2)', () => {
   });
 });
 
-test('a mentor\'s note that fails is no longer silent, and the text stays in the box (C7)', async ({ page, context }) => {
+test('a mentor\'s note that fails is no longer silent: it stays in the list as "Not sent" with Retry (C7, M4)', async ({ page, context }) => {
   await signInAs(page, 'mentor@example.com');
   await page.goto('/guild');
-  const box = visible(page.getByPlaceholder('Leave a note…')).first();
-  await box.fill('Nice work on this one');
+  // other tests publish quests at the same time, so the feed's order can change: find things by their own text
+  const item = visible(page.locator('.feed-item')).first();
+  const text = `Nice work ${Date.now()}`;
+  await item.getByPlaceholder('Leave a note…').fill(text);
   await context.setOffline(true);
-  await visible(page.getByRole('button', { name: 'Add note' })).first().click();
-  await expect(visible(page.locator('.notice'))).toHaveText('Could not add the note (it is still in the box). You are offline. Nothing was sent: reconnect and try again.');
-  await expect(page.locator('p.sr-only[role=status]')).toHaveText(/Could not add the note/);
-  await expect(box).toHaveValue('Nice work on this one');
+  await item.getByRole('button', { name: 'Add note' }).click();
+  const failed = page.locator('.note-failed').filter({ hasText: text });
+  await expect(failed).toContainText(text);
+  await expect(failed).toContainText('Not sent.');
+  await expect(page.getByTestId('toast-assertive')).toHaveText('Your note was not sent. You are offline. Nothing was sent: reconnect and try again.');
+  await expect(visible(page.locator('.toast-error'))).toBeVisible();
+  // the toast sits above the offline banner, not on top of it
+  const banner = await page.locator('.offline-banner').boundingBox();
+  const toastBox = await visible(page.locator('.toast-error')).boundingBox();
+  expect(toastBox && banner && toastBox.y + toastBox.height <= banner.y).toBe(true);
+  // back online, Retry sends the same text
+  await context.setOffline(false);
+  await failed.getByRole('button', { name: /^Retry sending your note/ }).click();
+  await expect(page.getByTestId('toast-polite')).toHaveText('Note added.');
+  await expect(failed).toHaveCount(0);
+  await expect(page.locator('.notes li').filter({ hasText: text })).not.toHaveClass(/note-pending|note-failed/);
+});
+
+test.describe('feedback while waiting (M4)', () => {
+  test('a guild note appears at once as "Sending…", then is simply there (optimistic)', async ({ page }) => {
+    await signInAs(page, 'mentor@example.com');
+    await page.goto('/guild');
+    const item = visible(page.locator('.feed-item')).first();
+    let release = () => {};
+    const held = new Promise<void>((resolve) => { release = resolve; });
+    await page.route('**/api/quests/*/notes', async (route) => { await held; await route.continue(); });
+    const text = `Optimistic ${Date.now()}`;
+    await item.getByPlaceholder('Leave a note…').fill(text);
+    await item.getByRole('button', { name: 'Add note' }).click();
+    const note = page.locator('.notes li').filter({ hasText: text }); // by its text: the feed's order can change meanwhile
+    await expect(note).toHaveClass('note-pending');
+    await expect(note).toContainText('Sending…');
+    await expect(item.getByPlaceholder('Leave a note…')).toHaveValue(''); // the text moved into the list; nothing refreshed yet
+    release();
+    await expect(page.getByTestId('toast-polite')).toHaveText('Note added.');
+    await expect(note).not.toContainText('Sending…');
+    await expect(note).toHaveCount(1);
+  });
+
+  test('a busy button says what it is doing, keeps keyboard focus, and ignores a second press', async ({ page }) => {
+    await newAdventurer(page);
+    await newQuestForm(page, 'Patience');
+    let posts = 0;
+    await page.route('**/api/quests', async (route) => { posts += 1; await new Promise((r) => setTimeout(r, 1500)); await route.continue(); });
+    await publish(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(publish(page)).toHaveText('Publishing…');
+    await expect(publish(page)).toHaveAttribute('aria-disabled', 'true');
+    await expect(publish(page)).toBeFocused(); // with `disabled`, focus would have dropped to <body>
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('dialog', { name: 'Quest complete!' })).toBeVisible();
+    expect(posts).toBe(1);
+  });
 });
 
 test.describe('the API and the log', () => {
@@ -132,6 +183,8 @@ test.describe('the API and the log', () => {
     const response = await reported;
     expect(response.status()).toBe(204);
     expect(response.request().postDataJSON()).toMatchObject({ source: 'window', message: 'e2e: thrown from a timer', path: '/' });
+    // and the person is told, since nothing else on the page could show it (M4)
+    await expect(page.getByTestId('toast-assertive')).toHaveText('Something on this page went wrong, and it has been reported. If anything looks wrong, reload the page.');
   });
 
   test('outside Vercel the /_vercel analytics scripts are not loaded, so the console stays clean (E-13)', async ({ page }) => {

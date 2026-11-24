@@ -6,6 +6,7 @@ import Pip from '@/components/Pip';
 import HeroPip from '@/components/landing/HeroPip';
 import HomeCta from '@/components/landing/HomeCta';
 import SectionBoundary from '@/components/errors/SectionBoundary';
+import { BoardSkeleton } from '@/components/Skeletons';
 import { getGuildBoard } from '@/lib/server/public';
 import { SITE } from '@/lib/site';
 
@@ -56,7 +57,7 @@ export default function Home() {
         <p className="home-lede">Every public adventurer, by XP.</p>
         {/* its own boundary: if the database can not answer, only the leaderboard says so; the rest of the page stays */}
         <SectionBoundary what="The guild board">
-          <Suspense fallback={<p className="home-lede">Gathering the guild…</p>}>
+          <Suspense fallback={<BoardSkeleton />}>
             <Board />
           </Suspense>
         </SectionBoundary>
