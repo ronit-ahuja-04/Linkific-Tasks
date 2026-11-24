@@ -3,10 +3,13 @@
  * clear message in the logs, instead of a confusing error on some later request.
  *
  *   server-only   AUTH_SECRET, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, MENTOR_INVITE_CODE, AUTH_GITHUB_ID/SECRET
+ *   CORS          CORS_ALLOWED_ORIGINS (Day 23): the origins allowed to read /api/public/*
  *   public        NEXT_PUBLIC_SITE_URL (inlined into the browser bundle at build time: never put a secret in one)
  *
  * A pure function over a plain object, so it is unit tested without touching the real environment.
  */
+import { parseAllowlist } from './cors';
+
 export interface EnvReport {
   errors: string[];
   warnings: string[];
@@ -34,6 +37,11 @@ export function checkEnv(env: Env, mode: 'development' | 'production' | 'test' =
   else if (!has('AUTH_GITHUB_ID')) warnings.push('AUTH_GITHUB_ID / AUTH_GITHUB_SECRET are not set: GitHub sign-in is off (email and password still work).');
   if (!has('MENTOR_INVITE_CODE')) warnings.push('MENTOR_INVITE_CODE is not set: nobody can become a mentor.');
   else if (mode === 'production' && env.MENTOR_INVITE_CODE === 'demo-mentor') errors.push('MENTOR_INVITE_CODE is still the demo value in production.');
+
+  // CORS: a wrong entry would be silently ignored by the proxy, so it stops the start instead (`*` most of all)
+  const cors = parseAllowlist(env.CORS_ALLOWED_ORIGINS);
+  for (const entry of cors.rejected) errors.push(`CORS_ALLOWED_ORIGINS: ${entry}.`);
+  if (!has('CORS_ALLOWED_ORIGINS')) warnings.push('CORS_ALLOWED_ORIGINS is not set: no other site can read /api/public (this app itself is not affected).');
 
   if (!has('NEXT_PUBLIC_SITE_URL')) {
     (mode === 'production' ? errors : warnings).push('NEXT_PUBLIC_SITE_URL is not set: canonical links and share cards would point at localhost.');

@@ -29,6 +29,8 @@ writeFileSync(
     `SUPABASE_URL=${url}`,
     `SUPABASE_SERVICE_ROLE_KEY=${serviceKey}`,
     'MENTOR_INVITE_CODE=demo-mentor',
+    '# Day 23: origins whose pages may read /api/public/* (the quest-card embed site and its CORS lab)',
+    'CORS_ALLOWED_ORIGINS=http://localhost:4000',
     '# GitHub sign-in (optional locally): create an OAuth app, callback http://localhost:3000/api/auth/callback/github',
     'AUTH_GITHUB_ID=',
     'AUTH_GITHUB_SECRET=',

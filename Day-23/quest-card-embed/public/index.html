@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quest card embed (demo site)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <p>A different website: <span class="origin" id="origin"></span></p>
+    <h1>My internship, as a quest card</h1>
+    <p>This page stands in for an intern's portfolio. It shows a live card from the Intern Quest API at
+      <code id="api"></code>. The card comes from <strong>another origin</strong>, so the browser only lets this page read
+      it because the API says this origin may (CORS).</p>
+
+    <div class="panel">
+      <form id="form">
+        <label>Handle <input id="handle" name="handle" value="ronit" autocomplete="off" spellcheck="false"></label>
+        <button type="submit">Show the card</button>
+      </form>
+    </div>
+
+    <div id="result" aria-live="polite"></div>
+
+    <p><a id="lab" href="lab.html">Open the CORS lab</a>: every case, live, with what happens and why.</p>
+  </main>
+  <script type="module" src="card.js"></script>
+</body>
+</html>

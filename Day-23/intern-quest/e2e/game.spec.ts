@@ -167,6 +167,8 @@ test.describe('mentors', () => {
     await item.getByPlaceholder('Leave a note…').fill('Lovely work on this one.');
     await item.getByRole('button', { name: 'Add note' }).click();
     await expect(item.getByText('Lovely work on this one.')).toBeVisible();
+    // Day 23: notes are optimistic (visible at once, while still sending): wait until the server has it
+    await expect(mentor.getByTestId('toast-polite')).toHaveText('Note added.');
 
     await item.getByRole('button', { name: 'Award badge' }).click();
     const award = mentor.getByRole('dialog', { name: /Award a badge/ });

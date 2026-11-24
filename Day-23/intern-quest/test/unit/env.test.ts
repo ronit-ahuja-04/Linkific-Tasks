@@ -9,6 +9,7 @@ const good = {
   AUTH_GITHUB_ID: 'id',
   AUTH_GITHUB_SECRET: 'secret',
   NEXT_PUBLIC_SITE_URL: 'https://intern-quest.vercel.app',
+  CORS_ALLOWED_ORIGINS: 'http://localhost:4000', // Day 23: the public card API's allowlist
 };
 
 describe('checkEnv', () => {
