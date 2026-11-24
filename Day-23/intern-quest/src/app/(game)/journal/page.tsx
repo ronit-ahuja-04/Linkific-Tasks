@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import PipCorner from '@/components/game/PipCorner';
 import CreateCharacterPrompt from '@/components/game/CreateCharacterPrompt';
 import Notice from '@/components/shell/Notice';
+import { JournalSkeleton } from '@/components/Skeletons';
 import { SKILL_LABELS } from '@/lib/game';
 import { getCharacterByUser, listMentorBadges, listQuests } from '@/lib/server/db';
 import { requireUser } from '@/lib/server/guards';
@@ -14,7 +15,7 @@ export const metadata: Metadata = { title: 'Journal', robots: { index: false } }
 
 export default function JournalPage(props: PageProps<'/journal'>) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<JournalSkeleton />}>
       <Journal searchParams={props.searchParams} />
     </Suspense>
   );
@@ -22,10 +23,9 @@ export default function JournalPage(props: PageProps<'/journal'>) {
 
 async function Journal({ searchParams }: Pick<PageProps<'/journal'>, 'searchParams'>) {
   const user = await requireUser('/journal');
-  const character = await getCharacterByUser(user.id);
-  const { notice } = await searchParams;
+  // all three at once: the quests and badges do not depend on the character (before Day 23 this was two round trips)
+  const [character, quests, badges, { notice }] = await Promise.all([getCharacterByUser(user.id), listQuests(user.id), listMentorBadges(user.id), searchParams]);
   if (!character) return <CreateCharacterPrompt />;
-  const [quests, badges] = await Promise.all([listQuests(user.id), listMentorBadges(user.id)]);
   const view = buildCharacterView(character, quests, badges, todayIso());
   const nextDay = quests.reduce((max, q) => Math.max(max, q.day), 0) + 1;
   const xpById = new Map(view.quests.map((q) => [q.day, q.xp]));

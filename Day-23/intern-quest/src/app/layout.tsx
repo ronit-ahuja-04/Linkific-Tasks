@@ -5,6 +5,7 @@ import { Fredoka, Nunito } from 'next/font/google';
 import ErrorListeners from '@/components/ErrorListeners';
 import MotionProvider from '@/components/MotionProvider';
 import OfflineBanner from '@/components/OfflineBanner';
+import Toaster from '@/components/Toaster';
 import { SITE } from '@/lib/site';
 import './globals.css';
 
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <MotionProvider>{children}</MotionProvider>
         <ErrorListeners />
         <OfflineBanner />
+        <Toaster />
         {/* Vercel Analytics (page views) and Speed Insights (Core Web Vitals from real visitors). They load scripts from
             /_vercel/*, which only exist on Vercel: anywhere else each page logged two console errors (116 in the
             Day 23 inventory), noise that hid real errors. So they are rendered only when built on Vercel. */}

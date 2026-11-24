@@ -17,6 +17,8 @@ export interface FormState {
   values?: { email?: string; name?: string };
 }
 
+const SIGN_IN_UNAVAILABLE = 'Signing in is not working right now: the problem is on our side, not your password. Try again in a moment.';
+
 const field = (data: FormData, name: string): string => {
   const value = data.get(name);
   return typeof value === 'string' ? value : '';
@@ -29,7 +31,9 @@ export async function loginAction(_previous: FormState, data: FormData): Promise
     return {};
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: error.type === 'CredentialsSignin' ? 'That email and password do not match.' : 'Could not sign in. Try again.', values: { email } };
+      // anything but a wrong password is OUR problem (e.g. the database did not answer): say so, so nobody retypes a
+      // correct password (Day 23 copy review)
+      return { error: error.type === 'CredentialsSignin' ? 'That email and password do not match.' : SIGN_IN_UNAVAILABLE, values: { email } };
     }
     throw error; // the success redirect
   }
@@ -43,6 +47,8 @@ export async function registerAction(_previous: FormState, data: FormData): Prom
     await createPasswordUser(parsed.value.email, parsed.value.password, parsed.value.name);
   } catch (error) {
     if (error instanceof DbError && error.kind === 'conflict') return { error: 'That email is already registered. Sign in instead.', values };
+    // the database did not answer: keep the form and say so, instead of replacing the page with an error screen
+    if (error instanceof DbError && error.kind === 'unavailable') return { error: 'Your account could not be created right now: the problem is on our side. Nothing was saved; try again in a moment.', values };
     throw error;
   }
   try {

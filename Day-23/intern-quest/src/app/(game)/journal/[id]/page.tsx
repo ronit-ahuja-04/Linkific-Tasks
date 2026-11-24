@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import QuestEditor from '@/components/game/QuestEditor';
+import { EditorSkeleton } from '@/components/Skeletons';
 import { getCharacterByUser, getQuest } from '@/lib/server/db';
 import { requireUser } from '@/lib/server/guards';
 import { isUuid } from '@/lib/validation';
@@ -10,7 +11,7 @@ export const metadata: Metadata = { title: 'Edit quest', robots: { index: false 
 
 export default function EditQuestPage(props: PageProps<'/journal/[id]'>) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<EditorSkeleton />}>
       <EditQuest params={props.params} />
     </Suspense>
   );

@@ -44,6 +44,7 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
 
   async function save(event: FormEvent) {
     event.preventDefault();
+    if (busy) return; // focusable while busy (aria-disabled): ignore a second press
     setBusy(true);
     setErrors({});
     setProblem(null);
@@ -110,7 +111,7 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
             <PipCustomizer tint={draft.avatar.colour} accessory={draft.avatar.accessory}
               onChange={({ tint, accessory }) => set('avatar', { ...draft.avatar, colour: tint, accessory })} />
             <div className="editor-actions">
-              <button type="submit" className="big-button" disabled={busy}>{busy ? 'Saving…' : isNew ? 'Create character' : 'Save character'}</button>
+              <button type="submit" className="big-button" aria-disabled={busy}>{busy ? (isNew ? 'Creating…' : 'Saving…') : isNew ? 'Create character' : 'Save character'}</button>
             </div>
           </div>
         </div>
@@ -127,7 +128,7 @@ export default function CharacterEditor({ initial, isNew, role }: { initial: Cha
                 <span>Mentor invite code</span>
                 <input name="code" autoComplete="off" spellCheck={false} />
               </label>
-              <button type="submit" className="ghost-button" disabled={mentorPending}>{mentorPending ? 'Checking…' : 'Become a guild master'}</button>
+              <button type="submit" className="ghost-button" aria-disabled={mentorPending}>{mentorPending ? 'Checking…' : 'Become a guild master'}</button>
               {mentor.error && <p className="form-error" role="alert">{mentor.error}</p>}
               {mentor.result === 'wrong' && <p className="form-error" role="alert">That invite code is not right.</p>}
               {mentor.result === 'missing' && <p className="form-error" role="alert">Enter the invite code.</p>}

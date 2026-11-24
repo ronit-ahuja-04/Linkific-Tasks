@@ -27,7 +27,8 @@ export default function AuthForm({ mode, action, next }: AuthFormProps) {
   return (
     // React 19 resets a form after its action runs. Keying the form on the returned values remounts it with those
     // values as defaults, so a failed attempt keeps the email and name (and, deliberately, clears the password).
-    <form key={JSON.stringify(state.values ?? {})} action={formAction} className="auth-form" noValidate>
+    <form key={JSON.stringify(state.values ?? {})} action={formAction} className="auth-form" noValidate
+      onSubmit={(event) => { if (pending) event.preventDefault(); /* React would queue a second sign-in, not drop it */ }}>
       <input type="hidden" name="next" value={next} />
       {state.error && <p className="auth-error" role="alert">{state.error}</p>}
       {register && (
@@ -48,7 +49,9 @@ export default function AuthForm({ mode, action, next }: AuthFormProps) {
           aria-invalid={Boolean(fieldError('password'))} aria-describedby={register ? 'password-hint' : undefined} />
         {register && <small id="password-hint" className={fieldError('password') ? '' : 'hint-text'}>{fieldError('password') ?? 'At least 10 characters.'}</small>}
       </label>
-      <button type="submit" className="auth-submit" disabled={pending}>
+      {/* aria-disabled keeps focus on the button while the action runs (with `disabled`, focus fell to <body> and a
+          failed sign-in left keyboard users at the top of the page); the form's onSubmit drops a second press */}
+      <button type="submit" className="auth-submit" aria-disabled={pending}>
         {pending ? (register ? 'Creating your character…' : 'Signing in…') : register ? 'Start your quest' : 'Sign in'}
       </button>
       <p className="auth-switch">

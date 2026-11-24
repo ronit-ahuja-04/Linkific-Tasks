@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import CharacterEditor from '@/components/game/CharacterEditor';
+import { CharacterSkeleton } from '@/components/Skeletons';
 import Notice from '@/components/shell/Notice';
 import { getCharacterByUser } from '@/lib/server/db';
 import { requireUser } from '@/lib/server/guards';
@@ -9,7 +10,7 @@ export const metadata: Metadata = { title: 'Your character', robots: { index: fa
 
 export default function CharacterPage(props: PageProps<'/character'>) {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<CharacterSkeleton />}>
       <Character searchParams={props.searchParams} />
     </Suspense>
   );
