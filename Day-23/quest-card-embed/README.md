@@ -17,7 +17,7 @@ cd Day-23/quest-card-embed && node server.mjs  # this site on http://localhost:4
 
 - **The allowed origin.** Open http://localhost:4000. The app's `.env.local` sets `CORS_ALLOWED_ORIGINS=http://localhost:4000` (`npm run env:local` writes it).
 - **A refused origin.** Open http://127.0.0.1:4000/lab.html. It's the same files on the same machine, but a different host name, so a different origin, and it isn't on the list.
-- **The live site.** Add `?api=https://intern-quest-smoky.vercel.app` to call the live API instead. Its allowlist is the Vercel environment variable.
+- **The live site.** Add `?api=https://intern-quest-smoky.vercel.app&handle=ronit-ahuja` to call the live API instead (the demo handle `ronit` exists only locally). The live allowlist, the Vercel variable `CORS_ALLOWED_ORIGINS`, is `http://localhost:4000`.
 
 No dependencies: `server.mjs` is a static file server on the loopback addresses only, and the pages are plain HTML
 with ES modules. Data from the API is written with `textContent`, never `innerHTML`.

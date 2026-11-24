@@ -9,5 +9,11 @@ export const API = (() => {
   }
 })();
 
-/** Keep ?api= on links between the pages of this site */
-export const withApi = (href) => (new URLSearchParams(location.search).has('api') ? `${href}?api=${encodeURIComponent(API)}` : href);
+/** Which character to show: ?handle=<handle>, or `ronit` (the local demo data; on the live site use e.g. ronit-ahuja) */
+export const HANDLE = (new URLSearchParams(location.search).get('handle') ?? 'ronit').toLowerCase();
+
+/** Keep ?api= and ?handle= on links between the pages of this site */
+export const withApi = (href) => {
+  const keep = new URLSearchParams([...new URLSearchParams(location.search)].filter(([key]) => key === 'api' || key === 'handle'));
+  return keep.size > 0 ? `${href}?${keep}` : href;
+};

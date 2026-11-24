@@ -56,7 +56,7 @@ The browser first sends an `OPTIONS` request carrying `Access-Control-Request-Me
 |---|---|---|
 | local development | `http://localhost:4000` (the embed site) | `npm run env:local` → `.env.local` |
 | browser tests | `http://localhost:4100` (the embed site on its test port) | `playwright.config.ts` |
-| production (Vercel) | `http://localhost:4000`: the lab, run locally, against the live API (M6) | `vercel env add CORS_ALLOWED_ORIGINS production` |
+| production (Vercel) | `http://localhost:4000`, so the lab, run locally, can call the live API | `vercel env add CORS_ALLOWED_ORIGINS production` (24 Nov) |
 
 **On `/api/public/*` only:**
 
@@ -148,6 +148,36 @@ HTTP/1.1 401 Unauthorized
 content-type: application/json
 ```
 
+**In production** (https://intern-quest-smoky.vercel.app, 24 Nov, after the deploy):
+
+```http
+GET /api/public/characters/ronit-ahuja    Origin: http://localhost:4000
+HTTP/2 200
+access-control-allow-origin: http://localhost:4000
+access-control-expose-headers: X-Request-Id
+cache-control: public, max-age=60
+vary: Origin
+
+OPTIONS /api/public/characters/ronit    Origin: http://localhost:4000   (+ Request-Method GET, Request-Headers x-client-name)
+HTTP/2 204
+access-control-allow-headers: Content-Type, X-Client-Name
+access-control-allow-methods: GET, OPTIONS
+access-control-allow-origin: http://localhost:4000
+access-control-max-age: 600
+
+OPTIONS …    Origin: https://evil.example        →  HTTP/2 403   (vary: Origin, nothing allowed)
+GET /api/quests    Origin: http://localhost:4000  →  HTTP/2 401   (no CORS headers)
+POST /api/quests    Origin: https://evil.example, Content-Type: text/plain
+HTTP/2 403
+{"error":"Requests that change data are accepted from this site only."}
+```
+
+**The lab against production** (`?api=https://intern-quest-smoky.vercel.app&handle=ronit-ahuja`):
+- from `localhost:4000`: cases 1 and 2 worked ("card for Ronit Ahuja"), and 3 to 7 were blocked;
+- from `127.0.0.1:4000`: all seven were blocked, and the console logged 7 "blocked by CORS policy" lines.
+
+The forged POST's request id found its line in the production log: `{"at":"proxy",…,"decision":"refused cross-site write"}` (see [DEBUGGING.md](DEBUGGING.md#3-from-a-reference-to-the-cause-the-server-log)).
+
 **In the browser** (the M1 inventory, rows X1 and X2, and the lab):
 - **A refused simple request did reach the server**, and the server answered. The browser then gave the script only `TypeError: Failed to fetch`, the **same error as being offline**. The console said `… has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present`. **A script can't tell a CORS refusal from a network failure; only the console and the Network tab can.** That's deliberate: a script must learn nothing about an answer it may not read.
 - **A refused preflight means the real request is never sent.** The Network tab shows only the `OPTIONS`.
@@ -171,7 +201,7 @@ Run it locally:
 
 **Cases 1 and 2 may show the same request id.** The card answer may be cached for 60 s (`Cache-Control: public, max-age=60`), so the browser can answer the GET from its cache. The lab says when that happens. Tick "Disable cache" in the Network tab to see every request reach the server.
 
-Add `?api=https://intern-quest-smoky.vercel.app` to run the same cases against the live site.
+Add `?api=https://intern-quest-smoky.vercel.app&handle=ronit-ahuja` to run the same cases against the live site. The demo handle `ronit` exists only in the local data.
 
 ## 8. Development workarounds, and why they stay in development
 
