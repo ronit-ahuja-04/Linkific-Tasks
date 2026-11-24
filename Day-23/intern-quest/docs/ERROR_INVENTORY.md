@@ -65,6 +65,25 @@ Re-running the same 33 scenarios after each milestone shows what changed; the fi
   - pages (S1–S7), offline sign-in (C9) and the chunk failure (C11) still show Next's generic page, for M3;
   - blank loading screens (S12) are for M4.
 
+**After M3 (boundaries and pages):** E-3, E-4, E-5, E-10 and E-11 are fixed; E-6 is explained below.
+- **S3–S7, a page that fails:**
+  - the failed page shows Pip, what happened, **Try again** (Next 16's `retry()`, which re-fetches the page), a way back, and the digest as the reference;
+  - the **navigation stays and works**, because the shell moved into `app/(game)/layout.tsx` and needs no database.
+- **S1, home page:** only the leaderboard section shows an error (`catchError` boundary). The hero, the steps and sign-in all stay.
+- **S2, a public sheet:** a branded full-screen error with a way home, instead of Next's unbranded page.
+- **C9, signing in offline:** the form stays and says "You are offline…". Before, the whole page was replaced.
+- **C11, the reward screen's code fails after a save:** a dialog says "Quest saved: +121 XP", explains that Intern Quest was updated, and reports the error.
+- **C10, offline:**
+  - a banner says so;
+  - links inside the app are stopped with a message, instead of landing on the browser's offline page;
+  - "Back online." appears when the connection returns.
+- **C4, a session that ended mid-form:** a "Sign in again in a new tab" link. The new sign-in's cookie applies to this tab too, so the same draft then saves.
+- **S12:** while a slow page loads, the navigation is now visible instead of a blank screen. Skeletons for the content are M4.
+- **E-6 is a documented limit, not a bug.** With Cache Components, Next.js sends the prerendered shell (with a `200`) before any request-time code runs. A `notFound()` or an error that happens later can't change the status any more. Next adds `<meta name="robots" content="noindex">` instead, and the error panel adds it too. Day 21 had already met this for unknown character sheets.
+  - The **API is not streamed**, so every API answer has its true status.
+  - The proxy could return a real 404 for addresses that can be judged without data. Here, every not-found case needs a database read.
+  - Monitoring should therefore use the log lines, not page status codes.
+
 ## CORS today (X1, X2)
 
 There is no CORS configuration, which is right for this API: every route uses the session cookie and is meant for this site only. What the browser does:

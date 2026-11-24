@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { logQuest, newAdventurer, signInAs, visible } from './helpers';
+import { logQuest, newAdventurer, newAdventurerAccount, signInAs, visible } from './helpers';
 
 /**
  * Day 23: the failures found by the M1 inventory (docs/ERROR_INVENTORY.md), replayed in a real browser against the
@@ -59,13 +59,25 @@ test.describe('a failed save never leaves you stuck (E-1, E-2)', () => {
     await expect(formError(page)).toHaveText('Intern Quest can not reach its database right now. Try again in a moment. (ref 3f2a9c1e)');
   });
 
-  test('the session ended while the form was open: it says so (C4)', async ({ page, context }) => {
-    await newAdventurer(page);
+  test('the session ended while the form was open: it says so, and signing in in a new tab saves the draft (C4, E-10)', async ({ page, context }) => {
+    const { email } = await newAdventurerAccount(page);
     await newQuestForm(page, 'Session ended');
     await context.clearCookies();
     await publish(page).click();
-    await expect(formError(page)).toHaveText('Your session has ended. Sign in again to continue.');
+    await expect(formError(page)).toContainText('Your session has ended. Sign in again to continue.');
     await expect(visible(page.getByLabel('Title'))).toHaveValue('Session ended');
+    // M3 (E-10): a way back that keeps the draft: sign in in a new tab, then publish again here
+    const again = formError(page).getByRole('link', { name: 'Sign in again in a new tab' });
+    await expect(again).toHaveAttribute('target', '_blank');
+    const [tab] = await Promise.all([context.waitForEvent('page'), again.click()]);
+    await tab.waitForLoadState();
+    await visible(tab.getByLabel('Email')).fill(email);
+    await visible(tab.getByLabel('Password')).fill('a long test password');
+    await visible(tab.getByRole('button', { name: 'Sign in' })).click();
+    await tab.waitForURL('/journal');
+    await tab.close();
+    await publish(page).click(); // the session cookie set by the other tab is sent with this request: saved
+    await expect(page.getByRole('dialog', { name: 'Quest complete!' })).toBeVisible();
   });
 
   test('deleting offline: the dialog closes and says why (C5)', async ({ page, context }) => {
@@ -101,7 +113,7 @@ test('a mentor\'s note that fails is no longer silent, and the text stays in the
   await context.setOffline(true);
   await visible(page.getByRole('button', { name: 'Add note' })).first().click();
   await expect(visible(page.locator('.notice'))).toHaveText('Could not add the note (it is still in the box). You are offline. Nothing was sent: reconnect and try again.');
-  await expect(page.getByRole('status')).toHaveText(/Could not add the note/);
+  await expect(page.locator('p.sr-only[role=status]')).toHaveText(/Could not add the note/);
   await expect(box).toHaveValue('Nice work on this one');
 });
 
@@ -131,5 +143,49 @@ test.describe('the API and the log', () => {
     await page.waitForLoadState('networkidle');
     expect(vercel).toEqual([]);
     expect(errors).toEqual([]);
+  });
+});
+
+test.describe('boundaries and offline (M3)', () => {
+  test('signing in offline keeps the form and says why, instead of an error page (C9)', async ({ page, context }) => {
+    await page.goto('/login');
+    await visible(page.getByLabel('Email')).fill('ada@example.com');
+    await visible(page.getByLabel('Password')).fill('demo-password-123');
+    await context.setOffline(true);
+    await visible(page.getByRole('button', { name: 'Sign in' })).click();
+    await expect(visible(page.locator('.auth-error'))).toHaveText('You are offline. Nothing was sent: reconnect and try again.');
+    await expect(visible(page.getByLabel('Email'))).toHaveValue('ada@example.com');
+    await expect(visible(page.getByRole('heading', { level: 1 }))).not.toHaveText(/could not load/);
+  });
+
+  test('the reward screen fails to load after a save: it says the quest IS saved, and reports it (C11, E-4)', async ({ page }) => {
+    await newAdventurer(page);
+    await newQuestForm(page, 'Saved despite the update');
+    await page.route('**/_next/static/chunks/**', (route) => route.abort()); // a new deploy: the old chunks are gone
+    const reported = page.waitForRequest((r) => r.url().endsWith('/api/client-errors'));
+    await publish(page).click();
+    const dialog = page.getByRole('dialog', { name: /^Quest saved: \+\d+ XP$/ });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText('Intern Quest was just updated. Your quest and its XP are saved.');
+    expect((await reported).postDataJSON()).toMatchObject({ source: 'boundary', name: 'ChunkLoadError' });
+    await page.unroute('**/_next/static/chunks/**');
+    await dialog.getByRole('button', { name: 'Back to my journal' }).click();
+    await page.waitForURL('/journal');
+    await expect(visible(page.getByRole('link', { name: /Saved despite the update/ }))).toBeVisible();
+  });
+
+  test('offline: a banner says so, links do not drop you on the browser\'s offline page, and it says when you are back (C10, E-11)', async ({ page, context }) => {
+    await newAdventurer(page);
+    const banner = page.locator('.offline-banner');
+    await expect(banner).toBeHidden();
+    await context.setOffline(true);
+    await expect(banner).toHaveText(/^You are offline\./);
+    await visible(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Character' })).click();
+    await expect(banner).toHaveText('You are offline, so that page can not open yet. Reconnect, then try again.');
+    await expect(page).toHaveURL(/\/journal$/);
+    await expect(visible(page.getByRole('heading', { level: 1 }))).toHaveText('Day 1 awaits.');
+    await context.setOffline(false);
+    await expect(banner).toHaveText('Back online.');
+    await expect(banner).toBeHidden({ timeout: 6000 });
   });
 });

@@ -15,7 +15,8 @@ test.describe('onboarding', () => {
     await visible(page.getByRole('button', { name: 'Create character' })).click();
     await page.waitForURL('/journal');
     await expect(visible(page.getByRole('heading', { level: 1 }))).toHaveText('Day 1 awaits.');
-    await expect(visible(page.getByRole('link', { name: 'My sheet' }))).toBeVisible();
+    await visible(page.getByRole('link', { name: 'My sheet' })).click();
+    await page.waitForURL(/\/c\/[a-z0-9-]+$/); // /me sends you on to your own sheet
   });
 });
 

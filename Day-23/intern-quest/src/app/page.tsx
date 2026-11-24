@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import Pip from '@/components/Pip';
 import HeroPip from '@/components/landing/HeroPip';
 import HomeCta from '@/components/landing/HomeCta';
+import SectionBoundary from '@/components/errors/SectionBoundary';
 import { getGuildBoard } from '@/lib/server/public';
 import { SITE } from '@/lib/site';
 
@@ -53,9 +54,12 @@ export default function Home() {
       <section className="home-board" aria-labelledby="board-title">
         <h2 id="board-title">The Guild hall</h2>
         <p className="home-lede">Every public adventurer, by XP.</p>
-        <Suspense fallback={<p className="home-lede">Gathering the guild…</p>}>
-          <Board />
-        </Suspense>
+        {/* its own boundary: if the database can not answer, only the leaderboard says so; the rest of the page stays */}
+        <SectionBoundary what="The guild board">
+          <Suspense fallback={<p className="home-lede">Gathering the guild…</p>}>
+            <Board />
+          </Suspense>
+        </SectionBoundary>
       </section>
 
       <footer className="home-foot">Intern Quest is a Linkific training project. Pip is drawn in SVG; no AI writes its lines.</footer>

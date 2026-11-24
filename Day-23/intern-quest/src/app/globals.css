@@ -402,3 +402,39 @@ button:focus-visible, .quests-scroll:focus-visible { outline: 3px solid #fff; ou
 
 /* the wordmark is a link: inherit the screen colour instead of the browser default link blue */
 .topbar .wordmark { color: inherit; text-decoration: none; }
+
+/* ---------------------------------------------------------------- Day 23: errors and offline */
+/* page error: inside the app shell, under the navigation */
+.error-page { display: grid; grid-template-columns: 160px 1fr; gap: 28px; align-items: center; max-width: 820px; padding: 28px 32px; }
+.error-pip .pip-svg { width: 160px; height: auto; }
+.error-heading { font-family: var(--font-display), sans-serif; font-size: clamp(1.8rem, 4vw, 2.6rem); line-height: 1.05; margin: 0; letter-spacing: -0.02em; }
+.error-heading:focus { outline: none; }
+.error-heading:focus-visible { outline: 3px solid #FFD54A; outline-offset: 4px; border-radius: 6px; }
+.error-text { font-weight: 700; font-size: 1.08rem; max-width: 46ch; margin: 12px 0 0; }
+.error-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+.error-ref { margin: 16px 0 0; font-size: 0.92rem; opacity: 0.85; }
+.error-ref code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: rgba(42, 30, 59, 0.08); padding: 2px 6px; border-radius: 6px; }
+/* screen error: the whole screen, branded like the not-found page (white text on violet) */
+.error-screen .error-text { max-width: 36ch; }
+.error-screen .error-ref code { background: rgba(255, 255, 255, 0.16); }
+.error-screen .ghost-button { background: rgba(255, 255, 255, 0.16); color: #fff; }
+/* section error: one part of a page */
+.error-section { display: grid; gap: 6px; }
+.error-section p { margin: 0; }
+.error-section .error-title { font-weight: 800; font-size: 1.1rem; }
+.error-section .error-actions { margin-top: 10px; }
+/* the reward screen could not load, but the quest is saved */
+.reward-fallback { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 24px 16px; background: rgba(20, 12, 35, 0.55); }
+.reward-fallback .card { max-width: 460px; display: grid; gap: 12px; justify-items: start; }
+.reward-fallback h2 { font-family: var(--font-display), sans-serif; font-size: 1.8rem; margin: 0; }
+.reward-fallback p { margin: 0; font-weight: 700; }
+/* offline banner: always in the page (a live region), visible only with a message */
+.offline-banner { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); z-index: 60; max-width: min(640px, calc(100vw - 32px)); background: var(--ink); color: #fff; font-weight: 800; padding: 12px 18px; border-radius: 14px; box-shadow: 0 6px 24px rgba(20, 12, 35, 0.35); }
+.offline-banner[data-show='false'] { display: none; }
+.offline-banner[data-state='online'] { background: #1E7A46; }
+.shell-main > .notice { margin: 0 0 16px; }
+@media (max-width: 719px) {
+  .error-page { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 22px 18px; }
+  .error-pip .pip-svg { width: 120px; }
+  .error-actions { justify-content: center; }
+}

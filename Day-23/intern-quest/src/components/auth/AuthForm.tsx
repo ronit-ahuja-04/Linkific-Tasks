@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 import type { FormState } from '@/app/(auth)/actions';
+import { guardAction } from '@/lib/action-guard';
 
 /**
  * One form for both sign-in and registration. `useActionState` runs the server action and keeps what it returns
@@ -15,7 +16,12 @@ interface AuthFormProps {
 }
 
 export default function AuthForm({ mode, action, next }: AuthFormProps) {
-  const [state, formAction, pending] = useActionState(action, {});
+  // guarded: offline, a failed sign-in POST becomes a message in the form, like a wrong password, instead of
+  // replacing the page with an error screen; what was typed is kept (except the password)
+  const [state, formAction, pending] = useActionState(
+    guardAction(action, (error, data): FormState => ({ error: error.message, values: { email: String(data.get('email') ?? ''), name: String(data.get('name') ?? '') } })),
+    {},
+  );
   const register = mode === 'register';
   const fieldError = (name: string) => state.fields?.[name];
   return (

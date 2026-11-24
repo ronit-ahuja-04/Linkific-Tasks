@@ -30,15 +30,20 @@ export async function signInAs(page: Page, email: string, password = 'demo-passw
 
 /** Register and create a Frontend Mage; returns the handle */
 export async function newAdventurer(page: Page): Promise<string> {
+  return (await newAdventurerAccount(page)).handle;
+}
+
+/** The same, also returning the account's email (its password is 'a long test password') */
+export async function newAdventurerAccount(page: Page): Promise<{ handle: string; email: string }> {
   const handle = unique('hero').slice(0, 24).replace(/-$/, 'x');
-  await registerNew(page, 'Quest Tester');
+  const email = await registerNew(page, 'Quest Tester');
   await page.goto('/character');
   await visible(page.getByLabel('Handle')).fill(handle);
   await visible(page.getByRole('radio', { name: /Frontend Mage/ })).click();
   await visible(page.getByRole('button', { name: 'Create character' })).click();
   await page.waitForURL('/journal');
   await expect(visible(page.getByRole('heading', { level: 1 }))).toHaveText('Day 1 awaits.');
-  return handle;
+  return { handle, email };
 }
 
 export async function logQuest(page: Page, fields: { title: string; difficulty?: string; skills?: string[]; pr?: string; blockers?: string; isPublic?: boolean; draft?: boolean }) {

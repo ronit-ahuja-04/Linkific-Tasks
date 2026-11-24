@@ -1,5 +1,6 @@
 import 'server-only';
 import type { PostgrestError } from '@supabase/supabase-js';
+import { cache } from 'react';
 import { db } from './client';
 import type { Json, Tables } from './database.types';
 import type { CharacterClass, Difficulty, Skill } from '@/lib/game';
@@ -74,11 +75,15 @@ export async function listCharacters(): Promise<Character[]> {
   return data.map(toCharacter);
 }
 
-export async function getCharacterByUser(userId: string): Promise<Character | null> {
+/**
+ * `cache`: within ONE server request, several components may need the user's character (a page and the parts it
+ * streams); this makes it one database read. (Outside a React server render, e.g. in a route handler, it simply calls through.)
+ */
+export const getCharacterByUser = cache(async (userId: string): Promise<Character | null> => {
   const { data, error } = await db().from('characters').select(CHARACTER_COLUMNS).eq('user_id', userId).maybeSingle();
   if (error) fail(error, 'Loading the character');
   return data ? toCharacter(data) : null;
-}
+});
 
 export async function getCharacterByHandle(handle: string): Promise<Character | null> {
   const { data, error } = await db().from('characters').select(CHARACTER_COLUMNS).eq('handle', handle).maybeSingle();

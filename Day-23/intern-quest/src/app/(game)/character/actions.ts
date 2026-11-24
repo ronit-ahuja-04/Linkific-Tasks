@@ -11,6 +11,8 @@ import { redeemInviteCode } from '@/lib/server/users';
  */
 export interface MentorState {
   result?: 'promoted' | 'wrong' | 'missing' | 'signed-out';
+  /** set in the browser when the server could not be reached (src/lib/action-guard.ts) */
+  error?: string;
 }
 
 export async function redeemMentorAction(_previous: MentorState, data: FormData): Promise<MentorState> {

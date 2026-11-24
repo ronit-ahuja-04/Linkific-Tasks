@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useLayoutEffect, useRef, useState, type FormEvent } from 'react';
 import Markdown from '@/components/Markdown';
+import FormMessage, { problemFrom, type FormProblem } from '@/components/errors/FormMessage';
+import RewardBoundary from './RewardBoundary';
 import { apiFetch } from '@/lib/api-client';
 import { toAppError } from '@/lib/errors';
 import { DIFFICULTIES, DIFFICULTY_XP, RULES, SKILL_LABELS, SKILLS, type Difficulty, type Skill } from '@/lib/game';
@@ -39,7 +41,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
   const [draft, setDraft] = useState<QuestDraft>(initial);
   const [tab, setTab] = useState<'write' | 'preview'>('write');
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState('');
+  const [problem, setProblem] = useState<FormProblem | null>(null);
   const [busy, setBusy] = useState(false);
   const [reward, setReward] = useState<Reward | null>(null);
   const dialog = useRef<HTMLDialogElement>(null);
@@ -51,7 +53,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
   useLayoutEffect(() => () => {
     setReward(null);
     setErrors({});
-    setMessage('');
+    setProblem(null);
     setTab('write');
   }, []);
 
@@ -67,7 +69,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
     event?.preventDefault();
     setBusy(true);
     setErrors({});
-    setMessage('');
+    setProblem(null);
     const body = { ...draft, status, prLinks: draft.prLinks.map((l) => l.trim()).filter(Boolean) };
     // apiFetch never leaves this hanging: it has a deadline, and every failure arrives here as an AppError with a
     // message for people (offline, timeout, the API's own field errors, our outage with a reference)
@@ -81,7 +83,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
     } catch (caught) {
       const error = toAppError(caught);
       setErrors(error.fields ?? {});
-      setMessage(error.messageWithReference);
+      setProblem(problemFrom(error));
     } finally {
       setBusy(false); // always: before Day 23 a network failure skipped this line and "Saving…" stayed forever
     }
@@ -93,7 +95,8 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
       await apiFetch(`/api/quests/${initial.id}`, { method: 'DELETE' });
       router.push('/journal?notice=deleted'); // the destination renders per request, so it is fresh
     } catch (caught) {
-      setMessage(`Could not delete the quest. ${toAppError(caught).messageWithReference}`);
+      const error = toAppError(caught);
+      setProblem({ message: `Could not delete the quest. ${error.messageWithReference}`, kind: error.kind });
     } finally {
       setBusy(false);
       dialog.current?.close();
@@ -110,7 +113,7 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
           <h1>{editing ? `Edit day ${initial.day}` : `Log day ${draft.day}`}</h1>
           <p className="muted">Base XP {DIFFICULTY_XP[draft.difficulty]} · +{RULES.prBonus} per PR link (up to {RULES.prBonusCap}) · +10% for a streak</p>
         </div>
-        {message && <p className="form-error" role="alert">{message}</p>}
+        <FormMessage problem={problem} />
 
         <div className="editor-grid">
           <div className="card editor-main">
@@ -217,7 +220,11 @@ export default function QuestEditor({ initial, handle }: { initial: QuestDraft; 
         </div>
       </dialog>
 
-      {reward && <RewardOverlay reward={reward} handle={handle} onDone={() => router.push('/journal')} />}
+      {reward && (
+        <RewardBoundary reward={reward} onDone={() => router.push('/journal')}>
+          <RewardOverlay reward={reward} handle={handle} onDone={() => router.push('/journal')} />
+        </RewardBoundary>
+      )}
     </>
   );
 }

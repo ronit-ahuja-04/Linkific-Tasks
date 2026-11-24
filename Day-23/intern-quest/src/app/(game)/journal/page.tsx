@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 import PipCorner from '@/components/game/PipCorner';
 import CreateCharacterPrompt from '@/components/game/CreateCharacterPrompt';
-import AppShell from '@/components/shell/AppShell';
+import Notice from '@/components/shell/Notice';
 import { SKILL_LABELS } from '@/lib/game';
 import { getCharacterByUser, listMentorBadges, listQuests } from '@/lib/server/db';
 import { requireUser } from '@/lib/server/guards';
@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: 'Journal', robots: { index: false } }
 
 export default function JournalPage(props: PageProps<'/journal'>) {
   return (
-    <Suspense fallback={<div className="shell tone-violet" />}>
+    <Suspense fallback={null}>
       <Journal searchParams={props.searchParams} />
     </Suspense>
   );
@@ -24,14 +24,15 @@ async function Journal({ searchParams }: Pick<PageProps<'/journal'>, 'searchPara
   const user = await requireUser('/journal');
   const character = await getCharacterByUser(user.id);
   const { notice } = await searchParams;
-  if (!character) return <AppShell user={user} handle={null}><CreateCharacterPrompt /></AppShell>;
+  if (!character) return <CreateCharacterPrompt />;
   const [quests, badges] = await Promise.all([listQuests(user.id), listMentorBadges(user.id)]);
   const view = buildCharacterView(character, quests, badges, todayIso());
   const nextDay = quests.reduce((max, q) => Math.max(max, q.day), 0) + 1;
   const xpById = new Map(view.quests.map((q) => [q.day, q.xp]));
 
   return (
-    <AppShell user={user} handle={character.handle} notice={typeof notice === 'string' ? notice : undefined}>
+    <>
+      <Notice code={notice} />
       <div className="journal">
         <section className="journal-hero">
           <p className="eyebrow">{view.classLabel} · level {view.level} {view.title}</p>
@@ -74,6 +75,6 @@ async function Journal({ searchParams }: Pick<PageProps<'/journal'>, 'searchPara
           )}
         </section>
       </div>
-    </AppShell>
+    </>
   );
 }
