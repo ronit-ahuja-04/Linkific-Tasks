@@ -2,7 +2,7 @@
 
 **Author:** Ronit Ahuja
 **Programme:** Linkific internship, Month 1 (training phase)
-**Status:** Days 1–22 delivered
+**Status:** Days 1–23 delivered
 
 One repository, one folder per training day. Days 1–3 are small standalone deliverables. From Day 5 onward the work compounds into a single product, **HackHQ**, a control room for a 24-hour hackathon, rebuilt each day around the concept being taught.
 
@@ -61,8 +61,9 @@ Backend services, authentication against a real server, and any library the day'
 | 18  | TypeScript for React                     | A TypeScript workbook, and SalesPulse converted to strict TypeScript with zero `any` | [Workbook](Day-18/ts-basics/README.md) · [SalesPulse TS](Day-18/salespulse-ts/README.md) · [PRD](Day-18/Day18_PRD.md) |
 | 19  | Advanced TypeScript, typed Redux         | An advanced-TypeScript workbook, and SalesPulse on a fully typed Redux Toolkit store | [Workbook](Day-19/ts-advanced/README.md) · [SalesPulse](Day-19/salespulse-ts-adv/README.md) · [PRD](Day-19/Day19_PRD.md) |
 | 20  | Next.js fundamentals                     | Dispatch: a Next.js App Router blog with SSG, ISR, SSR and CSR shown live | [README](Day-20/nextjs-blog/README.md) · [PRD](Day-20/Day20_PRD.md) |
-| 21  | Next.js advanced and deployment          | Intern Quest: the internship logbook as an RPG, with NextAuth, API routes, proxy.ts, Supabase, deployed on Vercel ([live](https://intern-quest-smoky.vercel.app)) | [README](Day-21/intern-quest/README.md) · [Deployment guide](Day-21/intern-quest/docs/DEPLOYMENT.md) · [PRD](Day-21/Day21_PRD.md) |
+| 21  | Next.js advanced and deployment          | Intern Quest: the internship logbook as an RPG, with NextAuth, API routes, proxy.ts, Supabase, deployed on Vercel (the live site runs the Day 23 version since Day 23) | [README](Day-21/intern-quest/README.md) · [Deployment guide](Day-21/intern-quest/docs/DEPLOYMENT.md) · [PRD](Day-21/Day21_PRD.md) |
 | 22  | UI/UX design principles                  | Huddle redesigned: a design system (tokens, Inter, a living style guide), every page rebuilt on it, WCAG 2.2 AA with every fix tested | [README](Day-22/huddle-redesign/README.md) · [Design system](Day-22/huddle-redesign/DESIGN.md) · [Accessibility audit](Day-22/huddle-redesign/ACCESSIBILITY_AUDIT.md) · [Before/after](Day-22/huddle-redesign/docs/GALLERY.md) · [PRD](Day-22/Day22_PRD.md) |
+| 23  | CORS, error handling and debugging        | Intern Quest made to fail well: a measured inventory of 33 failures before and after, one error model, error boundaries at every level, skeletons, toasts, a public CORS API with a live lab on a second origin, and a debugging guide ([live](https://intern-quest-smoky.vercel.app)) | [README](Day-23/intern-quest/README.md) · [Error inventory](Day-23/intern-quest/docs/ERROR_INVENTORY.md) · [CORS](Day-23/intern-quest/docs/CORS.md) · [Debugging](Day-23/intern-quest/docs/DEBUGGING.md) · [CORS lab](Day-23/quest-card-embed/README.md) · [PRD](Day-23/Day23_PRD.md) |
 
 ---
 

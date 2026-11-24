@@ -1,26 +1,46 @@
 # Intern Quest
 
-> **Day 23 copy (CORS, error handling and debugging), in progress.** This is Day 21's Intern Quest, copied so that it can be made to fail well. Done so far: M1, [the error inventory](docs/ERROR_INVENTORY.md), which measures what happens when the network, the database or an address fails (`npm run inventory`); M2, the error foundation: one error model and `apiFetch` (deadlines, offline, retries for reads only), JSON errors from every API route, a 5 s database deadline, and one searchable log line per error (`onRequestError`, `/api/client-errors`). M3, boundaries: the signed-in shell moved into a layout that needs no database, `error.tsx` per segment and `global-error.tsx`, section boundaries (`catchError`) for the home leaderboard and the reward screen, an offline banner, and sign-in forms that survive a network failure. M4, loading and feedback: skeleton screens for every page, parallel reads, busy buttons that keep focus, optimistic guild notes with Retry, and toasts with always-present live regions. M5, CORS ([docs/CORS.md](docs/CORS.md)): a public quest-card API with an origin allowlist (`CORS_ALLOWED_ORIGINS`), preflights answered in the proxy, forged cross-site writes refused, and a second website with a live CORS lab (`../quest-card-embed`). The rest of this README still describes Day 21; it is rewritten at the end of Day 23.
-
 **Your internship logbook as a role-playing game.** Every day you log is a *quest*: it gives XP to the skills you used, your character levels up and earns badges, mentors act as guild masters, and **Pip**, your sidekick, reacts to everything you log.
 
-**Live:** https://intern-quest-smoky.vercel.app · **Day 21 project:** Linkific Month 1 Training · **Author:** Ronit Ahuja
+**Live:** https://intern-quest-smoky.vercel.app · **Author:** Ronit Ahuja
+**Projects:** built on Day 21 (Next.js, NextAuth, deployment); made to **fail well** on Day 23 (CORS, error handling, debugging)
 **Stack:** Next.js 16.4.6 (App Router, Cache Components, Turbopack), React 19.3, TypeScript (strict), NextAuth v5 (Auth.js, beta), Supabase Postgres, Motion, Vercel; Vitest, Playwright, axe
-**Docs:** [Deployment guide](docs/DEPLOYMENT.md) · [Bundle measurements](docs/bundle-measurements.md) · [PRD](../Day21_PRD.md)
+**Docs:**
+- Day 23: [Error inventory](docs/ERROR_INVENTORY.md) · [CORS](docs/CORS.md) · [Debugging guide](docs/DEBUGGING.md) · [PRD](../Day23_PRD.md)
+- Day 21: [Deployment guide](docs/DEPLOYMENT.md) · [Bundle measurements](docs/bundle-measurements.md) · [PRD](../../Day-21/Day21_PRD.md)
 
 ---
+
+## Day 23: an app that fails well
+
+Day 21 built Intern Quest for the happy path. Day 23 **measured** what happens when things go wrong, using an automated inventory of 33 failure scenarios against a production build ([ERROR_INVENTORY.md](docs/ERROR_INVENTORY.md)), and then fixed each finding. The same script, run again at the end, gives the "after" column:
+
+| When… | Before (Day 21) | After (Day 23) |
+|---|---|---|
+| saving while offline | "Saving…" forever, error uncaught | "You are offline. Nothing was sent…", button works, the draft is kept |
+| the server never answers | spins forever | ends at a deadline (15 s browser, 5 s database) with a message |
+| the database is down, on a page | Next's unbranded "This page couldn't load", whole app gone | the page shows Pip, what happened, **Try again** and a reference; navigation stays |
+| the database is down, on the home page | whole page gone | only the leaderboard says so |
+| the database is down, in the API | `500` with an **empty body** | `503` JSON, `Retry-After`, the request id |
+| a new version is deployed mid-session | a "crash" right after a **successful** save | "Quest saved: +121 XP", explained |
+| a page is loading | a blank coloured screen | a skeleton in the page's shape, at once |
+| a mentor's note fails | nothing at all | "Not sent" in the list, with Retry; a toast says why |
+| a user reports an error | nothing to go on | a reference that leads to one log line |
+| another site reads the API | impossible (and private routes stay so) | a public card API, for listed origins only |
 
 ## Run it locally
 
 Needs Node 22+ and Docker (for the local Supabase stack).
 
 ```bash
-cd Day-21/intern-quest
+cd Day-23/intern-quest
 npm install
 npm run db:start      # local Postgres + API in Docker (ports 55421-55429), with the schema and demo data
-npm run env:local     # writes .env.local for the local stack (a fresh AUTH_SECRET too)
+npm run env:local     # writes .env.local for the local stack (a fresh AUTH_SECRET, and CORS_ALLOWED_ORIGINS)
 npm run dev           # http://localhost:3000
 ```
+
+The CORS demo needs a second origin: run `node server.mjs` in [`../quest-card-embed`](../quest-card-embed), then open http://localhost:4000. The lab is at `/lab.html`.
 
 Demo accounts (local only): `ronit@example.com` (your real 20 days), `ada@example.com`, `grace@example.com`, and the mentor `mentor@example.com`. Password `demo-password-123`. Mentor invite code: `demo-mentor`.
 
@@ -28,12 +48,106 @@ Demo accounts (local only): `ronit@example.com` (your real 20 days), `ada@exampl
 |---|---|
 | `npm run typecheck` | `next typegen` + `tsc` (strict, no `any`) |
 | `npm run lint` | ESLint (Next.js rules) |
-| `npm test` | 60 unit tests: the game rules, validation, the environment check |
-| `npm run test:integration` | 60 tests against the local database: the schema, the SQL XP views, and every API route handler |
-| `npm run test:e2e` | 43 browser tests against a **production build** (`next build` + `next start`), including axe |
+| `npm test` | 151 unit tests: the game rules, validation, the environment check, the error model, `apiFetch`, CORS rules, toasts |
+| `npm run test:integration` | 68 tests against the local database: the schema, the SQL XP views, every API route handler, JSON errors, `/api/client-errors` |
+| `npm run test:e2e` | 74 browser tests against a **production build**, including axe, failures replayed in the browser, the **real database failing** (through a fault proxy), and CORS from a second origin |
+| `npm run inventory` | the error inventory: 33 failure scenarios, written to `docs/errors/<label>.md` with screenshots (about 3 minutes) |
 | `npm run db:types` | regenerate `src/lib/server/database.types.ts` from the schema |
-| `npm run inventory` | Day 23: the error inventory, 33 failure scenarios against a production build, written to `docs/errors/<label>.md` (needs the local stack; about 5 minutes) |
 | `node scripts/measure-js.mjs` | JavaScript per page (needs a production server on :3122) |
+
+## The Day 23 brief, item by item
+
+| Brief | Where |
+|---|---|
+| **CORS**: same-origin policy, preflight, headers, credentials, solutions (server config, dev proxy), environment-based URLs | [docs/CORS.md](docs/CORS.md); `src/lib/cors.ts`, `src/proxy.ts`; `CORS_ALLOWED_ORIGINS` per environment; the [embed site and lab](../quest-card-embed) |
+| **Error handling**: try/catch, async errors, boundaries, global handlers, reporting | [the strategy below](#error-handling-strategy); `src/lib/errors.ts`, `src/lib/api-client.ts`, `withErrors`, `instrumentation.ts`, `ErrorListeners` |
+| **Error Boundaries**: class or framework, fallback UI, recovery, levels | `app/error.tsx`, `app/(game)/error.tsx`, `app/global-error.tsx`, `SectionBoundary` and `RewardBoundary` (`catchError`), `ErrorPanel` |
+| **Debugging**: DevTools, React DevTools, network, console, breakpoints, source maps | [docs/DEBUGGING.md](docs/DEBUGGING.md); `productionBrowserSourceMaps` |
+| **Error types**: network, 4xx/5xx, validation, runtime, auth | the error kinds table below |
+| **Loading states**: spinners, skeletons, Suspense, progressive loading, optimistic UI | `src/components/Skeletons.tsx`; busy buttons; streamed sections; optimistic guild notes |
+| **User feedback**: toasts, inline, modals, messages | `src/lib/toast.ts` and `<Toaster />`; `FormMessage`; the rules below |
+| **Deliverables**: comprehensive error handling, an Error Boundary, CORS documented, loading states for all async operations, network error handling, 404 and error pages, toasts, README with the strategy | all of the above; the before/after evidence in [ERROR_INVENTORY.md](docs/ERROR_INVENTORY.md) |
+
+## Error-handling strategy
+
+### Principles
+
+1. **Every failure ends.** Nothing waits forever, and no button stays busy: deadlines on both sides, `finally` on every request.
+2. **Say what happened and what to do next**, in words for people. Never raw server text for a 5xx, never a stack trace. Tell people whether their work was saved.
+3. **Keep what people did.** Forms, drafts and unsent notes survive every failure.
+4. **Contain it.** One failing section must not take its page down; one failing page must not take the app down.
+5. **Make it findable.** Every error the user sees carries a reference that leads to exactly one log line.
+
+### One error model
+
+Every failure in the browser becomes an `AppError` with a **kind** (`src/lib/errors.ts`). The kind decides the message, and whether retrying can help:
+
+| Kind | From | Message (shortened) | Retry |
+|---|---|---|---|
+| `offline` | the browser knows it's offline; nothing sent | "You are offline. Nothing was sent: reconnect and try again." | by the person |
+| `network` | `fetch` rejected (dropped connection, DNS, CORS) | "Could not reach Intern Quest. Check your connection…" | reads: automatic |
+| `timeout` | our 15 s deadline | "…took too long to answer." For a write: "**It may have been saved anyway**: check before sending it again." | reads: automatic |
+| `validation` | 400 | the API's own sentence, and the errors per field | no |
+| `unauthorized` | 401 | "Your session has ended…", with a link to sign in **in a new tab**, keeping the draft | no |
+| `forbidden`, `notFound`, `conflict` | 403, 404, 409 | the API's own sentence ("You already logged day 2…") | no |
+| `rateLimited` | 429 | "Too many tries… wait a minute" | by the person |
+| `unavailable` | 503 (our database not answering) | "…can not reach its database right now. Try again in a moment. (ref 3f2a9c1e)" | reads: automatic |
+| `server` | 500 and other 5xx | "Something broke on our side. It has been logged… (ref …)" | reads: automatic |
+
+### Where an error is shown
+
+| Situation | Shown as | Example |
+|---|---|---|
+| A form or a button failed | **inline**, next to it (`role="alert"`), the button usable again | Publish while offline |
+| A field is invalid | **inline per field**, from the API's `fields` | "title must be at least 3 characters" |
+| Something in the background, or with no place on screen | a **toast**: errors stay until dismissed, the rest leave after 6 s | a guild note not sent; an uncaught error |
+| One section of a page failed | a **section boundary**; the rest of the page stays | the home leaderboard |
+| A whole page failed | the **page boundary**, inside the shell: navigation stays | the journal during an outage |
+| A public page or sign-in failed | a **branded full screen**, with a way home | a public sheet during an outage |
+| The root layout itself failed | **`global-error.tsx`**, its own document and styles | (last resort) |
+| A code chunk failed (a new deploy) | "Intern Quest was updated", with **Reload** (retrying the old chunk can't work) | after a deploy |
+| The browser is offline | a **banner**, links held back, "Back online." when it returns | |
+
+### Retries and deadlines
+
+- **Reads** (GET) retry automatically twice, after a random, growing wait (exponential backoff with full jitter), and only when it can help: network, timeout, 503, 5xx.
+- **Writes are never retried automatically.** A POST that timed out may have been saved; sending it again could log the same day twice. The person decides, and the message says to check first.
+- **Retries happen in one layer only.** The browser retries reads. The server's Supabase client does not (`db: { retry: false }`); its built-in retries made an outage take ~10 s to show, and two layers multiply.
+- **Deadlines:** 15 s in the browser, and 5 s per database request (`DB_TIMEOUT_MS`). The server's is shorter, so it normally answers first, with a 503 that explains itself.
+- **Pages:** "Try again" on an error page calls Next 16's `retry()`, which **re-fetches** the page from the server (not only re-renders it).
+
+### Loading states
+
+- **Skeletons** in every Suspense fallback, in the page's own shape. They are part of the prerendered HTML, so they show before any JavaScript, and screen readers hear one "Loading…".
+- **Busy buttons** say what they're doing ("Publishing…"). They stay focusable (`aria-disabled`) and ignore a second press.
+- **Optimistic UI:** a guild note shows at once as "Sending…" (`useOptimistic`).
+- **Parallel reads:** the journal reads its data at once. With a slow database it appears in one round trip instead of two (6.4 s → 3.4 s).
+
+### Logging and references
+
+- **Server:** `onRequestError` (`src/instrumentation.ts`) and `withErrors` (route handlers) write **one JSON line** per error. Each has the request id (`x-request-id`, set by the proxy on every request), Next's digest, the route, the error kind and a short stack.
+- **Browser:** errors the page could not show (global `error` and `unhandledrejection` listeners, boundaries) go to `POST /api/client-errors`. Same origin only, 8 KB at most, 20 a minute per address, and the path only (no query string).
+- **The user sees a reference:** "ref 80defe78" (from the request id) or the digest on an error page. Search the log (locally the terminal, on Vercel its Logs) for that reference and you find the line.
+
+### Pages that are not found, or fail
+
+- A designed **404** for unknown addresses, characters and quests.
+- **Unknown `/api/…` addresses** answer JSON 404.
+- **Status codes:** with Cache Components, the prerendered shell is sent with `200` before request-time code runs. A later not-found or error keeps that `200`, and the page gets `<meta name="robots" content="noindex">`. That's Next's documented behaviour; [ERROR_INVENTORY.md](docs/ERROR_INVENTORY.md) has the details. The API is not streamed and always answers its true status.
+
+## CORS, in short
+
+- **The public API:** `GET /api/public/characters/:handle` is a public "quest card". Only pages from the origins in `CORS_ALLOWED_ORIGINS` may read it. The allowed origin is echoed back, never `*`, with `Vary: Origin` and no credentials.
+- **Preflights** are answered in the proxy.
+- **The signed-in API** sends no CORS headers, and the proxy refuses any API write whose `Origin` is not our own: CORS hides answers, it doesn't stop requests.
+- **Everything else** (headers, captured exchanges, the lab, common mistakes, how to debug a CORS error) is in [docs/CORS.md](docs/CORS.md).
+
+## Debugging
+
+[docs/DEBUGGING.md](docs/DEBUGGING.md) covers:
+- the Network tab, the Console (and where logs go in Next.js), and references to log lines;
+- browser and server breakpoints (`npm run dev -- --inspect`), React DevTools, and source maps in production;
+- the fault proxy, and a table of the bugs found this way.
 
 ## The game
 
@@ -47,7 +161,7 @@ Demo accounts (local only): `ronit@example.com` (your real 20 days), `ada@exampl
 
 The rules live in `src/lib/game/` as pure functions, **and** as SQL views in the database; a test checks both give identical numbers for every character.
 
-## The Day 21 brief, item by item
+## The Day 21 brief, item by item (the app Day 23 builds on)
 
 | Brief | Where |
 |---|---|
@@ -72,6 +186,8 @@ Browser ──► proxy.ts ─────────────────�
               a session → /login?next=…               • API: route handlers returning JSON
             • /guild for non-mentors → /journal                       │ service key (server only)
             • /@handle → rewrite /c/handle                            ▼
+            • CORS for /api/public/* (allowlist)
+            • API writes from another origin → 403
                                                       Supabase Postgres: users, accounts, characters, quests,
                                                       badges, notes + XP views; Row Level Security, no public access
 ```
@@ -91,8 +207,18 @@ Browser ──► proxy.ts ─────────────────�
 | `POST /api/register` | anyone | create an email-and-password account |
 | `POST /api/mentor` | signed in | redeem the mentor invite code |
 | `/api/auth/*` | NextAuth | sign-in, callbacks, session, sign-out |
+| `GET /api/public/characters/:handle` | anyone; **readable cross-origin** by `CORS_ALLOWED_ORIGINS` (Day 23) | a public quest card |
+| `POST /api/client-errors` | this site's pages | a browser-side error, written to the log (Day 23) |
+| anything else under `/api/` | | JSON 404 (Day 23) |
 
-Errors are JSON `{ error, fields? }`: **400** lists every invalid field at once; **401** not signed in; **403** someone else's (visible) record; **404** also for other people's private records, so the API never confirms they exist; **409** a day already logged, a handle taken, no character yet.
+Errors are JSON `{ error, fields?, requestId? }`:
+- **400** lists every invalid field at once;
+- **401** not signed in;
+- **403** someone else's (visible) record, or a write from another origin;
+- **404** also for other people's private records, so the API never confirms they exist;
+- **409** a day already logged, a handle taken, no character yet;
+- **503** + `Retry-After` when the database doesn't answer (Day 23);
+- **500** for a bug, logged, with the request id (Day 23).
 
 ## Authentication and security
 
@@ -115,6 +241,8 @@ Errors are JSON `{ error, fields? }`: **400** lists every invalid field at once;
 | `SUPABASE_SERVICE_ROLE_KEY` | server | local demo key | the project's secret key, sensitive |
 | `MENTOR_INVITE_CODE` | server | `demo-mentor` | your own phrase, sensitive |
 | `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` | server | optional | optional |
+| `CORS_ALLOWED_ORIGINS` (Day 23) | server | `http://localhost:4000` (the embed site) | the origins allowed to read `/api/public/*`; `*` refused at start |
+| `DB_TIMEOUT_MS` (Day 23) | server | optional (5000) | optional (5000) |
 
 `src/instrumentation.ts` checks them when a server starts. On the **live** deployment (`VERCEL_ENV=production`, or `APP_ENV=production` when self-hosting) it refuses to start with a missing value, a short secret, a local database URL, the demo mentor code, or a secret-looking `NEXT_PUBLIC_` variable. It keys off the deployment, not `NODE_ENV`: `next start` on a laptop is also a "production" build.
 
@@ -132,7 +260,12 @@ Errors are JSON `{ error, fields? }`: **400** lists every invalid field at once;
 
 ## Deploying
 
-See the **[deployment guide](docs/DEPLOYMENT.md)**. In short: Supabase project (apply the two migrations) → Vercel project with Root Directory `Day-21/intern-quest` and the variables above → optional GitHub OAuth app. Today the site is deployed with the Vercel CLI from the repository root; automatic deploys on push and preview URLs for pull requests start once GitHub is connected to the Vercel account.
+See the **[deployment guide](docs/DEPLOYMENT.md)**. In short:
+1. A Supabase project, with the two migrations applied.
+2. A Vercel project with the variables above. Its Root Directory is `Day-23/intern-quest` since Day 23 (it was `Day-21/intern-quest`).
+3. Optionally, a GitHub OAuth app.
+
+The site is deployed with the Vercel CLI from the repository root. Automatic deploys on push, and preview URLs for pull requests, start once GitHub is connected to the Vercel account.
 
 What the first deployment taught (each is now fixed or documented):
 
@@ -147,9 +280,10 @@ What the first deployment taught (each is now fixed or documented):
 
 | Suite | Count | Covers |
 |---|---|---|
-| Unit | 60 | XP (including a hand-worked example), levels, titles, badges, Pip's moods and lines, request validation, the environment check |
-| Integration | 60 | enums match the TypeScript; SQL XP views equal `computeStats` for every character; constraints; RLS blocks the public key; every route handler's methods and status codes; password hashing; GitHub linking; the JWT callback; the mentor code |
-| Browser (production build) | 43 | sign-up, sign-in, sign-out, wrong password, http-only cookie, open-redirect protection, GitHub redirect; onboarding; the reward (exact XP); drafts; edit and delete; someone else's quest; public sheet and `/@handle`; mentor gate, invite code, notes and badges; proxy redirects, headers and request ids; home, SEO tags, share-card PNG, sitemap and robots; cache freshness; axe on 11 pages; no secrets in client JavaScript |
+| Unit | 151 | XP, levels, titles, badges, Pip, request validation, the environment check; **Day 23:** every error kind, `apiFetch` (deadline with fake timers, offline, retries, never retrying writes), `fail()` outage detection, `withErrors`, the log line, the rate limiter, the error view, the action guard, toasts, CORS rules and the cross-site write check |
+| Integration | 68 | the schema, SQL XP views equal `computeStats`, RLS, every route handler; **Day 23:** 503/500 JSON with the request id, the JSON 404, `/api/client-errors` (origin, size, flood) |
+| Browser (production build) | 74 | the Day 21 flows (auth, quests, mentors, SEO, axe, no secrets in client JavaScript). **Day 23:** failures replayed in the browser (offline, a hung request, an HTML 500, an ended session, a failed code chunk); the **real database failing** through a fault proxy (page and section boundaries, Try again, outages while saving, a slow database and the skeleton); optimistic notes, toasts, busy buttons; CORS from a second origin; a forged write refused; axe on error and loading states |
+| Error inventory | 33 scenarios | not pass/fail: what a person sees for each failure, before and after ([ERROR_INVENTORY.md](docs/ERROR_INVENTORY.md)) |
 
 ## Bugs the tests (and the logs) found
 
@@ -160,11 +294,14 @@ What the first deployment taught (each is now fixed or documented):
 - **Contrast failures** (axe): translucent buttons and nav, faded text, a link-blue wordmark, and a badge grid that overflowed its card at 1280 px.
 - **A coloured screen briefly rendered white** after `LazyMotion` (its colour was set only by an animation).
 - The two from the deployment above (grants, request-time session).
+- **Day 23:** the error findings E-1 to E-14 and how each was found are in [ERROR_INVENTORY.md](docs/ERROR_INVENTORY.md) and [DEBUGGING.md](docs/DEBUGGING.md#8-bugs-that-only-appear-sometimes-tests-faults-and-the-inventory).
 
 ## Limits
 
 - **NextAuth v5 is still labelled beta.**
-- **Unknown handles answer status 200** with the not-found page and `noindex` (a "soft 404"): with Cache Components the shell streams before the lookup finishes. `instant = false` was tried and did not change it.
+- **Pages that are not found, or fail, answer status 200**, with `noindex` (a "soft 404"): with Cache Components the shell streams before request-time code runs. `instant = false` was tried and did not change it. The API is not affected.
+- **Offline writing is not queued:** offline, nothing is sent (and that is said); drafts are kept until the connection returns.
+- **`/api/client-errors` rate limiting is per server instance** (in memory).
 - **Cached reads live in each serverless instance's memory** (`'use cache: remote'` would share them).
 - **Preview deployments share the production database** in this setup; GitHub sign-in does not work on preview URLs (one callback per OAuth app).
 - **No admin portal**: mentors review interns in the Guild hall; anything else (removing accounts, changing roles) is done in the Supabase dashboard.
