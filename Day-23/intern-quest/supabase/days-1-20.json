@@ -1,0 +1,342 @@
+[
+  {
+    "day": 1,
+    "date": "2026-10-24",
+    "title": "Forge the first page",
+    "body": "HTML5 and CSS3: a responsive nav, a card grid, a blog layout and a portfolio, each building on the last.",
+    "blockers": "",
+    "difficulty": "easy",
+    "skills": [
+      "html_css",
+      "styling"
+    ],
+    "prLinks": []
+  },
+  {
+    "day": 2,
+    "date": "2026-10-25",
+    "title": "Learn the tongue of the web",
+    "body": "Modern JavaScript: ES6+, the DOM and async code, in practice scripts and four small apps.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "javascript"
+    ],
+    "prLinks": []
+  },
+  {
+    "day": 3,
+    "date": "2026-10-27",
+    "title": "Summon the GitHub oracle",
+    "body": "Git, GitHub and npm. Built repo-report, a CLI that asks the GitHub REST API about a repository.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "javascript",
+      "devops"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/1",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/2",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/3",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/4",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/5"
+    ]
+  },
+  {
+    "day": 4,
+    "date": "2026-10-28",
+    "title": "Assemble the first components",
+    "body": "React basics with DevHub: components, props, keys, composition and conditional UI.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "react",
+      "html_css"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/9",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/10",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/11",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/12",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/13"
+    ]
+  },
+  {
+    "day": 5,
+    "date": "2026-10-29",
+    "title": "Bend state to my will",
+    "body": "HackHQ control room: five stations built with useState only, a State Lab and 58 tests.",
+    "blockers": "",
+    "difficulty": "hard",
+    "skills": [
+      "react",
+      "state",
+      "testing"
+    ],
+    "prLinks": []
+  },
+  {
+    "day": 6,
+    "date": "2026-10-30",
+    "title": "Tame the side effects",
+    "body": "useEffect and custom hooks: a debounced directory with abort, a hack clock with cleanup, safe localStorage.",
+    "blockers": "Effects ran twice in development until I understood Strict Mode.",
+    "difficulty": "normal",
+    "skills": [
+      "react",
+      "javascript"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/21",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/22",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/23",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/24",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/25"
+    ]
+  },
+  {
+    "day": 7,
+    "date": "2026-10-31",
+    "title": "Map the realm",
+    "body": "React Router: real URLs for every station, nested routes and protected routes.",
+    "blockers": "",
+    "difficulty": "hard",
+    "skills": [
+      "routing",
+      "react",
+      "auth"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/29",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/30",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/31",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/32",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/33"
+    ]
+  },
+  {
+    "day": 8,
+    "date": "2026-11-02",
+    "title": "Restyle the castle",
+    "body": "Tailwind CSS: replaced a 5,400-line stylesheet with utilities and design tokens, with dark mode.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "styling",
+      "html_css"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/37",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/38",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/39",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/40"
+    ]
+  },
+  {
+    "day": 9,
+    "date": "2026-11-03",
+    "title": "Learn the Bootstrap arts",
+    "body": "Bootstrap 5: a full redesign plus two new features.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "styling"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/41",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/42",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/43",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/44",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/45"
+    ]
+  },
+  {
+    "day": 10,
+    "date": "2026-11-04",
+    "title": "Style with sorcery",
+    "body": "styled-components: themes, props-driven styles and a third redesign.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "styling",
+      "react"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/48",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/49",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/50",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/51"
+    ]
+  },
+  {
+    "day": 11,
+    "date": "2026-11-05",
+    "title": "Raise the Redux citadel",
+    "body": "FlowLane: a board, chat and notifications on Redux Toolkit, with thunks and many tests.",
+    "blockers": "",
+    "difficulty": "boss",
+    "skills": [
+      "state",
+      "react",
+      "testing"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/52",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/53",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/54",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/55",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/56"
+    ]
+  },
+  {
+    "day": 12,
+    "date": "2026-11-06",
+    "title": "Share the context",
+    "body": "React Context for auth, theme and language in FlowLane.",
+    "blockers": "",
+    "difficulty": "normal",
+    "skills": [
+      "state",
+      "react"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/65",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/66",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/67"
+    ]
+  },
+  {
+    "day": 13,
+    "date": "2026-11-12",
+    "title": "Study the Lodash scrolls",
+    "body": "DataDesk: a Lodash lab, and when the native language is enough.",
+    "blockers": "",
+    "difficulty": "easy",
+    "skills": [
+      "javascript"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/68"
+    ]
+  },
+  {
+    "day": 14,
+    "date": "2026-11-13",
+    "title": "Chart the stars",
+    "body": "SalesPulse: a Recharts dashboard with filters, drill-downs and accessible tables.",
+    "blockers": "",
+    "difficulty": "hard",
+    "skills": [
+      "react",
+      "styling"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/69"
+    ]
+  },
+  {
+    "day": 15,
+    "date": "2026-11-14",
+    "title": "Guard the gates",
+    "body": "Authentication: GitHub sign-in, issue import and an API that checks JWTs.",
+    "blockers": "",
+    "difficulty": "boss",
+    "skills": [
+      "auth",
+      "backend"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/70",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/71",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/72",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/73"
+    ]
+  },
+  {
+    "day": 16,
+    "date": "2026-11-16",
+    "title": "Bottle the lightning",
+    "body": "Firebase Storage and real-time: image uploads, a live dashboard and a setup guide.",
+    "blockers": "Setting the Storage retry limits with the setter functions broke two test files.",
+    "difficulty": "hard",
+    "skills": [
+      "database",
+      "backend"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/76",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/77",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/78",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/79",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/80"
+    ]
+  },
+  {
+    "day": 17,
+    "date": "2026-11-17",
+    "title": "Descend into Postgres",
+    "body": "Huddle on Supabase: Postgres, Row Level Security, Realtime and Storage, with database tests.",
+    "blockers": "",
+    "difficulty": "boss",
+    "skills": [
+      "database",
+      "auth",
+      "backend"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/85"
+    ]
+  },
+  {
+    "day": 18,
+    "date": "2026-11-18",
+    "title": "Learn the language of types",
+    "body": "TypeScript: a workbook, then SalesPulse converted to strict TypeScript with zero any.",
+    "blockers": "noUncheckedIndexedAccess found nine unchecked array reads to fix.",
+    "difficulty": "hard",
+    "skills": [
+      "typescript",
+      "react"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/86",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/87",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/88",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/89",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/90"
+    ]
+  },
+  {
+    "day": 19,
+    "date": "2026-11-19",
+    "title": "Bend types to my will",
+    "body": "Advanced TypeScript: utility, conditional and mapped types, and a fully typed Redux store.",
+    "blockers": "",
+    "difficulty": "hard",
+    "skills": [
+      "typescript",
+      "state"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/93",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/94"
+    ]
+  },
+  {
+    "day": 20,
+    "date": "2026-11-20",
+    "title": "Tame the App Router",
+    "body": "Next.js: Dispatch, a blog with SSG, ISR, SSR and CSR shown side by side.",
+    "blockers": "Under Cache Components an unknown post returns 200 instead of 404.",
+    "difficulty": "hard",
+    "skills": [
+      "nextjs",
+      "react"
+    ],
+    "prLinks": [
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/95",
+      "https://github.com/ronit-ahuja-04/Linkific-Tasks/pull/96"
+    ]
+  }
+]
