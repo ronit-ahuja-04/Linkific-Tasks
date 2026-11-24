@@ -1,0 +1,50 @@
+{
+  "name": "intern-quest",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --project unit",
+    "db:start": "supabase start -x studio,imgproxy,vector,logflare,edge-runtime,supavisor,postgres-meta,realtime,storage-api,inbucket",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "env:local": "node scripts/write-env.mjs",
+    "check": "npm run typecheck && npm run lint && npm test",
+    "db:types": "supabase gen types typescript --local --schema public > src/lib/server/database.types.ts",
+    "test:integration": "vitest run --project integration",
+    "test:e2e": "playwright test",
+    "inventory": "playwright test -c playwright.inventory.config.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.119.2",
+    "@vercel/analytics": "^2.0.1",
+    "@vercel/speed-insights": "^2.1.0",
+    "bcryptjs": "^3.0.3",
+    "motion": "^14.14.0",
+    "next": "16.4.6",
+    "next-auth": "^5.0.0-beta.32",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "postgres": "^3.4.9",
+    "supabase": "^3.2.0",
+    "typescript": "^5",
+    "vitest": "^4.1.12"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
