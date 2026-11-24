@@ -1,5 +1,7 @@
 # Deploying Intern Quest
 
+> **Day 23:** the live site now runs this folder, `Day-23/intern-quest`. The Vercel project's Root Directory was switched from `Day-21/intern-quest` (`vercel project update intern-quest --root-directory Day-23/intern-quest`); the URL, the database and the variables stayed the same. One variable was added: `CORS_ALLOWED_ORIGINS`.
+
 Three services, each on a free tier:
 
 | Service | What it does here |
@@ -16,7 +18,7 @@ Order matters: database first, then Vercel (which gives you the site's address),
 
 1. supabase.com → **New project**. Pick a region near your users (for India: *South Asia (Mumbai)*). Save the database password somewhere safe.
 2. Apply the schema. Either:
-   - **CLI** (from `Day-21/intern-quest`):
+   - **CLI** (from `Day-23/intern-quest`):
      ```bash
      npx supabase login
      npx supabase link --project-ref <your-project-ref>
@@ -36,7 +38,7 @@ Either in the dashboard, or with the CLI (this is how the live site was set up):
 ```bash
 vercel login
 vercel project add intern-quest
-vercel project update intern-quest --root-directory Day-21/intern-quest --framework nextjs --node-version 22.x --yes
+vercel project update intern-quest --root-directory Day-23/intern-quest --framework nextjs --node-version 22.x --yes
 cd ~/Desktop/Linkific-Tasks
 vercel link --yes --project intern-quest
 vercel env add SUPABASE_URL production
@@ -45,14 +47,14 @@ vercel deploy --prod
 
 The `vercel link` is run in the **repository root**; add the rest of the variables in the table below the same way.
 
-CLI deploys must run from the **repository root**, because the project's Root Directory is `Day-21/intern-quest`
+CLI deploys must run from the **repository root**, because the project's Root Directory is `Day-23/intern-quest`
 (deploying from inside that folder fails with *Root Directory does not exist*). The root `.vercelignore` makes the
 upload contain only this app.
 
 In the dashboard instead:
 
 1. vercel.com → **Add New → Project** → import the GitHub repository `Linkific-Tasks`.
-2. **Root Directory: `Day-21/intern-quest`** (the repository holds every day; this is the one app to deploy). Framework: Next.js (detected).
+2. **Root Directory: `Day-23/intern-quest`** (the repository holds every day; this is the one app to deploy). Framework: Next.js (detected).
 3. **Environment variables** (Settings → Environment Variables):
 
    | Name | Environments | Value |
@@ -63,6 +65,7 @@ In the dashboard instead:
    | `MENTOR_INVITE_CODE` | Production, Preview | a secret phrase you give to mentors (not `demo-mentor`: the app refuses to start with it) |
    | `NEXT_PUBLIC_SITE_URL` | Production | `https://<your-project>.vercel.app` (or your domain) |
    | `AUTH_GITHUB_ID`, `AUTH_GITHUB_SECRET` | Production | from step 3 (add after creating the GitHub app) |
+   | `CORS_ALLOWED_ORIGINS` (Day 23) | Production | the origins whose pages may read `/api/public/*`, e.g. `http://localhost:4000` for the CORS lab (not secret; `*` is refused at start) |
 
    `NEXT_PUBLIC_` values are baked into the browser JavaScript **at build time**: change one, then redeploy.
 4. **Deploy.** When it is live: Analytics tab → **Enable**; Speed Insights tab → **Enable** (the app already includes both components).
@@ -70,7 +73,7 @@ In the dashboard instead:
 What happens from then on:
 
 - Once the repository is connected (Vercel → Account Settings → Authentication → connect GitHub, then `vercel git connect` or the project's Git settings): **every push to `main`** deploys production, and **every pull request** gets its own preview URL (posted on the PR).
-- `vercel.json` has an `ignoreCommand` (`git diff --quiet HEAD^ HEAD -- .`): a push that does not touch `Day-21/intern-quest` (another day's work) does not rebuild this app.
+- `vercel.json` has an `ignoreCommand` (`git diff --quiet HEAD^ HEAD -- .`): a push that does not touch `Day-23/intern-quest` (another day's work) does not rebuild this app.
 - The build needs **no** database access or secrets (the leaderboard and sitemap are read at request time, then cached), so a build can not fail because the database is down.
 - `src/instrumentation.ts` checks the settings when a server starts. On the production deployment (`VERCEL_ENV=production`) it refuses to start with a missing secret, a short `AUTH_SECRET`, a local database URL, the demo mentor code, or no `NEXT_PUBLIC_SITE_URL`, and the error names the setting.
 
@@ -89,7 +92,7 @@ What happens from then on:
 Register on the live site, create your character, then import the real Days 1 to 20 of this repository into your account:
 
 ```bash
-cd Day-21/intern-quest
+cd Day-23/intern-quest
 read -s "KEY?Secret key: " && SUPABASE_URL=https://<ref>.supabase.co SUPABASE_SERVICE_ROLE_KEY=$KEY node scripts/import-days.mjs you@example.com; unset KEY
 ```
 

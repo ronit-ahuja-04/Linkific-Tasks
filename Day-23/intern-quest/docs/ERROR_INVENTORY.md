@@ -8,6 +8,27 @@ The facts come from `npm run inventory`:
 
 This page adds the judgement: what each result means for a user, and which milestone fixes it.
 
+## Result: every finding, before and after
+
+The same 33 scenarios were run at the end of Day 23 against the final build. The generated table is [errors/after.md](errors/after.md); compare it row by row with [errors/before.md](errors/before.md).
+
+| # | Finding | Status | After (rows) |
+|---|---|---|---|
+| E-1 | a failed request leaves the user stuck | fixed (M2) | C1–C8: a message every time, no button stuck |
+| E-2 | no timeouts | fixed (M2) | C2: ends at 15 s; S13: the server answers 503 after 5 s |
+| E-3 | one error replaces the whole app | fixed (M3) | S3–S7: the page fails inside the shell; C9: the form stays |
+| E-4 | "couldn't load" after a successful save | fixed (M3) | C11: "Quest saved: +121 XP" |
+| E-5 | cached public pages fail completely | fixed (M3) | S1: only the leaderboard fails |
+| E-6 | error and not-found pages answer 200 | documented limit (M3) | S1–S7, N1, N2, N4: still 200, with `noindex`; the API is exact |
+| E-7 | API errors not in the API's format | fixed (M2) | S8, S9: 503 JSON; N7: JSON 404 |
+| E-8 | errors hard to trace | fixed (M2) | every error is one log line with the request id and digest |
+| E-9 | blank screens while loading | fixed (M4) | S12: a skeleton at once; the heading after 3.4 s (was 6.4 s) |
+| E-10 | session ended mid-form | fixed (M3) | C4: "Sign in again in a new tab"; the draft saves |
+| E-11 | navigating offline drops the app | fixed (M3) | C10: the tab stays on the journal, a banner explains |
+| E-12 | vague messages | fixed (M2, M4) | C3, S10, S11: messages per kind; sign-in says it's not the password |
+| E-13 | console noise | fixed (M2) | 0 console errors from `/_vercel/*` (was 116) |
+| E-14 | a forged cross-site write could be saved | fixed (M5) | `e2e/cors.spec.ts` |
+
 ## How the faults are made
 
 None of them needs a change to the app.

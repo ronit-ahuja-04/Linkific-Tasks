@@ -1,11 +1,13 @@
-# Vercel CLI deploys from the repository root (the project's Root Directory is Day-21/intern-quest).
+# Vercel CLI deploys from the repository root (the project's Root Directory is Day-23/intern-quest).
 # Upload only that app, without dependencies, build output or local secrets.
 /*
-!/Day-21
-/Day-21/*
-!/Day-21/intern-quest
+!/Day-23
+/Day-23/*
+!/Day-23/intern-quest
 node_modules
 .next
 .env*.local
 test-results
 playwright-report
+inventory/.state
+inventory/.server.log
