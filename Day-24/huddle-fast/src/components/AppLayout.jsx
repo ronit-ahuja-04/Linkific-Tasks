@@ -128,15 +128,29 @@ export default function AppLayout() {
     page.preload().catch(() => undefined).finally(() => setLoadingPage(false));
   };
 
-  // And once the first page is on screen and the browser is idle, fetch the main pages too (they are small), unless the
-  // user asked to save data or is on a very slow connection. Touch screens have no hover, so this is what helps them.
+  // And later, fetch the main pages too (they are small), so a tap on a touch screen (no hover) rarely waits.
+  // NOT during the page's own loading: measured on a simulated slow phone, prefetching then competed with this page's
+  // requests and cost about 0.3 s of LCP (docs/PERFORMANCE.md, M2). So: after the window's load event, 2 s more, then
+  // when the browser is idle. Skipped when the user asked to save data or the connection is 2G.
   useEffect(() => {
     const connection = navigator.connection;
     if (connection?.saveData || /2g/.test(connection?.effectiveType ?? '')) return undefined;
-    const idle = window.requestIdleCallback ?? ((callback) => setTimeout(callback, 2000));
-    const cancel = window.cancelIdleCallback ?? clearTimeout;
-    const handle = idle(() => { for (const { to } of PRIMARY) preloadPath(to); });
-    return () => cancel(handle);
+    const idle = window.requestIdleCallback ?? ((callback) => setTimeout(callback, 1));
+    const cancelIdle = window.cancelIdleCallback ?? clearTimeout;
+    let timer;
+    let handle;
+    const schedule = () => {
+      timer = setTimeout(() => {
+        handle = idle(() => { for (const { to } of PRIMARY) preloadPath(to); });
+      }, 2000);
+    };
+    if (document.readyState === 'complete') schedule();
+    else window.addEventListener('load', schedule, { once: true });
+    return () => {
+      window.removeEventListener('load', schedule);
+      clearTimeout(timer);
+      if (handle) cancelIdle(handle);
+    };
   }, []);
 
   const handleSignOut = async () => {
