@@ -25,6 +25,7 @@ test.describe('Query lab and dashboard', () => {
     await signUpUI(page, newUser('lab'));
     await navLink(page, 'Query lab').click();
     const runButtons = page.getByRole('button', { name: /^run/i });
+    await runButtons.first().waitFor(); // the lab is a lazy chunk since Day 24: count() does not wait for it
     const count = await runButtons.count();
     expect(count).toBeGreaterThanOrEqual(20);
 

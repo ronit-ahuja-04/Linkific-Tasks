@@ -1,22 +1,17 @@
-import { lazy, Suspense } from 'react';
+import { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from './components/AppLayout';
+import PageLoading from './components/ui/PageLoading';
 import { ProtectedRoute, PublicOnlyRoute } from './auth/RouteGuards';
 import { isSupabaseConfigured } from './lib/supabase';
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
-import ResetPasswordPage from './pages/auth/ResetPasswordPage';
-import AuthCallbackPage from './pages/auth/AuthCallbackPage';
-import DashboardPage from './pages/DashboardPage';
-import ChatPage from './pages/ChatPage';
-import NotesPage from './pages/NotesPage';
-import FilesPage from './pages/FilesPage';
-import LabPage from './pages/LabPage';
-import ProfilePage from './pages/ProfilePage';
+import { pages } from './routes';
 
-// The living style guide: public, and loaded only when someone opens it
-const StyleguidePage = lazy(() => import('./pages/StyleguidePage'));
+// Every page is a lazy chunk (src/routes.js). The signed-in pages show their fallback INSIDE the app shell
+// (AppLayout wraps its <Outlet> in Suspense), so the sidebar stays while a page loads; the rest use this one.
+const {
+  LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage, AuthCallbackPage,
+  DashboardPage, ChatPage, NotesPage, FilesPage, LabPage, ProfilePage, StyleguidePage,
+} = pages;
 
 function NotFound() {
   return <main className="centered-page"><div className="card"><h1>Page not found</h1><p className="muted">There is nothing at this address.</p><a href="/">Back to Huddle</a></div></main>;
@@ -36,27 +31,29 @@ export default function App() {
     );
   }
   return (
-    <Routes>
-      <Route element={<PublicOnlyRoute />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      </Route>
-      {/* public: the page a magic link, a confirmation email, an OAuth sign-in or a password-reset email returns to */}
-      <Route path="/auth/callback" element={<AuthCallbackPage />} />
-      <Route path="/auth/reset" element={<ResetPasswordPage />} />
-      <Route path="/styleguide" element={<Suspense fallback={null}><StyleguidePage /></Suspense>} />
-      <Route element={<ProtectedRoute />}>
-        <Route element={<AppLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="/chat/:roomId?" element={<ChatPage />} />
-          <Route path="/notes" element={<NotesPage />} />
-          <Route path="/files" element={<FilesPage />} />
-          <Route path="/lab" element={<LabPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+    <Suspense fallback={<PageLoading fullPage />}>
+      <Routes>
+        <Route element={<PublicOnlyRoute />}>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         </Route>
-      </Route>
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* public: the page a magic link, a confirmation email, an OAuth sign-in or a password-reset email returns to */}
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/auth/reset" element={<ResetPasswordPage />} />
+        <Route path="/styleguide" element={<StyleguidePage />} />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route path="/chat/:roomId?" element={<ChatPage />} />
+            <Route path="/notes" element={<NotesPage />} />
+            <Route path="/files" element={<FilesPage />} />
+            <Route path="/lab" element={<LabPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
   );
 }

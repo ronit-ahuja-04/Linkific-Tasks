@@ -52,3 +52,59 @@ What makes Huddle slow, measured before any change, and what each milestone does
 - **Notes are paginated by the server** (6 per page), so the list stays small whatever the number of notes. Typing in the search box re-renders those 6 cards: 850 renders for 10 key presses, cheap. It's a candidate for the "when not to memo" section, not a problem.
 - **Total Blocking Time is near 0** on most pages: the main thread isn't busy during load. The JavaScript cost is download and parse, not long tasks.
 - **Accessibility 100 and best practices 100** on the audited pages (except P-9).
+
+## M2: code splitting
+
+**What changed**
+
+| Technique | Where | Why |
+|---|---|---|
+| **Route-based splitting**: every page is `React.lazy` | `src/routes.js`, `src/App.jsx` | a visit downloads the app shell, then only the page it shows |
+| **Preload on intent** | `src/lib/lazyPage.js` (`preload()`), one delegated handler on the shell (`AppLayout`) for pointer over, focus and touch start on any internal link | the download starts 100–300 ms before the click, so a click rarely waits |
+| **Preload at start-up** | `src/main.jsx` | the current page's chunk downloads in parallel with React starting and the session check, instead of after them (a waterfall). Without a stored session, `/login` is fetched too, since that is where the visitor is about to go |
+| **Idle prefetch** of the main pages | `AppLayout` (`requestIdleCallback`) | touch screens have no hover; skipped when the browser asks to save data or the connection is 2G |
+| **Fallbacks** | `PageLoading` inside the shell's `<Suspense>`; a full-page one for sign-in | a first visit to a page shows its shape, not a blank area |
+| **A progress bar for navigations** | `AppLayout` (`.page-progress` + a status for screen readers) | React Router navigates inside a React **transition**, and during a transition React keeps the **old** page on screen instead of showing the fallback. Without this bar, a click on a slow connection would seem to do nothing (found by a browser test) |
+| **Focus waits for the lazy page** | `AppLayout` (`MutationObserver`, up to 5 s) | Day 22's "focus moves to the new page's heading" ran one frame after navigation, before a lazy page had arrived |
+| **Vendor chunks** | `vite.config.js` (`advancedChunks`: `react-vendor`, `supabase-vendor`) | libraries change far less often than the app: after a deploy that only changes app code, returning visitors keep them cached. Same first-visit bytes (+0.7 KB) |
+| **Failed chunk downloads are retried** | `lazyPage.js` | a failed import (offline, or a deploy replaced the chunk) is forgotten, so the next attempt tries again |
+
+**What was checked and NOT done (on purpose)**
+
+- **Splitting small components.** The note editor is 3.5 KB of source, about 1 KB compressed. Loading it separately would add a network round trip to save 1 KB. Component-level splitting pays for heavy, rarely used parts. Here those were whole pages (the style guide, the Query lab), and they are now their own chunks. The image resizer in M4 will be loaded only when a file is picked.
+- **Unused dependencies.** None found: every package is imported. `jsdom` is chosen per test file by a comment, and `@testing-library/dom` is a required peer of `@testing-library/react`.
+- **Tree shaking.** The icons are imported by name in all 23 files, so only the icons used are bundled (about 8 KB in the first download), and there is no `import *` anywhere.
+- **`iceberg-js`** (2 KB) arrives with Supabase's storage client. It can't be dropped without replacing `supabase-js`. Not worth it.
+
+**What remains in the first download** is shared by every page, and that is why splitting cut "only" about 17%:
+- React and react-dom, and the router;
+- the Supabase client: auth, realtime, storage and the query builder, all built by `createClient`;
+- the shell.
+
+**Results** (numbers in [perf/m2.md](perf/m2.md); treemap [bundle-m2.html](perf/bundle-m2.html))
+
+| | Before | M2 |
+|---|---|---|
+| Initial JavaScript (gzip) | 178.3 KB in 1 file | **148.0 KB** in 5 (react-vendor 79, supabase-vendor 54, app 13, two tiny) |
+| Lazy JavaScript | 8.6 KB (style guide) | 55.8 KB in 27 chunks: every page, loaded when visited or prefetched |
+| Lighthouse "unused JavaScript", mobile | Dashboard 92 KB · Notes 90 KB · Sign in 103 KB (≈600 ms) | **62 · 61 · 71 KB** (≈450 ms) |
+| Sign in: JavaScript transferred | 151 KB | **135 KB** |
+| Lighthouse performance, mobile (median of 3) | 97 · 89 · 89 · 93 · 95 · 74 | 95 · 85 · 90 · 91 · 93 · 73: within run-to-run variation |
+
+**Honest reading:**
+- Splitting cut the first download by 17% and "unused JavaScript" by a third. It did **not** move the Lighthouse scores: on this app the time goes elsewhere (P-3, the images).
+- An app page now transfers slightly more in total (≈155 KB). That is the post-load prefetch of the other main pages, which Lighthouse still records after the page has finished.
+
+**A regression found and fixed while measuring.** The first M2 run scored chat 73 and notes 72 on mobile (from 89 and 93). Two causes, separated by controlled runs on the same build (Notes, mobile, 3 runs each):
+
+| Variant | Scores (LCP) |
+|---|---|
+| M2 as first built | 72 (8.4 s), 89 (3.4 s), 89 (3.4 s) |
+| the same, with avatar images blocked | 88, 88, 88 (3.4 s) |
+| no idle prefetch, avatars blocked | **91**, 90, 91 (3.1 s) |
+| prefetch after load + 2 s (final), avatars blocked | 91, 90, 90 (3.1 s) |
+
+1. **The 8 s runs are the 1 MB avatar photo (P-3), not the splitting.** The real timeline did not get worse (observed LCP 183 → 164 ms on Notes, 270 → 193 ms on chat). In Lighthouse's simulated slow phone, depending on request order, the avatar's ~5 s download lands before the LCP or after it, so the score jumps between ~73 and ~90. M4 makes the avatar ~100× smaller.
+2. **Prefetching the other pages *during* load cost ≈0.3 s of LCP.** They competed with the page's own requests. The prefetch now waits for the load event plus 2 s.
+
+**What a split costs:** the page's own chunk can only start once the main file runs. That is one extra round trip on a first visit (≈0.2 s on the simulated slow phone, Notes 2.9 → 3.1 s). Preloading at start-up keeps it to one trip, not two.

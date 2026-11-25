@@ -93,6 +93,8 @@ test.describe('motion', () => {
   test('"reduce motion" turns our animations off (WCAG 2.3.3 guidance)', async ({ page }) => {
     await page.goto('/login');
     const durations = await page.evaluate(() => ['--duration-fast', '--duration-base', '--duration-slow'].map((n) => getComputedStyle(document.documentElement).getPropertyValue(n).trim()));
-    expect(durations).toEqual(['0ms', '0ms', '0ms']);
+    // compared as numbers: the production CSS minifier writes 0ms as 0s (the same duration)
+    expect(durations.map((d) => parseFloat(d))).toEqual([0, 0, 0]);
+    expect(durations.every((d) => /^0m?s$/.test(d))).toBe(true);
   });
 });

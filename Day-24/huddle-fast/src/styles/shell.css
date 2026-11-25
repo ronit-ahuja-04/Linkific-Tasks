@@ -112,3 +112,9 @@
   /* the bell sits on the left now: open its panel to the right, over the page */
   .shell-bar .bell-panel { left: 0; right: auto; }
 }
+
+/* Day 24: a page's code is downloading after a click (lazy routes). A thin bar along the top; nothing when idle. */
+.page-progress { position: fixed; inset: 0 0 auto; height: 3px; z-index: 100; pointer-events: none; background: var(--color-accent, var(--color-primary)); transform-origin: left; transform: scaleX(0); opacity: 0; }
+.page-progress[data-active] { opacity: 1; animation: page-progress 1.2s ease-out forwards; }
+@keyframes page-progress { from { transform: scaleX(0.1); } to { transform: scaleX(0.8); } }
+@media (prefers-reduced-motion: reduce) { .page-progress[data-active] { animation: none; transform: scaleX(0.6); } }

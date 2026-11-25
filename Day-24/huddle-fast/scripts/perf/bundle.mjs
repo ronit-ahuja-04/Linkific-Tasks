@@ -53,13 +53,44 @@ export function measureBundle() {
       .map(({ name, file, raw, gzip, initial: isInitial }) => ({ name, file, raw, gzip, initial: isInitial }))
       .sort((a, b) => b.gzip - a.gzip),
   };
+  report.byPackage = byPackage(new Set(initialJs.map((c) => c.file)));
   mkdirSync(DOCS, { recursive: true });
   writeFileSync(path.join(DOCS, `bundle-${LABEL}.json`), JSON.stringify(report, null, 2));
   return report;
 }
 
+/**
+ * What the INITIAL JavaScript is made of, by npm package (or app folder), from the visualizer's raw data.
+ * Sizes are each module's gzip size inside the bundle (a little larger than its share of the gzipped file).
+ */
+function byPackage(initialFiles) {
+  const raw = JSON.parse(readFileSync(path.join(ROOT, 'node_modules', '.perf', 'bundle-modules.json'), 'utf8'));
+  const totals = new Map();
+  for (const meta of Object.values(raw.nodeMetas)) {
+    const id = meta.id;
+    let key;
+    if (id.includes('/node_modules/')) {
+      const parts = id.split('/node_modules/').pop().split('/');
+      key = parts[0].startsWith('@') ? `${parts[0]}/${parts[1]}` : parts[0];
+    } else if (id.includes('/src/')) {
+      const parts = id.split('/src/').pop().split('/');
+      key = `src/${parts.length > 1 ? parts[0] : parts[0]}`;
+    } else continue;
+    for (const [bundle, partId] of Object.entries(meta.moduleParts)) {
+      if (!initialFiles.has(bundle)) continue;
+      const part = raw.nodeParts[partId];
+      const entry = totals.get(key) ?? { raw: 0, gzip: 0 };
+      entry.raw += part.renderedLength;
+      entry.gzip += part.gzipLength ?? 0;
+      totals.set(key, entry);
+    }
+  }
+  return [...totals.entries()].map(([name, v]) => ({ name, ...v })).sort((a, b) => b.gzip - a.gzip).slice(0, 15);
+}
+
 if (import.meta.url === `file://${process.argv[1]}`) {
   build();
   const r = measureBundle();
+  for (const p of r.byPackage) console.log(`  ${p.name.padEnd(36)} ${(p.raw / 1024).toFixed(1).padStart(7)} KB  gzip ${(p.gzip / 1024).toFixed(1).padStart(6)} KB`);
   console.log(`initial JS: ${r.initial.chunks} chunks, ${(r.initial.gzip / 1024).toFixed(1)} KB gzip; lazy: ${r.lazy.chunks} chunks, ${(r.lazy.gzip / 1024).toFixed(1)} KB gzip; fonts: ${r.fonts.files} files`);
 }

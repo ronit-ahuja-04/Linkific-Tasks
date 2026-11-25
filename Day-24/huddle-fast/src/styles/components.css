@@ -297,3 +297,9 @@ table.data td.num, table.data th.num { text-align: right; font-variant-numeric: 
 
 /* Small uppercase section label (the only place letter-spacing is used) */
 .eyebrow { font-size: var(--text-xs); font-weight: var(--weight-semibold); text-transform: uppercase; letter-spacing: var(--tracking-caps); color: var(--color-text-secondary); }
+
+/* Day 24: the Suspense fallback of a lazy page (first load) */
+.page-loading { display: grid; gap: var(--space-4, 1rem); padding-block: var(--space-6, 1.5rem); max-width: 56rem; }
+.page-loading-title { height: 2rem; width: 40%; }
+.page-loading-line { height: 1rem; width: 70%; }
+.page-loading-block { height: 6rem; width: 100%; }
