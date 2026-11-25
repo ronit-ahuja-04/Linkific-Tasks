@@ -1,0 +1,107 @@
+{
+  "label": "before",
+  "renders": {
+    "typing": {
+      "onScreen": 500,
+      "commits": 32,
+      "total": 160,
+      "byComponent": {
+        "Anonymous": 64,
+        "Composer": 32,
+        "Paperclip": 32,
+        "Send": 32
+      }
+    },
+    "receiving": {
+      "onScreen": 500,
+      "commits": 6,
+      "total": 12902,
+      "byComponent": {
+        "MessageItem": 3018,
+        "Body": 3018,
+        "Avatar": 3000,
+        "Anonymous": 1920,
+        "Pencil": 942,
+        "Trash": 942,
+        "RoomView": 6,
+        "Link": 6,
+        "ArrowLeft": 6,
+        "Lock": 6,
+        "Composer": 6,
+        "Paperclip": 6,
+        "Send": 6,
+        "UnderTheHood": 6,
+        "CodeXml": 6,
+        "ChevronDown": 6,
+        "ChatPage": 2
+      }
+    },
+    "notesSearchTyping": {
+      "commits": 10,
+      "total": 850,
+      "byComponent": {
+        "Anonymous": 310,
+        "Pin": 70,
+        "NoteCard": 60,
+        "Lock": 60,
+        "Avatar": 60,
+        "RelativeTime": 60,
+        "Pencil": 60,
+        "Trash": 60,
+        "NotesPage": 10,
+        "PageHeader": 10,
+        "Radio": 10,
+        "Plus": 10,
+        "Search": 10,
+        "SlidersHorizontal": 10,
+        "CountBadge": 10,
+        "NoteFilters": 10,
+        "UnderTheHood": 10,
+        "CodeXml": 10,
+        "ChevronDown": 10
+      }
+    }
+  },
+  "timings": {
+    "openRoomMs": 320,
+    "onScreen": 500,
+    "domNodes": 6561,
+    "typing": {
+      "interactions": 10,
+      "worstMs": 64,
+      "medianMs": 64,
+      "longTaskMs": 0
+    },
+    "receivingLongTaskMs": 785,
+    "pages": {
+      "Files": {
+        "imageRequests": 15,
+        "imageKb": 17207,
+        "biggestImageKb": 1246,
+        "worstOversize": 50,
+        "cls": 0.037
+      },
+      "Profile": {
+        "imageRequests": 2,
+        "imageKb": 1010,
+        "biggestImageKb": 1009,
+        "worstOversize": 50,
+        "cls": 0.05
+      },
+      "Chat": {
+        "imageRequests": 5,
+        "imageKb": 4018,
+        "biggestImageKb": 1009,
+        "worstOversize": 50,
+        "cls": 0.001
+      },
+      "Dashboard": {
+        "imageRequests": 2,
+        "imageKb": 1010,
+        "biggestImageKb": 1009,
+        "worstOversize": 50,
+        "cls": 0.057
+      }
+    }
+  }
+}

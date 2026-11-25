@@ -1,0 +1,14 @@
+node_modules
+dist
+test-results/
+playwright-report/
+.DS_Store
+*.log
+.env
+.env.local
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+
+# Day 24 performance: full Lighthouse JSON reports (large; the summaries in docs/perf/ are committed)
+/docs/perf/lighthouse/

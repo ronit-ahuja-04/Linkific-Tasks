@@ -1,0 +1,44 @@
+{
+  "label": "before",
+  "initial": {
+    "chunks": 1,
+    "raw": 638392,
+    "gzip": 182543,
+    "brotli": 154761
+  },
+  "initialCss": {
+    "files": 1,
+    "raw": 61029,
+    "gzip": 12929
+  },
+  "lazy": {
+    "chunks": 1,
+    "raw": 30116,
+    "gzip": 8825
+  },
+  "total": {
+    "raw": 668508,
+    "gzip": 191368
+  },
+  "fonts": {
+    "files": 19,
+    "raw": 536996,
+    "referencedByInitialCss": 19
+  },
+  "chunks": [
+    {
+      "name": "index",
+      "file": "assets/index-F1usl1BJ.js",
+      "raw": 638392,
+      "gzip": 182543,
+      "initial": true
+    },
+    {
+      "name": "StyleguidePage",
+      "file": "assets/StyleguidePage-Cln9TlHa.js",
+      "raw": 30116,
+      "gzip": 8825,
+      "initial": false
+    }
+  ]
+}
