@@ -2,9 +2,9 @@
   "label": "m2",
   "initial": {
     "chunks": 5,
-    "raw": 517827,
-    "gzip": 151464,
-    "brotli": 130556
+    "raw": 518001,
+    "gzip": 151511,
+    "brotli": 130603
   },
   "initialCss": {
     "files": 1,
@@ -14,11 +14,11 @@
   "lazy": {
     "chunks": 27,
     "raw": 162676,
-    "gzip": 57141
+    "gzip": 57127
   },
   "total": {
-    "raw": 680503,
-    "gzip": 208605
+    "raw": 680677,
+    "gzip": 208638
   },
   "fonts": {
     "files": 19,
@@ -42,56 +42,56 @@
     },
     {
       "name": "index",
-      "file": "assets/index-DGuGvgd4.js",
-      "raw": 40140,
-      "gzip": 13632,
+      "file": "assets/index-CdyNjlDf.js",
+      "raw": 40314,
+      "gzip": 13679,
       "initial": true
     },
     {
       "name": "StyleguidePage",
-      "file": "assets/StyleguidePage-BvXXovPD.js",
+      "file": "assets/StyleguidePage-C9REtK_o.js",
       "raw": 30536,
-      "gzip": 9014,
+      "gzip": 9015,
       "initial": false
     },
     {
       "name": "LabPage",
-      "file": "assets/LabPage-Mu5TznyR.js",
+      "file": "assets/LabPage-CEbWnjmq.js",
       "raw": 24982,
-      "gzip": 8150,
+      "gzip": 8149,
       "initial": false
     },
     {
       "name": "NotesPage",
-      "file": "assets/NotesPage-CpTjdkOL.js",
+      "file": "assets/NotesPage-Ct8ECf02.js",
       "raw": 23487,
       "gzip": 7499,
       "initial": false
     },
     {
       "name": "ChatPage",
-      "file": "assets/ChatPage-CGonaJHb.js",
+      "file": "assets/ChatPage-Du0DqneC.js",
       "raw": 23163,
-      "gzip": 7379,
+      "gzip": 7378,
       "initial": false
     },
     {
       "name": "FilesPage",
-      "file": "assets/FilesPage-pGojQQVu.js",
+      "file": "assets/FilesPage-xTs_yATb.js",
       "raw": 12903,
-      "gzip": 4527,
+      "gzip": 4525,
       "initial": false
     },
     {
       "name": "DashboardPage",
-      "file": "assets/DashboardPage-BSBFVdIk.js",
+      "file": "assets/DashboardPage-7ZBCIKAy.js",
       "raw": 8292,
       "gzip": 2922,
       "initial": false
     },
     {
       "name": "ProfilePage",
-      "file": "assets/ProfilePage-B3Z133BN.js",
+      "file": "assets/ProfilePage-CAjaFUFB.js",
       "raw": 8805,
       "gzip": 2851,
       "initial": false
@@ -112,16 +112,16 @@
     },
     {
       "name": "LoginPage",
-      "file": "assets/LoginPage-Beq_Pg4W.js",
+      "file": "assets/LoginPage-BXxiE5jG.js",
       "raw": 3816,
-      "gzip": 1595,
+      "gzip": 1592,
       "initial": false
     },
     {
       "name": "RegisterPage",
-      "file": "assets/RegisterPage-CjcCBoEN.js",
+      "file": "assets/RegisterPage-C5W0x0g1.js",
       "raw": 4050,
-      "gzip": 1581,
+      "gzip": 1580,
       "initial": false
     },
     {
@@ -133,9 +133,9 @@
     },
     {
       "name": "ResetPasswordPage",
-      "file": "assets/ResetPasswordPage-KZDAZOnS.js",
+      "file": "assets/ResetPasswordPage-B6s3oUSC.js",
       "raw": 2737,
-      "gzip": 1242,
+      "gzip": 1239,
       "initial": false
     },
     {
@@ -147,16 +147,9 @@
     },
     {
       "name": "ForgotPasswordPage",
-      "file": "assets/ForgotPasswordPage-CMyJC82F.js",
+      "file": "assets/ForgotPasswordPage-R8W19c10.js",
       "raw": 1637,
-      "gzip": 879,
-      "initial": false
-    },
-    {
-      "name": "AuthCallbackPage",
-      "file": "assets/AuthCallbackPage-CvhyoUAs.js",
-      "raw": 1423,
-      "gzip": 763,
+      "gzip": 877,
       "initial": false
     },
     {
@@ -167,15 +160,22 @@
       "initial": false
     },
     {
+      "name": "AuthCallbackPage",
+      "file": "assets/AuthCallbackPage-Duy5QkCi.js",
+      "raw": 1423,
+      "gzip": 761,
+      "initial": false
+    },
+    {
       "name": "AuthShell",
-      "file": "assets/AuthShell-CJLIkzR7.js",
+      "file": "assets/AuthShell-B6UViWob.js",
       "raw": 1372,
       "gzip": 661,
       "initial": false
     },
     {
       "name": "OAuthButtons",
-      "file": "assets/OAuthButtons-ezOuo3q1.js",
+      "file": "assets/OAuthButtons-Dt-441fP.js",
       "raw": 848,
       "gzip": 562,
       "initial": false
@@ -289,8 +289,8 @@
     },
     {
       "name": "src/components",
-      "raw": 24730,
-      "gzip": 7403
+      "raw": 25052,
+      "gzip": 7484
     },
     {
       "name": "@supabase/postgrest-js",

@@ -80,3 +80,31 @@ What makes Huddle slow, measured before any change, and what each milestone does
 - React and react-dom, and the router;
 - the Supabase client: auth, realtime, storage and the query builder, all built by `createClient`;
 - the shell.
+
+**Results** (numbers in [perf/m2.md](perf/m2.md); treemap [bundle-m2.html](perf/bundle-m2.html))
+
+| | Before | M2 |
+|---|---|---|
+| Initial JavaScript (gzip) | 178.3 KB in 1 file | **148.0 KB** in 5 (react-vendor 79, supabase-vendor 54, app 13, two tiny) |
+| Lazy JavaScript | 8.6 KB (style guide) | 55.8 KB in 27 chunks: every page, loaded when visited or prefetched |
+| Lighthouse "unused JavaScript", mobile | Dashboard 92 KB · Notes 90 KB · Sign in 103 KB (≈600 ms) | **62 · 61 · 71 KB** (≈450 ms) |
+| Sign in: JavaScript transferred | 151 KB | **135 KB** |
+| Lighthouse performance, mobile (median of 3) | 97 · 89 · 89 · 93 · 95 · 74 | 95 · 85 · 90 · 91 · 93 · 73: within run-to-run variation |
+
+**Honest reading:**
+- Splitting cut the first download by 17% and "unused JavaScript" by a third. It did **not** move the Lighthouse scores: on this app the time goes elsewhere (P-3, the images).
+- An app page now transfers slightly more in total (≈155 KB). That is the post-load prefetch of the other main pages, which Lighthouse still records after the page has finished.
+
+**A regression found and fixed while measuring.** The first M2 run scored chat 73 and notes 72 on mobile (from 89 and 93). Two causes, separated by controlled runs on the same build (Notes, mobile, 3 runs each):
+
+| Variant | Scores (LCP) |
+|---|---|
+| M2 as first built | 72 (8.4 s), 89 (3.4 s), 89 (3.4 s) |
+| the same, with avatar images blocked | 88, 88, 88 (3.4 s) |
+| no idle prefetch, avatars blocked | **91**, 90, 91 (3.1 s) |
+| prefetch after load + 2 s (final), avatars blocked | 91, 90, 90 (3.1 s) |
+
+1. **The 8 s runs are the 1 MB avatar photo (P-3), not the splitting.** The real timeline did not get worse (observed LCP 183 → 164 ms on Notes, 270 → 193 ms on chat). In Lighthouse's simulated slow phone, depending on request order, the avatar's ~5 s download lands before the LCP or after it, so the score jumps between ~73 and ~90. M4 makes the avatar ~100× smaller.
+2. **Prefetching the other pages *during* load cost ≈0.3 s of LCP.** They competed with the page's own requests. The prefetch now waits for the load event plus 2 s.
+
+**What a split costs:** the page's own chunk can only start once the main file runs. That is one extra round trip on a first visit (≈0.2 s on the simulated slow phone, Notes 2.9 → 3.1 s). Preloading at start-up keeps it to one trip, not two.
