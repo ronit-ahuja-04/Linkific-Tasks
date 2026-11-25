@@ -115,17 +115,17 @@ export function AuthProvider({ children, client = defaultClient }) {
   }, [loadProfile, userId]);
   const refreshProfile = useCallback(async () => setProfile(await loadProfile(userId)), [loadProfile, userId]);
 
-  // 3. which OAuth buttons to show: the Auth server says what is switched on (GET /auth/v1/settings)
-  useEffect(() => {
-    if (!supabaseUrl || !supabaseAnonKey || client !== defaultClient) return undefined;
-    let active = true;
+  // 3. which OAuth buttons to show: the Auth server says what is switched on (GET /auth/v1/settings).
+  // Day 24: asked only when the sign-in buttons are actually shown (OAuthButtons calls loadProviders), once. Before,
+  // every page asked at start-up: with its CORS preflight, two requests in front of every page's own data.
+  const providersAsked = useRef(false);
+  const loadProviders = useCallback(() => {
+    if (providersAsked.current || !supabaseUrl || !supabaseAnonKey || client !== defaultClient) return;
+    providersAsked.current = true;
     fetch(`${supabaseUrl}/auth/v1/settings`, { headers: { apikey: supabaseAnonKey } })
       .then((response) => (response.ok ? response.json() : null))
-      .then((settings) => active && settings?.external && setProviders({ github: Boolean(settings.external.github), google: Boolean(settings.external.google) }))
-      .catch(() => {});
-    return () => {
-      active = false;
-    };
+      .then((settings) => settings?.external && setProviders({ github: Boolean(settings.external.github), google: Boolean(settings.external.google) }))
+      .catch(() => { providersAsked.current = false; });
   }, [client]);
 
   // ---- the ways in and out ---------------------------------------------------------------------------
@@ -177,10 +177,10 @@ export function AuthProvider({ children, client = defaultClient }) {
 
   const value = useMemo(
     () => ({
-      client, status, session, user, profile, providers, isAuthenticated: status === 'authenticated',
+      client, status, session, user, profile, providers, loadProviders, isAuthenticated: status === 'authenticated',
       refreshProfile, recheckSession, sessionEnded, signUp, signIn, signInWithMagicLink, signInWithProvider, resetPassword, updatePassword, signOut,
     }),
-    [client, status, session, user, profile, providers, refreshProfile, recheckSession, sessionEnded, signUp, signIn, signInWithMagicLink, signInWithProvider, resetPassword, updatePassword, signOut]
+    [client, status, session, user, profile, providers, loadProviders, refreshProfile, recheckSession, sessionEnded, signUp, signIn, signInWithMagicLink, signInWithProvider, resetPassword, updatePassword, signOut]
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

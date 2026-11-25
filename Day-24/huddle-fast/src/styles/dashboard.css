@@ -18,7 +18,9 @@
 /* The numbers: label left, figure right, figures in tabular digits so they line up */
 .dash-numbers-title { margin-bottom: var(--space-3); }
 .dash-stats { margin: 0; }
-.dash-stat { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border); }
+/* flex-wrap (Day 24): at 200% text a three-digit count no longer fits beside a long label ("Messages today 130"
+   overflowed by 9 px); the number then moves under its label instead of past the edge of the page */
+.dash-stat { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--space-3); padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border); }
 .dash-stat:last-child { border-bottom: 0; padding-bottom: 0; }
 .dash-stat dt { font-size: var(--text-sm); }
 .dash-stat dt a { color: var(--color-text-secondary); text-decoration: none; display: inline-flex; min-height: var(--target-min); align-items: center; }
@@ -28,3 +30,10 @@
 .dash-actions .btn { justify-content: flex-start; }
 
 .dash-demo { margin: 0; padding-left: 1.25rem; display: flex; flex-direction: column; gap: var(--space-2); }
+
+/* Day 24: a list panel keeps the height of 5 rows (5 x 59 px + spacing = 21rem; in rem, so it grows with the text size)
+   in every state, so nothing below it moves when its data arrives. Empty states sit in the middle of that space. */
+.dash-panel-body { min-height: 21rem; display: flex; flex-direction: column; justify-content: center; }
+.dash-panel-body > .rows { align-self: stretch; margin-block-end: auto; }
+.skeleton-text { color: transparent; display: block; border-radius: var(--radius-sm); }
+.row-icon.skeleton { display: inline-block; }

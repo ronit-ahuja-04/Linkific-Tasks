@@ -212,3 +212,45 @@ Virtualising it would have broken two things that work today:
   - M2 took it to 93: the page's code now arrives in a second step.
   - M4 took it to 91: `react-window` added 6.6 KB to the Files chunk (4.4 → 11.0 KB gzip), and LCP went 2.6 → 2.9 s.
   - **The trade:** every file reachable (the 200 that were hidden) and 17 MB of images down to 8 KB, against ~0.3 s on a simulated slow phone's first visit. M5 works on that first download.
+
+## M5: Lighthouse 90+ on every page
+
+After M4, two mobile pages were under 90: Dashboard 87 (CLS 0.14) and Chat 89. What was left was the first load: layout shift, the work before a page's own data could start, and three of the baseline findings (P-6 to P-9).
+
+**What changed**
+
+| Fix | Where | Why |
+|---|---|---|
+| **Dashboard panels keep their size while loading** (P-6) | `Panels.jsx` (`LoadingRows`: five placeholder rows shaped like the real ones), `dashboard.css` (`.dash-panel-body`, `min-height: 21rem`) | each panel was a one-line "Loading…" that grew to five rows when its data came, pushing the panels below it down. Now the space is there from the start, so the data fills it in place |
+| **Preconnect to Supabase** (P-7) | `index.html`: `<link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin>` | every page's data comes from another origin. The browser now opens that connection (DNS, TCP, TLS) while the JavaScript downloads, not after. `crossorigin` because the queries are CORS requests, which use a separate connection |
+| **Sign-in options asked for only where they are shown** | `AuthContext` (`loadProviders`), `OAuthButtons` | `GET /auth/v1/settings` (which OAuth buttons are on) ran at the start of **every** page, signed in or not, and as a CORS request with an `apikey` header it needed a **preflight** first. Signed-in pages now send 2 fewer requests (Dashboard 50 → 48, Chat 52 → 50, Notes 45 → 43) |
+| **A small loading splash in the HTML** | `index.html` (`.boot`, inside `#root`, replaced when React renders) | before, the page stayed blank until all the JavaScript had run. It is deliberately small: a large splash would become the "largest contentful paint" itself and make LCP look good while the real content was just as slow. Checked: the LCP element is still the real content on every page (the sign-in text, the dashboard's "caught up" line, a chat message, a note) |
+| **Caching rules for the built files** (P-8) | `public/_headers` | files in `/assets/` have a content hash in their name, so they are cached for a year (`immutable`): a returning visitor downloads nothing that has not changed. `index.html` is `no-cache` (checked on every visit), because it names the current files. Read by Netlify and Cloudflare Pages (and the perf server); Vercel would need the same rules in `vercel.json` |
+| **The chat textbox's ARIA** (P-9) | `Composer.jsx` | `role="combobox"` is not allowed on a `<textarea>`. A textbox may still carry `aria-autocomplete`, `aria-controls` and `aria-activedescendant`, which is all the @-mention list needs: screen readers still hear the highlighted suggestion. `aria-controls` is set only while the list exists (a reference to a missing element is invalid: axe caught that in this change) |
+
+**Found on the way (not a performance fix):** the production browser tests failed the WCAG "text at 200%" check on the Dashboard. "Messages today" had reached 130 (the tests send messages), and at double text size a three-digit count no longer fit beside its label, so it stuck 9 px past the edge of the page. A pre-existing layout bug that the growing data exposed, not the M5 panel change (checked with and without it). The stat rows now wrap, so the number moves under its label.
+
+**Results** (numbers in [perf/m5.md](perf/m5.md), mobile, median of 3 runs)
+
+| Page | Before | M4 | **M5** | Runs | What moved |
+|---|---|---|---|---|---|
+| Sign in | 97 | 95 | **94** | 94, 94, 94 | within M4's range (94–95); see below |
+| Dashboard | 89 | 87 | **94** | 93, 94, 94 | **CLS 0.140 → 0.018** |
+| Chat | 89 | 89 | **90** | 90, 90, 90 | first paint 2.27 → 1.96 s; accessibility 99 → **100** |
+| Notes | 93 | 90 | **91** | 91, 91, 91 | first paint 2.27 → 1.96 s |
+| Files | 95 | 91 | **91** | 91, 91, 92 | first paint 2.36 → 2.12 s |
+| Profile | 74 | 91 | **92** | 92, 92, 92 | CLS 0.047 → 0.000 |
+
+- **Desktop: 100 on all six pages** (Notes 99 in one run). Accessibility and best practices: **100 on all twelve** audits.
+- **Every page is now 90 or more on mobile**, which was the goal. The three runs of each page agree within 1 point.
+- **Lighthouse no longer suggests "Preconnect to required origins"** (it estimated 88 ms on Dashboard and Profile in M4).
+- **First paint is ~0.3 s earlier on the app pages.** That is the splash appearing as soon as the CSS is in. LCP itself moved less, because it waits for the page's data.
+- **Sign in 95 → 94 is within noise, but its LCP did get 170 ms later in the simulation.** The page used to ask for the sign-in options at start-up; now it asks when the buttons appear, slightly later. That costs nothing signed in, where the request is now never sent at all.
+
+**What still limits mobile scores** (Lighthouse's remaining suggestions, all pages):
+- **Unused JavaScript, 60–68 KB, about half each from the two vendor chunks** (Dashboard: 32 of 46 KB of `supabase-vendor`, 30 of 68 KB of `react-vendor`). That is code the first render doesn't run: react-dom's paths for features a page doesn't use yet, and supabase-js's Realtime, Storage and the auth flows other than "restore the session". supabase-js is one client object, so splitting it would mean loading the client in pieces, a large change for a few points. react-dom can't be split at all.
+- **Render-blocking CSS, ~150 ms:** one 10.5 KB (gzip) stylesheet. Inlining the "critical" CSS of each page would remove it, at the cost of a build step and two copies of the styles. Not done.
+- **Fonts: two files, 87 KB.** Inter for the text, and JetBrains Mono, which every page really uses (the teaching panels show code). Both use `font-display: swap`, so text is never hidden waiting for them; they are not render-blocking.
+- **Chat LCP: 87% of it is "render delay"**, meaning the page is waiting for its JavaScript and then its messages, not for a slow download. The 300 ms Lighthouse attributes to "Enable text compression" there is the **local** Supabase API, which doesn't compress (see the notes at the top); the cloud does.
+
+**CORS preflights, a cost Day 23 explained.** Huddle's queries go to another origin with an `Authorization` header, so the browser asks permission (an `OPTIONS` preflight) before sending them. The answer can be cached with `Access-Control-Max-Age`, but the local Supabase sends none, so Chrome keeps each for only its default 5 seconds. A page load sends **7–9 of them** (Dashboard 9, Chat 8, Notes 7 in M5). M5 removed the one that was avoidable (the settings request). Removing the rest would need a **same-origin proxy**: the app calling `/api/...` on its own host, which forwards to Supabase. No more CORS, so no preflights, at the cost of a server hop on every request and running that proxy. Recommended for a production deployment where the first load matters most. Not done here.

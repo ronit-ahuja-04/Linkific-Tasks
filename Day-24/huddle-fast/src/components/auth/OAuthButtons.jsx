@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../auth/AuthContext';
 import { friendlyAuthError } from '../../lib/profiles';
 
@@ -10,7 +10,8 @@ const LABELS = { github: 'GitHub', google: 'Google' };
  * sends the user back to /auth/callback with a ?code= that supabase-js exchanges for a session (PKCE flow).
  */
 export default function OAuthButtons({ onError }) {
-  const { providers, signInWithProvider } = useAuth();
+  const { providers, loadProviders, signInWithProvider } = useAuth();
+  useEffect(() => { loadProviders?.(); }, [loadProviders]); // ask the Auth server which providers are on, now that buttons are shown
   const [busy, setBusy] = useState(null);
   const enabled = Object.keys(LABELS).filter((name) => providers?.[name]);
   if (enabled.length === 0) return null;

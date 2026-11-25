@@ -1,0 +1,452 @@
+[
+  {
+    "page": "Sign in",
+    "path": "/login",
+    "formFactor": "mobile",
+    "scores": [
+      94,
+      94,
+      94
+    ],
+    "performance": 94,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 2743.1387499999996,
+    "fcp": 1953.5998999999997,
+    "tbt": 0,
+    "cls": 0,
+    "si": 1953.5998999999997,
+    "totalKb": 237,
+    "scriptKb": 137,
+    "imageKb": 0,
+    "fontKb": 87,
+    "requests": 20,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 600,
+        "kb": 68
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      }
+    ]
+  },
+  {
+    "page": "Sign in",
+    "path": "/login",
+    "formFactor": "desktop",
+    "scores": [
+      100,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 625.1495,
+    "fcp": 403.79820000000007,
+    "tbt": 0,
+    "cls": 0,
+    "si": 403.79820000000007,
+    "totalKb": 237,
+    "scriptKb": 137,
+    "imageKb": 0,
+    "fontKb": 87,
+    "requests": 20,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 80,
+        "kb": 67
+      }
+    ]
+  },
+  {
+    "page": "Dashboard",
+    "path": "/",
+    "formFactor": "mobile",
+    "scores": [
+      93,
+      94,
+      94
+    ],
+    "performance": 94,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 2767.4526,
+    "fcp": 2119.0742,
+    "tbt": 0,
+    "cls": 0.017739348234019216,
+    "si": 2119.0742,
+    "totalKb": 273,
+    "scriptKb": 162,
+    "imageKb": 0,
+    "fontKb": 87,
+    "requests": 48,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 450,
+        "kb": 62
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      }
+    ]
+  },
+  {
+    "page": "Dashboard",
+    "path": "/",
+    "formFactor": "desktop",
+    "scores": [
+      100,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 630.1308,
+    "fcp": 403.9819,
+    "tbt": 0,
+    "cls": 0.01468934026865716,
+    "si": 403.9819,
+    "totalKb": 275,
+    "scriptKb": 162,
+    "imageKb": 2,
+    "fontKb": 87,
+    "requests": 49,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 80,
+        "kb": 62
+      }
+    ]
+  },
+  {
+    "page": "Chat (Perf lab)",
+    "path": "/chat/:room",
+    "formFactor": "mobile",
+    "scores": [
+      90,
+      90,
+      90
+    ],
+    "performance": 90,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 3358.18955,
+    "fcp": 1955.2553000000003,
+    "tbt": 0,
+    "cls": 0,
+    "si": 1955.2553000000003,
+    "totalKb": 325,
+    "scriptKb": 162,
+    "imageKb": 9,
+    "fontKb": 87,
+    "requests": 50,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 450,
+        "kb": 60
+      },
+      {
+        "id": "uses-text-compression",
+        "title": "Enable text compression",
+        "ms": 300,
+        "kb": 36
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      }
+    ]
+  },
+  {
+    "page": "Chat (Perf lab)",
+    "path": "/chat/:room",
+    "formFactor": "desktop",
+    "scores": [
+      100,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 707.3342000000001,
+    "fcp": 403.98839999999996,
+    "tbt": 0,
+    "cls": 0.001385004231970347,
+    "si": 403.98839999999996,
+    "totalKb": 325,
+    "scriptKb": 162,
+    "imageKb": 9,
+    "fontKb": 87,
+    "requests": 50,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 80,
+        "kb": 60
+      },
+      {
+        "id": "uses-text-compression",
+        "title": "Enable text compression",
+        "ms": 50,
+        "kb": 36
+      }
+    ]
+  },
+  {
+    "page": "Notes",
+    "path": "/notes",
+    "formFactor": "mobile",
+    "scores": [
+      91,
+      91,
+      91
+    ],
+    "performance": 91,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 3229.7368999999994,
+    "fcp": 1955.9788,
+    "tbt": 0,
+    "cls": 0.06025557491406816,
+    "si": 1955.9788,
+    "totalKb": 283,
+    "scriptKb": 162,
+    "imageKb": 2,
+    "fontKb": 87,
+    "requests": 43,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 450,
+        "kb": 62
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      },
+      {
+        "id": "uses-text-compression",
+        "title": "Enable text compression",
+        "ms": 150,
+        "kb": 7
+      }
+    ]
+  },
+  {
+    "page": "Notes",
+    "path": "/notes",
+    "formFactor": "desktop",
+    "scores": [
+      99,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 680.65325,
+    "fcp": 408.0601,
+    "tbt": 0,
+    "cls": 0.03220317726118554,
+    "si": 408.0601,
+    "totalKb": 283,
+    "scriptKb": 162,
+    "imageKb": 2,
+    "fontKb": 87,
+    "requests": 43,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 80,
+        "kb": 62
+      }
+    ]
+  },
+  {
+    "page": "Files",
+    "path": "/files",
+    "formFactor": "mobile",
+    "scores": [
+      91,
+      91,
+      92
+    ],
+    "performance": 91,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 3044.749699999999,
+    "fcp": 2121.73175,
+    "tbt": 0,
+    "cls": 0.0672415623635999,
+    "si": 2121.73175,
+    "totalKb": 324,
+    "scriptKb": 162,
+    "imageKb": 6,
+    "fontKb": 87,
+    "requests": 45,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 450,
+        "kb": 61
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      },
+      {
+        "id": "uses-text-compression",
+        "title": "Enable text compression",
+        "ms": 150,
+        "kb": 40
+      }
+    ]
+  },
+  {
+    "page": "Files",
+    "path": "/files",
+    "formFactor": "desktop",
+    "scores": [
+      100,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 622.0052000000001,
+    "fcp": 407.0026,
+    "tbt": 0,
+    "cls": 0.03522560706884978,
+    "si": 407.0026,
+    "totalKb": 327,
+    "scriptKb": 162,
+    "imageKb": 8,
+    "fontKb": 87,
+    "requests": 46,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 80,
+        "kb": 61
+      },
+      {
+        "id": "uses-text-compression",
+        "title": "Enable text compression",
+        "ms": 0,
+        "kb": 40
+      }
+    ]
+  },
+  {
+    "page": "Profile",
+    "path": "/profile",
+    "formFactor": "mobile",
+    "scores": [
+      92,
+      92,
+      92
+    ],
+    "performance": 92,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 3013.74,
+    "fcp": 2048.75925,
+    "tbt": 0,
+    "cls": 0,
+    "si": 2048.75925,
+    "totalKb": 285,
+    "scriptKb": 168,
+    "imageKb": 11,
+    "fontKb": 87,
+    "requests": 43,
+    "opportunities": [
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 600,
+        "kb": 62
+      },
+      {
+        "id": "prioritize-lcp-image",
+        "title": "Preload Largest Contentful Paint image",
+        "ms": 309,
+        "kb": 0
+      },
+      {
+        "id": "render-blocking-resources",
+        "title": "Eliminate render-blocking resources",
+        "ms": 150,
+        "kb": 0
+      }
+    ]
+  },
+  {
+    "page": "Profile",
+    "path": "/profile",
+    "formFactor": "desktop",
+    "scores": [
+      100,
+      100,
+      100
+    ],
+    "performance": 100,
+    "accessibility": 100,
+    "bestPractices": 100,
+    "lcp": 694.3795,
+    "fcp": 450.90524999999997,
+    "tbt": 0,
+    "cls": 0.0008709971397717654,
+    "si": 450.90524999999997,
+    "totalKb": 288,
+    "scriptKb": 168,
+    "imageKb": 14,
+    "fontKb": 87,
+    "requests": 44,
+    "opportunities": [
+      {
+        "id": "prioritize-lcp-image",
+        "title": "Preload Largest Contentful Paint image",
+        "ms": 129,
+        "kb": 0
+      },
+      {
+        "id": "unused-javascript",
+        "title": "Reduce unused JavaScript",
+        "ms": 120,
+        "kb": 62
+      }
+    ]
+  }
+]
