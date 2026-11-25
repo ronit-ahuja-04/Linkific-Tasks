@@ -2,7 +2,7 @@
 
 What makes Huddle slow, measured before any change, and what each milestone does about it.
 - **The numbers:** all of them come from `npm run perf`. It builds the app, runs Lighthouse (signed in, median of 3 runs) and replays real interactions, then writes [perf/before.md](perf/before.md).
-- **The final run:** the same script, run at the end, writes `perf/after.md`.
+- **The final run:** the same script, run at the end, wrote [perf/after.md](perf/after.md); the comparison is in [After: the final run](#after-the-final-run).
 
 ## How it is measured
 
@@ -254,3 +254,42 @@ After M4, two mobile pages were under 90: Dashboard 87 (CLS 0.14) and Chat 89. W
 - **Chat LCP: 87% of it is "render delay"**, meaning the page is waiting for its JavaScript and then its messages, not for a slow download. The 300 ms Lighthouse attributes to "Enable text compression" there is the **local** Supabase API, which doesn't compress (see the notes at the top); the cloud does.
 
 **CORS preflights, a cost Day 23 explained.** Huddle's queries go to another origin with an `Authorization` header, so the browser asks permission (an `OPTIONS` preflight) before sending them. The answer can be cached with `Access-Control-Max-Age`, but the local Supabase sends none, so Chrome keeps each for only its default 5 seconds. A page load sends **7–9 of them** (Dashboard 9, Chat 8, Notes 7 in M5). M5 removed the one that was avoidable (the settings request). Removing the rest would need a **same-origin proxy**: the app calling `/api/...` on its own host, which forwards to Supabase. No more CORS, so no preflights, at the cost of a server hop on every request and running that proxy. Recommended for a production deployment where the first load matters most. Not done here.
+
+## The React Compiler, compared with memoising by hand
+
+React 19's compiler (`babel-plugin-react-compiler` 1.0) adds memoisation automatically at build time. The question: would it have made M3's hand-written `memo`/`useCallback`/`useMemo` unnecessary?
+
+**How it was measured:** the M2 code (before any hand-written memoisation), in a separate git worktree, built with the compiler (`@rolldown/plugin-babel` with `reactCompilerPreset()` from `@vitejs/plugin-react`), then the same `scripts/perf/interactions.mjs`. Numbers in [perf/interactions-compiler.json](perf/interactions-compiler.json). The compiler is **not** part of the app: this was an experiment.
+
+| Scenario (500 messages on screen) | M2, no memoisation | M2 + React Compiler | M3, by hand |
+|---|---|---|---|
+| Receive 5 messages: component renders | 12,911 | 4,915 | **128** |
+| Receive 5 messages: main thread blocked, CPU 4x slower | 1,178 ms | 379 ms | **0 ms** |
+| Type 32 characters in the composer: renders | 160 | **32** | 160 |
+| Type 10 characters in the notes search: renders | 850 | **10** | 850 |
+
+**What it shows:**
+- **The compiler memoises *inside* components.** In each `MessageItem` it kept `Body` from rendering again (3,021 → 5), and it removed the notes-search and composer re-renders that M3 had judged too cheap to bother with (850 → 10, 160 → 32), with no code written.
+- **It doesn't add `memo` boundaries between components.** `RoomView` builds its 500 `<MessageItem>` elements in one `messages.map(...)`. The compiler can cache that whole list, but only until `messages` changes, and a new message changes it. Then all 500 elements are new and every `MessageItem` runs again (1,510 renders). M3's `memo(MessageItem)` is the boundary that lets the 499 unchanged messages skip it.
+- **Best of both:** the compiler for everything, plus `React.memo` on the rows of long lists. That combination wasn't adopted here: the compiler adds a Babel pass to every build, and M3's three targeted changes already make the expensive case free. It's the recommendation for a new project.
+
+## After: the final run
+
+`PERF_LABEL=after npm run perf` on the finished app wrote [perf/after.md](perf/after.md) (treemap: [bundle-after.html](perf/bundle-after.html)). The same script and data as [perf/before.md](perf/before.md):
+
+| | Before | After |
+|---|---|---|
+| Lighthouse mobile: Sign in · Dashboard · Chat · Notes · Files · Profile | 97 · 89 · 89 · 93 · 95 · 74 | **95 · 94 · 90 · 90 · 92 · 92** |
+| Lighthouse desktop | 95 to 100 | **100 on all six** |
+| Accessibility / best practices | 100 / 100 (chat 99) | **100 / 100 on all twelve** |
+| Initial JavaScript (gzip) | 178.3 KB in 1 file | **149.6 KB** in 6; 28 lazy chunks |
+| Receive 5 messages, 500 on screen | 12,902 renders, 785 ms blocked | **128 renders, 0 ms** |
+| Image bytes: Files · Profile · Chat · Dashboard | 17,207 · 1,010 · 4,018 · 1,010 KB | **8 · 13 · 7 · 2 KB** |
+| Largest contentful paint, mobile: Profile | 8.3 s | **3.0 s** |
+| CLS, mobile: Dashboard | 0.14 | **0.018** |
+
+**Noise in the final run:**
+- **Notes had one run at 87** (runs 87, 90, 91; M5 had 91, 91, 91). That run had 54 ms of blocking time where every other run had 0, so the machine was probably busy at that moment (I was testing a script during the run).
+- **The worst key press was slower than in M5** (88 vs 24 ms). The medians didn't change (16 ms), and no long tasks were recorded.
+
+The scores to rely on are the medians, with all three runs shown in the report.

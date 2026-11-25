@@ -1,77 +1,135 @@
-# Huddle, redesigned
+# Huddle, made fast
 
-> **Day 24 copy (performance), in progress.** This is Day 22's Huddle, copied to be made measurably faster. M1 is done: [docs/PERFORMANCE.md](docs/PERFORMANCE.md) lists what is slow and why, measured by `npm run perf` (bundle, Lighthouse signed in, re-render counts, interaction timings) on a large test data set (`npm run perf:data -- add`). The rest of this README still describes Day 22; it is rewritten at the end of Day 24.
-
-**Day 22 project:** Linkific Month 1 Training · UI/UX design principles for developers
+**Day 24 project:** Linkific Month 1 Training · Performance optimisation and best practices
 **Author:** Ronit Ahuja
-**Based on:** [Day 17's Huddle](../../Day-17/huddle) (a team workspace on Supabase), copied here and redesigned; the database, the API calls and the features are unchanged.
-**Stack:** React 19, Vite, supabase-js, local Supabase; Inter and JetBrains Mono (self-hosted); Vitest, Playwright, axe-core, pgTAP
-**PRD:** [Day22_PRD.md](../Day22_PRD.md) · **Design system:** [DESIGN.md](DESIGN.md) · **Accessibility audit:** [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md) · **Before/after:** [docs/GALLERY.md](docs/GALLERY.md)
+**Based on:** [Day 22's Huddle](../../Day-22/huddle-redesign) (a team workspace on Supabase, redesigned and accessible), copied here and made measurably faster. Features, design and accessibility are unchanged.
+**Stack:** React 19, Vite 8, React Router, supabase-js, react-window, local Supabase; Lighthouse 12, rollup-plugin-visualizer, bippy (render counts); Vitest, Playwright, axe-core, pgTAP
+**PRD:** [Day24_PRD.md](../Day24_PRD.md) · **Every measurement and technique:** [docs/PERFORMANCE.md](docs/PERFORMANCE.md) · **Before / after reports:** [perf/before.md](docs/perf/before.md), [perf/after.md](docs/perf/after.md)
 
-Day 17 built Huddle fast to learn Supabase; styling was an afterthought. Day 22 redesigns it with real design principles, makes it accessible to WCAG 2.2 AA, and backs every claim with evidence a script produced: contrast ratios, screenshots, measurements and tests.
+Optimisation by opinion tends to memoise everything and change nothing. Day 24 started by **measuring**: one script (`npm run perf`) builds the app, runs Lighthouse signed in (median of 3 runs, mobile and desktop), counts every component render while the app is used, and times interactions with the CPU slowed 4x. It runs on a large test data set: a room with 5,000 messages, 1,000 notes and 300 files. That gave nine findings, P-1 to P-9. Each milestone fixed some of them and ran the same script again.
 
-| Before (Day 17) | After (Day 22) |
-|---|---|
-| ![Dashboard before](docs/screenshots/before/dashboard-light.jpg) | ![Dashboard after](docs/screenshots/after/dashboard-light.jpg) |
+## Before and after
+
+| | Before | After |
+|---|---|---|
+| **Lighthouse performance, mobile**: Sign in · Dashboard · Chat · Notes · Files · Profile | 97 · 89 · 89 · 93 · 95 · **74** | 95 · **94** · **90** · 90 · 92 · **92** (every page 90+) |
+| Lighthouse performance, desktop | 95 to 100 | **100 on every page** |
+| Lighthouse accessibility / best practices | 100 / 100 (chat 99) | **100 / 100 everywhere** |
+| First download (JavaScript, gzip) | 178 KB in one file, for every page | **150 KB**; each page's code loads when it's visited or about to be |
+| Images on the Files page | **17.2 MB** (full-size photos) | **8 KB** (160 px WebP thumbnails, only near the screen) |
+| Profile: largest contentful paint, mobile | **8.3 s** (a 1 MB avatar) | **3.0 s** (a 13 KB WebP) |
+| Receiving 5 messages with 500 on screen | **12,902** component renders, 785 ms of blocked main thread | **128** renders, **0 ms** |
+| Dashboard layout shift (CLS), mobile | 0.14 | **0.018** |
+| Files reachable in the Files page | the newest 100 | **all** (a virtualised list with infinite loading) |
+
+Desktop scores and the slow-phone simulation both come from the same reports. Each number is reproduced by `npm run perf` (below).
 
 ## What the brief asked for, and where it is
 
 | Deliverable | Where |
 |---|---|
-| A redesigned application | this folder: every page, light and dark, desktop and phone ([gallery](docs/GALLERY.md)) |
-| Figma file for one component (optional) | skipped by choice: the design source is code. The living style guide at **`/styleguide`** renders every token and component from the real CSS, in both themes ([screenshot](docs/screenshots/styleguide-light.jpg)) |
-| Accessibility audit with fixes | [ACCESSIBILITY_AUDIT.md](ACCESSIBILITY_AUDIT.md): 14 findings with WCAG criterion, severity, fix and how it is verified; measurements [before](docs/audit/before.md) and [after](docs/audit/after.md) |
-| Colour palette and typography documentation | [DESIGN.md](DESIGN.md), and [docs/contrast.md](docs/contrast.md) (every colour pair, generated) |
-| Before/after screenshots | [docs/GALLERY.md](docs/GALLERY.md): 20 views, same pages, same data, same sizes, taken by [a script](scripts/screenshots.mjs) |
-| README explaining the design decisions | this file |
+| An optimised React application | this folder |
+| React.memo examples | `memo(MessageItem)` with the measurement (12,902 → 128 renders), a unit test that proves memo does nothing *without* stable props, and a measured "when not to memo" table: [PERFORMANCE.md, M3](docs/PERFORMANCE.md#m3-rendering-reactmemo-usememo-usecallback) |
+| useMemo / useCallback | `RoomView.jsx` (`useCallback` for the handlers a memoised row receives, `useMemo` for the grouping flags), `AuthContext.jsx` (the context value); the debounce vs throttle choice in the composer |
+| Code splitting, lazy-loaded routes | every page `React.lazy` (`src/routes.js`), preloaded on hover/focus/touch and at start-up, prefetched when idle, vendor chunks, a navigation progress bar: [M2](docs/PERFORMANCE.md#m2-code-splitting) |
+| Image optimisation | resized to WebP **in the browser** at upload (64/256 px avatars, 160 px thumbnails), `srcset`/`sizes`, `width`/`height`, lazy loading, `fetchpriority`, a backfill script for older pictures: [M4](docs/PERFORMANCE.md#m4-images-and-lists) |
+| Lighthouse score 90+ | every page, mobile **and** desktop: [M5](docs/PERFORMANCE.md#m5-lighthouse-90-on-every-page) |
+| Before / after comparison | the table above, generated reports [before](docs/perf/before.md) and [after](docs/perf/after.md), and bundle treemaps ([before](docs/perf/bundle-before.html), [after](docs/perf/bundle-after.html)) |
+| README with the optimisation techniques | this file |
+| Also (from the brief's topics) | virtualisation (react-window) with infinite loading, debounce and throttle, preconnect, caching headers, the React DevTools profiler data (render counts through React's DevTools hook), and the **React Compiler compared** with memoising by hand |
 
-## Design decisions, principle by principle
+## The techniques
 
-| Principle | The problem on Day 17 | What changed |
-|---|---|---|
-| **Visual hierarchy** | Developer explanations ("How this page works") competed with the product on every page; five equal stat tiles; one size for everything | One `h1` per page in the same place; the explanations are collapsed in one "Under the hood" panel at the end of each page; the dashboard leads with what needs you, and the numbers became a quiet list |
-| **Contrast** | Every list item an underlined link; no difference between primary and secondary actions | One primary button per view; secondary, ghost and danger buttons; links underlined only in running text; every text pair at least 4.5:1, measured ([contrast](docs/contrast.md)) |
-| **Alignment** | Cards of uneven height left holes; ad-hoc pixel values | A 4 px spacing grid with eight steps, a 12-column layout, equal-height cards with their footers on the bottom edge |
-| **Proximity** | Notes: six filters in a big panel, search far from "New note"; the chat room list floated loose | One toolbar (search + More filters), quick filter chips that apply at once, the active filters as removable chips; rooms as one list with their unread count on the row |
-| **Repetition** | Every page laid out differently | The same page header, row pattern, empty state and "Under the hood" panel everywhere; one sidebar |
-| **White space** | Dense blocks, no maximum line length | Generous card padding (16 px phone, 24 px desktop), 70-character lines, 24 px between cards |
-| **Colour** | One green plus greys; nothing said "this needs you" | Green stays the brand; warm greys do the work; one **amber accent**, kept for mentions and "needs you", so it keeps its pull; status colours for success, warning, danger, info; a real dark theme |
-| **Typography** | System font at ad-hoc sizes | **Inter** (built for screens; `cv05` so l, I and 1 differ) and **JetBrains Mono** for code; a 1.25 type scale (12 to 39 px) in rem |
-| **Reading patterns** | The useful information was not where the eye lands | Dashboard laid out for an **F-pattern** (Needs you top left); sign-in a **Z-pattern** split (brand, pitch, then the form and its button) |
-| **Mobile first** | On a phone the header wrapped into three rows before any content | One 56 px bar with a Menu button; the sidebar becomes a disclosure panel; chat becomes two screens (rooms, conversation) |
+Each row says what was done, where, and the measured effect. The "why" and the dead ends are in [PERFORMANCE.md](docs/PERFORMANCE.md).
 
-The full system (every token, why it exists, how to add one) is in [DESIGN.md](DESIGN.md).
+### Measuring first (M1)
 
-## The redesign, page by page
+| Tool | Used for |
+|---|---|
+| `scripts/perf/bundle.mjs` (Vite's build manifest + `rollup-plugin-visualizer`) | what each page downloads first, what's lazy, a treemap of every package |
+| `scripts/perf/lighthouse.mjs` (the Lighthouse Node API) | six pages, signed in, mobile and desktop, median of 3, HTTP cache cleared each run |
+| `scripts/perf/interactions.mjs` + `render-counter.js` (bippy, React's DevTools hook) | **component renders** per interaction, the same data the React DevTools Profiler shows but scripted and repeatable. No test code goes in the app |
+| the Event Timing API, long tasks, layout shift (Chrome, CPU 4x slower) | how long a key press takes to paint, how long the main thread is blocked |
+| `scripts/perf-data.mjs add / remove / status` | the large test data set, for four test accounts (local only) |
 
-- **App shell:** a sticky sidebar on wide screens (pages, my rooms with live unread counts, developer tools, me); a one-row bar with a disclosure menu on phones; skip link; focus moves to the new page's heading on every page change.
-- **Dashboard:** "Needs you" (unread mentions with a quote, rooms with new messages, or "all caught up"), recent team notes and my files with names and relative times, a quiet "Workspace" list, "Start something".
-- **Chat:** `/chat` is a room browser (search, your rooms, public rooms, New room); a room is a full-width conversation, oldest first, grouped by author, with the composer at the bottom and an About / Online now panel.
-- **Notes:** search and More filters in one toolbar; chips for All / Mine / Team / Private / Pinned; equal-height cards; "No notes yet" and "No notes match" are different states.
-- **Files, Profile, Query lab:** the same header, cards and panel; the bucket demo and the SQL notes live under the hood.
-- **Sign-in, register, reset:** a split layout, the pitch on brand green and the form on the right; one line above the form on a phone.
+### Code splitting (M2)
 
-## Accessibility
+- **Every route is lazy** (`React.lazy` + `Suspense`), so a visit downloads the shell and then only the page it shows. First download 178 → 148 KB gzip; Lighthouse's "unused JavaScript" fell by a third.
+- **Preloading so a click rarely waits:**
+  - the current page's chunk starts at start-up, in parallel with React;
+  - other pages preload on hover, focus or touch of a link;
+  - the main pages are prefetched when the browser is idle, 2 s after load (skipped on save-data or 2G).
+- **A progress bar for navigations.** React Router navigates in a transition, which keeps the old page on screen while the new one loads; without the bar a click on a slow connection seemed to do nothing.
+- **Vendor chunks** (`react-vendor`, `supabase-vendor`) stay cached across deploys that only change app code.
+- **Not done, on purpose:** splitting small components (one more round trip to save 1 KB).
 
-Huddle already passed axe's WCAG 2.1 rules on Day 17; the real problems were in the 2.2 rules and in what only a person or a script measuring the page finds. The [audit](ACCESSIBILITY_AUDIT.md) lists 14 findings, each fixed (or closed as a false positive) and each covered by a test:
+### Rendering (M3): React.memo, useCallback, useMemo
 
-| | Day 17 design | Now |
-|---|---|---|
-| axe, WCAG 2.2 AA, light and dark | 1 rule failing (chat) | **0**, also with a room, forms, filters and the notification panel open |
-| Sideways scrolling at 320 px | Files | **none** (every page tested) |
-| Targets under 24×24 px | links 23 px, checkboxes 16 px | **none** |
-| Tab stops before the content on a phone | 11 | **4** |
-| Focus after a failed sign-in / after choosing a page | lost / left on the link | stays on the button / the new page's heading |
-| Colour pairs checked | none | **68, all AA** |
+```jsx
+// MessageItem.jsx: a message re-renders only when ITS props change
+export default memo(MessageItem);
 
-Also tested: text at 200%, `prefers-reduced-motion`, keyboard-only flows, and ARIA snapshots of the accessibility tree. **Not yet done:** a VoiceOver pass by a person ([script](docs/VOICEOVER_CHECK.md)); NVDA and JAWS (Windows) were not tried.
+// RoomView.jsx: memo compares props by identity, so the handlers must keep theirs
+const edit = useCallback(async (id, body) => { /* editMessage(client, …), update the list */ }, [client]);
+const remove = useCallback(async (id) => { /* deleteMessage(client, …), update the list */ }, [client]);
+const grouped = useMemo(() => messages.map((m, i) => continuesGroup(m, messages[i - 1])), [messages]);
+```
+
+- **Effect:** receiving 5 messages with 500 on screen went from 12,902 renders and 785 ms blocked to **128 renders and 0 ms**. Only the 5 new messages render.
+- **`memo` alone would have done nothing:** the handlers were new functions on every render. A unit test renders 50 messages both ways to prove it.
+- **When NOT to memoise, measured:** the 6 note cards re-render while you type in the search box, and every key still paints within 16 ms on a 4x slower CPU, so memo would add code for no gain. Inline arrow functions on DOM elements cost nothing.
+- **Debounce vs throttle:** the @-mention lookup is debounced (150 ms: one query per pause, not per key); "is typing" is throttled (every 2 s *while* typing).
+- **The React Compiler, compared:** on the code without hand-written memoisation it cut those 12,911 renders to 4,915 by itself, and removed the cheap re-renders I'd left alone (notes search 850 → 10). It doesn't add `memo` boundaries between components, so the long list still needed `memo(MessageItem)`. The best combination is both. [Details](docs/PERFORMANCE.md#the-react-compiler-compared-with-memoising-by-hand)
+
+### Images and long lists (M4)
+
+| Technique | Effect |
+|---|---|
+| **Resize in the browser before upload** (`src/lib/images.js`: canvas → WebP), loaded only when a file is picked | an avatar is stored as 64 and 256 px WebP (a 1600 px photo: ~1 MB → ~4–11 KB); an image file gets a 160 px thumbnail (`files.thumb_path`). No server-side resizing needed |
+| **`srcset` + `sizes`** | the browser picks the 64 or 256 px file for the size shown |
+| **`width` / `height`** | space is reserved before the picture arrives (Profile CLS 0.047 → 0) |
+| **`loading="lazy"`, `decoding="async"`** | an avatar 400 messages up the chat isn't downloaded until you scroll near it |
+| **`fetchpriority="high"`** on the profile picture | it's that page's largest element: LCP 8.3 → 3.0 s |
+| **A year of caching** on resized files | every new picture gets a new name, so a cached copy is never stale |
+| `scripts/backfill-images.mjs` | makes the same small copies for pictures uploaded before Day 24 (originals kept) |
+| **Files list virtualised** (`react-window` 2, variable row heights, scrolling with the window) **+ infinite loading** (pages of 100, with the total) | all 300 files reachable (it showed only 100), with a few dozen rows in the page at any time; screen readers hear "item 5 of 300" |
+| **Chat: infinite scroll upward** | earlier messages load as you near the top; the button stays for keyboard users |
+| **Chat NOT virtualised, on purpose** | after M3, 2,000 messages scroll at 60 fps on a 4x slower CPU, and a windowed list would break the screen-reader live region and "keep my place" on loading earlier messages |
+
+### The first load (M5)
+
+| Technique | Effect |
+|---|---|
+| Dashboard panels keep their size while loading (row-shaped placeholders) | CLS 0.14 → 0.018, mobile 87 → 94 |
+| `<link rel="preconnect">` to Supabase | the connection opens while the JavaScript downloads |
+| The OAuth settings request only where the sign-in buttons are | 2 fewer requests (one CORS preflight) on every signed-in page |
+| A small splash in `index.html` | no blank page while JavaScript loads; small on purpose so it can't fake the LCP |
+| `public/_headers`: hashed assets `immutable` for a year, `index.html` `no-cache` | a returning visitor downloads only what changed |
+| The chat textbox's ARIA (no `combobox` role on a `<textarea>`) | accessibility 100 on every page |
+
+**What still limits mobile scores**, and why it was left:
+- about 60 KB of vendor JavaScript that the first render doesn't run (react-dom, supabase-js: neither splits further);
+- one 10.5 KB stylesheet;
+- 7–9 CORS preflights per page. A same-origin proxy would remove them; it's recommended for production in [PERFORMANCE.md](docs/PERFORMANCE.md#m5-lighthouse-90-on-every-page).
+
+## Measure it yourself
+
+```bash
+cd Day-24/huddle-fast
+npm run perf:data -- add                  # the large test data set (local only; `remove` deletes it, `status` counts it)
+node scripts/backfill-images.mjs          # small copies of the test data's pictures (--all for every account)
+PERF_LABEL=mine npm run perf              # build + bundle + Lighthouse (RUNS=3) + interactions -> docs/perf/mine.md
+ANALYZE=1 npm run build                   # just the treemap: docs/perf/bundle-<label>.html
+```
+
+The perf test user is `perf@example.com`, password `perf-password-123` (local stack only). A full run takes about 10 minutes.
 
 ## Run it (local Supabase, no account needed)
 
 You need Node 20+, Docker (Docker Desktop, or Colima on a Mac) and about 4 GB of memory for the containers.
 
 ```bash
-cd Day-22/huddle-redesign
+cd Day-24/huddle-fast
 npm install
 npm run db:start      # starts Postgres, Auth, REST, Realtime, Storage and a mail catcher; applies the migrations and the seed
 npm run env:local     # writes .env with the local API URL and the public anon key
@@ -103,7 +161,7 @@ The buttons appear only when the server has the provider enabled (the app reads 
 
 **Not verified here:** a real Google or GitHub sign-in (it needs your own OAuth app). The flow up to the provider redirect, and the callback handling, are tested; the provider's own consent screen is not.
 
-## How it works (the Supabase side, unchanged from Day 17)
+## How it works (the Supabase side, from Day 17)
 
 ```
 Browser (React + supabase-js)  ──HTTP──►  Kong gateway ──► GoTrue   (sign-up, sign-in, magic link, OAuth)  issues a JWT
@@ -117,7 +175,7 @@ The browser only ever holds the **anon key** (public) and the signed-in user's *
 
 ### Schema (9 tables)
 
-`profiles` (one per auth user, created by a trigger), `notes`, `tags`, `note_tags` (many to many), `files`, `rooms`, `room_members`, `messages`, `notifications`.
+`profiles` (one per auth user, created by a trigger), `notes`, `tags`, `note_tags` (many to many), `files` (with `thumb_path` since Day 24), `rooms`, `room_members`, `messages`, `notifications`.
 
 - **Generated columns:** `rooms.slug` (from the name) and `notes.fts`, a `tsvector` with a GIN index for full-text search.
 - **Indexes:** composite (`owner_id, created_at desc`), partial (pinned notes only, unread notifications only), GIN for search, and foreign-key indexes.
@@ -154,41 +212,48 @@ Two tricks to know: policies are written `(select auth.uid())` so Postgres evalu
 The RPCs are `security invoker`: they run with the caller's rights, so RLS still applies inside them (a search never returns someone's private note).
 
 
-## Scripts (Day 22)
+## Scripts
 
 ```bash
-npm run contrast                          # every token pair, light and dark, against WCAG AA; writes docs/contrast.md; exits 1 on a failure
-node scripts/audit.mjs after              # axe + the measurements axe does not make; writes docs/audit/after.md (dev server running)
-node scripts/screenshots.mjs after        # the 20 gallery views; run npm run db:reset first so the data matches
+npm run perf                              # the measurements above (Day 24)
+npm run perf:data -- add|remove|status    # the large test data set (Day 24)
+node scripts/serve-dist.mjs               # the production build on :4190, compressed and cached like a real host (after npm run build)
+node scripts/backfill-images.mjs [--all]  # resized copies of older pictures (Day 24)
+npm run contrast                          # every token pair against WCAG AA (Day 22)
 ```
 
 ## Tests
 
 ```bash
-npm test                 # 310 unit and component tests (fake supabase client), including the contrast gate
-npm run db:test          # 77 pgTAP assertions inside the real database
-npm run test:e2e         # 75 browser tests against the real local stack
+npm test                 # 321 unit and component tests (fake supabase client)
+npm run db:test          # 82 pgTAP assertions inside the real database
+npm run test:e2e         # 81 browser tests against the real local stack (dev server)
+npm run test:e2e:prod    # the same 81 against the production build
 npm run lint
 ```
 
-| Layer | What |
+| Layer | Added on Day 24 |
 |---|---|
-| Unit / component | every page and component, the shell (landmarks, menu, focus after navigation), the design tokens (every pair passes AA; no raw colours outside `tokens.css`; every token the style guide shows exists), toasts are shown **and** announced |
-| Database (pgTAP) | policies for several users and `anon`, triggers, constraints, RPCs, storage policies |
-| Browser (Playwright, Chrome) | everything from Day 17 (two browsers chatting live, notes, uploads, 15 direct API attacks that must be refused) plus: axe WCAG 2.2 AA on every page and on states behind a click in both themes, tab order with a visible focus ring on every stop, the skip link, the phone menu, 320 px reflow, text at 200%, reduced motion, keyboard-only flows, ARIA snapshots, the style guide |
+| Unit / component | memo proof (50 messages, with and without stable handlers), the debounced mention lookup, avatar variants and thumbnails (upload, replace, roll back a half-saved avatar, delete), paged file listing |
+| Database (pgTAP) | `files.thumb_path`: optional, and only inside the owner's folder |
+| Browser (Playwright, Chrome) | a 1600 px avatar stored and served as WebP with `srcset`, fixed size and high priority; a 2000 px photo's thumbnail under 20 KB; 150 files in a virtualised list (only some rows in the page, all reachable, correct `aria-setsize`); chat scroll-up loading; lazy pages (not downloaded until wanted, preloaded on pointing, the loading state on a slow download, then focus on the new heading). Everything from Day 22 still runs: axe WCAG 2.2 AA, keyboard, 320 px, text at 200% |
 
-## Problems the redesign found (and fixed)
+## Problems found on the way (and fixed)
 
-- **Chat looked newest-first, but was not.** The list was built oldest first; the seed inserted its messages in one statement, so they shared a timestamp, and the query had no tie-breaker. Fixed with `.order('id')` and realistic seed times.
-- **Focus was lost after a failed sign-in.** The submit button was `disabled` while busy, and disabling the focused element sends focus to `<body>`. Buttons now stay focusable (`aria-disabled`) with a guard against double submits.
-- **Screen readers met two "Attach a file" buttons**: the hidden file input was in the accessibility tree. Now `aria-hidden`.
-- **Toasts were not reliably announced**: a live region created together with its text is often not read. They now go through live regions that are always on the page.
-- **Hidden screen-reader text widened the page on phones**: absolutely positioned `.sr-only` text escaped a scrolling table. The scroller is now `position: relative`.
-- **A session the server had ended was only noticed at the next reload.** After the account was deleted (a local `supabase db reset` did it to a real sign-up), the page still acted signed in and the avatar upload showed PostgREST's raw "Cannot coerce the result to a single JSON object". The app now asks the Auth server again when you come back to the tab and after a "no such row" error, signs out, and the sign-in page says why. (Day 17's start-up check had only worked because supabase-js signs out by itself for one of the two cases.)
-- **A Day 17 test failed now and then**: it advanced a fake clock before the countdown's timer existed. It now waits for it.
+- **Two-thirds of the files were unreachable.** The Files page listed only the newest 100. Found while building the large data set, fixed by the virtualised, infinitely loading list.
+- **A click on a lazy page seemed to do nothing on a slow connection.** React Router's transitions keep the old page visible while the new chunk loads. Fixed with a progress bar and a screen-reader status (found by a browser test).
+- **Focus after navigation landed before the lazy page existed.** It now waits for the new page's heading.
+- **Prefetching other pages during load slowed the current one** (≈0.3 s of LCP). It now waits until 2 s after load.
+- **Lighthouse scores jumped between 73 and 90 from run to run.** The cause was the 1 MB avatar finishing before or after the main content in the simulation, not the code splitting. Fixed by M4's resizing.
+- **Screen readers would have heard "item 5 of 100" in a list of 300.** react-window sets `aria-setsize` to the rows loaded so far. Overridden with the real total (a browser test caught it).
+- **`role="combobox"` on the chat textarea** isn't allowed by ARIA in HTML. Day 22's WCAG-only rules passed it; Lighthouse's didn't.
+- **At 200% text, "Messages today 130" stuck out of the Dashboard** by 9 px, once the count reached three digits. The stat rows now wrap.
 
 ## Limits
 
-- The VoiceOver pass is written but not yet run; only Chrome was tested, and no real phone (the phone checks are Chrome viewports).
-- No Figma file (the brief made it optional; the style guide is the design reference).
-- Day 17's limits still apply: OAuth providers unverified, Realtime is not guaranteed delivery, file deletion is two calls, local seed and relaxed rate limits only.
+- **Measured locally:** Huddle runs against the local Supabase stack and isn't deployed. Lighthouse simulates the slow phone and network (that's how it scores anyway), but there's no real CDN, and the local API doesn't compress its JSON as Supabase's cloud does.
+- **Chrome only**, and no real phone.
+- **Image resizing needs a browser with canvas WebP encoding.** Others upload the original, as before. The backfill script runs against the local stack only.
+- **Files on mobile went 95 → 91:** react-window and a second download step for the page's code, against every file being reachable and 17 MB of images less. A documented trade-off.
+- **Chat isn't virtualised** (see above), and the **React Compiler** was measured, not adopted.
+- Day 22's and Day 17's limits still apply: OAuth providers unverified, the VoiceOver pass not run by a person, Realtime isn't guaranteed delivery.
