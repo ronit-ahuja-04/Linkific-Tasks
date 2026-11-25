@@ -6,6 +6,7 @@
  * PostgREST, which turns it into SQL and runs it AS THE SIGNED-IN USER, so Row Level Security (RLS) decides
  * which rows come back. Every call resolves to `{ data, error }`: it never throws for a database problem.
  */
+import { uploadThumbnail } from './files';
 
 export const PAGE_SIZE = 50;
 /** Wait this long after the last key press before looking up @mentions (Day 24: one query per pause, not per key) */
@@ -192,13 +193,14 @@ export async function uploadAttachment(client, userId, file, uuid = () => crypto
   const bucket = client.storage.from('attachments');
   const uploaded = await bucket.upload(path, file, { contentType: file.type || 'application/octet-stream', upsert: false });
   if (uploaded.error) return { data: null, error: uploaded.error };
+  const thumbPath = await uploadThumbnail(bucket, path, file); // Day 24: it shows on the Files page too
   const { data, error } = await client
     .from('files')
-    .insert({ name: file.name.slice(0, 200), mime: file.type || null, size: file.size, path })
+    .insert({ name: file.name.slice(0, 200), mime: file.type || null, size: file.size, path, thumb_path: thumbPath })
     .select('id, name, mime, size, path')
     .single();
   if (error) {
-    await bucket.remove([path]);
+    await bucket.remove(thumbPath ? [path, thumbPath] : [path]);
     return { data: null, error };
   }
   return { data, error: null };

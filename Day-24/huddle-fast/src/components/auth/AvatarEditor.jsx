@@ -24,7 +24,10 @@ export default function AvatarEditor() {
     if (problem) return setError(problem);
     setError('');
     setBusy(true);
-    const { error: uploadError } = await uploadAvatar(client, { userId: user.id, file, oldPath: profile?.avatar_path, stamp: Date.now() });
+    // Day 24: resize in the browser to 64 and 256 px WebP before uploading (the resizer is downloaded only now, when a
+    // picture is picked). If this browser can not, the original is uploaded as before.
+    const variants = await import('../../lib/images').then((m) => m.avatarVariants(file)).catch(() => null);
+    const { error: uploadError } = await uploadAvatar(client, { userId: user.id, file, oldPath: profile?.avatar_path, stamp: Date.now(), variants });
     if (uploadError) {
       setBusy(false);
       if (uploadError.code === 'PGRST116') recheckSession?.(); // no profile row: is this session still a real user?
@@ -53,7 +56,7 @@ export default function AvatarEditor() {
     <section className="profile-avatar" aria-labelledby="profile-avatar-title">
       <h2 id="profile-avatar-title" className="profile-h2">Profile picture</h2>
       <div className="profile-avatar-row">
-        <Avatar profile={profile} size={96} />
+        <Avatar profile={profile} size={96} priority />
         <div className="profile-avatar-actions">
           <input ref={inputRef} id="avatar-file" type="file" className="sr-only" tabIndex={-1} aria-hidden="true" accept="image/png,image/jpeg,image/webp,image/gif" onChange={onPick} disabled={busy} aria-label="Choose a profile picture" />
           <button type="button" className="btn" onClick={() => inputRef.current?.click()} disabled={busy}>{busy ? 'Working…' : 'Choose picture'}</button>

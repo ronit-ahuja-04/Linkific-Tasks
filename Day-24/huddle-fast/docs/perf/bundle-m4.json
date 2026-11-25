@@ -1,0 +1,345 @@
+{
+  "label": "m4",
+  "initial": {
+    "chunks": 6,
+    "raw": 522160,
+    "gzip": 153153,
+    "brotli": 132030
+  },
+  "initialCss": {
+    "files": 1,
+    "raw": 45520,
+    "gzip": 10753
+  },
+  "lazy": {
+    "chunks": 28,
+    "raw": 181669,
+    "gzip": 63539
+  },
+  "total": {
+    "raw": 703829,
+    "gzip": 216692
+  },
+  "fonts": {
+    "files": 19,
+    "raw": 536996,
+    "referencedByInitialCss": 19
+  },
+  "chunks": [
+    {
+      "name": "react-vendor",
+      "file": "assets/react-vendor-DIwYtoXM.js",
+      "raw": 257955,
+      "gzip": 80869,
+      "initial": true
+    },
+    {
+      "name": "supabase-vendor",
+      "file": "assets/supabase-vendor-D_8df79H.js",
+      "raw": 216000,
+      "gzip": 55091,
+      "initial": true
+    },
+    {
+      "name": "index",
+      "file": "assets/index-Cp-dS2kF.js",
+      "raw": 42858,
+      "gzip": 14493,
+      "initial": true
+    },
+    {
+      "name": "FilesPage",
+      "file": "assets/FilesPage-Bbgx6X6d.js",
+      "raw": 32936,
+      "gzip": 11302,
+      "initial": false
+    },
+    {
+      "name": "StyleguidePage",
+      "file": "assets/StyleguidePage-B8CasiM9.js",
+      "raw": 30540,
+      "gzip": 9011,
+      "initial": false
+    },
+    {
+      "name": "LabPage",
+      "file": "assets/LabPage-CTNr39nw.js",
+      "raw": 24982,
+      "gzip": 8150,
+      "initial": false
+    },
+    {
+      "name": "ChatPage",
+      "file": "assets/ChatPage-Dt47NUjJ.js",
+      "raw": 23799,
+      "gzip": 7593,
+      "initial": false
+    },
+    {
+      "name": "NotesPage",
+      "file": "assets/NotesPage-S_ZIvIe0.js",
+      "raw": 23490,
+      "gzip": 7495,
+      "initial": false
+    },
+    {
+      "name": "ProfilePage",
+      "file": "assets/ProfilePage-CdZ3HV2g.js",
+      "raw": 8972,
+      "gzip": 2937,
+      "initial": false
+    },
+    {
+      "name": "DashboardPage",
+      "file": "assets/DashboardPage-DpuamBeG.js",
+      "raw": 8298,
+      "gzip": 2922,
+      "initial": false
+    },
+    {
+      "name": "profiles",
+      "file": "assets/profiles-DmxXVJXL.js",
+      "raw": 4368,
+      "gzip": 1967,
+      "initial": false
+    },
+    {
+      "name": "LoginPage",
+      "file": "assets/LoginPage-SPy4_RTd.js",
+      "raw": 3816,
+      "gzip": 1593,
+      "initial": false
+    },
+    {
+      "name": "RegisterPage",
+      "file": "assets/RegisterPage-BHnHuoAx.js",
+      "raw": 4050,
+      "gzip": 1575,
+      "initial": false
+    },
+    {
+      "name": "createLucideIcon",
+      "file": "assets/createLucideIcon-DNC3f_F-.js",
+      "raw": 3133,
+      "gzip": 1504,
+      "initial": true
+    },
+    {
+      "name": "ResetPasswordPage",
+      "file": "assets/ResetPasswordPage-Ol2kx8T8.js",
+      "raw": 2737,
+      "gzip": 1240,
+      "initial": false
+    },
+    {
+      "name": "PasswordField",
+      "file": "assets/PasswordField-ZrHi3Yqa.js",
+      "raw": 2218,
+      "gzip": 1074,
+      "initial": false
+    },
+    {
+      "name": "ForgotPasswordPage",
+      "file": "assets/ForgotPasswordPage-ChBZ0Y4A.js",
+      "raw": 1637,
+      "gzip": 877,
+      "initial": false
+    },
+    {
+      "name": "preload-helper",
+      "file": "assets/preload-helper-7y9sWmk5.js",
+      "raw": 1615,
+      "gzip": 828,
+      "initial": true
+    },
+    {
+      "name": "EmptyState",
+      "file": "assets/EmptyState-DKSMxkkp.js",
+      "raw": 1663,
+      "gzip": 762,
+      "initial": false
+    },
+    {
+      "name": "AuthCallbackPage",
+      "file": "assets/AuthCallbackPage-D9Rs38Qe.js",
+      "raw": 1423,
+      "gzip": 761,
+      "initial": false
+    },
+    {
+      "name": "AuthShell",
+      "file": "assets/AuthShell-iqZNQtdL.js",
+      "raw": 1375,
+      "gzip": 659,
+      "initial": false
+    },
+    {
+      "name": "OAuthButtons",
+      "file": "assets/OAuthButtons-Br60BxIL.js",
+      "raw": 848,
+      "gzip": 563,
+      "initial": false
+    },
+    {
+      "name": "images",
+      "file": "assets/images-Dvg4ey4A.js",
+      "raw": 918,
+      "gzip": 563,
+      "initial": false
+    },
+    {
+      "name": "UnderTheHood",
+      "file": "assets/UnderTheHood-C_dohnuy.js",
+      "raw": 776,
+      "gzip": 433,
+      "initial": false
+    },
+    {
+      "name": "rolldown-runtime",
+      "file": "assets/rolldown-runtime-WkwZ5CU-.js",
+      "raw": 599,
+      "gzip": 368,
+      "initial": true
+    },
+    {
+      "name": "file-text",
+      "file": "assets/file-text-sNN1f1t-.js",
+      "raw": 425,
+      "gzip": 279,
+      "initial": false
+    },
+    {
+      "name": "RelativeTime",
+      "file": "assets/RelativeTime-C9Z0uu0w.js",
+      "raw": 341,
+      "gzip": 266,
+      "initial": false
+    },
+    {
+      "name": "trash",
+      "file": "assets/trash-V6HXyI8e.js",
+      "raw": 386,
+      "gzip": 254,
+      "initial": false
+    },
+    {
+      "name": "PageHeader",
+      "file": "assets/PageHeader-DIM_S4sV.js",
+      "raw": 473,
+      "gzip": 253,
+      "initial": false
+    },
+    {
+      "name": "pencil",
+      "file": "assets/pencil-B4rVB3UB.js",
+      "raw": 316,
+      "gzip": 251,
+      "initial": false
+    },
+    {
+      "name": "upload",
+      "file": "assets/upload-BXAxgkLP.js",
+      "raw": 270,
+      "gzip": 221,
+      "initial": false
+    },
+    {
+      "name": "search",
+      "file": "assets/search-DVDupvhZ.js",
+      "raw": 214,
+      "gzip": 194,
+      "initial": false
+    },
+    {
+      "name": "plus",
+      "file": "assets/plus-DG98KjqF.js",
+      "raw": 193,
+      "gzip": 176,
+      "initial": false
+    },
+    {
+      "name": "authUrl",
+      "file": "assets/authUrl-BueR2wHu.js",
+      "raw": 205,
+      "gzip": 168,
+      "initial": false
+    }
+  ],
+  "byPackage": [
+    {
+      "name": "react-dom",
+      "raw": 536687,
+      "gzip": 101365
+    },
+    {
+      "name": "@supabase/auth-js",
+      "raw": 174194,
+      "gzip": 34080
+    },
+    {
+      "name": "react-router",
+      "raw": 94843,
+      "gzip": 23428
+    },
+    {
+      "name": "@supabase/realtime-js",
+      "raw": 56810,
+      "gzip": 16348
+    },
+    {
+      "name": "@supabase/phoenix",
+      "raw": 40712,
+      "gzip": 9836
+    },
+    {
+      "name": "lucide-react",
+      "raw": 15434,
+      "gzip": 8631
+    },
+    {
+      "name": "@supabase/storage-js",
+      "raw": 42119,
+      "gzip": 7908
+    },
+    {
+      "name": "src/components",
+      "raw": 25308,
+      "gzip": 7584
+    },
+    {
+      "name": "@supabase/postgrest-js",
+      "raw": 31853,
+      "gzip": 7354
+    },
+    {
+      "name": "src/lib",
+      "raw": 16825,
+      "gzip": 6754
+    },
+    {
+      "name": "@supabase/supabase-js",
+      "raw": 20994,
+      "gzip": 6200
+    },
+    {
+      "name": "react",
+      "raw": 17166,
+      "gzip": 4938
+    },
+    {
+      "name": "scheduler",
+      "raw": 9212,
+      "gzip": 2426
+    },
+    {
+      "name": "src/auth",
+      "raw": 7409,
+      "gzip": 2423
+    },
+    {
+      "name": "iceberg-js",
+      "raw": 8031,
+      "gzip": 1951
+    }
+  ]
+}

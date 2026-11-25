@@ -91,13 +91,16 @@ describe('uploadFile', () => {
 });
 
 describe('queries', () => {
-  it('lists my files newest first with the note joined in', () => {
+  it('lists my files newest first with the note joined in, one page at a time with the total (Day 24)', () => {
     const client = makeClient();
     listFiles(client, 'u1');
     expect(client.from).toHaveBeenCalledWith('files');
     expect(client.log.map((c) => [c.method, ...c.args])).toEqual([
-      ['select', '*, note:notes(id, title)'], ['eq', 'owner_id', 'u1'], ['order', 'created_at', { ascending: false }], ['limit', 100],
+      ['select', '*, note:notes(id, title)', { count: 'exact' }], ['eq', 'owner_id', 'u1'], ['order', 'created_at', { ascending: false }],
+      ['order', 'id', { ascending: false }], ['range', 0, 99],
     ]);
+    listFiles(client, 'u1', { from: 100 });
+    expect(client.log.at(-1)).toEqual({ table: 'files', method: 'range', args: [100, 199] });
   });
   it('creates a signed URL with the chosen expiry', async () => {
     const client = makeClient();

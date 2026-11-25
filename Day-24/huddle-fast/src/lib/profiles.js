@@ -134,26 +134,46 @@ export function avatarPathFor(userId, file, stamp) {
  * the first folder is my id), (2) save the path on my profile row, (3) delete the old object.
  * If step 2 fails the new object is removed again so nothing is left behind.
  */
-export async function uploadAvatar(client, { userId, file, oldPath, stamp }) {
+export async function uploadAvatar(client, { userId, file, oldPath, stamp, variants = null }) {
   const problem = validateAvatarFile(file);
   if (problem) return { data: null, error: { message: problem, code: 'invalid_file' } };
-  const path = avatarPathFor(userId, file, stamp);
   const bucket = client.storage.from(AVATAR_BUCKET);
-  const { error: uploadError } = await bucket.upload(path, file, { contentType: file.type, upsert: false, cacheControl: '3600' });
-  if (uploadError) return { data: null, error: uploadError };
+  // Day 24: with resized `variants` ([{ size, blob, ext }], from src/lib/images.js) store those, not the original:
+  // <user>/avatar-<stamp>-64.webp and -256.webp, the profile pointing at the largest. Without them (no canvas in
+  // this browser) the original is stored as before.
+  const uploads = variants?.length
+    ? variants.map((v) => ({ path: `${userId}/avatar-${stamp}-${v.size}.${v.ext}`, body: v.blob, type: v.blob.type }))
+    : [{ path: avatarPathFor(userId, file, stamp), body: file, type: file.type }];
+  const done = [];
+  for (const u of uploads) {
+    // a year of browser caching: every new picture gets a new path, so a cached copy is never stale
+    const { error: uploadError } = await bucket.upload(u.path, u.body, { contentType: u.type, upsert: false, cacheControl: '31536000' });
+    if (uploadError) {
+      if (done.length) await bucket.remove(done);
+      return { data: null, error: uploadError };
+    }
+    done.push(u.path);
+  }
+  const path = done[done.length - 1];
   const { data, error } = await client.from('profiles').update({ avatar_path: path }).eq('id', userId).select().single();
   if (error) {
-    await bucket.remove([path]);
+    await bucket.remove(done);
     return { data: null, error };
   }
-  if (oldPath && oldPath !== path) await bucket.remove([oldPath]); // best effort: a leftover file is harmless
+  if (oldPath && oldPath !== path) await bucket.remove(avatarFiles(oldPath)); // best effort: a leftover file is harmless
   return { data, error: null };
+}
+
+/** Every stored file of an avatar: the resized variants share one name with a size (Day 24), older ones are one file */
+export function avatarFiles(path) {
+  const match = path?.match(/^(.*-)256\.(webp|png)$/);
+  return match ? [`${match[1]}64.${match[2]}`, path] : [path];
 }
 
 /** "Remove picture": clear the column first (so the app stops showing it), then delete the object */
 export async function removeAvatar(client, { userId, path }) {
   const { data, error } = await client.from('profiles').update({ avatar_path: null }).eq('id', userId).select().single();
   if (error) return { data: null, error };
-  if (path) await client.storage.from(AVATAR_BUCKET).remove([path]);
+  if (path) await client.storage.from(AVATAR_BUCKET).remove(avatarFiles(path));
   return { data, error: null };
 }
