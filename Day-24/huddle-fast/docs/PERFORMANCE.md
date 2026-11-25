@@ -52,3 +52,31 @@ What makes Huddle slow, measured before any change, and what each milestone does
 - **Notes are paginated by the server** (6 per page), so the list stays small whatever the number of notes. Typing in the search box re-renders those 6 cards: 850 renders for 10 key presses, cheap. It's a candidate for the "when not to memo" section, not a problem.
 - **Total Blocking Time is near 0** on most pages: the main thread isn't busy during load. The JavaScript cost is download and parse, not long tasks.
 - **Accessibility 100 and best practices 100** on the audited pages (except P-9).
+
+## M2: code splitting
+
+**What changed**
+
+| Technique | Where | Why |
+|---|---|---|
+| **Route-based splitting**: every page is `React.lazy` | `src/routes.js`, `src/App.jsx` | a visit downloads the app shell, then only the page it shows |
+| **Preload on intent** | `src/lib/lazyPage.js` (`preload()`), one delegated handler on the shell (`AppLayout`) for pointer over, focus and touch start on any internal link | the download starts 100–300 ms before the click, so a click rarely waits |
+| **Preload at start-up** | `src/main.jsx` | the current page's chunk downloads in parallel with React starting and the session check, instead of after them (a waterfall). Without a stored session, `/login` is fetched too, since that is where the visitor is about to go |
+| **Idle prefetch** of the main pages | `AppLayout` (`requestIdleCallback`) | touch screens have no hover; skipped when the browser asks to save data or the connection is 2G |
+| **Fallbacks** | `PageLoading` inside the shell's `<Suspense>`; a full-page one for sign-in | a first visit to a page shows its shape, not a blank area |
+| **A progress bar for navigations** | `AppLayout` (`.page-progress` + a status for screen readers) | React Router navigates inside a React **transition**, and during a transition React keeps the **old** page on screen instead of showing the fallback. Without this bar, a click on a slow connection would seem to do nothing (found by a browser test) |
+| **Focus waits for the lazy page** | `AppLayout` (`MutationObserver`, up to 5 s) | Day 22's "focus moves to the new page's heading" ran one frame after navigation, before a lazy page had arrived |
+| **Vendor chunks** | `vite.config.js` (`advancedChunks`: `react-vendor`, `supabase-vendor`) | libraries change far less often than the app: after a deploy that only changes app code, returning visitors keep them cached. Same first-visit bytes (+0.7 KB) |
+| **Failed chunk downloads are retried** | `lazyPage.js` | a failed import (offline, or a deploy replaced the chunk) is forgotten, so the next attempt tries again |
+
+**What was checked and NOT done (on purpose)**
+
+- **Splitting small components.** The note editor is 3.5 KB of source, about 1 KB compressed. Loading it separately would add a network round trip to save 1 KB. Component-level splitting pays for heavy, rarely used parts. Here those were whole pages (the style guide, the Query lab), and they are now their own chunks. The image resizer in M4 will be loaded only when a file is picked.
+- **Unused dependencies.** None found: every package is imported. `jsdom` is chosen per test file by a comment, and `@testing-library/dom` is a required peer of `@testing-library/react`.
+- **Tree shaking.** The icons are imported by name in all 23 files, so only the icons used are bundled (about 8 KB in the first download), and there is no `import *` anywhere.
+- **`iceberg-js`** (2 KB) arrives with Supabase's storage client. It can't be dropped without replacing `supabase-js`. Not worth it.
+
+**What remains in the first download** is shared by every page, and that is why splitting cut "only" about 17%:
+- React and react-dom, and the router;
+- the Supabase client: auth, realtime, storage and the query builder, all built by `createClient`;
+- the shell.

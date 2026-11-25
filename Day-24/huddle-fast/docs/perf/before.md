@@ -13,6 +13,26 @@ Treemap: [bundle-before.html](bundle-before.html). Sizes are what the browser do
 | Initial CSS | 1 | 59.6 KB | 12.6 KB |
 | Font files in the build | 19 | 524.4 KB | |
 
+What the initial JavaScript is made of (gzip size of each part inside the bundle):
+
+| Package or app folder | Raw | gzip |
+|---|---|---|
+| react-dom | 524.1 KB | 99.0 KB |
+| src/components | 126.8 KB | 36.4 KB |
+| @supabase/auth-js | 170.1 KB | 33.3 KB |
+| react-router | 92.6 KB | 22.9 KB |
+| src/lib | 51.0 KB | 17.5 KB |
+| src/pages | 60.7 KB | 17.5 KB |
+| @supabase/realtime-js | 55.5 KB | 16.0 KB |
+| lucide-react | 24.9 KB | 14.7 KB |
+| @supabase/phoenix | 39.8 KB | 9.6 KB |
+| @supabase/storage-js | 41.1 KB | 7.7 KB |
+| @supabase/postgrest-js | 31.1 KB | 7.2 KB |
+| @supabase/supabase-js | 20.5 KB | 6.1 KB |
+| react | 16.8 KB | 4.8 KB |
+| scheduler | 9.0 KB | 2.4 KB |
+| src/auth | 7.2 KB | 2.4 KB |
+
 Largest chunks:
 
 | Chunk | gzip | Loaded |

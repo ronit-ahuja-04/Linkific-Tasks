@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { Suspense, useEffect, useId, useRef, useState } from 'react';
 import { Link, matchPath, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { FlaskConical, FolderOpen, LayoutDashboard, LogOut, Menu, MessagesSquare, NotebookPen, Palette, UserRound, X } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
@@ -8,6 +8,8 @@ import Avatar from './Avatar';
 import NotificationBell from './NotificationBell';
 import SidebarRooms from './SidebarRooms';
 import ThemeToggle from './ThemeToggle';
+import PageLoading from './ui/PageLoading';
+import { pageFor, preloadPath } from '../routes';
 import '../styles/shell.css';
 
 const PRIMARY = [
@@ -69,25 +71,73 @@ export default function AppLayout() {
     if (event.target.closest('a')) setMenuOpen(false);
   };
 
-  // A new page: move focus to its h1, unless the page already put focus somewhere inside itself
+  // A new page: move focus to its h1, unless the page already put focus somewhere inside itself.
+  // Pages are lazy chunks (Day 24): when the code is still downloading, the h1 is not there yet, so wait for it
+  // (a MutationObserver, up to 5 s) instead of settling on <main>.
   useEffect(() => {
     if (lastPath.current === location.pathname) return undefined;
     lastPath.current = location.pathname;
-    const frame = requestAnimationFrame(() => {
-      const main = mainRef.current;
-      if (!main) return;
+    const main = mainRef.current;
+    if (!main) return undefined;
+    const focusHeading = () => {
       const active = document.activeElement;
-      if (active && active !== document.body && active !== main && main.contains(active)) return;
+      if (active && active !== document.body && active !== main && main.contains(active)) return true;
       const heading = main.querySelector('h1');
-      if (!heading) {
-        main.focus();
-        return;
-      }
+      if (!heading) return false;
       if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
       heading.focus();
+      return true;
+    };
+    let observer = null;
+    let timer = null;
+    const frame = requestAnimationFrame(() => {
+      if (focusHeading()) return;
+      observer = new MutationObserver(() => {
+        if (focusHeading()) observer.disconnect();
+      });
+      observer.observe(main, { childList: true, subtree: true });
+      timer = setTimeout(() => {
+        observer.disconnect();
+        if (!main.querySelector('h1')) main.focus();
+      }, 5000);
     });
-    return () => cancelAnimationFrame(frame);
+    return () => {
+      cancelAnimationFrame(frame);
+      observer?.disconnect();
+      clearTimeout(timer);
+    };
   }, [location.pathname]);
+
+  // Preload a page's code when the user signals they are going there: pointer over a link, keyboard focus on it, or
+  // the start of a tap. One delegated handler covers every internal link in the shell (menu, rooms, quick actions).
+  const preloadLink = (event) => {
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (link && link.origin === window.location.origin) preloadPath(link.pathname);
+  };
+
+  // A click on a page whose code is not here yet. React Router navigates inside a React transition, and during a
+  // transition React keeps the OLD page on screen while the new one loads (no Suspense fallback), so without this
+  // nothing would visibly happen on a slow connection. A thin bar and a status for screen readers say it is coming.
+  const [loadingPage, setLoadingPage] = useState(false);
+  const watchNavigation = (event) => {
+    const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+    if (!link || link.origin !== window.location.origin) return;
+    const page = pageFor(link.pathname);
+    if (!page || page.isLoaded()) return;
+    setLoadingPage(true);
+    page.preload().catch(() => undefined).finally(() => setLoadingPage(false));
+  };
+
+  // And once the first page is on screen and the browser is idle, fetch the main pages too (they are small), unless the
+  // user asked to save data or is on a very slow connection. Touch screens have no hover, so this is what helps them.
+  useEffect(() => {
+    const connection = navigator.connection;
+    if (connection?.saveData || /2g/.test(connection?.effectiveType ?? '')) return undefined;
+    const idle = window.requestIdleCallback ?? ((callback) => setTimeout(callback, 2000));
+    const cancel = window.cancelIdleCallback ?? clearTimeout;
+    const handle = idle(() => { for (const { to } of PRIMARY) preloadPath(to); });
+    return () => cancel(handle);
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -98,7 +148,9 @@ export default function AppLayout() {
   const name = profile?.full_name || profile?.username || user?.email;
 
   return (
-    <div className="shell">
+    <div className="shell" onMouseOver={preloadLink} onFocus={preloadLink} onTouchStart={preloadLink} onClickCapture={watchNavigation}>
+      <div className="page-progress" data-active={loadingPage ? '' : undefined} aria-hidden="true" />
+      <p className="sr-only" role="status">{loadingPage ? 'Loading the page…' : ''}</p>
       <a className="skip-link" href="#main">Skip to content</a>
 
       <div className="shell-sidebar" ref={sidebarRef} onBlur={onSidebarBlur}>
@@ -168,7 +220,10 @@ export default function AppLayout() {
       </div>
 
       <main id="main" ref={mainRef} className="shell-main" tabIndex={-1}>
-        <Outlet />
+        {/* the page's chunk may still be downloading: the shell stays, and the fallback takes the page's place */}
+        <Suspense fallback={<PageLoading />}>
+          <Outlet />
+        </Suspense>
       </main>
     </div>
   );

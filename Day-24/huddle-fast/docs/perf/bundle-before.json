@@ -40,5 +40,82 @@
       "gzip": 8825,
       "initial": false
     }
+  ],
+  "byPackage": [
+    {
+      "name": "react-dom",
+      "raw": 536687,
+      "gzip": 101365
+    },
+    {
+      "name": "src/components",
+      "raw": 129872,
+      "gzip": 37240
+    },
+    {
+      "name": "@supabase/auth-js",
+      "raw": 174198,
+      "gzip": 34083
+    },
+    {
+      "name": "react-router",
+      "raw": 94849,
+      "gzip": 23431
+    },
+    {
+      "name": "src/lib",
+      "raw": 52273,
+      "gzip": 17917
+    },
+    {
+      "name": "src/pages",
+      "raw": 62146,
+      "gzip": 17892
+    },
+    {
+      "name": "@supabase/realtime-js",
+      "raw": 56810,
+      "gzip": 16348
+    },
+    {
+      "name": "lucide-react",
+      "raw": 25506,
+      "gzip": 15090
+    },
+    {
+      "name": "@supabase/phoenix",
+      "raw": 40712,
+      "gzip": 9836
+    },
+    {
+      "name": "@supabase/storage-js",
+      "raw": 42119,
+      "gzip": 7908
+    },
+    {
+      "name": "@supabase/postgrest-js",
+      "raw": 31853,
+      "gzip": 7354
+    },
+    {
+      "name": "@supabase/supabase-js",
+      "raw": 20994,
+      "gzip": 6200
+    },
+    {
+      "name": "react",
+      "raw": 17166,
+      "gzip": 4938
+    },
+    {
+      "name": "scheduler",
+      "raw": 9212,
+      "gzip": 2426
+    },
+    {
+      "name": "src/auth",
+      "raw": 7409,
+      "gzip": 2423
+    }
   ]
 }
