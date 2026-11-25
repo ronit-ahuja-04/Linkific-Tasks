@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Hash, Lock, MessagesSquare } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
@@ -134,20 +134,28 @@ export default function RoomView({ room, onRead }) {
     return null;
   };
 
-  const edit = async (id, body) => {
+  // useCallback (Day 24): every MessageItem receives these two. MessageItem is memoised (React.memo), and memo compares
+  // props by identity: a NEW function on every RoomView render (a new message, someone typing, presence) would make
+  // all 500 messages re-render anyway. With useCallback they stay the same function as long as `client` does.
+  const edit = useCallback(async (id, body) => {
     const { data, error: failure } = await editMessage(client, id, body);
     if (failure) return friendlyError(failure, 'Could not save the edit.');
     setMessages((list) => upsertMessage(list, data));
     return null;
-  };
+  }, [client]);
 
-  const remove = async (id) => {
+  const remove = useCallback(async (id) => {
     const { error: failure } = await deleteMessage(client, id);
     if (failure) return friendlyError(failure, 'Could not delete the message.');
     setMessages((list) => list.filter((m) => m.id !== id));
     textareaRef.current?.focus(); // the deleted message's buttons are gone: put focus somewhere useful
     return null;
-  };
+  }, [client]);
+
+  // useMemo (Day 24): "does this message continue the previous person's group?" for every message. RoomView renders
+  // far more often than the list changes (typing indicator, presence, the composer's sends), so compute it only when
+  // the list itself changes. Booleans: an unchanged message keeps the same `grouped` value, so memo can skip it.
+  const grouped = useMemo(() => messages.map((m, i) => continuesGroup(m, messages[i - 1])), [messages]);
 
   const others = typing.map((p) => p.username).filter(Boolean);
   const typingText = others.length === 0 ? '' : others.length === 1 ? `${others[0]} is typing...` : `${others.join(', ')} are typing...`;
@@ -187,7 +195,7 @@ export default function RoomView({ room, onRead }) {
                 <div className="chat-log" role="log" aria-label="Messages" aria-live="polite">
                   <ol className="chat-messages">
                     {messages.map((m, i) => (
-                      <MessageItem key={m.id} message={m} mine={m.user_id === userId} grouped={continuesGroup(m, messages[i - 1])} onEdit={edit} onDelete={remove} />
+                      <MessageItem key={m.id} message={m} mine={m.user_id === userId} grouped={grouped[i]} onEdit={edit} onDelete={remove} />
                     ))}
                   </ol>
                 </div>

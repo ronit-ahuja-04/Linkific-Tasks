@@ -147,6 +147,16 @@ async function measureTimings(stack, room) {
     await page.waitForFunction(() => [...document.querySelectorAll('[role="log"] li')].filter((li) => li.textContent.includes('Incoming message')).length >= 5);
     await page.waitForTimeout(500);
     out.receivingLongTaskMs = Math.round((await page.evaluate(() => window.__perf.longTasks)).reduce((a, b) => a + b, 0));
+    // the notes search box: typing re-renders the page and its 6 cards on every key (is that worth memoising?)
+    await page.goto(`${base}/notes`);
+    await page.locator('#notes-search-input').waitFor();
+    await page.locator('[data-testid="note-card"]').first().waitFor();
+    await page.waitForTimeout(500);
+    await page.evaluate(() => { window.__perf.events = []; window.__perf.longTasks = []; });
+    await page.locator('#notes-search-input').pressSequentially('deployment', { delay: 50 });
+    await page.waitForTimeout(500);
+    const notes = await page.evaluate(() => window.__perf);
+    out.notesTyping = { interactions: notes.events.length, worstMs: Math.max(0, ...notes.events), medianMs: median(notes.events) ?? 0, longTaskMs: Math.round(notes.longTasks.reduce((a, b) => a + b, 0)) };
     await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
 
     // images and layout shift on the pages that show pictures (a fresh page each, so the counts are per page)

@@ -199,7 +199,9 @@ describe('Composer', () => {
     const { user, onSend } = setup({}, client);
     await user.type(screen.getByLabelText('Message'), 'hi @gr');
     const option = await screen.findByRole('option', { name: /@grace/ });
-    expect(client.op(client.callsOn('profiles')[0], 'ilike')).toEqual(['username', 'g%']);
+    // debounced (Day 24): typing "@gr" sends ONE lookup, for what was typed when typing paused
+    expect(client.callsOn('profiles')).toHaveLength(1);
+    expect(client.op(client.callsOn('profiles')[0], 'ilike')).toEqual(['username', 'gr%']);
     await user.click(option);
     expect(screen.getByLabelText('Message')).toHaveValue('hi @grace ');
     expect(onSend).not.toHaveBeenCalled();
