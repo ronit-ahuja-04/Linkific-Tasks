@@ -1,0 +1,84 @@
+{
+  "label": "compiler",
+  "renders": {
+    "typing": {
+      "onScreen": 500,
+      "commits": 32,
+      "total": 32,
+      "byComponent": {
+        "Composer": 32
+      }
+    },
+    "receiving": {
+      "onScreen": 500,
+      "commits": 6,
+      "total": 4915,
+      "byComponent": {
+        "MessageItem": 1510,
+        "Avatar": 1501,
+        "Anonymous": 943,
+        "Pencil": 471,
+        "Trash": 471,
+        "Body": 5,
+        "RoomView": 3,
+        "Composer": 3,
+        "ChatPage": 2,
+        "AppLayout": 1,
+        "SidebarRooms": 1,
+        "NavLink": 1,
+        "Link": 1,
+        "Lock": 1,
+        "CountBadge": 1
+      }
+    },
+    "notesSearchTyping": {
+      "commits": 10,
+      "total": 10,
+      "byComponent": {
+        "NotesPage": 10
+      }
+    }
+  },
+  "timings": {
+    "openRoomMs": 509,
+    "onScreen": 500,
+    "domNodes": 6584,
+    "typing": {
+      "interactions": 16,
+      "worstMs": 64,
+      "medianMs": 24,
+      "longTaskMs": 0
+    },
+    "receivingLongTaskMs": 379,
+    "pages": {
+      "Files": {
+        "imageRequests": 2,
+        "imageKb": 11,
+        "biggestImageKb": 11,
+        "worstOversize": null,
+        "cls": 0.001
+      },
+      "Profile": {
+        "imageRequests": 2,
+        "imageKb": 11,
+        "biggestImageKb": 11,
+        "worstOversize": 8,
+        "cls": 0.001
+      },
+      "Chat": {
+        "imageRequests": 5,
+        "imageKb": 43,
+        "biggestImageKb": 11,
+        "worstOversize": 8,
+        "cls": 0.001
+      },
+      "Dashboard": {
+        "imageRequests": 2,
+        "imageKb": 11,
+        "biggestImageKb": 11,
+        "worstOversize": 8,
+        "cls": 0.059
+      }
+    }
+  }
+}
