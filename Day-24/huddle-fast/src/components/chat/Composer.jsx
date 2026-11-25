@@ -120,7 +120,11 @@ export default function Composer({ onSend, onTyping, textareaRef }) {
           <textarea
             id="chat-input" ref={textareaRef} rows={2} maxLength={MAX_BODY} value={text} onChange={change} onKeyDown={keyDown}
             placeholder="Write a message, @ to mention someone" aria-describedby="chat-hint"
-            role="combobox" aria-expanded={suggestions.length > 0} aria-controls="chat-mentions" aria-autocomplete="list"
+            /* Day 24 (finding P-9): no role="combobox" or aria-expanded, which ARIA in HTML does not allow on a <textarea>.
+               A textarea is a textbox, and a textbox may carry aria-autocomplete, aria-controls and aria-activedescendant,
+               which is all the @-mention list needs: screen readers still hear the highlighted suggestion. aria-controls only
+               while the list exists (a reference to a missing element is invalid; axe caught it). */
+            aria-controls={suggestions.length ? 'chat-mentions' : undefined} aria-autocomplete="list"
             aria-activedescendant={suggestions.length ? `mention-${active}` : undefined}
           />
           {suggestions.length ? (

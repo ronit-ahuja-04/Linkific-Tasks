@@ -114,7 +114,7 @@ test.describe('the accessibility tree (ARIA snapshots)', () => {
             - list:
               - listitem:
                 - paragraph: first
-          - combobox "Message"
+          - textbox "Message"
           - button "Attach a file"
           - button "Send"
         - complementary "About this room"

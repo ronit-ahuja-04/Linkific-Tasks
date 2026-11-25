@@ -7,6 +7,18 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="color-scheme" content="light dark" />
     <title>Huddle</title>
+    <!-- Day 24: every page's data comes from Supabase, another origin. Open that connection now, while the JavaScript
+         downloads, instead of when the first query is sent. crossorigin: the queries are CORS requests. -->
+    <link rel="preconnect" href="%VITE_SUPABASE_URL%" crossorigin />
+    <style>
+      /* Day 24: a small splash, painted as soon as the HTML arrives (React replaces it when it starts). Before, the page
+         stayed blank until all the JavaScript had run. Deliberately SMALL: a large splash would become the "largest
+         contentful paint" itself and make LCP look early while the real content still takes as long. */
+      /* the design tokens (src/styles/tokens.css) are already loaded at first paint: the CSS blocks rendering anyway,
+         and the theme attribute is set by the script below (before the body is parsed), so the splash matches light and dark without colours of its own */
+      .boot { min-height: 100vh; display: grid; place-content: center; justify-items: center; gap: 0.75rem; font: 500 0.875rem/1.4 system-ui, sans-serif; color: var(--color-text-secondary); background: var(--color-bg); }
+      .boot-mark { width: 2rem; height: 2rem; border-radius: 0.5rem; display: grid; place-items: center; background: var(--color-primary); color: var(--color-on-primary); font-weight: 700; }
+    </style>
     <script>
       /* Set the theme before the first paint, so a dark-mode visitor never sees a white flash.
          Same rule as ThemeContext: a saved choice wins, otherwise follow the system. */
@@ -22,7 +34,7 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="boot" aria-busy="true"><span class="boot-mark" aria-hidden="true">H</span><span>Loading Huddle…</span></div></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

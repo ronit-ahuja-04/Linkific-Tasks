@@ -7,13 +7,38 @@ import EmptyState from '../ui/EmptyState';
 import RelativeTime from '../ui/RelativeTime';
 import UnderTheHood from '../ui/UnderTheHood';
 
-/** Three grey lines while a list loads; screen readers hear "Loading..." once */
+/** Three grey lines while something loads; screen readers hear "Loading..." once */
 function Loading() {
   return (
     <div className="dash-loading">
       <p role="status" className="sr-only">Loading...</p>
       {[70, 55, 62].map((w) => <span key={w} className="skeleton" style={{ width: `${w}%` }} aria-hidden="true" />)}
     </div>
+  );
+}
+
+/**
+ * Day 24: while a LIST panel loads, placeholders with the shape of its rows (the same `.row` markup, with an invisible
+ * line of text where the title and detail go, so each is exactly as tall as a real row). Before, three short lines
+ * stood in for five rows: the panel grew by ~265 px when the data came, and pushed the panel below it down (the
+ * dashboard's layout shift, CLS 0.14 on mobile).
+ */
+function LoadingRows({ rows = 5 }) {
+  return (
+    <>
+      <p role="status" className="sr-only">Loading...</p>
+      <ul className="rows rows-flush" aria-hidden="true">
+        {Array.from({ length: rows }, (_, i) => (
+          <li key={i} className="row">
+            <span className="row-icon skeleton" />
+            <span className="row-main">
+              <span className="row-link skeleton skeleton-text" style={{ width: `${[62, 48, 70, 55, 40][i % 5]}%` }}>&nbsp;</span>
+              <span className="row-meta skeleton skeleton-text" style={{ width: '22%' }}>&nbsp;</span>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -25,10 +50,13 @@ export function Panel({ id, title, to, linkText, state, error, empty, count = 0,
         <h2 id={id} className="card-title">{title}</h2>
         {to ? <Link to={to} className="dash-view-all">{linkText}</Link> : null}
       </div>
-      {state === 'loading' && <Loading />}
-      {state === 'error' && <p className="alert alert-error" role="alert">{error}</p>}
-      {state === 'ready' && count === 0 && empty}
-      {state === 'ready' && count > 0 && children}
+      {/* the body keeps the height of a full list (5 rows) whatever it shows: loading, a short list, empty, an error */}
+      <div className="dash-panel-body">
+        {state === 'loading' && <LoadingRows />}
+        {state === 'error' && <p className="alert alert-error" role="alert">{error}</p>}
+        {state === 'ready' && count === 0 && empty}
+        {state === 'ready' && count > 0 && children}
+      </div>
     </section>
   );
 }
