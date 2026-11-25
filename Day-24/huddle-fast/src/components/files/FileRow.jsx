@@ -4,7 +4,7 @@ import { EXPIRY_OPTIONS, formatBytes, formatCountdown, isImage } from '../../lib
 import RelativeTime from '../ui/RelativeTime';
 
 /** One file: preview, facts, and the actions. `actions` are async functions from the page. */
-export default function FileRow({ file, previewUrl, actions, busy }) {
+export default function FileRow({ file, previewUrl, actions, busy, style, ariaAttributes }) {
   const [seconds, setSeconds] = useState(3600);
   const [share, setShare] = useState(null); // { url, left, total }
   const [copied, setCopied] = useState(false);
@@ -29,9 +29,13 @@ export default function FileRow({ file, previewUrl, actions, busy }) {
 
   const expired = share && left === 0;
   return (
-    <li className="files-row" data-testid="file-row">
+    // Day 24: a row of a virtualised list (react-window positions it with `style`; `ariaAttributes` make it a listitem
+    // with its position, "5 of 300", for screen readers, since most rows are not in the page at any moment)
+    <div className="files-row" data-testid="file-row" style={style} {...ariaAttributes}>
       <div className="files-thumb">
-        {isImage(file.mime) && previewUrl ? <img src={previewUrl} alt={`Preview of ${file.name}`} /> : <FileText size={24} aria-hidden="true" />}
+        {/* Day 24: the box is 56 px (3.5rem). Fixed dimensions: no layout shift when it arrives. Lazy: a preview far
+            down the list is fetched only when scrolled near. */}
+        {isImage(file.mime) && previewUrl ? <img src={previewUrl} alt={`Preview of ${file.name}`} width={56} height={56} loading="lazy" decoding="async" /> : <FileText size={24} aria-hidden="true" />}
       </div>
       <div className="files-info">
         <p className="files-name">{file.name}</p>
@@ -75,6 +79,6 @@ export default function FileRow({ file, previewUrl, actions, busy }) {
           </div>
         )}
       </div>
-    </li>
+    </div>
   );
 }

@@ -1,0 +1,129 @@
+{
+  "label": "m4",
+  "renders": {
+    "typing": {
+      "onScreen": 500,
+      "commits": 32,
+      "total": 160,
+      "byComponent": {
+        "Anonymous": 64,
+        "Composer": 32,
+        "Paperclip": 32,
+        "Send": 32
+      }
+    },
+    "receiving": {
+      "onScreen": 500,
+      "commits": 5,
+      "total": 128,
+      "byComponent": {
+        "Anonymous": 36,
+        "Link": 13,
+        "NavLink": 7,
+        "Avatar": 6,
+        "Lock": 5,
+        "MessageItem": 5,
+        "Body": 5,
+        "RoomView": 4,
+        "ArrowLeft": 4,
+        "Composer": 4,
+        "Paperclip": 4,
+        "Send": 4,
+        "UnderTheHood": 4,
+        "CodeXml": 4,
+        "ChevronDown": 4,
+        "ChatPage": 2,
+        "AppLayout": 1,
+        "Menu": 1,
+        "NotificationBell": 1,
+        "Bell": 1,
+        "ThemeToggle": 1,
+        "Moon": 1,
+        "LayoutDashboard": 1,
+        "MessagesSquare": 1,
+        "NotebookPen": 1,
+        "FolderOpen": 1,
+        "SidebarRooms": 1,
+        "CountBadge": 1,
+        "FlaskConical": 1,
+        "Palette": 1,
+        "UserRound": 1,
+        "LogOut": 1,
+        "Outlet": 1
+      }
+    },
+    "notesSearchTyping": {
+      "commits": 10,
+      "total": 850,
+      "byComponent": {
+        "Anonymous": 310,
+        "Pin": 70,
+        "NoteCard": 60,
+        "Lock": 60,
+        "Avatar": 60,
+        "RelativeTime": 60,
+        "Pencil": 60,
+        "Trash": 60,
+        "NotesPage": 10,
+        "PageHeader": 10,
+        "Radio": 10,
+        "Plus": 10,
+        "Search": 10,
+        "SlidersHorizontal": 10,
+        "CountBadge": 10,
+        "NoteFilters": 10,
+        "UnderTheHood": 10,
+        "CodeXml": 10,
+        "ChevronDown": 10
+      }
+    }
+  },
+  "timings": {
+    "openRoomMs": 564,
+    "onScreen": 500,
+    "domNodes": 6575,
+    "typing": {
+      "interactions": 16,
+      "worstMs": 24,
+      "medianMs": 16,
+      "longTaskMs": 0
+    },
+    "receivingLongTaskMs": 0,
+    "notesTyping": {
+      "interactions": 10,
+      "worstMs": 24,
+      "medianMs": 16,
+      "longTaskMs": 0
+    },
+    "pages": {
+      "Files": {
+        "imageRequests": 3,
+        "imageKb": 8,
+        "biggestImageKb": 5,
+        "worstOversize": 3,
+        "cls": 0.037
+      },
+      "Profile": {
+        "imageRequests": 3,
+        "imageKb": 13,
+        "biggestImageKb": 11,
+        "worstOversize": 1,
+        "cls": 0.001
+      },
+      "Chat": {
+        "imageRequests": 5,
+        "imageKb": 7,
+        "biggestImageKb": 2,
+        "worstOversize": 1,
+        "cls": 0.001
+      },
+      "Dashboard": {
+        "imageRequests": 2,
+        "imageKb": 2,
+        "biggestImageKb": 2,
+        "worstOversize": 1,
+        "cls": 0.057
+      }
+    }
+  }
+}

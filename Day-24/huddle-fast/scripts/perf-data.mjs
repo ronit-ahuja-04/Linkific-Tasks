@@ -7,7 +7,7 @@
 // What it adds, all owned by four test accounts (`perf@example.com` and three "perf bots"):
 //   - a PRIVATE room "Perf lab" with 5,000 messages over 30 days, from the four of them (only they can see it);
 //   - 1,000 PRIVATE notes for perf@example.com, with 15 tags;
-//   - 300 files for perf@example.com: 40 real photos (large JPEGs, ~2000x1500) and 260 small documents;
+//   - 300 files for perf@example.com: every 8th is a real photo (38 large JPEGs, ~2000x1500), the rest small documents;
 //   - a large photo as each account's avatar.
 // Nothing existing is changed or deleted: your own accounts never see this data (private room, private notes).
 // Sign in as perf@example.com / perf-password-123 (local only) to see it.
@@ -25,7 +25,7 @@ const PEOPLE = [
   { email: 'perf-bot-3@example.com', username: 'perf_bot_grace', full_name: 'Grace (perf bot)' },
 ];
 const ROOM = 'Perf lab';
-const COUNTS = { messages: 5000, notes: 1000, files: 300, photos: 40 };
+const COUNTS = { messages: 5000, notes: 1000, files: 300, photoEvery: 8 }; // 300 / 8 -> 38 photos
 
 const status = execSync('npx supabase status -o env', { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
 const read = (name) => status.match(new RegExp(`^${name}="?([^"\\n]+)"?$`, 'm'))?.[1];
@@ -192,9 +192,9 @@ async function add() {
   const links = savedNotes.flatMap((note) => [...new Set(Array.from({ length: Math.floor(rand() * 4) }, () => pick(tags).id))].map((tag_id) => ({ note_id: note.id, tag_id })));
   await inBatches(links, 500, (batch) => api('/rest/v1/note_tags', { method: 'POST', body: batch, extra: { Prefer: 'return=minimal' } }));
 
-  console.log(`${COUNTS.files} files (${COUNTS.photos} photos), uploaded to storage…`);
+  console.log(`${COUNTS.files} files (every ${COUNTS.photoEvery}th a photo), uploaded to storage…`);
   const files = Array.from({ length: COUNTS.files }, (_, i) => {
-    const photo = i % Math.round(COUNTS.files / COUNTS.photos) === 0 && i / Math.round(COUNTS.files / COUNTS.photos) < COUNTS.photos;
+    const photo = i % COUNTS.photoEvery === 0;
     const name = photo ? `photo-${i + 1}.jpg` : `${pick(WORDS)}-${pick(WORDS)}-${i + 1}.${pick(['txt', 'md', 'csv'])}`;
     const bytes = photo ? photos[i % photos.length] : Buffer.from(paragraph(3 + Math.floor(rand() * 10)));
     return { name, bytes, mime: photo ? 'image/jpeg' : 'text/plain', path: `${me}/perf-${String(i + 1).padStart(3, '0')}-${name}`, created_at: new Date(start + i * 8_000_000).toISOString() };

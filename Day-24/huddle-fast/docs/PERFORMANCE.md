@@ -12,7 +12,7 @@ What makes Huddle slow, measured before any change, and what each milestone does
 | Lighthouse | Lighthouse 12 on the **production build**, served with brotli/gzip like a static host; `/login` signed out, five app pages signed in (session kept, HTTP cache cleared before every run); mobile (default throttling) and desktop; **median of 3 runs** | `scripts/perf/lighthouse.mjs` |
 | Re-renders | React's DevTools hook (through `bippy`, the library behind react-scan), injected before React loads, counts every component that rendered in each commit. **No test code in the app** | `scripts/perf/render-counter.js`, `interactions.mjs` |
 | Interaction cost | the Event Timing API (what INP is built on), long tasks, layout shift, image bytes, on the production build with the CPU slowed 4x | `scripts/perf/interactions.mjs` |
-| Scale | a large test data set: a private room with **5,000 messages**, **1,000 notes**, **300 files** (40 photos) and photo avatars, for four test accounts | `scripts/perf-data.mjs add / remove / status` |
+| Scale | a large test data set: a private room with **5,000 messages**, **1,000 notes**, **300 files** (38 photos) and photo avatars, for four test accounts | `scripts/perf-data.mjs add / remove / status` |
 
 **The long chat session** is the key scenario: the Perf lab room after "Load earlier messages" 9 times, which is **500 messages on screen**, as a team chat open all day would be.
 
@@ -155,3 +155,60 @@ The rule "avoid index as key" protects against reordering lists with state, and 
 - components are small and single-purpose;
 - fragments are used where no wrapper element is needed;
 - state is kept where it's used (the composer's text is local to `Composer`, which is why typing never re-rendered 500 messages).
+
+## M4: images and lists
+
+**Images: what changed**
+
+| Technique | Where | Why |
+|---|---|---|
+| **Resize in the browser at upload, to WebP** | `src/lib/images.js` (`resizeImage`, canvas → `image/webp`), loaded only when a file is picked | a phone photo is 2–5 MB and 3000+ px; Huddle shows avatars at 24–96 px and previews in a 56 px box. The browser makes the small copy once, so every later view downloads kilobytes |
+| **Avatars: 64 and 256 px** | `uploadAvatar` (variants), `avatarSources` | 64 px is sharp for the 24/32 px avatars on 2x screens, 256 px for the 96 px profile picture. Served with `srcset` + `sizes`, so the browser picks |
+| **File previews: a 160 px thumbnail** | `uploadThumbnail`, `files.thumb_path` (migration), `FilesPage` | the box is 56 px (112 on a 2x screen). The plan said ~480 px; measuring the box showed that would be 3x too large |
+| **`width`/`height` on every image** | `Avatar`, `FileRow` | the space is reserved before the picture arrives, so nothing jumps (CLS) |
+| **`loading="lazy"`, `decoding="async"`** | the same | an avatar 400 messages up a chat is not downloaded until scrolled near |
+| **`fetchpriority="high"`, `loading="eager"`** | the profile picture (`Avatar priority`) | on the profile page the avatar *is* the main picture (the LCP element): ask for it first |
+| **A year of caching on resized images** | `cacheControl: 31536000` | every new picture gets a new file name, so a cached copy is never out of date |
+| **Backfill for older pictures** | `scripts/backfill-images.mjs` (`--all` for every account) | existing images had only originals; this makes the same copies with the app's own resizer (bundled and run in Chrome). Originals are kept |
+| **Fallbacks** | everywhere | no canvas or WebP encoder in a browser means the original is uploaded as before. GIFs are not resized (animation) and SVGs not at all (vector) |
+
+**A CDN.** Supabase Storage serves public files through its CDN in the cloud. Locally there is none, and the resized files are what make the difference either way: a CDN delivers 1 MB faster, but 4 KB fastest.
+
+**Lists: what changed**
+
+| List | Approach | Why |
+|---|---|---|
+| **Files** | **virtualised** (`react-window` 2, `List` with `useDynamicRowHeight`, scrolling with the window) **+ infinite loading** (pages of 100 with the total) | it showed only the newest 100 files: the rest were **unreachable**. Now all of them, in one list, with a few dozen rows in the page at any time. Rows are measured (a row grows when its share link is open). Each row keeps its identity (`rowKey` by id), and screen readers hear "item 5 of 300" (`aria-setsize` set to the real total, not the pages loaded so far: a browser test caught that) |
+| **Chat** | **infinite scroll upward** (an `IntersectionObserver` on the "Load earlier" button, 300 px ahead) | reading back through history needs no clicks; the button stays for keyboard and screen-reader users. The reader's place is kept (test) |
+| **Notes** | **pagination** (server-side, 6 per page; unchanged) | notes are browsed and filtered, not read in sequence: pages with "1–6 of 23" fit, and the list stays small whatever the total |
+
+**Chat was NOT virtualised, on purpose** (decided with Ronit, from measurements). After M3, even 2,000 loaded messages scroll at 60 fps on a 4x slower CPU:
+
+| Messages loaded | "Load earlier" | DOM elements | JS memory | Scroll frames (median / worst) |
+|---|---|---|---|---|
+| 500 | 236 ms | 6,585 | 15 MB | 17 / 18 ms |
+| 1,000 | 246 ms | 13,077 | 16 MB | 17 / 34 ms |
+| 2,000 | 415 ms | 25,500 | 21 MB | 17 / 20 ms |
+
+Virtualising it would have broken two things that work today:
+- **Screen readers:** the message log is a live region that announces added messages. A windowed list adds rows while you scroll, so old messages would be read out as new.
+- **Keeping your place on "Load earlier":** prepending variable-height rows is the hardest case for windowed lists.
+
+**Tried and not adopted: `content-visibility: auto`** on messages. The browser skips off-screen rows but keeps them in the page. Measured in single runs: "Load earlier" ~10–20% faster (448 → 399 ms at 2,000 messages), scrolling unchanged. Close to run-to-run noise, and it makes the browser estimate the heights the keep-your-place logic depends on. Not worth the risk here.
+
+**Results** (numbers in [perf/m4.md](perf/m4.md); the test data's older pictures were backfilled with `scripts/backfill-images.mjs`)
+
+| Page | Image bytes, before → M4 | Lighthouse mobile, before → M4 (runs) | |
+|---|---|---|---|
+| Files | **17,207 KB → 8 KB** (15 → 3 requests) | 95 → 91 (90, 91, 92) | only the previews near the screen are requested; the score cost is explained below |
+| Profile | 1,010 KB → **13 KB** | **74 → 91** (91, 91, 91) | **LCP 8.3 s → 3.2 s**; CLS 0.050 → 0.001 |
+| Chat | 4,018 KB → 7 KB | 89 → 89 (89, 89, 89) | the 73-point outliers of M2 are gone |
+| Dashboard | 1,010 KB → 2 KB | 89 → 87 | CLS 0.14 remains: M5 |
+| Desktop | | Chat, Notes, Profile 95 → **100** | |
+
+- **What the image work fixed:** the 1 MB avatar caused the large swings between Lighthouse runs (M2). With it ~4 KB, every page's three runs now agree within 2 points.
+- **What it didn't fix:** the mobile scores of the other pages stay around 87–91. What limits them now is the first download and render-blocking CSS and fonts, which is M5.
+- **Files on mobile went 95 → 91, a real cost, not noise** (runs 95, 95, 95 → 90, 91, 92):
+  - M2 took it to 93: the page's code now arrives in a second step.
+  - M4 took it to 91: `react-window` added 6.6 KB to the Files chunk (4.4 → 11.0 KB gzip), and LCP went 2.6 → 2.9 s.
+  - **The trade:** every file reachable (the 200 that were hidden) and 17 MB of images down to 8 KB, against ~0.3 s on a simulated slow phone's first visit. M5 works on that first download.

@@ -101,10 +101,14 @@ export default function RoomView({ room, onRead }) {
     stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80;
   };
 
+  const loadingEarlier = useRef(false);
   const loadEarlier = async () => {
+    if (loadingEarlier.current) return; // the button and the scroll trigger can both ask: load once
+    loadingEarlier.current = true;
     setLoadingMore(true);
     anchor.current = listRef.current?.scrollHeight ?? 0;
     const { data, error: failure, hasMore: more } = await fetchMessages(client, room.id, { before: messages[0]?.created_at });
+    loadingEarlier.current = false;
     setLoadingMore(false);
     if (failure) {
       anchor.current = null;
@@ -115,6 +119,25 @@ export default function RoomView({ room, onRead }) {
     setMessages((list) => data.reduce((acc, m) => upsertMessage(acc, m), list));
     setHasMore(Boolean(more));
   };
+
+  // INFINITE SCROLL UPWARD (Day 24): when the "Load earlier messages" button comes within 300 px of the top of the
+  // conversation, the earlier page loads by itself, so reading back through history needs no clicks. The button stays
+  // (keyboard and screen-reader users, and a fallback). It cannot loop: after a load, the reader's place is kept
+  // (the layout effect above), which moves the button back out of view.
+  const earlierRef = useRef(null);
+  const loadEarlierLatest = useRef(loadEarlier);
+  useEffect(() => { loadEarlierLatest.current = loadEarlier; });
+  useEffect(() => {
+    const target = earlierRef.current;
+    const root = listRef.current;
+    if (!target || !root || !hasMore || status !== 'ready') return undefined;
+    if (typeof IntersectionObserver === 'undefined') return undefined; // an older browser: the button still works
+    const observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) loadEarlierLatest.current();
+    }, { root, rootMargin: '300px 0px 0px 0px' });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [hasMore, status]);
 
   // returns an error sentence, or null when it worked (the Composer shows it)
   const send = async ({ body, file }) => {
@@ -185,7 +208,7 @@ export default function RoomView({ room, onRead }) {
               {error ? <p role="alert" className="alert alert-error">{error}</p> : null}
               <div className="chat-scroll" ref={listRef} onScroll={onScroll}>
                 {hasMore ? (
-                  <button type="button" className="btn btn-sm chat-earlier" onClick={loadEarlier} disabled={loadingMore}>{loadingMore ? 'Loading...' : 'Load earlier messages'}</button>
+                  <button type="button" ref={earlierRef} className="btn btn-sm chat-earlier" onClick={loadEarlier} disabled={loadingMore}>{loadingMore ? 'Loading...' : 'Load earlier messages'}</button>
                 ) : null}
                 {messages.length === 0 ? (
                   <EmptyState compact headingLevel={2} icon={<MessagesSquare size={20} />} title="No messages yet">

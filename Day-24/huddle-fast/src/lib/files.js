@@ -53,6 +53,27 @@ export function isImage(mime) {
   return typeof mime === 'string' && mime.startsWith('image/');
 }
 
+/** Pictures we make a small preview of. Not GIF (it would lose its animation) or SVG (already small and sharp at any size). */
+export const canThumbnail = (mime) => isImage(mime) && !/gif|svg/.test(mime);
+
+/**
+ * Day 24: upload a small WebP preview next to an image (`<path>.thumb.webp`) and return its path, or null.
+ * Best effort: no canvas in this browser, or a failed upload, just means no thumbnail (the original is shown instead).
+ * The resizer (src/lib/images.js) is downloaded only now, when an image is uploaded.
+ */
+export async function uploadThumbnail(bucket, path, file) {
+  if (!canThumbnail(file.type)) return null;
+  try {
+    const { makeThumbnail } = await import('./images');
+    const thumb = await makeThumbnail(file);
+    const thumbPath = `${path}.thumb.${thumb.ext}`;
+    const { error } = await bucket.upload(thumbPath, thumb.blob, { contentType: thumb.blob.type, upsert: false, cacheControl: '31536000' });
+    return error ? null : thumbPath;
+  } catch {
+    return null;
+  }
+}
+
 /** "3:05" for 185 seconds, "1:00:00" for an hour: what the countdown shows */
 export function formatCountdown(seconds) {
   const s = Math.max(0, Math.floor(seconds));
@@ -90,15 +111,16 @@ export async function uploadFile(client, userId, file, { noteId = null } = {}) {
 
   const { error: uploadError } = await bucket.upload(path, file, { contentType, upsert: false });
   if (uploadError) return { data: null, error: uploadError };
+  const thumbPath = await uploadThumbnail(bucket, path, file);
 
   const { data, error: rowError } = await client
     .from('files')
-    .insert({ name: file.name.slice(0, 200), mime: contentType, size: file.size, path, note_id: noteId })
+    .insert({ name: file.name.slice(0, 200), mime: contentType, size: file.size, path, note_id: noteId, thumb_path: thumbPath })
     .select('*, note:notes(id, title)')
     .single();
 
   if (rowError) {
-    const { error: cleanupError } = await bucket.remove([path]); // ROLLBACK the bytes
+    const { error: cleanupError } = await bucket.remove(thumbPath ? [path, thumbPath] : [path]); // ROLLBACK the bytes
     return { data: null, error: rowError, cleanupError };
   }
   return { data, error: null };
@@ -111,10 +133,20 @@ export async function uploadFile(client, userId, file, { noteId = null } = {}) {
  * access (so a room can download them), and public rooms are open to everybody. Without the explicit owner filter
  * this list would show other people's files too. RLS says what I MAY see, the query still says what I WANT.
  */
-export function listFiles(client, userId, { limit = 100 } = {}) {
+export const FILES_PAGE = 100;
+
+export function listFiles(client, userId, { from = 0, pageSize = FILES_PAGE } = {}) {
   // select('*, note:notes(id, title)') is an EMBEDDED SELECT: PostgREST follows the foreign key files.note_id -> notes.id
   // and joins the note, so one request returns each file together with its note title.
-  return client.from('files').select('*, note:notes(id, title)').eq('owner_id', userId).order('created_at', { ascending: false }).limit(limit);
+  // Day 24: one PAGE at a time (range), with the total (count: 'exact'). Before, the page stopped at the newest 100
+  // files and the rest could not be reached at all; now the list loads more as it is scrolled (FilesPage).
+  return client
+    .from('files')
+    .select('*, note:notes(id, title)', { count: 'exact' })
+    .eq('owner_id', userId)
+    .order('created_at', { ascending: false })
+    .order('id', { ascending: false }) // a stable order: pages never repeat or skip a file with the same time
+    .range(from, from + pageSize - 1);
 }
 
 /** My notes for the "attach to a note" dropdown */
@@ -146,7 +178,7 @@ export async function createPreviewUrls(client, paths, seconds = 600) {
 
 /** DELETE: bytes first, then the row. (If the bytes cannot be removed the row stays, so nothing is lost silently.) */
 export async function deleteFile(client, file) {
-  const { error: storageError } = await client.storage.from(BUCKET).remove([file.path]);
+  const { error: storageError } = await client.storage.from(BUCKET).remove(file.thumb_path ? [file.path, file.thumb_path] : [file.path]);
   if (storageError) return { error: storageError };
   const { error } = await client.from('files').delete().eq('id', file.id);
   return { error };
