@@ -8,6 +8,8 @@
  */
 
 export const PAGE_SIZE = 50;
+/** Wait this long after the last key press before looking up @mentions (Day 24: one query per pause, not per key) */
+export const MENTION_DEBOUNCE_MS = 150;
 export const MAX_ATTACHMENT_BYTES = 10 * 1024 * 1024; // the 'attachments' bucket limit
 export const MAX_BODY = 2000; // messages.body check constraint
 

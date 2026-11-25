@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Paperclip, Send, X } from 'lucide-react';
 import { useAuth } from '../../auth/AuthContext';
-import { MAX_ATTACHMENT_BYTES, MAX_BODY, formatBytes, insertMention, mentionQuery, searchUsernames } from '../../lib/chat';
+import { MAX_ATTACHMENT_BYTES, MAX_BODY, MENTION_DEBOUNCE_MS, formatBytes, insertMention, mentionQuery, searchUsernames } from '../../lib/chat';
 
 /** The message box: Enter sends (Shift+Enter = new line), "@" + letters suggests usernames, a file can be attached */
 export default function Composer({ onSend, onTyping, textareaRef }) {
@@ -17,21 +17,32 @@ export default function Composer({ onSend, onTyping, textareaRef }) {
   const latest = useRef(0);
 
   // Mention autocomplete: runs when the text or the caret changes. Stale answers are ignored.
-  const updateSuggestions = async (value, caret) => {
+  // DEBOUNCED (Day 24): each lookup is a database query, and before Day 24 every key press after "@" sent one
+  // (typing "@perf_te" = 7 queries, 6 of them thrown away). Now the query waits until typing pauses for 150 ms.
+  // Clearing the list stays immediate. Compare "is typing" (useRoomChannel), which is THROTTLED instead: that one
+  // should go out regularly WHILE typing (at most every 2 s), this one only once typing pauses.
+  const debounce = useRef(null);
+  const updateSuggestions = (value, caret) => {
     const found = mentionQuery(value, caret);
     const ticket = ++latest.current;
+    clearTimeout(debounce.current);
     if (!found || !found.query) {
       setSuggestions([]);
       return;
     }
-    const { data } = await searchUsernames(client, found.query);
-    if (ticket === latest.current) {
-      setSuggestions(data ?? []);
-      setActive(0);
-    }
+    debounce.current = setTimeout(async () => {
+      const { data } = await searchUsernames(client, found.query);
+      if (ticket === latest.current) {
+        setSuggestions(data ?? []);
+        setActive(0);
+      }
+    }, MENTION_DEBOUNCE_MS);
   };
 
-  useEffect(() => () => { latest.current += 1; }, []);
+  useEffect(() => () => {
+    latest.current += 1;
+    clearTimeout(debounce.current);
+  }, []);
 
   const change = (event) => {
     setText(event.target.value);

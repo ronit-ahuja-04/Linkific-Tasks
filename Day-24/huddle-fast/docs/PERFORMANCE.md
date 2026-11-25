@@ -29,7 +29,7 @@ What makes Huddle slow, measured before any change, and what each milestone does
 | Lighthouse performance, desktop | 95 to 100 |
 | Lighthouse accessibility / best practices | 100 / 100 (chat 99: see P-9) |
 | Images | **Files page: 17.2 MB** (15 requests); every avatar a **1 MB photo shown 50× smaller** than downloaded |
-| Receiving 5 messages (500 on screen) | **8,655 component renders**; **785 ms** of blocked main thread (CPU 4x slower) |
+| Receiving 5 messages (500 on screen) | **12,902 component renders**; **785 ms** of blocked main thread (CPU 4x slower) |
 | Page size with 500 messages | 6,561 DOM elements |
 
 ## Findings
@@ -39,7 +39,7 @@ What makes Huddle slow, measured before any change, and what each milestone does
 | P-1 | **Every page downloads the whole app.** One 638 KB chunk (178 KB gzip); Lighthouse finds about 90 KB of it unused on every page (≈600 ms on mobile). | bundle, Lighthouse "Reduce unused JavaScript" | M2 |
 | P-2 | **Render-blocking CSS and fonts.** Three font families and styles (Inter, Inter italic, JetBrains Mono: 19 files) are declared on every page; the CSS blocks the first paint (≈450 ms on mobile). | Lighthouse "Eliminate render-blocking resources" | M5 |
 | P-3 | **Images are full-size originals.** Avatars are 1600 px photos (~1 MB) shown at 32–96 px; file previews are 2000 px photos (~1.2 MB each). Files page: 17.2 MB. Profile on mobile: **LCP 8.3 s**, the avatar. | interactions (image bytes, 50× oversize); Lighthouse "Properly size images" (16 MB), "next-gen formats", "Defer offscreen images" | M4 |
-| P-4 | **One new message re-renders the whole history.** With 500 messages on screen, 5 incoming messages cause 8,655 component renders (every `MessageItem`, its `Body` and `Avatar`, each time), 785 ms of blocked main thread. | render counts, long tasks | M3 |
+| P-4 | **One new message re-renders the whole history.** With 500 messages on screen, 5 incoming messages cause 12,902 component renders (every `MessageItem`, its `Body` and `Avatar`, each time), 785 ms of blocked main thread. | render counts, long tasks | M3 |
 | P-5 | **Long sessions grow the page without limit.** Every loaded message stays in the DOM: 500 messages = 6,561 elements. | DOM size | M4 (virtualisation) |
 | P-6 | **Layout shift on the dashboard.** Mobile CLS 0.14, desktop 0.07: panels change height as their data arrives. | Lighthouse CLS | M4 / M5 |
 | P-7 | **No early connection to Supabase.** Every page's data comes from another origin; the browser connects only once the JavaScript asks. | Lighthouse "Preconnect to required origins" (75–120 ms) | M5 |
@@ -108,3 +108,50 @@ What makes Huddle slow, measured before any change, and what each milestone does
 2. **Prefetching the other pages *during* load cost ≈0.3 s of LCP.** They competed with the page's own requests. The prefetch now waits for the load event plus 2 s.
 
 **What a split costs:** the page's own chunk can only start once the main file runs. That is one extra round trip on a first visit (≈0.2 s on the simulated slow phone, Notes 2.9 → 3.1 s). Preloading at start-up keeps it to one trip, not two.
+
+## M3: rendering (React.memo, useMemo, useCallback)
+
+**What changed**
+
+| Technique | Where | Why |
+|---|---|---|
+| **`React.memo(MessageItem)`** | `src/components/chat/MessageItem.jsx` | a long session has hundreds of messages on screen; before, every one re-rendered whenever the room did (each new message, each "is typing", each presence change) |
+| **`useCallback` for `edit` and `remove`** | `RoomView.jsx` | memo compares props by identity: these two were new functions on every `RoomView` render, so memo alone would have done **nothing**. Proven by a unit test that renders 50 messages with and without stable handlers |
+| **`useMemo` for the grouping flags** | `RoomView.jsx` | "does this message continue the previous person's group?" for every message, recomputed on every render before; now only when the list changes. The flags are booleans, so an unchanged message keeps the same value and memo can skip it |
+| **Debounced @-mention lookup** (150 ms) | `Composer.jsx`, `MENTION_DEBOUNCE_MS` in `lib/chat.js` | each lookup is a database query; typing `@perf_te` sent 7 (6 thrown away), now one per pause |
+| **Throttle, already right** | `useRoomChannel.js` | "is typing" goes out at most every 2 s *while* typing: a throttle, because it must keep going during typing. A debounce would only send it once typing stopped |
+
+No custom comparison function is needed: `upsertMessage` copies only the row it changes, so every other message keeps the same object, and the default shallow comparison sees "unchanged".
+
+**Results** (numbers in [perf/m3.md](perf/m3.md))
+
+| Scenario: the Perf lab room, 500 messages on screen | Before | M3 |
+|---|---|---|
+| Receive 5 messages: component renders | 12,902 (every `MessageItem`, `Body`, `Avatar`, each time) | **128**: exactly 5 `MessageItem`s (the new ones), plus the room view, composer and sidebar around them |
+| Receive 5 messages: main thread blocked, CPU 4x slower | 785 ms | **0 ms** |
+| Type 32 characters in the composer: worst key press | 64 ms | 24 ms |
+| Type 32 characters: component renders | 160 (only the composer) | 160 (unchanged: it was already right) |
+| Lighthouse | | unchanged (memoisation changes what happens *after* load, not the load) |
+
+**When NOT to memoise (measured, left alone)**
+
+| Candidate | Why not |
+|---|---|
+| `Avatar`, `Body` inside `MessageItem` | they render only when their memoised parent does. A second memo would add a props comparison per message and save nothing |
+| `NoteCard` | typing 10 letters in the notes search re-renders the 6 cards on the page (850 component renders), and every key press still paints within **16 ms** with the CPU 4x slower (no long tasks). Memo would also need three `useCallback`s in `NotesPage` (two handlers are inline arrows), all to save a few milliseconds of nothing |
+| `Composer` | it re-renders when the room does, but it is one component holding a textarea; its own typing state is already local, which is why typing never re-rendered the message list |
+| `useMemo` for `splitMentions(text)` in `Body` | a regular expression over one short message, and only when that message renders |
+| "Avoid inline functions in JSX" as a rule | an inline arrow costs nothing on a DOM element (`<button onClick={() => …}>`). It only matters when passed to a **memoised** child, as `onEdit`/`onDelete` were |
+
+**Keys.** Every list keyed by a stable id where the items can change order or have state (messages by `m.id`, notes, files, rooms). Five places use the index as key, and all are the legitimate case: a list that never reorders and whose items hold no state.
+- `Body` and `Snippet`: the parts of one message or snippet, split by mentions or matches;
+- the Query lab's event log (append-only) and result rows (replaced as a whole);
+- the style guide's 12 decorative grid columns.
+
+The rule "avoid index as key" protects against reordering lists with state, and none of these qualify.
+
+**Already following the other best practices** (checked, nothing to change):
+- props are destructured in the signature;
+- components are small and single-purpose;
+- fragments are used where no wrapper element is needed;
+- state is kept where it's used (the composer's text is local to `Composer`, which is why typing never re-rendered 500 messages).

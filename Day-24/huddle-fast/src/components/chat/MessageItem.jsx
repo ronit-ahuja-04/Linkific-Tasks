@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import Avatar from '../Avatar';
 import Attachment from './Attachment';
@@ -17,8 +17,15 @@ function Body({ text }) {
 /**
  * One message. `grouped` = the same person wrote the message above a moment ago: no second avatar and name
  * (less noise), but screen readers still hear who wrote it and when.
+ *
+ * React.memo (Day 24): a long chat session has hundreds of these on screen, and before Day 24 every one re-rendered
+ * whenever the room did (each new message, each "is typing"): 5 incoming messages = 12,902 component renders. Now a
+ * message renders only when ITS props change: its own row (an edit), `mine`, `grouped`, or the two handlers, which
+ * RoomView keeps stable with useCallback. Its own state (edit mode, draft) still re-renders it as before.
+ * The default shallow comparison is enough: `message` is the same object until that message changes (upsertMessage
+ * copies only the row it updates), so no custom comparison function is needed.
  */
-export default function MessageItem({ message, mine, grouped = false, onEdit, onDelete }) {
+function MessageItem({ message, mine, grouped = false, onEdit, onDelete }) {
   const [mode, setMode] = useState('view'); // view | edit | confirm
   const [draft, setDraft] = useState(message.body);
   const [busy, setBusy] = useState(false);
@@ -107,3 +114,5 @@ export default function MessageItem({ message, mine, grouped = false, onEdit, on
     </li>
   );
 }
+
+export default memo(MessageItem);

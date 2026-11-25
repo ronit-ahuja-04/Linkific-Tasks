@@ -84,6 +84,7 @@ function sections(label) {
       `| Typing: key press to next paint, median / worst (${t.typing.interactions} interactions) | ${ms(t.typing.medianMs)} / ${ms(t.typing.worstMs)} |`,
       `| Typing: main thread blocked (long tasks) | ${ms(t.typing.longTaskMs)} |`,
       `| Receiving 5 messages: main thread blocked (long tasks) | **${ms(t.receivingLongTaskMs)}** |`,
+      ...(t.notesTyping ? [`| Notes search: key press to next paint, median / worst (${t.notesTyping.interactions} interactions) | ${ms(t.notesTyping.medianMs)} / ${ms(t.notesTyping.worstMs)} |`] : []),
       '',
       '| Page | Image requests | Image bytes | Biggest image | Downloaded vs shown width (worst) | CLS |',
       '|---|---|---|---|---|---|',
