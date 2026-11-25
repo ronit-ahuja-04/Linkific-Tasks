@@ -1,0 +1,54 @@
+# Performance (Day 24)
+
+What makes Huddle slow, measured before any change, and what each milestone does about it.
+- **The numbers:** all of them come from `npm run perf`. It builds the app, runs Lighthouse (signed in, median of 3 runs) and replays real interactions, then writes [perf/before.md](perf/before.md).
+- **The final run:** the same script, run at the end, writes `perf/after.md`.
+
+## How it is measured
+
+| What | How | Script |
+|---|---|---|
+| Bundle | build manifest + gzip/brotli sizes; "initial" = the entry chunk and its static imports (needed before the first render); treemap with `rollup-plugin-visualizer`, Vite's counterpart of webpack-bundle-analyzer | `scripts/perf/bundle.mjs` |
+| Lighthouse | Lighthouse 12 on the **production build**, served with brotli/gzip like a static host; `/login` signed out, five app pages signed in (session kept, HTTP cache cleared before every run); mobile (default throttling) and desktop; **median of 3 runs** | `scripts/perf/lighthouse.mjs` |
+| Re-renders | React's DevTools hook (through `bippy`, the library behind react-scan), injected before React loads, counts every component that rendered in each commit. **No test code in the app** | `scripts/perf/render-counter.js`, `interactions.mjs` |
+| Interaction cost | the Event Timing API (what INP is built on), long tasks, layout shift, image bytes, on the production build with the CPU slowed 4x | `scripts/perf/interactions.mjs` |
+| Scale | a large test data set: a private room with **5,000 messages**, **1,000 notes**, **300 files** (40 photos) and photo avatars, for four test accounts | `scripts/perf-data.mjs add / remove / status` |
+
+**The long chat session** is the key scenario: the Perf lab room after "Load earlier messages" 9 times, which is **500 messages on screen**, as a team chat open all day would be.
+
+**Notes on the setup:**
+- Huddle runs against the **local** Supabase stack, so there's no real network or CDN. Lighthouse simulates a slow phone and network on top, which is how its score is computed anyway.
+- The local Supabase API doesn't compress its JSON answers. Lighthouse flags that ("Enable text compression": 20 KB on chat). It isn't the app: Supabase's cloud compresses.
+
+## Baseline (25 Nov), in short
+
+| | Value |
+|---|---|
+| Initial JavaScript | **one 638 KB file (178 KB gzip)** for every page; only the style guide is lazy |
+| Lighthouse performance, mobile | Sign in 97 · Dashboard 89 · Chat 89 · Notes 93 · Files 95 · **Profile 74** |
+| Lighthouse performance, desktop | 95 to 100 |
+| Lighthouse accessibility / best practices | 100 / 100 (chat 99: see P-9) |
+| Images | **Files page: 17.2 MB** (15 requests); every avatar a **1 MB photo shown 50× smaller** than downloaded |
+| Receiving 5 messages (500 on screen) | **8,655 component renders**; **785 ms** of blocked main thread (CPU 4x slower) |
+| Page size with 500 messages | 6,561 DOM elements |
+
+## Findings
+
+| # | Finding | Evidence | Fix in |
+|---|---|---|---|
+| P-1 | **Every page downloads the whole app.** One 638 KB chunk (178 KB gzip); Lighthouse finds about 90 KB of it unused on every page (≈600 ms on mobile). | bundle, Lighthouse "Reduce unused JavaScript" | M2 |
+| P-2 | **Render-blocking CSS and fonts.** Three font families and styles (Inter, Inter italic, JetBrains Mono: 19 files) are declared on every page; the CSS blocks the first paint (≈450 ms on mobile). | Lighthouse "Eliminate render-blocking resources" | M5 |
+| P-3 | **Images are full-size originals.** Avatars are 1600 px photos (~1 MB) shown at 32–96 px; file previews are 2000 px photos (~1.2 MB each). Files page: 17.2 MB. Profile on mobile: **LCP 8.3 s**, the avatar. | interactions (image bytes, 50× oversize); Lighthouse "Properly size images" (16 MB), "next-gen formats", "Defer offscreen images" | M4 |
+| P-4 | **One new message re-renders the whole history.** With 500 messages on screen, 5 incoming messages cause 8,655 component renders (every `MessageItem`, its `Body` and `Avatar`, each time), 785 ms of blocked main thread. | render counts, long tasks | M3 |
+| P-5 | **Long sessions grow the page without limit.** Every loaded message stays in the DOM: 500 messages = 6,561 elements. | DOM size | M4 (virtualisation) |
+| P-6 | **Layout shift on the dashboard.** Mobile CLS 0.14, desktop 0.07: panels change height as their data arrives. | Lighthouse CLS | M4 / M5 |
+| P-7 | **No early connection to Supabase.** Every page's data comes from another origin; the browser connects only once the JavaScript asks. | Lighthouse "Preconnect to required origins" (75–120 ms) | M5 |
+| P-8 | **Repeat visits revalidate every file.** Hashed assets never change, but are served `max-age=0, must-revalidate` (no caching rules shipped). | server headers | M5 (`_headers`) |
+| P-9 | **`role="combobox"` on the chat `<textarea>`** is not allowed by ARIA in HTML. Day 22's WCAG-only axe rules passed it; Lighthouse's best-practice rule doesn't. | Lighthouse accessibility 99 on chat (`aria-allowed-role`) | M5 |
+
+## Already good (measured, kept)
+
+- **Typing in the chat composer re-renders only the composer.** Its text is local state, so the 500 messages don't re-render while you type (32 key presses: 160 renders, all in the composer). Memoising the list would not change this case.
+- **Notes are paginated by the server** (6 per page), so the list stays small whatever the number of notes. Typing in the search box re-renders those 6 cards: 850 renders for 10 key presses, cheap. It's a candidate for the "when not to memo" section, not a problem.
+- **Total Blocking Time is near 0** on most pages: the main thread isn't busy during load. The JavaScript cost is download and parse, not long tasks.
+- **Accessibility 100 and best practices 100** on the audited pages (except P-9).
