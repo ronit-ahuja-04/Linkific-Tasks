@@ -1,0 +1,259 @@
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
+import {
+  BookOpen,
+  Flame,
+  GraduationCap,
+  LayoutDashboard,
+  LogOut,
+  Moon,
+  ShieldAlert,
+  Sparkles,
+  Sun,
+  Trophy,
+  Volume2,
+  VolumeX,
+  Wrench,
+} from 'lucide-react';
+import { useEffect } from 'react';
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
+import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { signOutUser } from '../../features/auth/authSlice';
+import { dismissReward } from '../../features/quest/questSlice';
+import { dismissToast, toggleSound, toggleTheme } from '../../features/ui/uiSlice';
+import { DEMO_GUILD_ENTRIES } from '../../lib/demoData';
+import { GAME_RULES } from '../../lib/game/catalog';
+import { sfx } from '../../lib/game/sfx';
+import { progressFor } from '../../lib/game/xp';
+import { isSupabaseConfigured } from '../../lib/supabase';
+import { AppErrorBoundary } from '../AppErrorBoundary';
+import { CountUpValue } from '../game/CountUpValue';
+import { RewardOverlay } from '../game/RewardOverlay';
+
+interface NavTabItem {
+  to: string;
+  label: string;
+  icon: typeof BookOpen;
+}
+
+export function AppShell() {
+  const dispatch = useAppDispatch();
+  const location = useLocation();
+  const reduce = useReducedMotion();
+  const theme = useAppSelector((state) => state.ui.theme);
+  const soundEnabled = useAppSelector((state) => state.ui.soundEnabled);
+  const toasts = useAppSelector((state) => state.ui.toasts);
+  const { profile, userId } = useAppSelector((state) => state.auth);
+  const { sessionEarnedXp, activeReward } = useAppSelector((state) => state.quest);
+  const liveSupabase = isSupabaseConfigured();
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+  }, [theme]);
+
+  const baseEntry = profile
+    ? DEMO_GUILD_ENTRIES.find((item) => item.userId === profile.id)
+    : undefined;
+  const activeXp = (baseEntry?.totalXp ?? 0) + sessionEarnedXp;
+  const activeProgress = progressFor(activeXp, GAME_RULES.characterLevelScale);
+
+  const tabs: NavTabItem[] = [
+    { to: '/courses', label: 'Catalog', icon: BookOpen },
+    { to: '/guild', label: 'Guild Hall', icon: Trophy },
+    { to: '/dashboard', label: 'My Learning', icon: LayoutDashboard },
+  ];
+
+  if (profile?.role === 'instructor' || profile?.role === 'admin') {
+    tabs.push({ to: '/instructor', label: 'Studio', icon: Wrench });
+  }
+  if (profile?.role === 'admin') {
+    tabs.push({ to: '/admin', label: 'Admin', icon: ShieldAlert });
+  }
+
+  return (
+    <div className="min-h-screen bg-bg text-ink">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-brand focus:px-3 focus:py-2 focus:text-sm focus:font-bold focus:text-on-brand"
+      >
+        Skip to content
+      </a>
+
+      <header className="sticky top-0 z-30 border-b-2 border-line bg-surface/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              onClick={() => sfx.tap()}
+              className="group inline-flex items-center gap-2 font-display text-xl font-bold tracking-tight"
+            >
+              <m.span
+                whileHover={reduce ? undefined : { rotate: -12, scale: 1.12 }}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-on-brand shadow-[0_3px_0_var(--brand-deep)]"
+              >
+                <GraduationCap className="h-5 w-5" aria-hidden="true" />
+              </m.span>
+              <span>SkillForge</span>
+            </Link>
+            <span
+              className={`hidden rounded-full px-2.5 py-0.5 font-mono text-[11px] font-bold sm:inline-block ${
+                liveSupabase ? 'bg-good/15 text-good' : 'bg-gold/30 text-ink dark:text-gold'
+              }`}
+            >
+              {liveSupabase ? 'Supabase Live' : 'Demo Mode'}
+            </span>
+          </div>
+
+          <nav aria-label="Primary navigation" className="flex flex-wrap items-center gap-1">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <NavLink
+                  key={tab.to}
+                  to={tab.to}
+                  onClick={() => sfx.tap()}
+                  className={({ isActive }) =>
+                    `relative inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-bold transition-colors ${
+                      isActive ? 'text-on-brand' : 'text-muted hover:bg-surface-2 hover:text-ink'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      {isActive && (
+                        <m.span
+                          layoutId="primary-nav-pill"
+                          transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                          className="absolute inset-0 rounded-xl bg-brand shadow-[0_3px_0_var(--brand-deep)]"
+                        />
+                      )}
+                      <Icon className="relative z-10 h-4 w-4" aria-hidden="true" />
+                      <span className="relative z-10">{tab.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              );
+            })}
+          </nav>
+
+          <div className="flex items-center gap-2">
+            {(userId || sessionEarnedXp > 0) && (
+              <div className="hidden items-center gap-2 rounded-xl border-2 border-line bg-surface-2/80 px-2.5 py-1 text-xs font-bold md:flex">
+                <span className="rounded-lg bg-brand px-1.5 py-0.5 font-mono text-[11px] text-on-brand">
+                  Lv.{activeProgress.level}
+                </span>
+                <span className="inline-flex items-center gap-1 font-mono text-ink dark:text-gold">
+                  <Sparkles className="h-3 w-3 text-gold-deep dark:text-gold" aria-hidden="true" />
+                  <CountUpValue value={activeXp} suffix=" XP" duration={600} />
+                </span>
+                {(baseEntry?.streakDays ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-0.5 text-warn">
+                    <Flame className="h-3.5 w-3.5" aria-hidden="true" />
+                    {baseEntry?.streakDays}d
+                  </span>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => dispatch(toggleSound())}
+              aria-label={soundEnabled ? 'Mute sound effects' : 'Enable sound effects'}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-line bg-surface p-2 text-ink transition-transform hover:bg-surface-2 active:translate-y-0.5"
+            >
+              {soundEnabled ? (
+                <Volume2 className="h-4 w-4 text-brand" aria-hidden="true" />
+              ) : (
+                <VolumeX className="h-4 w-4 text-muted" aria-hidden="true" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => dispatch(toggleTheme())}
+              aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-line bg-surface p-2 text-ink transition-transform hover:bg-surface-2 active:translate-y-0.5"
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-4 w-4" aria-hidden="true" />
+              ) : (
+                <Moon className="h-4 w-4" aria-hidden="true" />
+              )}
+            </button>
+
+            {userId && profile ? (
+              <div className="flex items-center gap-2">
+                <Link
+                  to="/character"
+                  className="inline-flex items-center gap-1.5 rounded-xl border-2 border-line bg-surface-2 px-3 py-1.5 text-xs font-bold hover:border-brand"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-brand" aria-hidden="true" />
+                  <span>@{profile.handle}</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => void dispatch(signOutUser())}
+                  aria-label="Sign out"
+                  className="inline-flex items-center justify-center rounded-xl border-2 border-line bg-surface p-2 text-muted hover:text-danger"
+                >
+                  <LogOut className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="rpg-btn-primary rounded-xl px-3.5 py-1.5 text-sm font-bold"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main id="main-content" className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <m.div
+          key={location.pathname}
+          initial={reduce ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+        >
+          <AppErrorBoundary key={location.pathname}>
+            <Outlet />
+          </AppErrorBoundary>
+        </m.div>
+      </main>
+
+      <AnimatePresence>
+        {activeReward && (
+          <RewardOverlay reward={activeReward} onDone={() => dispatch(dismissReward())} />
+        )}
+      </AnimatePresence>
+
+      <div
+        aria-live="polite"
+        className="pointer-events-none fixed right-4 bottom-4 z-40 flex flex-col gap-2"
+      >
+        <AnimatePresence>
+          {toasts.map((toast) => (
+            <m.div
+              key={toast.id}
+              initial={reduce ? false : { opacity: 0, y: 16, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 8, scale: 0.9 }}
+              className="pointer-events-auto flex items-center gap-3 rounded-xl border-2 border-line bg-surface px-4 py-2.5 text-sm font-bold shadow-md"
+            >
+              <span>{toast.text}</span>
+              <button
+                type="button"
+                onClick={() => dispatch(dismissToast(toast.id))}
+                className="text-xs text-muted hover:text-ink"
+              >
+                Dismiss
+              </button>
+            </m.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

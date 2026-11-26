@@ -1,0 +1,174 @@
+@import '@fontsource-variable/space-grotesk';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/jetbrains-mono';
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * SkillForge RPG Design Tokens (heritage from Intern Quest: Plum Ink, Electric Violet, Championship Gold)
+ */
+:root {
+  --bg: #faf8fd;
+  --surface: #ffffff;
+  --surface-2: #f3effb;
+  --line: #e4dcf2;
+  --ink: #2a1e3b;
+  --muted: #6b617a;
+  --brand: #6c4df5;
+  --brand-deep: #4a2fc9;
+  --brand-hover: #5b3ce6;
+  --on-brand: #ffffff;
+  --gold: #ffc12e;
+  --gold-deep: #d99b06;
+  --on-gold: #2a1e3b;
+  --accent: #0f9d78;
+  --good: #118a5d;
+  --warn: #b45309;
+  --danger: #dc2626;
+}
+
+.dark {
+  --bg: #120d1d;
+  --surface: #1b142b;
+  --surface-2: #251c3a;
+  --line: #362952;
+  --ink: #f7f4ff;
+  --muted: #b3a7c7;
+  --brand: #7d62ff;
+  --brand-deep: #5537d9;
+  --brand-hover: #6c4df5;
+  --on-brand: #ffffff;
+  --gold: #ffc83d;
+  --gold-deep: #c98a00;
+  --on-gold: #221633;
+  --accent: #20c997;
+  --good: #34d399;
+  --warn: #fbbf24;
+  --danger: #f87171;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-brand: var(--brand);
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-hover: var(--brand-hover);
+  --color-on-brand: var(--on-brand);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-on-gold: var(--on-gold);
+  --color-accent: var(--accent);
+  --color-good: var(--good);
+  --color-warn: var(--warn);
+  --color-danger: var(--danger);
+  --font-display: 'Space Grotesk Variable', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+.rpg-card {
+  border-radius: 1.25rem;
+  border: 2px solid var(--line);
+  background-color: var(--surface);
+  box-shadow: 0 4px 0 rgba(42, 30, 59, 0.08);
+}
+
+.dark .rpg-card {
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+.rpg-btn-primary {
+  background-color: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 4px 0 var(--brand-deep);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease,
+    background-color 0.15s ease;
+}
+
+.rpg-btn-primary:hover {
+  background-color: var(--brand-hover);
+}
+
+.rpg-btn-primary:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--brand-deep);
+}
+
+.rpg-btn-gold {
+  background-color: var(--gold);
+  color: var(--on-gold);
+  box-shadow: 0 4px 0 var(--gold-deep);
+  transition:
+    transform 0.1s ease,
+    box-shadow 0.1s ease;
+}
+
+.rpg-btn-gold:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 var(--gold-deep);
+}
+
+@keyframes xp-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(220%);
+  }
+}
+
+@keyframes pulse-beacon {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(108, 77, 245, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 12px rgba(108, 77, 245, 0);
+  }
+}
+
+.xp-bar-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.xp-bar-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: xp-shimmer 2.6s ease-in-out infinite;
+}
+
+.quest-beacon {
+  animation: pulse-beacon 2.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xp-bar-fill::after,
+  .quest-beacon {
+    animation: none;
+  }
+}
