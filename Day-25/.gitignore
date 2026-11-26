@@ -1,0 +1,6 @@
+.agents/
+.claude/
+_bmad/
+.DS_Store
+**/.DS_Store
+*.tmp.html

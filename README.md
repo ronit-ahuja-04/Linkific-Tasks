@@ -2,7 +2,7 @@
 
 **Author:** Ronit Ahuja
 **Programme:** Linkific internship, Month 1 (training phase)
-**Status:** Days 1–24 delivered
+**Status:** Days 1–25 delivered (Day 25 launches Days 25–30 Capstone)
 
 One repository, one folder per training day. Days 1–3 are small standalone deliverables. From Day 5 onward the work compounds into a single product, **HackHQ**, a control room for a 24-hour hackathon, rebuilt each day around the concept being taught.
 
@@ -65,6 +65,7 @@ Backend services, authentication against a real server, and any library the day'
 | 22  | UI/UX design principles                  | Huddle redesigned: a design system (tokens, Inter, a living style guide), every page rebuilt on it, WCAG 2.2 AA with every fix tested | [README](Day-22/huddle-redesign/README.md) · [Design system](Day-22/huddle-redesign/DESIGN.md) · [Accessibility audit](Day-22/huddle-redesign/ACCESSIBILITY_AUDIT.md) · [Before/after](Day-22/huddle-redesign/docs/GALLERY.md) · [PRD](Day-22/Day22_PRD.md) |
 | 23  | CORS, error handling and debugging        | Intern Quest made to fail well: a measured inventory of 33 failures before and after, one error model, error boundaries at every level, skeletons, toasts, a public CORS API with a live lab on a second origin, and a debugging guide ([live](https://intern-quest-smoky.vercel.app)) | [README](Day-23/intern-quest/README.md) · [Error inventory](Day-23/intern-quest/docs/ERROR_INVENTORY.md) · [CORS](Day-23/intern-quest/docs/CORS.md) · [Debugging](Day-23/intern-quest/docs/DEBUGGING.md) · [CORS lab](Day-23/quest-card-embed/README.md) · [PRD](Day-23/Day23_PRD.md) |
 | 24  | Performance optimisation                 | Huddle made fast, measured by one script before and after: lazy routes with preloading, `React.memo`/`useCallback`/`useMemo` where they pay (12,902 → 128 renders per 5 messages), images resized to WebP in the browser (Files 17 MB → 8 KB), a virtualised Files list, Lighthouse 90+ on every page on mobile and 100 on desktop, and the React Compiler compared with memoising by hand | [README](Day-24/huddle-fast/README.md) · [Performance](Day-24/huddle-fast/docs/PERFORMANCE.md) · [Before](Day-24/huddle-fast/docs/perf/before.md) / [after](Day-24/huddle-fast/docs/perf/after.md) · [PRD](Day-24/Day24_PRD.md) |
+| 25  | Capstone planning & architecture         | SkillForge LMS: Day 25–30 capstone architecture, Postgres RLS + anti-farming RPC schema, Phase 1 RPG foundation + playable Micro-Quest Arcade, Quest Path & Boss Battles | [README](Day-25/README.md) · [Proposal](Day-25/docs/PROJECT_PROPOSAL.md) · [Tech stack](Day-25/docs/TECH_STACK_DECISION.md) · [Architecture](Day-25/docs/ARCHITECTURE.md) · [Task breakdown](Day-25/docs/TASK_BREAKDOWN.md) · [PRD](Day-25/_bmad-output/planning-artifacts/prds/prd-Day-25-2026-11-26/prd.md) · [App](Day-25/skillforge-lms/README.md) |
 
 ---
 
