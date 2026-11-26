@@ -1,0 +1,45 @@
+# generated: 11-26-2026 16:42
+# project: SkillForge LMS (Day-25 Capstone)
+# project_key: SFLMS
+# tracking_system: file-system
+# story_location: "_bmad-output/planning-artifacts/epics.md"
+
+generated: 11-26-2026 16:42
+last_updated: 11-26-2026 16:42
+project: SkillForge LMS (RPG Edition)
+project_key: SFLMS
+tracking_system: file-system
+story_location: "_bmad-output/planning-artifacts/epics.md"
+
+development_status:
+  epic-1: done
+  1-1-project-scaffold-tooling-and-rpg-schema: done
+  1-2-rpg-theme-pip-companion-and-game-engine: done
+  1-3-auth-character-class-and-pip-customizer: done
+  1-4-course-realms-catalog-and-guild-hall: done
+  epic-1-retrospective: optional
+
+  epic-2: in-progress
+  2-1-winding-quest-path-and-enrollment: ready-for-dev
+  2-2-course-ratings-and-verified-reviews: ready-for-dev
+  2-3-theater-video-player-and-pip-corner: ready-for-dev
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-persistent-lesson-progress-and-auto-complete: backlog
+  3-2-server-graded-boss-quizzes-and-remediation: backlog
+  3-3-confetti-reward-overlay-and-auto-badges: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-student-command-center-dashboard: backlog
+  4-2-verifiable-guild-certificate: backlog
+  4-3-instructor-studio-storage-and-recharts: backlog
+  4-4-admin-grandmaster-deck: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-full-test-suite-a11y-and-lighthouse-polish: backlog
+  epic-5-retrospective: optional
+
+action_items: []
