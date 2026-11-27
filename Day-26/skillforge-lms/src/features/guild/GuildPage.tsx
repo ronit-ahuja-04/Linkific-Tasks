@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { CountUpValue } from '../../components/game/CountUpValue';
 import { Pip } from '../../components/pip/Pip';
+import { Card, ErrorState, LoadingState, buttonClasses } from '../../components/ui';
 import { CLASS_INFO, GAME_RULES } from '../../lib/game/catalog';
 import { sfx } from '../../lib/game/sfx';
 import { progressFor, stageFor, titleFor } from '../../lib/game/xp';
@@ -64,31 +65,26 @@ export function GuildPage() {
         <Link
           to="/courses"
           onClick={() => sfx.tap()}
-          className="rpg-btn-gold rounded-xl px-4 py-2 text-sm font-bold"
+          className={buttonClasses({ variant: 'gold', size: 'md' })}
         >
           Earn More XP
         </Link>
       </div>
 
       {error && (
-        <div
-          role="alert"
-          className="rounded-xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger"
-        >
-          {error.message}
-        </div>
+        <ErrorState
+          code={error.code}
+          message={error.message}
+          onRetry={() => void dispatch(fetchGuildLeaderboard(profile))}
+        />
       )}
 
       {status === 'loading' ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="rpg-card h-24 animate-pulse bg-surface-2/60 p-4" />
-          ))}
-        </div>
+        <LoadingState variant="skeleton-rows" count={3} label="Loading Guild Hall leaderboard..." />
       ) : rankedEntries.length === 0 ? (
-        <div className="rpg-card p-8 text-center text-sm text-muted">
+        <Card padding="lg" className="text-center text-sm text-muted">
           No adventurers in the Guild yet.
-        </div>
+        </Card>
       ) : (
         <>
           {rankedEntries.length >= 3 && (

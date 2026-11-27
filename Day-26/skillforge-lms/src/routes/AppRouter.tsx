@@ -10,6 +10,7 @@ import { CharacterSheetPage } from '../features/guild/CharacterSheetPage';
 import { GuildPage } from '../features/guild/GuildPage';
 import { HomePage } from '../features/home/HomePage';
 import { RealmQuestPage } from '../features/quest/RealmQuestPage';
+import { ComponentLibraryPage } from '../features/ui/ComponentLibraryPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 function PhasePlaceholder({
@@ -55,6 +56,7 @@ export function AppRouter() {
         <Route path="/c/:handle" element={<CharacterSheetPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/components" element={<ComponentLibraryPage />} />
         <Route
           path="/character"
           element={
