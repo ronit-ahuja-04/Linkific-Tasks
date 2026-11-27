@@ -2,6 +2,7 @@ import { Flame } from 'lucide-react';
 import { Link, Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
 import { Badge, Card, buttonClasses } from '../components/ui';
+import { AuthCallbackPage } from '../features/auth/AuthCallbackPage';
 import { CharacterPage } from '../features/auth/CharacterPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
@@ -54,6 +55,7 @@ export function AppRouter() {
         <Route path="/c/:handle" element={<CharacterSheetPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/components" element={<ComponentLibraryPage />} />
         <Route
           path="/character"

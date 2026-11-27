@@ -1,7 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { PageHeader } from '../../components/layout';
 import { PipCustomizer } from '../../components/pip/PipCustomizer';
+import { Button, Card, ErrorState, Input, buttonClasses } from '../../components/ui';
 import type { ApiError, UserProfile } from '../../types/lms';
 import { pushToast } from '../ui/uiSlice';
 import { saveCharacterProfile } from './authSlice';
@@ -51,81 +53,60 @@ function CharacterEditor({ profile, error }: { profile: UserProfile; error: ApiE
 
   return (
     <section className="mx-auto max-w-4xl space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold">Character &amp; Pip Studio</h1>
-          <p className="text-sm text-muted">
-            Customize @{profile.handle}&apos;s class bonus and Pip companion look.
-          </p>
-        </div>
-        <Link
-          to={`/c/${profile.handle}`}
-          className="rounded-xl border-2 border-line bg-surface px-4 py-2 text-sm font-bold hover:bg-surface-2"
-        >
-          View Public Sheet
-        </Link>
-      </div>
+      <PageHeader
+        title="Character & Pip Studio"
+        description={`Customize @${profile.handle}'s class bonus and Pip companion look.`}
+        actions={
+          <Link
+            to={`/c/${profile.handle}`}
+            className={buttonClasses({ variant: 'outline', size: 'md' })}
+          >
+            View Public Sheet
+          </Link>
+        }
+      />
 
-      {error && (
-        <div
-          role="alert"
-          className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm font-medium text-danger"
-        >
-          {error.message}
-        </div>
-      )}
+      {error && <ErrorState code={error.code} message={error.message} />}
 
-      <form onSubmit={(e) => void handleSave(e)} className="rpg-card space-y-6 p-6">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <label htmlFor="char-name" className="block text-sm font-bold">
-              Display Name
-            </label>
-            <input
+      <Card padding="md">
+        <form onSubmit={(e) => void handleSave(e)} className="space-y-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Input
               id="char-name"
               type="text"
+              label="Display Name"
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="mt-1 w-full rounded-xl border-2 border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
             />
-          </div>
-          <div>
-            <label htmlFor="char-bio" className="block text-sm font-bold">
-              Guild Motto / Bio
-            </label>
-            <input
+            <Input
               id="char-bio"
               type="text"
+              label="Guild Motto / Bio"
               maxLength={160}
               value={bio}
               onChange={(e) => setBio(e.target.value)}
-              className="mt-1 w-full rounded-xl border-2 border-line bg-surface px-3 py-2 text-sm focus:border-brand focus:outline-none"
             />
           </div>
-        </div>
 
-        <PipCustomizer
-          characterClass={characterClass}
-          pipTint={pipTint}
-          pipAccessory={pipAccessory}
-          stage="sprite"
-          mood="proud"
-          onChangeClass={setCharacterClass}
-          onChangeTint={setPipTint}
-          onChangeAccessory={setPipAccessory}
-        />
+          <PipCustomizer
+            characterClass={characterClass}
+            pipTint={pipTint}
+            pipAccessory={pipAccessory}
+            stage="sprite"
+            mood="proud"
+            onChangeClass={setCharacterClass}
+            onChangeTint={setPipTint}
+            onChangeAccessory={setPipAccessory}
+          />
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            disabled={saving}
-            className="rpg-btn-primary rounded-xl px-5 py-2.5 text-sm font-bold disabled:opacity-60"
-          >
-            {saving ? 'Saving...' : 'Save Character'}
-          </button>
-        </div>
-      </form>
+          <div className="flex justify-end">
+            <Button type="submit" variant="primary" loading={saving} loadingText="Saving...">
+              Save Character
+            </Button>
+          </div>
+        </form>
+      </Card>
     </section>
   );
 }
