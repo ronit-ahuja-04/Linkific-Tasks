@@ -22,16 +22,6 @@ npm run dev
 
 Open **`http://localhost:5178`**. Without `.env`, the app runs in **`Demo Mode`** using seeded realms (`React Architecture`, `Supabase Security`, `Tailwind v4 Design Systems`, `Full-Stack Testing`), local quest progression, and quick-switch demo accounts (`@maya`, `@dev`, `@alex`).
 
-## Key Routes (Days 25–26)
-
-- `/` — RPG Hero, interactive Pip combo, and Instant Micro-Quest Arena
-- `/courses` & `/courses/:slug` — Filterable Course Realms catalog & Winding Quest Path
-- `/guild` & `/c/:handle` — Adventurer Leaderboard & public Character Sheets
-- `/login`, `/register`, `/auth/callback` — Persistent auth (`localStorage`/`sessionStorage`), validation & GitHub OAuth callback
-- `/dashboard` & `/character` — Protected Student Command Center & Character/Pip Studio
-- `/components` — Interactive UI Component Library showcase (documented in [`Day-26/COMPONENTS.md`](../../Day-26/COMPONENTS.md))
-- `*` — Dedicated 404 Realm Not Found page
-
 ## Local Supabase Setup (requires Colima or Docker Desktop)
 
 ```bash

@@ -1,4 +1,4 @@
-import { m, useReducedMotion } from 'motion/react';
+import { AnimatePresence, m, useReducedMotion } from 'motion/react';
 import {
   ArrowRight,
   Award,
@@ -8,6 +8,7 @@ import {
   Printer,
   Sparkles,
   Trophy,
+  X,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -15,7 +16,6 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { CountUpValue } from '../../components/game/CountUpValue';
 import { MicroChallengeCard } from '../../components/game/MicroChallengeCard';
 import { Pip } from '../../components/pip/Pip';
-import { Button, Card, Modal } from '../../components/ui';
 import { DEMO_REALM_CURRICULA, HOME_ARCADE_CHALLENGES } from '../../lib/demoCurricula';
 import { DEMO_GUILD_ENTRIES } from '../../lib/demoData';
 import { earnedBadgesFor } from '../../lib/game/badges';
@@ -235,7 +235,7 @@ export function DashboardPage() {
         </div>
 
         <div className="space-y-6">
-          <Card padding="md">
+          <div className="rpg-card p-5">
             <h2 className="flex items-center gap-2 text-xl font-bold">
               <Trophy className="h-5 w-5 text-gold-deep" aria-hidden="true" />
               <span>Earned Badges ({badges.length})</span>
@@ -257,9 +257,9 @@ export function DashboardPage() {
                 </m.li>
               ))}
             </ul>
-          </Card>
+          </div>
 
-          <Card padding="md">
+          <div className="rpg-card p-5">
             <h2 className="flex items-center gap-2 text-xl font-bold">
               <Award className="h-5 w-5 text-good" aria-hidden="true" />
               <span>Verifiable Certificates ({claimedCertificateIds.length})</span>
@@ -284,49 +284,76 @@ export function DashboardPage() {
                           ID: SF-{r.slug.slice(0, 6).toUpperCase()}-2026
                         </p>
                       </div>
-                      <Button size="sm" variant="gold" onClick={() => setCertCourseId(id)}>
+                      <button
+                        type="button"
+                        onClick={() => setCertCourseId(id)}
+                        className="rpg-btn-gold rounded-lg px-3 py-1.5 text-xs font-bold"
+                      >
                         Inspect
-                      </Button>
+                      </button>
                     </li>
                   );
                 })}
               </ul>
             )}
-          </Card>
+          </div>
         </div>
       </div>
 
-      <Modal
-        open={Boolean(certRealm)}
-        onClose={() => setCertCourseId(null)}
-        title="Certificate of Realm Mastery"
-        description="SkillForge Guild Verification"
-        closeLabel="Close certificate preview"
-        className="border-4 border-gold text-center"
-      >
+      <AnimatePresence>
         {certRealm && (
-          <div>
-            <Award className="mx-auto h-12 w-12 text-gold-deep" aria-hidden="true" />
-            <p className="mt-3 text-sm text-muted">Awarded to</p>
-            <p className="mt-1 font-display text-xl font-bold text-ink">
-              {profile?.fullName ?? 'Maya Sharma'} (@{profile?.handle ?? 'maya'})
-            </p>
-            <p className="mt-3 text-sm text-muted">for conquering every quest and Boss Battle in</p>
-            <p className="mt-1 font-display text-lg font-bold text-brand">{certRealm.title}</p>
-            <p className="mt-4 font-mono text-xs text-muted">
-              Verification Code: SF-{certRealm.slug.slice(0, 6).toUpperCase()}-2026
-            </p>
-            <Button
-              variant="primary"
-              leftIcon={<Printer className="h-4 w-4" />}
-              onClick={() => window.print()}
-              className="mt-6"
+          <m.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            role="dialog"
+            aria-modal="true"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+          >
+            <m.div
+              initial={{ scale: 0.9, y: 16 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.92, y: 12 }}
+              className="rpg-card relative w-full max-w-lg border-4 border-gold bg-surface p-8 text-center"
             >
-              Print Certificate
-            </Button>
-          </div>
+              <button
+                type="button"
+                aria-label="Close certificate preview"
+                onClick={() => setCertCourseId(null)}
+                className="absolute top-4 right-4 rounded-lg p-1.5 text-muted hover:bg-surface-2"
+              >
+                <X className="h-5 w-5" aria-hidden="true" />
+              </button>
+              <Award className="mx-auto h-12 w-12 text-gold-deep" aria-hidden="true" />
+              <p className="mt-3 font-mono text-xs font-bold uppercase tracking-widest text-brand">
+                SkillForge Guild Verification
+              </p>
+              <h3 className="mt-2 font-display text-2xl font-extrabold">
+                Certificate of Realm Mastery
+              </h3>
+              <p className="mt-2 text-sm text-muted">Awarded to</p>
+              <p className="mt-1 font-display text-xl font-bold text-ink">
+                {profile?.fullName ?? 'Maya Sharma'} (@{profile?.handle ?? 'maya'})
+              </p>
+              <p className="mt-3 text-sm text-muted">
+                for conquering every quest and Boss Battle in
+              </p>
+              <p className="mt-1 font-display text-lg font-bold text-brand">{certRealm.title}</p>
+              <p className="mt-4 font-mono text-xs text-muted">
+                Verification Code: SF-{certRealm.slug.slice(0, 6).toUpperCase()}-2026
+              </p>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="rpg-btn-primary mt-6 inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold"
+              >
+                <Printer className="h-4 w-4" aria-hidden="true" />
+                <span>Print Certificate</span>
+              </button>
+            </m.div>
+          </m.div>
         )}
-      </Modal>
+      </AnimatePresence>
     </section>
   );
 }
