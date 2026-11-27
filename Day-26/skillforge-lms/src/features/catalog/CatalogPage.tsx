@@ -3,6 +3,7 @@ import { BookOpen, CheckCircle2, Clock, Flame, Search, Sparkles, Star, Swords } 
 import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
+import { PageHeader } from '../../components/layout';
 import {
   Badge,
   Button,
@@ -70,35 +71,29 @@ export function CatalogPage() {
 
   return (
     <section className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-brand">
-            <Swords className="h-3.5 w-3.5" aria-hidden="true" />
-            Course Realms
-          </p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Choose Your Next Quest Realm</h1>
-          <p className="mt-1 text-sm text-muted">
-            Each Realm opens a playable winding overworld map with micro-challenges and a Boss
-            Battle.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <label htmlFor="catalog-sort" className="text-xs font-bold text-muted">
-            Sort by
-          </label>
-          <Select
-            id="catalog-sort"
-            value={filters.sort}
-            onChange={(e) => dispatch(setCatalogSort(e.target.value as CatalogSort))}
-            options={[
-              { value: 'xp', label: 'Highest XP Reward' },
-              { value: 'rating', label: 'Highest Rated' },
-              { value: 'newest', label: 'Newest Realms' },
-            ]}
-          />
-        </div>
-      </div>
+      <PageHeader
+        eyebrow="Course Realms"
+        eyebrowIcon={<Swords className="h-3.5 w-3.5" />}
+        title="Choose Your Next Quest Realm"
+        description="Each Realm opens a playable winding overworld map with micro-challenges and a Boss Battle."
+        actions={
+          <>
+            <label htmlFor="catalog-sort" className="text-xs font-bold text-muted">
+              Sort by
+            </label>
+            <Select
+              id="catalog-sort"
+              value={filters.sort}
+              onChange={(e) => dispatch(setCatalogSort(e.target.value as CatalogSort))}
+              options={[
+                { value: 'xp', label: 'Highest XP Reward' },
+                { value: 'rating', label: 'Highest Rated' },
+                { value: 'newest', label: 'Newest Realms' },
+              ]}
+            />
+          </>
+        }
+      />
 
       <Card padding="sm" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Input

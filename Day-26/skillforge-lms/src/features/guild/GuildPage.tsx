@@ -4,6 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { CountUpValue } from '../../components/game/CountUpValue';
+import { PageHeader } from '../../components/layout';
 import { Pip } from '../../components/pip/Pip';
 import { Card, ErrorState, LoadingState, buttonClasses } from '../../components/ui';
 import { CLASS_INFO, GAME_RULES } from '../../lib/game/catalog';
@@ -51,25 +52,21 @@ export function GuildPage() {
 
   return (
     <section className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-brand">
-            <Crown className="h-3.5 w-3.5 text-gold-deep" aria-hidden="true" />
-            The Guild Hall
-          </p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Adventurer Leaderboard</h1>
-          <p className="mt-1 text-sm text-muted">
-            Ranked by anti-farmed XP across completed quest maps and Boss Battles.
-          </p>
-        </div>
-        <Link
-          to="/courses"
-          onClick={() => sfx.tap()}
-          className={buttonClasses({ variant: 'gold', size: 'md' })}
-        >
-          Earn More XP
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="The Guild Hall"
+        eyebrowIcon={<Crown className="h-3.5 w-3.5 text-gold-deep" />}
+        title="Adventurer Leaderboard"
+        description="Ranked by anti-farmed XP across completed quest maps and Boss Battles."
+        actions={
+          <Link
+            to="/courses"
+            onClick={() => sfx.tap()}
+            className={buttonClasses({ variant: 'gold', size: 'md' })}
+          >
+            Earn More XP
+          </Link>
+        }
+      />
 
       {error && (
         <ErrorState
