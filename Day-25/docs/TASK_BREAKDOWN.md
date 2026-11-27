@@ -30,9 +30,9 @@
 | T1.1 | Write Proposal, Tech Stack, Architecture, Wireframes & Workflow docs | Role 1 + 2 | 2.5h | Day 25 | Done |
 | T1.2 | Create 12-table Postgres schema, RLS policies, Storage buckets, RPCs & `seed.sql` | Role 1 | 3.0h | Day 25 | Done |
 | T1.3 | Scaffold Vite 8 + React 19 + strict TS + Tailwind v4 + oxlint/Prettier/Vitest | Role 1 | 2.0h | Day 25 | Done |
-| T1.4 | Build design tokens, Web Audio FX, `Pip` SVG companion & `xp`/`badges` engine | Role 2 + 3 | 3.0h | Day 26 | Done (early) |
-| T1.5 | Build Auth flows (`/login`, `/register`, `/character`), `ProtectedRoute` & demo switch | Role 1 | 2.5h | Day 26 | Done (early) |
-| T1.6 | Build Course Realms Catalog (`/courses`) & Guild Hall (`/guild`, `/c/:handle`) | Role 2 + 3 | 3.0h | Day 26 | Done (early) |
+| T1.4 | Build design tokens, Web Audio FX, `Pip` SVG companion & `xp`/`badges` engine | Role 2 + 3 | 3.0h | Day 26 | Done |
+| T1.5 | Build Auth flows (`/login`, `/register`, `/auth/callback`, `/character`), `ProtectedRoute`, persistence & demo switch | Role 1 | 2.5h | Day 26 | Done |
+| T1.6 | Build UI Component Library (`Button`, `Card`, `Input`, `Modal`, `LoadingState`, `ErrorState`), `Navbar`/`Footer`/`404` & `COMPONENTS.md` | Role 2 + 3 | 3.0h | Day 26 | Done |
 | T2.1 | Build Playable Quest Path map, inline Micro-Challenges & Course Reviews (`/courses/:slug`) | Role 2 + 3 | 3.5h | Day 27 | Done (Demo Mode) |
 | T2.2 | Build Theater HTML5/embed Video Player (`0.75x–2x`, shortcuts, `PipCorner`) | Role 3 | 4.0h | Day 27 | Ready |
 | T2.3 | Wire live Supabase enrollment & verified review persistence (`enrollments`, `course_reviews`) | Role 1 | 2.0h | Day 27 | Ready |

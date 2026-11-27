@@ -1,4 +1,5 @@
 import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { ErrorState } from './ui/ErrorState';
 
 interface AppErrorBoundaryProps {
   children: ReactNode;
@@ -26,17 +27,14 @@ export class AppErrorBoundary extends Component<AppErrorBoundaryProps, AppErrorB
   override render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <section className="rpg-card mx-auto max-w-lg p-8 text-center">
-          <h1 className="font-display text-2xl font-bold">Quest Scene Interrupted</h1>
-          <p className="mt-2 text-sm text-muted">{this.state.message}</p>
-          <button
-            type="button"
-            onClick={() => window.location.reload()}
-            className="rpg-btn-primary mt-5 rounded-xl px-5 py-2.5 text-sm font-bold"
-          >
-            Reload Quest Screen
-          </button>
-        </section>
+        <ErrorState
+          variant="panel"
+          code="ROUTE_BOUNDARY_ERROR"
+          title="Quest Scene Interrupted"
+          message={this.state.message}
+          actionLabel="Reload Quest Screen"
+          onRetry={() => window.location.reload()}
+        />
       );
     }
 

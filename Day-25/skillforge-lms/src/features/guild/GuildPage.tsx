@@ -4,7 +4,9 @@ import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { CountUpValue } from '../../components/game/CountUpValue';
+import { PageHeader } from '../../components/layout';
 import { Pip } from '../../components/pip/Pip';
+import { Card, ErrorState, LoadingState, buttonClasses } from '../../components/ui';
 import { CLASS_INFO, GAME_RULES } from '../../lib/game/catalog';
 import { sfx } from '../../lib/game/sfx';
 import { progressFor, stageFor, titleFor } from '../../lib/game/xp';
@@ -50,45 +52,36 @@ export function GuildPage() {
 
   return (
     <section className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="inline-flex items-center gap-1.5 font-mono text-xs font-bold uppercase tracking-wider text-brand">
-            <Crown className="h-3.5 w-3.5 text-gold-deep" aria-hidden="true" />
-            The Guild Hall
-          </p>
-          <h1 className="mt-1 text-3xl font-bold tracking-tight">Adventurer Leaderboard</h1>
-          <p className="mt-1 text-sm text-muted">
-            Ranked by anti-farmed XP across completed quest maps and Boss Battles.
-          </p>
-        </div>
-        <Link
-          to="/courses"
-          onClick={() => sfx.tap()}
-          className="rpg-btn-gold rounded-xl px-4 py-2 text-sm font-bold"
-        >
-          Earn More XP
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow="The Guild Hall"
+        eyebrowIcon={<Crown className="h-3.5 w-3.5 text-gold-deep" />}
+        title="Adventurer Leaderboard"
+        description="Ranked by anti-farmed XP across completed quest maps and Boss Battles."
+        actions={
+          <Link
+            to="/courses"
+            onClick={() => sfx.tap()}
+            className={buttonClasses({ variant: 'gold', size: 'md' })}
+          >
+            Earn More XP
+          </Link>
+        }
+      />
 
       {error && (
-        <div
-          role="alert"
-          className="rounded-xl border border-danger/40 bg-danger/10 p-4 text-sm text-danger"
-        >
-          {error.message}
-        </div>
+        <ErrorState
+          code={error.code}
+          message={error.message}
+          onRetry={() => void dispatch(fetchGuildLeaderboard(profile))}
+        />
       )}
 
       {status === 'loading' ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((n) => (
-            <div key={n} className="rpg-card h-24 animate-pulse bg-surface-2/60 p-4" />
-          ))}
-        </div>
+        <LoadingState variant="skeleton-rows" count={3} label="Loading Guild Hall leaderboard..." />
       ) : rankedEntries.length === 0 ? (
-        <div className="rpg-card p-8 text-center text-sm text-muted">
+        <Card padding="lg" className="text-center text-sm text-muted">
           No adventurers in the Guild yet.
-        </div>
+        </Card>
       ) : (
         <>
           {rankedEntries.length >= 3 && (

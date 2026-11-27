@@ -1,6 +1,8 @@
 import { Flame } from 'lucide-react';
-import { Link, Navigate, Route, Routes } from 'react-router-dom';
+import { Link, Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/layout/AppShell';
+import { Badge, Card, buttonClasses } from '../components/ui';
+import { AuthCallbackPage } from '../features/auth/AuthCallbackPage';
 import { CharacterPage } from '../features/auth/CharacterPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
@@ -10,6 +12,8 @@ import { CharacterSheetPage } from '../features/guild/CharacterSheetPage';
 import { GuildPage } from '../features/guild/GuildPage';
 import { HomePage } from '../features/home/HomePage';
 import { RealmQuestPage } from '../features/quest/RealmQuestPage';
+import { ComponentLibraryPage } from '../features/ui/ComponentLibraryPage';
+import { NotFoundPage } from '../features/ui/NotFoundPage';
 import { ProtectedRoute } from './ProtectedRoute';
 
 function PhasePlaceholder({
@@ -22,25 +26,21 @@ function PhasePlaceholder({
   summary: string;
 }) {
   return (
-    <section className="rpg-card mx-auto max-w-2xl p-8">
-      <p className="inline-flex items-center gap-1.5 rounded-full bg-surface-2 px-3 py-1 font-mono text-xs font-bold text-brand">
-        <Flame className="h-3.5 w-3.5" aria-hidden="true" />
-        <span>{phase}</span>
-      </p>
+    <Card as="section" padding="lg" className="mx-auto max-w-2xl">
+      <Badge tone="brand" size="sm" icon={<Flame className="h-3.5 w-3.5" />} className="font-mono">
+        {phase}
+      </Badge>
       <h1 className="mt-3 text-2xl font-bold">{title}</h1>
       <p className="mt-2 text-sm text-muted">{summary}</p>
       <div className="mt-5 flex flex-wrap gap-3">
-        <Link to="/courses" className="rpg-btn-primary rounded-xl px-4 py-2 text-sm font-bold">
+        <Link to="/courses" className={buttonClasses({ variant: 'primary', size: 'md' })}>
           Browse Realms
         </Link>
-        <Link
-          to="/guild"
-          className="rounded-xl border-2 border-line px-4 py-2 text-sm font-bold hover:bg-surface-2"
-        >
+        <Link to="/guild" className={buttonClasses({ variant: 'outline', size: 'md' })}>
           Visit Guild Hall
         </Link>
       </div>
-    </section>
+    </Card>
   );
 }
 
@@ -55,6 +55,8 @@ export function AppRouter() {
         <Route path="/c/:handle" element={<CharacterSheetPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
+        <Route path="/components" element={<ComponentLibraryPage />} />
         <Route
           path="/character"
           element={
@@ -95,7 +97,7 @@ export function AppRouter() {
             </ProtectedRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
   );
