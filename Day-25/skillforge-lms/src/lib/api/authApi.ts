@@ -14,7 +14,6 @@ export interface AuthPayload {
 export interface SignInParams {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface RegisterParams {
@@ -65,9 +64,7 @@ function mapProfileRow(row: ProfileRow): UserProfile {
 
 function readDemoStorage(): { email: string; profile: UserProfile } | null {
   try {
-    const raw =
-      window.localStorage.getItem(DEMO_STORAGE_KEY) ??
-      window.sessionStorage.getItem(DEMO_STORAGE_KEY);
+    const raw = window.localStorage.getItem(DEMO_STORAGE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as { email: string; profile: UserProfile };
   } catch {
@@ -75,16 +72,12 @@ function readDemoStorage(): { email: string; profile: UserProfile } | null {
   }
 }
 
-function writeDemoStorage(
-  data: { email: string; profile: UserProfile } | null,
-  rememberMe = true,
-): void {
+function writeDemoStorage(data: { email: string; profile: UserProfile } | null): void {
   try {
-    window.localStorage.removeItem(DEMO_STORAGE_KEY);
-    window.sessionStorage.removeItem(DEMO_STORAGE_KEY);
-    if (data) {
-      const target = rememberMe ? window.localStorage : window.sessionStorage;
-      target.setItem(DEMO_STORAGE_KEY, JSON.stringify(data));
+    if (!data) {
+      window.localStorage.removeItem(DEMO_STORAGE_KEY);
+    } else {
+      window.localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(data));
     }
   } catch {
     // ignore storage errors in restricted contexts
@@ -146,7 +139,7 @@ export async function signInWithEmail(params: SignInParams): Promise<AuthPayload
           'Demo sign-in supports maya@skillforge.local, dev@skillforge.local, or admin@skillforge.local (any password >= 4 chars).',
       } satisfies ApiError;
     }
-    writeDemoStorage({ email: normalizedEmail, profile: matched }, params.rememberMe ?? true);
+    writeDemoStorage({ email: normalizedEmail, profile: matched });
     return {
       userId: matched.id,
       email: normalizedEmail,
@@ -257,29 +250,9 @@ export async function startGithubOAuth(): Promise<void> {
   }
   const { error } = await client.auth.signInWithOAuth({
     provider: 'github',
-    options: { redirectTo: `${window.location.origin}/auth/callback` },
+    options: { redirectTo: window.location.origin },
   });
-  if (error) throw normalizeApiError(error, 'GitHub OAuth failed');
-}
-
-export function subscribeToAuthChanges(onAuthChange: () => void): () => void {
-  const client = getSupabaseClient();
-  if (!client || !isSupabaseConfigured()) {
-    const handleStorage = (event: StorageEvent) => {
-      if (event.key === DEMO_STORAGE_KEY) {
-        onAuthChange();
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }
-
-  const {
-    data: { subscription },
-  } = client.auth.onAuthStateChange(() => {
-    onAuthChange();
-  });
-  return () => subscription.unsubscribe();
+  if (error) throw normalizeApiError(error, 'GitHub OAuth redirect failed');
 }
 
 export async function updateCharacterCustomization(

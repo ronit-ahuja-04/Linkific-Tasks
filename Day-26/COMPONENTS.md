@@ -1,15 +1,15 @@
 # SkillForge UI Component Library & Layout System
 
-**Live Interactive Showcase:** `/components` ([`ComponentLibraryPage.tsx`](../Day-25/skillforge-lms/src/features/ui/ComponentLibraryPage.tsx))  
-**Source Directory:** [`Day-25/skillforge-lms/src/components/ui/`](../Day-25/skillforge-lms/src/components/ui/) and [`src/components/layout/`](../Day-25/skillforge-lms/src/components/layout/)  
-**Design Tokens:** [`src/styles/index.css`](../Day-25/skillforge-lms/src/styles/index.css) (`--bg`, `--surface`, `--surface-2`, `--line`, `--ink`, `--muted`, `--brand`, `--gold`, `--good`, `--warn`, `--danger`)
+**Live Interactive Showcase:** `/components` ([`ComponentLibraryPage.tsx`](skillforge-lms/src/features/ui/ComponentLibraryPage.tsx))  
+**Source Directory:** [`skillforge-lms/src/components/ui/`](skillforge-lms/src/components/ui/) and [`skillforge-lms/src/components/layout/`](skillforge-lms/src/components/layout/)  
+**Design Tokens:** [`skillforge-lms/src/styles/index.css`](skillforge-lms/src/styles/index.css) (`--bg`, `--surface`, `--surface-2`, `--line`, `--ink`, `--muted`, `--brand`, `--gold`, `--good`, `--warn`, `--danger`)
 
 ---
 
 ## 1. Architecture & Conventions
 
 - **Strict TypeScript:** Every component exports an explicit TypeScript interface (`ButtonProps`, `CardProps`, `InputProps`, `ModalProps`, etc.) with zero `any`.
-- **Clean ESLint / React Refresh Boundary:** Style builders (`buttonClasses`, `cardClasses`, `badgeClasses`) live in [`variants.ts`](../Day-25/skillforge-lms/src/components/ui/variants.ts) so `.tsx` modules only export React components and erased TypeScript types (`oxlint` `react/only-export-components` stays at 0 warnings).
+- **Clean ESLint / React Refresh Boundary:** Style builders (`buttonClasses`, `cardClasses`, `badgeClasses`) live in [`variants.ts`](skillforge-lms/src/components/ui/variants.ts) so `.tsx` modules only export React components and erased TypeScript types (`oxlint` `react/only-export-components` stays at 0 warnings).
 - **Accessible by Default:** Form fields automatically wire `useId()` to `<label>`, `aria-invalid`, and `aria-describedby`; dialogs manage focus restoration and `Escape` dismissal; loaders and errors expose `role="status"` / `role="alert"`.
 - **Reduced Motion Safe:** Animated overlays respect `<MotionConfig reducedMotion="user">` and `useReducedMotion()`.
 
@@ -17,7 +17,7 @@
 
 ## 2. UI Primitives (`src/components/ui/`)
 
-### `Button` ([Button.tsx](../Day-25/skillforge-lms/src/components/ui/Button.tsx))
+### `Button` ([Button.tsx](skillforge-lms/src/components/ui/Button.tsx))
 
 Interactive tactile RPG button extending `ButtonHTMLAttributes<HTMLButtonElement>`. Defaults `type` to `"button"` to avoid accidental form submissions.
 
@@ -44,7 +44,7 @@ import { Button } from '../../components/ui';
 
 ---
 
-### `Card`, `CardHeader`, `CardBody`, `CardFooter` ([Card.tsx](../Day-25/skillforge-lms/src/components/ui/Card.tsx))
+### `Card`, `CardHeader`, `CardBody`, `CardFooter` ([Card.tsx](skillforge-lms/src/components/ui/Card.tsx))
 
 Composable surface container extending `HTMLAttributes<HTMLDivElement>`.
 
@@ -65,7 +65,7 @@ Composable surface container extending `HTMLAttributes<HTMLDivElement>`.
 
 ---
 
-### `Badge` ([Badge.tsx](../Day-25/skillforge-lms/src/components/ui/Badge.tsx))
+### `Badge` ([Badge.tsx](skillforge-lms/src/components/ui/Badge.tsx))
 
 Pill indicator for skill tags, XP rewards, role markers, and HTTP/404 statuses.
 
@@ -77,7 +77,7 @@ Pill indicator for skill tags, XP rewards, role markers, and HTTP/404 statuses.
 
 ---
 
-### `Input`, `Select`, `Textarea` ([Input.tsx](../Day-25/skillforge-lms/src/components/ui/Input.tsx), [Select.tsx](../Day-25/skillforge-lms/src/components/ui/Select.tsx), [Textarea.tsx](../Day-25/skillforge-lms/src/components/ui/Textarea.tsx))
+### `Input`, `Select`, `Textarea` ([Input.tsx](skillforge-lms/src/components/ui/Input.tsx), [Select.tsx](skillforge-lms/src/components/ui/Select.tsx), [Textarea.tsx](skillforge-lms/src/components/ui/Textarea.tsx))
 
 Accessible form controls sharing consistent label/hint/error wiring via `useId()`.
 
@@ -94,7 +94,7 @@ Accessible form controls sharing consistent label/hint/error wiring via `useId()
 
 ---
 
-### `Modal` ([Modal.tsx](../Day-25/skillforge-lms/src/components/ui/Modal.tsx))
+### `Modal` ([Modal.tsx](skillforge-lms/src/components/ui/Modal.tsx))
 
 Accessible dialog overlay built with `motion/react` `AnimatePresence` (`useReducedMotion()`).
 
@@ -112,7 +112,7 @@ Accessible dialog overlay built with `motion/react` `AnimatePresence` (`useReduc
 
 ---
 
-### `LoadingState` ([LoadingState.tsx](../Day-25/skillforge-lms/src/components/ui/LoadingState.tsx))
+### `LoadingState` ([LoadingState.tsx](skillforge-lms/src/components/ui/LoadingState.tsx))
 
 Status-announced loading feedback (`role="status"`, `aria-live="polite"`).
 
@@ -124,7 +124,7 @@ Status-announced loading feedback (`role="status"`, `aria-live="polite"`).
 
 ---
 
-### `ErrorState` ([ErrorState.tsx](../Day-25/skillforge-lms/src/components/ui/ErrorState.tsx))
+### `ErrorState` ([ErrorState.tsx](skillforge-lms/src/components/ui/ErrorState.tsx))
 
 Consistent error reporting (`role="alert"`) with optional recovery actions.
 
@@ -144,7 +144,7 @@ Consistent error reporting (`role="alert"`) with optional recovery actions.
 
 | Component | File | Purpose |
 | --- | --- | --- |
-| `AppShell` | [AppShell.tsx](../Day-25/skillforge-lms/src/components/layout/AppShell.tsx) | Full-height flex column shell with Skip Link, `Navbar`, `<main>` + `AppErrorBoundary`, `Footer`, `RewardOverlay`, and live toast stack |
-| `Navbar` | [Navbar.tsx](../Day-25/skillforge-lms/src/components/layout/Navbar.tsx) | Sticky header with SkillForge brand, Demo/Live mode badge, spring active nav pill, Lv/XP/Streak HUD, sound/theme toggles, and sign-in / sign-out controls |
-| `Footer` | [Footer.tsx](../Day-25/skillforge-lms/src/components/layout/Footer.tsx) | Semantic `<footer>` with Explore Realms links (including `/components`), Adventurer Account links, and tech stack metadata |
-| `PageHeader` | [PageHeader.tsx](../Day-25/skillforge-lms/src/components/layout/PageHeader.tsx) | Reusable page heading with optional back breadcrumb, eyebrow icon/label, title, description, and right-aligned actions slot |
+| `AppShell` | [AppShell.tsx](skillforge-lms/src/components/layout/AppShell.tsx) | Full-height flex column shell with Skip Link, `Navbar`, `<main>` + `AppErrorBoundary`, `Footer`, `RewardOverlay`, and live toast stack |
+| `Navbar` | [Navbar.tsx](skillforge-lms/src/components/layout/Navbar.tsx) | Sticky header with SkillForge brand, Demo/Live mode badge, spring active nav pill, Lv/XP/Streak HUD, sound/theme toggles, and sign-in / sign-out controls |
+| `Footer` | [Footer.tsx](skillforge-lms/src/components/layout/Footer.tsx) | Semantic `<footer>` with Explore Realms links (including `/components`), Adventurer Account links, and tech stack metadata |
+| `PageHeader` | [PageHeader.tsx](skillforge-lms/src/components/layout/PageHeader.tsx) | Reusable page heading with optional back breadcrumb, eyebrow icon/label, title, description, and right-aligned actions slot |
