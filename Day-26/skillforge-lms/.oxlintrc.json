@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "oxc", "typescript"],
+  "ignorePatterns": ["dist/", "scripts/", "supabase/"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "typescript/no-explicit-any": "error",
+    "react/only-export-components": ["warn", { "allowConstantExport": true }]
+  },
+  "overrides": [
+    {
+      "files": ["test/**"],
+      "rules": {
+        "react/globals": "off",
+        "react/immutability": "off"
+      }
+    }
+  ]
+}
