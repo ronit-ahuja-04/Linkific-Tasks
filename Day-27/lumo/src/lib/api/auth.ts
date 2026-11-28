@@ -39,6 +39,9 @@ export async function signUp(input: SignUpInput): Promise<Profile | null> {
     email: input.email.trim(),
     password: input.password,
     options: {
+      // The confirmation email links back to this site (it must be in Supabase's allowed redirect URLs; otherwise
+      // Supabase falls back to the project's Site URL).
+      emailRedirectTo: `${window.location.origin}/`,
       data: {
         display_name: input.displayName.trim(),
         handle: input.handle.trim().toLowerCase(),
