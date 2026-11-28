@@ -14,7 +14,7 @@
 | M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles | **done** |
 | M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)          | **done** |
 | M2b       | Video spike: script → local voice → captions → animated Remotion video            | **done** |
-| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                 |          |
+| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                 | **done** |
 | M4        | AI pipeline: outline → scripts → quizzes → rendered videos                        |          |
 | M5        | Certificates, comeback, admin review and Wisp safety                              |          |
 | M6        | E2E, accessibility, performance, deployment                                       |          |
@@ -46,6 +46,16 @@ Demo accounts (local only), password `lumo-demo-123`:
 | riya@lumo.local  | instructor | the course studio |
 | admin@lumo.local | admin      | people & roles    |
 
+## The learner loop (M3)
+
+1. **Meet Wisp:** a new learner's first screen is a short chat: pick an island, a daily goal (3/10/20/30 min) and how Wisp should talk (cheeky, calm or coach). Learners who already know some of the topic get a two-question placement check; both right starts them at unit 2 (unit 1 stays open).
+2. **The map** shows finished, current, skipped and locked lessons, the daily flame (lit or not yet today, in the learner's timezone) and Light.
+3. **A lesson:** the video bite with captions and a transcript, then the questions one at a time (keys 1–6 and Enter work). The server grades each answer and only then reveals the right one; Wisp explains, including the note for the exact wrong option picked. A miss comes back at the end until it's right.
+4. **Rewards:** Light (once per lesson), the flame, level-ups and Wisp's growth stage.
+5. **The fog:** every idea a lesson checks is scheduled with FSRS. When one is due, Gloom's fog covers its unit on the map; a review (up to 10 ideas) clears it, +2 Light per idea that was really due. Misses come back in 10 minutes; remembered ideas move days ahead.
+
+Wisp's explanations come from the lesson's own (instructor-checked) text, in the chosen personality. Explanations in Wisp's own words through the AI arrive with M4, grounded in the same text.
+
 ## What the course studio does (M2)
 
 | Day 27 brief               | In Lumo                                                                                                                                    |
@@ -73,6 +83,7 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **Lesson media is private.** Videos sit in a private bucket under `<course id>/…`; a file can be read only by someone who can see its course, through short-lived signed links, so drafts never leak. Uploads, replacements and deletes are allowed only for the course's editors.
 - **A question is never saved without its key.** `save_question()` writes both in one transaction and checks that the correct option exists and no two options are the same. Questions Wisp drafts stay "unverified" until a person saves them.
 - **Live content can't be hard-deleted** (a trigger refuses it), because learner progress would cascade away; lessons are hidden instead. Courses are soft-deleted through `delete_course()`, which is audit-logged, and only admins can remove a live one.
+- **The learner loop can't be gamed from the browser:** lessons complete only when every question has a correct server-graded attempt (`complete_lesson()`), Light is awarded once per lesson, review Light only for ideas that were actually due (`review_answer()`), the FSRS schedule is computed in Postgres (`fsrs_next()`), and the flame helper (`bump_flame()`) can't be called by clients. Placement only moves the START marker, so nothing is awarded by it.
 - **Generation jobs:** only one active job of a kind per course (a unique index), editors can cancel, and only the worker (service role, server side) writes progress.
 
 ## Tests

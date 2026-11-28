@@ -1,5 +1,6 @@
 import { Compass, Map, UserRound } from 'lucide-react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { Navigate, NavLink, Outlet } from 'react-router-dom';
+import { useAppSelector } from '../../app/hooks';
 
 const TABS = [
   { to: '/map', label: 'Map', icon: Map },
@@ -9,6 +10,9 @@ const TABS = [
 
 /** The learner app: the page, then a bottom tab bar (a side rail on wide screens). */
 export function LearnerShell() {
+  const profile = useAppSelector((s) => s.auth.profile);
+  // New learners meet Wisp first (staff skip it: they arrive through the studio).
+  if (profile?.role === 'learner' && !profile.onboarded_at) return <Navigate to="/setup" replace />;
   return (
     <div className="flex min-h-dvh flex-col md:flex-row-reverse">
       <main id="main" className="flex-1 pb-20 md:pb-0">

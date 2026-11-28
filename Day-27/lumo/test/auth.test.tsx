@@ -30,6 +30,7 @@ const profile = (role: Profile['role']): Profile => ({
   best_flame: 0,
   last_goal_date: null,
   embers: 2,
+  onboarded_at: '2026-11-28T00:00:00Z',
 });
 
 function renderAt(path: string, store = createAppStore()) {
