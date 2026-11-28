@@ -8,6 +8,7 @@ import { toAppError } from '../../lib/errors';
 import { completeLesson, getPlayableLesson, myStats, submitAnswer } from '../../lib/api/learn';
 import { useAsync } from '../../lib/useAsync';
 import { profilePatched } from '../auth/authSlice';
+import { ReportDialog } from './ReportDialog';
 import { QuizRunner } from './QuizRunner';
 import { Rewards, type RewardNumbers } from './Rewards';
 
@@ -30,6 +31,7 @@ function Player({ lessonId }: { lessonId: string }) {
   const [reward, setReward] = useState<RewardNumbers | null>(null);
   const [finishError, setFinishError] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const [reporting, setReporting] = useState<string | null>(null);
   const onProgress = useCallback((f: number) => setProgress(f), []);
 
   if (lesson.status === 'loading') {
@@ -227,6 +229,7 @@ function Player({ lessonId }: { lessonId: string }) {
             persona={persona}
             onProgress={onProgress}
             onDone={() => void finish()}
+            onReport={(q) => setReporting(q.id)}
           />
         </>
       )}
@@ -243,6 +246,7 @@ function Player({ lessonId }: { lessonId: string }) {
         </div>
       )}
 
+      <ReportDialog questionId={reporting} onClose={() => setReporting(null)} />
       <ConfirmDialog
         open={leaving}
         onClose={() => setLeaving(false)}

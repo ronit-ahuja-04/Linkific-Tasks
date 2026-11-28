@@ -31,6 +31,12 @@ export function WelcomePage() {
           Start my adventure
         </Link>
         <Link
+          to="/taste"
+          className={buttonClasses({ variant: 'dark', size: 'md', fullWidth: true })}
+        >
+          Try a 3-minute taste first
+        </Link>
+        <Link
           to="/login"
           className={buttonClasses({ variant: 'dark', size: 'md', fullWidth: true })}
         >

@@ -3,6 +3,10 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { Wisp } from '../../components/characters';
 import { Button, buttonClasses, cardClasses } from '../../components/ui';
 import { levelForLight, levelProgress, stageForLevel } from '../../lib/game/level';
+import { effectiveFlame } from '../../lib/game/path';
+import { myCertificates } from '../../lib/api/trust';
+import { useAsync } from '../../lib/useAsync';
+import { Award } from 'lucide-react';
 import { signOut } from '../auth/authSlice';
 
 const STAGE_NAMES = { spark: 'Spark', wisp: 'Wisp', lantern: 'Lantern', beacon: 'Beacon' } as const;
@@ -10,6 +14,7 @@ const STAGE_NAMES = { spark: 'Spark', wisp: 'Wisp', lantern: 'Lantern', beacon: 
 export function MePage() {
   const profile = useAppSelector((s) => s.auth.profile);
   const dispatch = useAppDispatch();
+  const certificates = useAsync(() => myCertificates(), [profile?.id]);
   if (!profile) return null;
   const level = levelForLight(profile.light);
   const stage = stageForLevel(level);
@@ -38,7 +43,7 @@ export function MePage() {
       <dl className="m-0 grid grid-cols-2 gap-3">
         {[
           ['Light', profile.light],
-          ['Flame', `${profile.flame_days} days`],
+          ['Flame', `${effectiveFlame(profile)} days`],
           ['Best flame', `${profile.best_flame} days`],
           ['Embers', profile.embers],
         ].map(([label, value]) => (
@@ -48,6 +53,33 @@ export function MePage() {
           </div>
         ))}
       </dl>
+      {certificates.status === 'ready' && certificates.data.length > 0 && (
+        <section aria-labelledby="certs-heading" className="flex flex-col gap-3">
+          <h2 id="certs-heading" className="m-0 text-xl font-semibold">
+            Certificates
+          </h2>
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {certificates.data.map((c) => (
+              <li key={c.code}>
+                <Link
+                  to={`/verify/${c.code}`}
+                  className={cardClasses(
+                    'flex items-center gap-3 px-4 py-3 text-ink no-underline hover:border-glow',
+                  )}
+                >
+                  <Award aria-hidden="true" className="h-6 w-6 text-glow-deep" />
+                  <span className="flex flex-col">
+                    <b>{c.course.island_name}</b>
+                    <span className="text-sm text-dusk">
+                      {c.course.title} · {new Date(c.issued_at).toLocaleDateString()}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       {profile.role !== 'learner' && (
         <Link
           to={profile.role === 'admin' ? '/admin' : '/studio'}
