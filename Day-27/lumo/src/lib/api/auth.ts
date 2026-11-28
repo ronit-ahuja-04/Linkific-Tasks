@@ -62,3 +62,16 @@ export function onAuthChange(listener: (session: Session | null) => void): () =>
 }
 
 export { loadProfile };
+
+/** Email a reset link that opens /reset-password, where the link's one-time session lets them pick a new password. */
+export async function requestPasswordReset(email: string): Promise<void> {
+  const { error } = await supabase().auth.resetPasswordForEmail(email.trim(), {
+    redirectTo: `${window.location.origin}/reset-password`,
+  });
+  if (error) throw toAppError(error);
+}
+
+export async function updatePassword(password: string): Promise<void> {
+  const { error } = await supabase().auth.updateUser({ password });
+  if (error) throw toAppError(error);
+}

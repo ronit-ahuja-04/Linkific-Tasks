@@ -1,6 +1,6 @@
 /** Grey placeholders in the shape of what's loading, so the page doesn't jump when data arrives. */
 export function Skeleton({ className = '' }: { className?: string }) {
-  return <div aria-hidden="true" className={`animate-pulse rounded-xl bg-mist ${className}`} />;
+  return <div aria-hidden="true" className={`shimmer rounded-xl ${className}`} />;
 }
 
 export function CardSkeletons({ count = 3, label }: { count?: number; label: string }) {

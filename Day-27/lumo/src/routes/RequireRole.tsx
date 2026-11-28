@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppSelector } from '../app/hooks';
-import { Loading } from '../components/ui';
+import { BootScreen } from '../components/motion/Motion';
 import type { Role } from '../lib/types';
 
 /**
@@ -11,7 +11,7 @@ import type { Role } from '../lib/types';
 export function RequireRole({ roles, children }: { roles?: Role[]; children: ReactNode }) {
   const { status, profile } = useAppSelector((s) => s.auth);
   const location = useLocation();
-  if (status === 'checking') return <Loading label="Finding your lantern…" />;
+  if (status === 'checking') return <BootScreen label="Finding your lantern…" />;
   if (status === 'signedOut' || !profile) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }

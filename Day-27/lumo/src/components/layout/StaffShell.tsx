@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import { BookOpen, LogOut, Map, ShieldCheck } from 'lucide-react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '../../app/hooks';
 import { signOut } from '../../features/auth/authSlice';
+import { PageTransition, RouteLoading } from '../motion/Motion';
 
 /** Instructor and admin web tools: a sidebar (stacks above the page on a phone) and the page. */
 export function StaffShell() {
@@ -56,7 +58,11 @@ export function StaffShell() {
         </div>
       </aside>
       <main id="main" className="min-w-0 grow-[999] basis-[560px] p-6 md:p-8">
-        <Outlet />
+        <Suspense fallback={<RouteLoading />}>
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
+        </Suspense>
       </main>
     </div>
   );

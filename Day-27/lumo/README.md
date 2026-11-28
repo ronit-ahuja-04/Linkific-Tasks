@@ -123,12 +123,19 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **Certificates are earned, never typed in:** `claim_certificate()` checks that every visible lesson was finished, and `verify_certificate()` (public) returns only the name, island, date and lesson count. **Reports** go through `report_content()` (signed in, a known category, at most 20 a day); learners can't read the queue, instructors see reports on their own courses, and only admins close them with `review_flag()`, which is audit-logged.
 - **AI content is never shown unreviewed:** drafted units are unpublished, which hides them and their lessons and questions from learners (row-level policies, and the review function skips them), and `publish_unit()` refuses while any answer key is unchecked. The AI key lives only in the worker's `.env.worker`, never in the browser.
 
+## Screens, motion and notifications
+
+- **Every state has a screen.** A branded boot screen matches the HTML shell, so there's no flash. Pages download behind a thin glowing bar while the sidebar or tab bar stays put, and Wisp appears only if a load takes longer than 0.4 s. The **404** is an island lost in the fog with a way home, and a crash shows **"Gloom got into the gears"** with Reload, instead of a blank page.
+- **Sign-in screens:** night isles beside the form on wide screens, with the form first on a phone. Registering suggests a handle from your name, checks each field when you leave it, and shows a **password-strength meter** with one concrete tip. **Forgot password** emails a one-time link to `/reset-password`. It answers the same whether or not the email has an account, so it can't be used to find out who's registered.
+- **Motion:** pages rise in, the stones on the path and the island cards arrive one after another, cards lift under the pointer, dialogs pop open, and placeholders shimmer. Everything is short and soft, and turned off for people who ask for reduced motion. Fades start at 0.001 opacity, not 0, so Chrome can still measure Largest Contentful Paint.
+- **Notifications:** toasts slide in and show a countdown bar. They **pause while hovered or focused**, so nobody loses a message mid-read, and errors stay twice as long. An **offline banner** appears when the connection drops, with a note when it's back.
+
 ## Tests and quality (M6)
 
 ```bash
-npm test                 # unit + component tests (Vitest, 45 tests)
+npm test                 # unit + component tests (Vitest, 52 tests)
 npm run db:test          # pgTAP: the security rules above, inside the real database (125 tests)
-npm run e2e              # Playwright: both journeys + accessibility on every page (18 tests, about 1 minute)
+npm run e2e              # Playwright: journeys, password reset, 404 + accessibility on every page (22 tests, about 1.5 minutes)
 LUMO_E2E_WORKER=1 npm run e2e   # also has Wisp draft a unit end to end (needs npm run worker)
 npm run build && npm run lighthouse   # Lighthouse scores for the production build
 npm run typecheck && npm run lint && npm run format:check
@@ -138,16 +145,17 @@ npm run typecheck && npm run lint && npm run format:check
 
 - **Learner journey:** a visitor tries Code Reef, then signs up and goes through the setup chat. They take a captioned video lesson, get an explanation for a wrong answer, report the question, and see missed questions come back. The server awards Light and the flame. The next day fog returns and a review clears it. After days away a welcome back appears. They earn a certificate and a signed-out stranger verifies it. The admin closes the report, with a note, in the activity log.
 - **Staff journey:** an instructor's forms reject bad input, a wrong file type is refused, and a video uploads and plays back through a signed link. A question is saved with its answer key and the island is sent for review. The admin publishes it from the review queue, and a learner finds it with search and filters. With the worker running, Wisp drafts a unit that can't be published until every question is checked.
-- **Accessibility:** axe (WCAG 2.1 AA) on 16 pages for all four roles. Any serious or critical problem fails the test, and so does sideways scrolling at 375 px. Every page currently has zero violations.
+- **Accounts:** a forgotten password is reset from the real email (the local Mailpit inbox), the new password works and the old one is refused, and unknown addresses get the 404 island.
+- **Accessibility:** axe (WCAG 2.1 AA) on 18 pages for all four roles. Any serious or critical problem fails the test, and so does sideways scrolling at 375 px. Every page currently has zero violations.
 - **Same tests, production build:** `npm run build && npx vite preview --port 5181`, then `LUMO_E2E_URL=http://localhost:5181 npm run e2e`. Preview serves the same security headers as Vercel, so this also proves the Content-Security-Policy blocks nothing the app needs.
 
 **Lighthouse** (production build, mobile profile with slow 4G and a 4× slower CPU):
 
 | Page        | Performance | Accessibility | Best practices | SEO |
 | ----------- | ----------- | ------------- | -------------- | --- |
-| `/`         | 95          | 100           | 100            | 100 |
-| `/taste`    | 93          | 100           | 100            | 100 |
-| `/login`    | 93          | 100           | 100            | 100 |
+| `/`         | 94          | 100           | 100            | 100 |
+| `/taste`    | 92          | 100           | 100            | 100 |
+| `/login`    | 92          | 100           | 100            | 100 |
 | `/register` | 95          | 100           | 100            | 100 |
 
 **Security headers** (`vercel.json`): a strict Content-Security-Policy (scripts only from Lumo itself, network calls only to Supabase, no framing), plus `nosniff`, a referrer policy, a permissions policy and HSTS. Built assets are cached for a year because their file names change on every build.

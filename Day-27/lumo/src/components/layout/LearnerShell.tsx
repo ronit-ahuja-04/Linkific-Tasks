@@ -1,6 +1,8 @@
+import { Suspense } from 'react';
 import { Compass, Map, UserRound } from 'lucide-react';
 import { Navigate, NavLink, Outlet } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
+import { PageTransition, RouteLoading } from '../motion/Motion';
 
 const TABS = [
   { to: '/map', label: 'Map', icon: Map },
@@ -16,7 +18,11 @@ export function LearnerShell() {
   return (
     <div className="flex min-h-dvh flex-col md:flex-row-reverse">
       <main id="main" className="flex-1 pb-20 md:pb-0">
-        <Outlet />
+        <Suspense fallback={<RouteLoading />}>
+          <PageTransition>
+            <Outlet />
+          </PageTransition>
+        </Suspense>
       </main>
       <nav
         aria-label="Main"
