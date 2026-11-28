@@ -1,0 +1,63 @@
+{
+  "id": "colour",
+  "title": "Contrast first in 90 seconds",
+  "island": "Palette Peaks",
+  "guardian": "mystery",
+  "voice": "am_adam",
+  "code": "",
+  "parts": {},
+  "scenes": [
+    {
+      "visual": "title",
+      "lines": [
+        { "say": "Welcome to Palette Peaks.", "show": { "bubble": "Colour!" } },
+        {
+          "say": "Before picking pretty colours, make sure everyone can read them.",
+          "show": { "bubble": "Readable?" }
+        }
+      ]
+    },
+    {
+      "visual": "points",
+      "heading": "Contrast, in numbers",
+      "lines": [
+        {
+          "say": "Contrast is how different the text is from its background, as a ratio.",
+          "show": { "points": ["Text vs background"] }
+        },
+        {
+          "say": "Black on white is twenty-one to one. The same colour on itself is one to one.",
+          "show": { "points": ["Text vs background", "21:1 to 1:1"] }
+        },
+        {
+          "say": "The accessibility guidelines, level double A, ask for four and a half to one for normal text.",
+          "show": { "points": ["Text vs background", "21:1 to 1:1", "4.5:1 for body text"] }
+        },
+        {
+          "say": "Large headings can go down to three to one.",
+          "show": {
+            "points": [
+              "Text vs background",
+              "21:1 to 1:1",
+              "4.5:1 for body text",
+              "3:1 for big text"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "visual": "recap",
+      "lines": [
+        {
+          "say": "So: four and a half to one for body text, three to one for big text.",
+          "show": { "points": ["4.5:1 body", "3:1 large"] }
+        },
+        {
+          "say": "Now, a quick check.",
+          "show": { "bubble": "Quiz!", "points": ["4.5:1 body", "3:1 large"] }
+        }
+      ]
+    }
+  ]
+}

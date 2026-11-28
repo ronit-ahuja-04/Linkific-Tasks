@@ -1,5 +1,5 @@
 // Shared by the lesson videos (make-video.mjs) and the product demo (make-demo.mjs).
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -131,4 +131,32 @@ export async function renderTo({ serveUrl, id, inputProps, output, crf = 24, sca
     },
   });
   console.log('');
+}
+
+/**
+ * Upload a rendered lesson (video, captions) to the private course-media bucket and link it to the lesson, with its
+ * transcript and length; the lesson's previous files are removed. `db` is any supabase-js client allowed to edit the
+ * lesson: the local service role (make-video --attach) or a signed-in instructor (attach-cloud).
+ */
+export async function attachToLesson(db, lesson, { mp4, vtt, transcript, seconds }) {
+  const base = `${lesson.units.course_id}/lessons/${lesson.id}/${randomUUID()}`;
+  const bucket = db.storage.from('course-media');
+  const up = async (file, dest, contentType) => {
+    const { error } = await bucket.upload(dest, readFileSync(file), { contentType, upsert: false });
+    if (error) throw error;
+  };
+  await up(mp4, `${base}.mp4`, 'video/mp4');
+  await up(vtt, `${base}.vtt`, 'text/vtt');
+  const { error } = await db
+    .from('lessons')
+    .update({
+      video_path: `${base}.mp4`,
+      captions_path: `${base}.vtt`,
+      transcript,
+      duration_seconds: Math.min(1800, Math.max(10, Math.round(seconds))),
+    })
+    .eq('id', lesson.id);
+  if (error) throw error;
+  const old = [lesson.video_path, lesson.captions_path].filter(Boolean);
+  if (old.length) await bucket.remove(old);
 }

@@ -1,0 +1,62 @@
+{
+  "id": "variables",
+  "title": "Boxes with names",
+  "island": "Code Reef",
+  "guardian": "byte",
+  "voice": "am_puck",
+  "code": "let score = 0;\nscore = 5;\nconst name = 'Maya';\nname = 'Sam'; // TypeError",
+  "parts": {
+    "let": "let score = 0",
+    "change": "score = 5",
+    "const": "const name = 'Maya'",
+    "boom": "name = 'Sam'"
+  },
+  "scenes": [
+    {
+      "visual": "title",
+      "lines": [
+        { "say": "Hi, I'm Byte!", "show": { "bubble": "Hi!" } },
+        {
+          "say": "Programs need to remember things, like a score or a name.",
+          "show": { "bubble": "Remember!" }
+        },
+        { "say": "They keep them in variables: boxes with names.", "show": { "bubble": "Boxes!" } }
+      ]
+    },
+    {
+      "visual": "code",
+      "lines": [
+        {
+          "say": "let makes a box you can change later.",
+          "show": { "highlight": "let", "label": "let" }
+        },
+        {
+          "say": "Here, the score starts at zero, then becomes five. That's fine.",
+          "show": { "highlight": "change", "label": "Change it" }
+        },
+        {
+          "say": "const makes a box that's sealed once it's set.",
+          "show": { "highlight": "const", "label": "const" }
+        },
+        {
+          "say": "So giving a const a new value throws a TypeError.",
+          "show": { "highlight": "boom", "label": "Error!", "fail": true }
+        }
+      ]
+    },
+    {
+      "visual": "recap",
+      "lines": [
+        { "say": "Use let when the value will change.", "show": { "points": ["let: can change"] } },
+        {
+          "say": "Use const when it never should.",
+          "show": { "points": ["let: can change", "const: set once"] }
+        },
+        {
+          "say": "Ready? Let's try the quiz!",
+          "show": { "bubble": "Quiz time!", "points": ["let: can change", "const: set once"] }
+        }
+      ]
+    }
+  ]
+}

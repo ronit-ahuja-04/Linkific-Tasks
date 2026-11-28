@@ -9,10 +9,9 @@
 //      lesson. Uses the local service-role key from `supabase status` (kept in memory, never printed); refuses any
 //      non-local URL. In M4 the generation worker does this step for drafted lessons.
 import { execSync } from 'node:child_process';
-import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { FPS, bundleVideo, createVoice, renderTo, root, toVtt } from './lib.mjs';
+import { FPS, attachToLesson, bundleVideo, createVoice, renderTo, root, toVtt } from './lib.mjs';
 
 const args = process.argv.slice(2);
 const scriptPath = args.find((a) => a.endsWith('.json'));
@@ -126,29 +125,11 @@ if (attach) {
   if (lessons.length > 1)
     throw new Error(`"${attach}" matches ${lessons.length} lessons; pass its id.`);
   const lesson = lessons[0];
-  const base = `${lesson.units.course_id}/lessons/${lesson.id}/${randomUUID()}`;
-  const bucket = db.storage.from('course-media');
-
-  const up = async (file, dest, contentType) => {
-    const { error: e } = await bucket.upload(dest, readFileSync(file), {
-      contentType,
-      upsert: false,
-    });
-    if (e) throw e;
-  };
-  await up(output, `${base}.mp4`, 'video/mp4');
-  await up(path.join(outDir, `${script.id}.vtt`), `${base}.vtt`, 'text/vtt');
-  const { error: updateError } = await db
-    .from('lessons')
-    .update({
-      video_path: `${base}.mp4`,
-      captions_path: `${base}.vtt`,
-      transcript,
-      duration_seconds: Math.min(1800, Math.max(10, Math.round(seconds))),
-    })
-    .eq('id', lesson.id);
-  if (updateError) throw updateError;
-  const old = [lesson.video_path, lesson.captions_path].filter(Boolean);
-  if (old.length) await bucket.remove(old);
+  await attachToLesson(db, lesson, {
+    mp4: output,
+    vtt: path.join(outDir, `${script.id}.vtt`),
+    transcript,
+    seconds,
+  });
   console.log(`Attached to "${lesson.title}" (${lesson.id}).`);
 }

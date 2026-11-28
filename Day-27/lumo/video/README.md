@@ -23,6 +23,17 @@ npm run studio                                                                  
 
 In M4 the AI pipeline writes the script JSON (Gemini free tier) and the generation worker runs these same steps.
 
+## The starter lessons, on the hosted app
+
+Each video lesson in the starter islands has a script in `scripts/lessons/`: `variables`, `for-loops`, `charts`, `colour` and `money`. Each one teaches what its quiz then asks, in its island guardian's voice.
+
+```bash
+for s in variables for-loops charts colour money; do npm run make -- scripts/lessons/$s.json; done
+npm run attach:cloud        # asks for your Lumo email and password (hidden), then uploads all five
+```
+
+`attach:cloud` gets the project's URL and public key from Vercel (`vercel env pull`), signs in **as you**, and uploads each video, its captions and its transcript to the private bucket, linked to its lesson. Row Level Security decides what you may change, exactly as in the studio: no service key is used, and a learner account is refused. `--local` targets the local stack instead.
+
 ## The product demo (made by Lumo)
 
 `npm run demo` makes a 3-minute walkthrough of Lumo with this same pipeline: out/lumo-demo.mp4 (1080p) plus captions and a transcript.
