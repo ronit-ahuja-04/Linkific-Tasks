@@ -65,6 +65,8 @@ export type Level = Course['level'];
 /** A lesson as the studio sees it: media, hidden state and how many questions it has. */
 export interface StudioLesson extends Lesson {
   video_path: string | null;
+  /** WebVTT captions for the video, next to it in the course-media bucket. */
+  captions_path: string | null;
   transcript: string | null;
   deleted_at: string | null;
   question_count: number;

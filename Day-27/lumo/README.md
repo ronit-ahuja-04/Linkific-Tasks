@@ -13,6 +13,7 @@
 | --------- | --------------------------------------------------------------------------------- | -------- |
 | M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles | **done** |
 | M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)          | **done** |
+| M2b       | Video spike: script → local voice → captions → animated Remotion video            | **done** |
 | M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                 |          |
 | M4        | AI pipeline: outline → scripts → quizzes → rendered videos                        |          |
 | M5        | Certificates, comeback, admin review and Wisp safety                              |          |
@@ -95,6 +96,7 @@ src/
 supabase/
   migrations/             the schema, policies, functions, storage buckets
   seed.sql                demo accounts, Code Reef, Starfall Lagoon (draft) and three more live islands
+video/                    lesson videos: script → narration (Kokoro) → captions → Remotion render (see video/README.md)
 scripts/
   write-env.mjs           writes .env for the local stack (public anon key only)
   fake-worker.mjs         the local stand-in for the AI pipeline (npm run worker)

@@ -21,7 +21,7 @@ import type {
 const COURSE_COLUMNS =
   'id, slug, title, island_name, guardian, topic, level, summary, owner_id, status, version, ai_generated, updated_at';
 const LESSON_COLUMNS =
-  'id, unit_id, position, kind, title, summary, duration_seconds, xp, video_path, transcript, deleted_at';
+  'id, unit_id, position, kind, title, summary, duration_seconds, xp, video_path, captions_path, transcript, deleted_at';
 
 export interface CourseInput {
   title: string;
@@ -154,7 +154,11 @@ export async function createLesson(unitId: string, input: LessonInput): Promise<
 
 export async function updateLesson(
   id: string,
-  input: Partial<LessonInput> & { video_path?: string | null; transcript?: string | null },
+  input: Partial<LessonInput> & {
+    video_path?: string | null;
+    captions_path?: string | null;
+    transcript?: string | null;
+  },
 ): Promise<void> {
   const { error } = await supabase().from('lessons').update(input).eq('id', id);
   if (error) throw toAppError(error);
