@@ -2,7 +2,7 @@
 
 **Learn a little. Light up a lot.** A game-driven learning world with an AI guide, Wisp. Courses are islands, lessons are lanterns, and the fog of forgetting (spaced repetition) brings learners back.
 
-- **Capstone:** Linkific internship, Days 25–30 (rebuilt from Day 25–26's SkillForge from Day 27 on)
+- **Capstone:** Linkific internship, Days 25–30. Day 27 rebuilds Day 25–26's SkillForge as Lumo; each day's version lives in its own `Day-N/lumo` folder
 - **Design prototype:** [Lumo canvas](https://claude.ai/artifact/8rXkMpS2MWU91gR5NQAcdR) (every screen, the cast, the flows)
 - **Plan:** local `Day-27/DAY27_PLAN.md`
 - **Stack:** React 19, Vite 8, strict TypeScript, Tailwind CSS 4, Redux Toolkit, React Router 7, Supabase (Postgres, Auth, Row Level Security, Storage, Realtime). Zero-cost by design: Supabase free plan, Vercel Hobby, and the Gemini API free tier for the AI parts (later milestones).
@@ -23,7 +23,7 @@
 Needs Node 20+, Docker (Colima on this Mac) and about 4 GB of free memory.
 
 ```bash
-cd capstone/lumo
+cd Day-27/lumo
 npm install
 npm run db:start      # local Supabase on ports 54420–54424 (separate from Huddle's 543xx)
 npm run env:local     # writes .env with the local URL and the public anon key
