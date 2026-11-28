@@ -2,7 +2,7 @@ import { Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAppSelector } from '../../app/hooks';
 import { Wisp } from '../../components/characters';
-import { Button } from '../../components/ui';
+import { Button, Dialog, Field, TextAreaField } from '../../components/ui';
 import { toAppError } from '../../lib/errors';
 import { cancelJob, listJobs, queueJob, watchJobs } from '../../lib/api/studio';
 import type { GenerationJob, JobStatus } from '../../lib/types';
@@ -32,6 +32,10 @@ export function JobsPanel({ courseId, onDrafted }: { courseId: string; onDrafted
   const initial = useAsync(() => listJobs(courseId), [courseId]);
   const [updates, setUpdates] = useState<Record<string, GenerationJob>>({});
   const [queueing, setQueueing] = useState(false);
+  const [asking, setAsking] = useState(false);
+  const [topic, setTopic] = useState('');
+  const [notes, setNotes] = useState('');
+  const [topicError, setTopicError] = useState<string>();
   const [cancelling, setCancelling] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const callbacks = useRef({ onDrafted, toast });
@@ -77,12 +81,24 @@ export function JobsPanel({ courseId, onDrafted }: { courseId: string; onDrafted
   const stalled =
     active?.status === 'queued' && now - new Date(active.updated_at).getTime() > STALL_MS;
 
-  async function ask() {
+  async function ask(event: React.FormEvent) {
+    event.preventDefault();
+    const t = topic.trim();
+    if (t.length < 3 || t.length > 200) {
+      setTopicError('Tell Wisp what the unit should teach (3–200 characters).');
+      return;
+    }
     setQueueing(true);
     try {
-      const job = await queueJob(courseId, profile?.id ?? '', 'outline');
+      const job = await queueJob(courseId, profile?.id ?? '', 'outline', {
+        topic: t,
+        notes: notes.trim() || undefined,
+      });
       setUpdates((u) => ({ ...u, [job.id]: job }));
       setNow(Date.now());
+      setAsking(false);
+      setTopic('');
+      setNotes('');
     } catch (error) {
       toast.error(toAppError(error).message);
     } finally {
@@ -126,7 +142,12 @@ export function JobsPanel({ courseId, onDrafted }: { courseId: string; onDrafted
       {active ? (
         <div className="flex flex-col gap-2" aria-live="polite">
           <div className="flex items-center justify-between gap-2 text-sm font-bold">
-            <span>{active.message || STATUS_TEXT[active.status]}</span>
+            <span>
+              {active.message || STATUS_TEXT[active.status]}
+              {active.status === 'waiting_quota' && active.run_after
+                ? ` (tries again ${new Date(active.run_after).toLocaleString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' })})`
+                : ''}
+            </span>
             <span className="text-moon">{active.progress}%</span>
           </div>
           <div
@@ -173,18 +194,84 @@ export function JobsPanel({ courseId, onDrafted }: { courseId: string; onDrafted
             loading={queueing}
             loadingText="Asking Wisp…"
             leftIcon={<Sparkles aria-hidden="true" className="h-5 w-5" />}
-            onClick={() => void ask()}
+            onClick={() => setAsking(true)}
           >
             Ask Wisp to draft a unit
           </Button>
-          {lastDone && (
-            <span className="text-sm text-moon">
-              Last draft: {STATUS_TEXT[lastDone.status].toLowerCase()}
-              {lastDone.status === 'failed' && lastDone.error ? ` (${lastDone.error})` : ''}
-            </span>
-          )}
+          {lastDone && <LastDraft job={lastDone} />}
         </div>
       )}
+
+      <Dialog
+        open={asking}
+        onClose={() => setAsking(false)}
+        title="What should this unit teach?"
+        description="Wisp writes a short animated video and a quiz. You check every question before learners see it."
+      >
+        <form noValidate onSubmit={ask} className="flex flex-col gap-4 text-ink">
+          <Field
+            label="Topic"
+            value={topic}
+            onChange={(e) => {
+              setTopic(e.target.value);
+              setTopicError(undefined);
+            }}
+            error={topicError}
+            placeholder="Arrays: lists of values"
+            maxLength={200}
+            autoFocus
+          />
+          <TextAreaField
+            label="Notes for Wisp (optional)"
+            hint="Anything to include or avoid, e.g. “use a shopping list example”."
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            maxLength={1000}
+            rows={3}
+          />
+          <div className="flex flex-wrap justify-end gap-3">
+            <Button variant="ghost" onClick={() => setAsking(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" variant="violet" loading={queueing} loadingText="Asking Wisp…">
+              Draft the unit
+            </Button>
+          </div>
+        </form>
+      </Dialog>
     </section>
+  );
+}
+
+/** What the last job made, in a line: the unit, the code check's work, and the video. */
+function LastDraft({ job }: { job: GenerationJob }) {
+  if (job.status === 'failed') {
+    return (
+      <span className="text-sm text-moon">
+        Last draft failed{job.error ? `: ${job.error}` : ''}
+      </span>
+    );
+  }
+  if (job.status !== 'succeeded' || !job.result) {
+    return (
+      <span className="text-sm text-moon">Last draft: {STATUS_TEXT[job.status].toLowerCase()}</span>
+    );
+  }
+  const r = job.result;
+  const dropped = r.questions_dropped?.length ?? 0;
+  return (
+    <span className="text-sm text-moon">
+      Last draft: “{r.unit_title}” with {r.questions_kept} questions
+      {dropped > 0 && `, ${dropped} dropped by the code check`}
+      {r.answers_corrected
+        ? `, ${r.answers_corrected} answer${r.answers_corrected === 1 ? '' : 's'} corrected by running the code`
+        : ''}
+      {r.video === 'rendered'
+        ? ', video rendered'
+        : r.video === 'failed'
+          ? ', video failed (transcript shown)'
+          : ''}
+      .
+    </span>
   );
 }

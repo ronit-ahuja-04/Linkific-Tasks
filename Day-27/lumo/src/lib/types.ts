@@ -74,10 +74,15 @@ export interface StudioLesson extends Lesson {
   transcript: string | null;
   deleted_at: string | null;
   question_count: number;
+  /** Questions whose answer key no person has checked yet (AI drafts). */
+  unchecked_count: number;
 }
 
 export interface StudioUnit extends Omit<Unit, 'lessons'> {
   lessons: StudioLesson[];
+  /** False for a unit Wisp drafted that hasn't been published: learners can't see it. */
+  published: boolean;
+  ai_drafted: boolean;
 }
 
 export interface StudioCourse extends Course {
@@ -121,6 +126,18 @@ export interface GenerationJob {
   attempts: number;
   created_at: string;
   updated_at: string;
+  input: { topic?: string; notes?: string };
+  /** What the worker made: the unit, question counts, what the code check dropped, whether the video rendered. */
+  result: {
+    unit_title?: string;
+    questions_kept?: number;
+    questions_dropped?: { prompt: string; reason: string }[];
+    answers_corrected?: number;
+    video?: string;
+    model?: string;
+  } | null;
+  /** When a job waiting for AI quota will try again. */
+  run_after: string | null;
 }
 
 // ---------------------------------------------------------------------------------------------------------------

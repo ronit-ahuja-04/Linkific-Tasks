@@ -6,3 +6,4 @@ package-lock.json
 video/node_modules/
 video/out/
 video/public/generated/
+video/scripts/lessons/generated/

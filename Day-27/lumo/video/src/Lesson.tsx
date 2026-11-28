@@ -12,8 +12,8 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from 'remotion';
-// The same Byte the app draws, so the video and the app look like one world.
-import { Byte } from '../../src/components/characters/Guardians';
+// The same characters the app draws, so the video and the app look like one world.
+import { Guardian } from '../../src/components/characters/Guardians';
 import type { Cue, SceneSpan, Show, Timeline } from './types';
 
 // Lumo's design tokens (src/styles/index.css).
@@ -128,21 +128,23 @@ function Bubble({ text, start, frame }: { text: string; start: number; frame: nu
   );
 }
 
-function ByteHost({
+function GuardianHost({
   cue,
   frame,
   talking,
   big,
+  guardian,
 }: {
   cue: Cue | undefined;
   frame: number;
   talking: boolean;
   big: boolean;
+  guardian: 'byte' | 'nova' | 'mystery';
 }) {
   const { fps } = useVideoConfig();
   const enter = spring({ frame, fps, config: { damping: 12 } });
   const bob = Math.sin(frame / 12) * 6;
-  // While Byte speaks, a quick bounce stands in for lip sync.
+  // While the guardian speaks, a quick bounce stands in for lip sync.
   const talk = talking ? Math.abs(Math.sin(frame / 3)) * 0.06 : 0;
   const size = big ? 320 : 240;
   return (
@@ -156,7 +158,7 @@ function ByteHost({
       }}
     >
       {cue?.show.bubble && <Bubble text={cue.show.bubble} start={cue.from} frame={frame} />}
-      <Byte size={size} decorative />
+      <Guardian guardian={guardian} size={size} decorative />
     </div>
   );
 }
@@ -380,8 +382,103 @@ function TraceScene({
   );
 }
 
-function RecapScene({ cue, frame }: { cue: Cue | undefined; frame: number }) {
+/** The frame each revealed point first appeared, so every point pops in once, when it's said. */
+function pointStarts(scene: SceneSpan): number[] {
+  const starts: number[] = [];
+  for (const cue of scene.cues) {
+    const n = cue.show.points?.length ?? 0;
+    while (starts.length < n) starts.push(cue.from);
+  }
+  return starts;
+}
+
+function PointsScene({
+  scene,
+  cue,
+  frame,
+}: {
+  scene: SceneSpan;
+  cue: Cue | undefined;
+  frame: number;
+}) {
+  const { fps } = useVideoConfig();
+  const points = cue?.show.points ?? [];
+  const starts = pointStarts(scene);
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: 440,
+        top: 120,
+        width: 760,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 26,
+      }}
+    >
+      <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 60, color: C.white }}>
+        {scene.heading || 'Key ideas'}
+      </div>
+      {points.map((p, i) => {
+        const s = spring({ frame: since(frame, starts[i] ?? 0), fps, config: { damping: 13 } });
+        const latest = i === points.length - 1;
+        return (
+          <div
+            key={i}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 20,
+              transform: `translateX(${(1 - s) * 60}px)`,
+              opacity: s,
+            }}
+          >
+            <span
+              style={{
+                width: 52,
+                height: 52,
+                borderRadius: 999,
+                background: latest ? C.glow : C.violet,
+                color: latest ? C.night : C.white,
+                fontFamily: DISPLAY,
+                fontWeight: 700,
+                fontSize: 30,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexShrink: 0,
+              }}
+            >
+              {i + 1}
+            </span>
+            <span
+              style={{
+                fontFamily: SANS,
+                fontWeight: 800,
+                fontSize: 40,
+                color: latest ? C.white : C.moon,
+              }}
+            >
+              {p}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function RecapScene({
+  scene,
+  cue,
+  frame,
+}: {
+  scene: SceneSpan;
+  cue: Cue | undefined;
+  frame: number;
+}) {
   const show = cue?.show ?? {};
+  const starts = pointStarts(scene);
   return (
     <div
       style={{
@@ -391,6 +488,7 @@ function RecapScene({ cue, frame }: { cue: Cue | undefined; frame: number }) {
         display: 'flex',
         flexDirection: 'column',
         gap: 30,
+        maxWidth: 640,
       }}
     >
       <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 64, color: C.white }}>
@@ -409,7 +507,18 @@ function RecapScene({ cue, frame }: { cue: Cue | undefined; frame: number }) {
           </Chip>
         </div>
       ) : (
-        <div style={{ fontFamily: MONO, fontSize: 44, color: C.lagoonSoft }}>prints 0 1 2</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 16 }}>
+          {(show.points ?? []).map((p, i) => (
+            <Chip
+              key={i}
+              colour={[C.glow, C.violet, C.lagoon][i % 3]!}
+              start={starts[i] ?? 0}
+              frame={frame}
+            >
+              {p}
+            </Chip>
+          ))}
+        </div>
       )}
     </div>
   );
@@ -455,8 +564,15 @@ function SceneView({ scene, timeline }: { scene: SceneSpan; timeline: Timeline }
       {scene.visual === 'trace' && (
         <TraceScene timeline={timeline} scene={scene} cue={cue} frame={frame} />
       )}
-      {scene.visual === 'recap' && <RecapScene cue={stepsCue ?? cue} frame={frame} />}
-      <ByteHost cue={cue} frame={frame} talking={talking} big={big} />
+      {scene.visual === 'points' && <PointsScene scene={scene} cue={cue} frame={frame} />}
+      {scene.visual === 'recap' && <RecapScene scene={scene} cue={stepsCue ?? cue} frame={frame} />}
+      <GuardianHost
+        cue={cue}
+        frame={frame}
+        talking={talking}
+        big={big}
+        guardian={timeline.guardian ?? 'byte'}
+      />
     </AbsoluteFill>
   );
 }

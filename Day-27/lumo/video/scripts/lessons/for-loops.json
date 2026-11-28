@@ -68,7 +68,10 @@
     {
       "visual": "recap",
       "lines": [
-        { "say": "So this loop prints zero, one, two.", "show": { "bubble": "0 1 2" } },
+        {
+          "say": "So this loop prints zero, one, two.",
+          "show": { "bubble": "0 1 2", "points": ["prints 0 1 2"] }
+        },
         { "say": "Start, check, step.", "show": { "steps": true } },
         {
           "say": "Remember those three, and loops will never trick you.",

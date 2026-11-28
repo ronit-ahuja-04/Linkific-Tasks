@@ -98,13 +98,20 @@ export async function getStudioCourse(id: string): Promise<StudioCourse> {
   const { data, error } = await supabase()
     .from('courses')
     .select(
-      `${COURSE_COLUMNS}, units(id, course_id, position, title, summary, lessons(${LESSON_COLUMNS}, questions(count)))`,
+      `${COURSE_COLUMNS}, units(id, course_id, position, title, summary, published, ai_drafted, lessons(${LESSON_COLUMNS}, questions(id, answer_keys(verified))))`,
     )
     .eq('id', id)
     .is('deleted_at', null)
     .single();
   if (error) throw toAppError(error);
-  type RawLesson = Omit<StudioLesson, 'question_count'> & { questions: { count: number }[] };
+  type RawLesson = Omit<StudioLesson, 'question_count' | 'unchecked_count'> & {
+    questions: {
+      id: string;
+      answer_keys: { verified: boolean } | { verified: boolean }[] | null;
+    }[];
+  };
+  const checked = (k: RawLesson['questions'][number]['answer_keys']) =>
+    Array.isArray(k) ? Boolean(k[0]?.verified) : Boolean(k?.verified);
   const raw = data as unknown as Course & {
     units: (Omit<StudioUnit, 'lessons'> & { lessons: RawLesson[] })[];
   };
@@ -114,7 +121,11 @@ export async function getStudioCourse(id: string): Promise<StudioCourse> {
       ...u,
       lessons: [...u.lessons]
         .sort((a, b) => a.position - b.position)
-        .map(({ questions, ...l }) => ({ ...l, question_count: questions[0]?.count ?? 0 })),
+        .map(({ questions, ...l }) => ({
+          ...l,
+          question_count: questions.length,
+          unchecked_count: questions.filter((q) => !checked(q.answer_keys)).length,
+        })),
     }));
   return { ...raw, units };
 }
@@ -134,6 +145,12 @@ export async function updateUnit(id: string, title: string): Promise<void> {
 
 export async function deleteUnit(id: string): Promise<void> {
   const { error } = await supabase().from('units').delete().eq('id', id);
+  if (error) throw toAppError(error);
+}
+
+/** Make a drafted unit visible to learners. The database refuses while any question is unchecked. */
+export async function publishUnit(id: string): Promise<void> {
+  const { error } = await supabase().rpc('publish_unit', { p_unit: id });
   if (error) throw toAppError(error);
 }
 
@@ -209,7 +226,13 @@ export async function getStudioLesson(
       key: Array.isArray(answer_keys) ? (answer_keys[0] ?? null) : answer_keys,
     }));
   const { units, ...lesson } = raw;
-  return { ...lesson, course_id: units.course_id, question_count: questions.length, questions };
+  return {
+    ...lesson,
+    course_id: units.course_id,
+    question_count: questions.length,
+    unchecked_count: questions.filter((q) => !q.key?.verified).length,
+    questions,
+  };
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -244,7 +267,7 @@ export async function deleteQuestion(id: string): Promise<void> {
 // Generation jobs (written by the worker; the studio queues, cancels and watches them)
 // ---------------------------------------------------------------------------------------------------------------
 const JOB_COLUMNS =
-  'id, course_id, kind, status, progress, message, error, attempts, created_at, updated_at';
+  'id, course_id, kind, status, progress, message, error, attempts, created_at, updated_at, input, result, run_after';
 
 export async function listJobs(courseId: string): Promise<GenerationJob[]> {
   const { data, error } = await supabase()
@@ -261,10 +284,17 @@ export async function queueJob(
   courseId: string,
   requestedBy: string,
   kind: JobKind,
+  input: { topic: string; notes?: string } = { topic: '' },
 ): Promise<GenerationJob> {
   const { data, error } = await supabase()
     .from('generation_jobs')
-    .insert({ course_id: courseId, requested_by: requestedBy, kind, message: 'Waiting in line' })
+    .insert({
+      course_id: courseId,
+      requested_by: requestedBy,
+      kind,
+      input,
+      message: 'Waiting in line',
+    })
     .select(JOB_COLUMNS)
     .single();
   if (error) {
