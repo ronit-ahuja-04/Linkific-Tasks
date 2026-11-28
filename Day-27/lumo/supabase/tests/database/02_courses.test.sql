@@ -13,7 +13,7 @@ grant select on expected to anon;
 set local role anon;
 select is((select count(*) from public.courses where status <> 'live'), 0::bigint, 'a visitor sees only live courses');
 select is((select count(*) from public.lessons l join public.units u on u.id = l.unit_id where u.course_id = 'c0000000-0000-4000-8000-000000000001'), (select reef_lessons from expected), 'a visitor can see the live course''s lessons (hidden ones excluded)');
-select is((select count(*) from public.answer_keys), 0::bigint, 'a visitor sees no answer keys');
+select throws_ok($$ select count(*) from public.answer_keys $$, '42501', null, 'a visitor can''t read answer keys at all');
 reset role;
 
 -- Maya, a learner.
