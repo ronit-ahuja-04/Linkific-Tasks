@@ -12,7 +12,7 @@
 | Milestone | What                                                                              | State    |
 | --------- | --------------------------------------------------------------------------------- | -------- |
 | M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles | **done** |
-| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)          | next     |
+| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)          | **done** |
 | M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                 |          |
 | M4        | AI pipeline: outline → scripts → quizzes → rendered videos                        |          |
 | M5        | Certificates, comeback, admin review and Wisp safety                              |          |
@@ -32,6 +32,10 @@ npm run dev           # http://localhost:5180
 
 With Colima, the Supabase CLI needs to be told where Docker is: `export DOCKER_HOST=unix://$HOME/.colima/default/docker.sock`.
 
+To try "Ask Wisp to draft a unit", run the fake AI worker in a second terminal: `npm run worker`. It calls no AI and costs nothing; it walks a job through its steps (the studio shows them live over Realtime), then writes a drafted unit whose questions are marked "needs checking". It only ever connects to the local stack. `LUMO_FAKE_QUOTA=1 npm run worker` stops halfway with "out of today's quota", to see that state. The real Gemini pipeline replaces it in M4.
+
+Applying new migrations to an existing local database (keeps your data): `npx supabase migration up`.
+
 Demo accounts (local only), password `lumo-demo-123`:
 
 | Account          | Role       | Lands on          |
@@ -40,6 +44,20 @@ Demo accounts (local only), password `lumo-demo-123`:
 | sam@lumo.local   | learner    | the map           |
 | riya@lumo.local  | instructor | the course studio |
 | admin@lumo.local | admin      | people & roles    |
+
+## What the course studio does (M2)
+
+| Day 27 brief               | In Lumo                                                                                                                                    |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| CRUD                       | Courses, units, lessons and questions: create, edit, reorder (one atomic call), delete or hide                                             |
+| Forms with validation      | Course, lesson and question forms check the same rules as the database, show errors next to each field and move focus to the first one     |
+| Data display               | Island cards, the path (units and lessons with type, length, questions, video), question cards with the correct option and "checked" badge |
+| Search and filter          | Explore: words (title, island, summary), topic and level, all in the URL; the studio list filters by status                                |
+| API calls, loading, errors | Typed API layer, skeletons and loading states, one error model, toasts for every save and failure                                          |
+| Real-time                  | Wisp's workshop: a generation job's progress arrives live over Supabase Realtime, and the drafted unit appears without a reload            |
+| File uploads               | Lesson videos (MP4/WebM, 50 MB): drag and drop or pick, type and size checked first, real progress, cancel, duration read from the file    |
+
+Edge cases handled: a course link that's already taken, two options that say the same thing, a removed option (the right answer and the notes move with it), an empty course sent for review, a live course (lessons can be hidden, not deleted, so learners keep their progress), a second draft job while one is running, a job nobody picks up, leaving mid-upload, a replaced video (the old file is deleted), and a failed save after upload (the new file is deleted).
 
 ## How security works
 
@@ -51,6 +69,10 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **Light is awarded once per lesson** (`complete_lesson()`), and the daily flame is computed in the learner's own timezone, with an Ember covering one missed day.
 - **New accounts are always learners**, whatever the sign-up form sends. Roles change only through `set_user_role()`: admin-only, written to the audit log, and it refuses to remove the last admin.
 - **Status rules:** instructors move their course between draft and in review; only admins publish or archive.
+- **Lesson media is private.** Videos sit in a private bucket under `<course id>/…`; a file can be read only by someone who can see its course, through short-lived signed links, so drafts never leak. Uploads, replacements and deletes are allowed only for the course's editors.
+- **A question is never saved without its key.** `save_question()` writes both in one transaction and checks that the correct option exists and no two options are the same. Questions Wisp drafts stay "unverified" until a person saves them.
+- **Live content can't be hard-deleted** (a trigger refuses it), because learner progress would cascade away; lessons are hidden instead. Courses are soft-deleted through `delete_course()`, which is audit-logged, and only admins can remove a live one.
+- **Generation jobs:** only one active job of a kind per course (a unique index), editors can cancel, and only the worker (service role, server side) writes progress.
 
 ## Tests
 
@@ -65,13 +87,16 @@ npm run typecheck && npm run lint && npm run format:check
 ```
 src/
   components/characters   Wisp (4 stages × 5 moods), Byte, Nova, Gloom, Guardian
-  components/ui           Button, Field, Loading, ErrorPanel + style builders
+  components/ui           Button, Field, Select/TextArea fields, Dialog, skeletons, Loading, ErrorPanel
   components/layout       LearnerShell (bottom tabs / side rail), StaffShell (sidebar)
-  features/               welcome, auth, map, explore, me, studio, admin
-  lib/                    supabase client, error model, typed API, game rules, useAsync
+  features/               welcome, auth, map, explore, me, studio, admin, toast
+  lib/                    supabase client, error model, typed API (courses, studio, storage), game rules, useAsync
   routes/                 router, role guard, home per role
 supabase/
   migrations/             the schema, policies, functions, storage buckets
-  seed.sql                demo accounts and the Code Reef course
+  seed.sql                demo accounts, Code Reef, Starfall Lagoon (draft) and three more live islands
+scripts/
+  write-env.mjs           writes .env for the local stack (public anon key only)
+  fake-worker.mjs         the local stand-in for the AI pipeline (npm run worker)
   tests/database/         pgTAP tests
 ```

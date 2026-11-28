@@ -92,3 +92,46 @@ begin
     'Read the stars, then your own spreadsheets.', v_riya, 'draft', true);
 end;
 $$;
+
+-- Three more live islands (owned by the admin), so Explore's search and filters have something to find.
+do $$
+declare
+  v_admin uuid := 'a0000000-0000-4000-8000-000000000004';
+  r record;
+  v_u uuid; v_l uuid; v_q uuid;
+begin
+  for r in
+    select * from (values
+      ('c0000000-0000-4000-8000-000000000003'::uuid, 'charts-that-tell-the-truth', 'Charts That Tell the Truth', 'Chart Cove', 'nova', 'data', 'intermediate',
+       'Pick the right chart, spot a misleading axis, and tell a story with numbers.',
+       'Reading a chart', 'Axes, scales and the story they tell.',
+       'Where does the axis start?', '["At zero, for bar charts", "Wherever looks dramatic", "At the smallest value"]', 0,
+       'Bars compare lengths, so a bar chart''s axis must start at zero or the comparison lies.', 'bar chart baselines'),
+      ('c0000000-0000-4000-8000-000000000004'::uuid, 'colour-for-screens', 'Colour for Screens', 'Palette Peaks', 'mystery', 'design', 'beginner',
+       'Contrast, palettes and colour that works for everyone, one swatch at a time.',
+       'Contrast first', 'Why text needs contrast, and how much.',
+       'What contrast ratio does body text need (WCAG AA)?', '["2:1", "4.5:1", "10:1"]', 1,
+       'WCAG AA asks for at least 4.5:1 for normal-size text.', 'text contrast'),
+      ('c0000000-0000-4000-8000-000000000005'::uuid, 'money-basics', 'Money Basics', 'Coin Keys', 'byte', 'money', 'beginner',
+       'Budgets, interest and why small amounts grow, explained with treasure maps.',
+       'Where money goes', 'Needs, wants and the 50/30/20 split.',
+       'In a 50/30/20 budget, what is the 20 for?', '["Rent", "Fun", "Saving and paying off debt"]', 2,
+       'The 20% goes to the future you: savings and paying off debt.', '50/30/20 budget')
+    ) as t(id, slug, title, island, guardian, topic, level, summary, unit_title, unit_summary, prompt, options, correct, explanation, concept)
+  loop
+    insert into public.courses (id, slug, title, island_name, guardian, topic, level, summary, owner_id, status)
+    values (r.id, r.slug, r.title, r.island, r.guardian, r.topic, r.level, r.summary, v_admin, 'live')
+    on conflict (id) do nothing;
+    if not found then continue; end if;
+    insert into public.units (course_id, position, title, summary) values (r.id, 1, r.unit_title, r.unit_summary) returning id into v_u;
+    insert into public.lessons (unit_id, position, kind, title, summary, duration_seconds, xp)
+    values (v_u, 1, 'video', r.unit_title || ' in 90 seconds', r.unit_summary, 90, 10);
+    insert into public.lessons (unit_id, position, kind, title, summary, xp)
+    values (v_u, 2, 'quiz', 'Quick check', 'One question to lock it in.', 15) returning id into v_l;
+    insert into public.questions (lesson_id, position, prompt, options, concept)
+    values (v_l, 1, r.prompt, r.options::jsonb, r.concept) returning id into v_q;
+    insert into public.answer_keys (question_id, correct_index, explanation, verified)
+    values (v_q, r.correct, r.explanation, true);
+  end loop;
+end;
+$$;

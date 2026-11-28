@@ -4,15 +4,15 @@ select plan(15);
 
 -- A visitor who isn't signed in (Explore before sign-up).
 set local role anon;
-select is((select count(*) from public.courses), 1::bigint, 'a visitor sees only the live course');
-select is((select count(*) from public.lessons), 5::bigint, 'a visitor can see the live course''s lessons');
+select is((select count(*) from public.courses where status <> 'live'), 0::bigint, 'a visitor sees only live courses');
+select is((select count(*) from public.lessons l join public.units u on u.id = l.unit_id where u.course_id = 'c0000000-0000-4000-8000-000000000001'), 5::bigint, 'a visitor can see the live course''s lessons');
 select is((select count(*) from public.answer_keys), 0::bigint, 'a visitor sees no answer keys');
 reset role;
 
 -- Maya, a learner.
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
 set local role authenticated;
-select is((select count(*) from public.courses), 1::bigint, 'a learner does not see a draft course');
+select is((select count(*) from public.courses where status <> 'live'), 0::bigint, 'a learner does not see a draft course');
 select is((select count(*) from public.answer_keys), 0::bigint, 'a learner sees no answer keys');
 select throws_ok(
   $$ insert into public.courses (slug, title, island_name, topic, owner_id) values ('my-course', 'My course', 'My isle', 'code', 'a0000000-0000-4000-8000-000000000001') $$,
@@ -23,8 +23,8 @@ select is((select title from public.courses where slug = 'javascript-foundations
 
 -- Riya, an instructor.
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000003","role":"authenticated"}', true);
-select is((select count(*) from public.courses), 2::bigint, 'an instructor sees live courses plus their own draft');
-select is((select count(*) from public.answer_keys), 3::bigint, 'an instructor sees the answer keys of their own course');
+select ok(exists (select 1 from public.courses where slug = 'data-basics') and not exists (select 1 from public.courses where status <> 'live' and owner_id <> 'a0000000-0000-4000-8000-000000000003'), 'an instructor sees live courses plus their own drafts only');
+select ok((select count(*) from public.answer_keys) >= 3 and not exists (select 1 from public.answer_keys k where public.course_of_question(k.question_id) not in (select id from public.courses where owner_id = 'a0000000-0000-4000-8000-000000000003')), 'an instructor sees the answer keys of their own courses only');
 select lives_ok(
   $$ insert into public.courses (slug, title, island_name, topic, owner_id) values ('design-basics', 'Design Basics', 'Hue Hollow', 'design', 'a0000000-0000-4000-8000-000000000003') $$,
   'an instructor can create a draft course they own'
@@ -42,7 +42,7 @@ select lives_ok($$ update public.courses set status = 'live' where slug = 'data-
 
 -- Back to Maya: the published course is now visible.
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-4000-8000-000000000001","role":"authenticated"}', true);
-select is((select count(*) from public.courses), 2::bigint, 'once published, learners see the course');
+select ok(exists (select 1 from public.courses where slug = 'data-basics'), 'once published, learners see the course');
 
 select * from finish();
 rollback;

@@ -16,7 +16,8 @@
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
-    "env:local": "node scripts/write-env.mjs"
+    "env:local": "node scripts/write-env.mjs",
+    "worker": "node --experimental-websocket --no-warnings scripts/fake-worker.mjs"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
