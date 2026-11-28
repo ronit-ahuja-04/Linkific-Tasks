@@ -9,15 +9,15 @@
 
 ## Status
 
-| Milestone | What                                                                              | State    |
-| --------- | --------------------------------------------------------------------------------- | -------- |
-| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles | **done** |
-| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)          | **done** |
-| M2b       | Video spike: script → local voice → captions → animated Remotion video            | **done** |
-| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                 | **done** |
-| M4        | AI pipeline: outline → scripts → quizzes → rendered videos                        |          |
-| M5        | Certificates, comeback, admin review and Wisp safety                              |          |
-| M6        | E2E, accessibility, performance, deployment                                       |          |
+| Milestone | What                                                                                | State                                                                  |
+| --------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles   | **done**                                                               |
+| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)            | **done**                                                               |
+| M2b       | Video spike: script → local voice → captions → animated Remotion video              | **done**                                                               |
+| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                   | **done**                                                               |
+| M4        | AI pipeline: topic → script + quiz → code check → rendered video → review → publish | **built** (tested with the stand-in AI; the Gemini run needs your key) |
+| M5        | Certificates, comeback, admin review and Wisp safety                                |                                                                        |
+| M6        | E2E, accessibility, performance, deployment                                         |                                                                        |
 
 ## Run it locally
 
@@ -33,7 +33,7 @@ npm run dev           # http://localhost:5180
 
 With Colima, the Supabase CLI needs to be told where Docker is: `export DOCKER_HOST=unix://$HOME/.colima/default/docker.sock`.
 
-To try "Ask Wisp to draft a unit", run the fake AI worker in a second terminal: `npm run worker`. It calls no AI and costs nothing; it walks a job through its steps (the studio shows them live over Realtime), then writes a drafted unit whose questions are marked "needs checking". It only ever connects to the local stack. `LUMO_FAKE_QUOTA=1 npm run worker` stops halfway with "out of today's quota", to see that state. The real Gemini pipeline replaces it in M4.
+To try "Ask Wisp to draft a unit", run the content worker in a second terminal: `npm run worker` (see [Wisp drafts a unit](#wisp-drafts-a-unit-m4)).
 
 Applying new migrations to an existing local database (keeps your data): `npx supabase migration up`.
 
@@ -45,6 +45,32 @@ Demo accounts (local only), password `lumo-demo-123`:
 | sam@lumo.local   | learner    | the map           |
 | riya@lumo.local  | instructor | the course studio |
 | admin@lumo.local | admin      | people & roles    |
+
+## Wisp drafts a unit (M4)
+
+An instructor with no content types a topic ("Arrays: lists of values") and Wisp drafts a whole unit: an animated video and a quiz. The worker (`npm run worker`) runs on this Mac and reports every step live in the studio:
+
+| Step   | What happens                                                                                                                                                                                                                                                                                                |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Write  | One AI request returns the whole unit as structured JSON: unit title, a 60-second video script (scenes and lines), 3–4 questions with explanations and a note for every wrong option                                                                                                                        |
+| Check  | Shape, lengths, duplicate options, valid answer index; an unusable draft gets one retry with the problems listed                                                                                                                                                                                            |
+| Verify | Every "what does this print?" question is run in a sandbox (a separate Node process with the permission model on, inside an empty VM context: no files, network, `process` or modules, 1-second limit). A wrongly marked answer is corrected; a question whose code doesn't print what it claims is dropped |
+| Save   | A **hidden** draft unit: learners can't see it (database policies), and every answer key is marked "needs checking"                                                                                                                                                                                         |
+| Render | The [video package](video/README.md) records the narration (Kokoro, local) and renders it with the island's guardian; one retry, then the lesson falls back to its transcript                                                                                                                               |
+| Review | The instructor opens and saves each question; **Publish unit** stays disabled until all are checked (`publish_unit()` enforces it)                                                                                                                                                                          |
+
+**Free-quota handling:** a per-minute limit is waited out; the daily limit parks the job as "waiting for quota" with the time it will try again (after Google's midnight-Pacific reset), and it resumes by itself. One request per unit keeps a whole course well inside the free tier.
+
+### Add your Gemini key (free, no card)
+
+1. Create a key at [aistudio.google.com](https://aistudio.google.com) → **Get API key**. The free tier needs no billing account; when the free quota is used up, requests just fail and wait. (On the free tier Google may use prompts to improve its products; Lumo's prompts contain only the course and the topic.)
+2. Save it into `.env.worker` (gitignored, readable only by you) without it appearing on screen:
+
+```bash
+cd ~/Desktop/Linkific-Tasks/Day-27/lumo && read -s "k?Gemini API key: " && printf 'GEMINI_API_KEY=%s\n' "$k" > .env.worker && chmod 600 .env.worker && unset k && echo saved
+```
+
+3. Restart `npm run worker`: it says `AI = Gemini (free tier)`. Without a key it uses a stand-in that writes a generic draft with no AI, so the whole pipeline can be tried for free. Set `LUMO_RENDER=0` to skip video rendering.
 
 ## The learner loop (M3)
 
@@ -85,6 +111,7 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **Live content can't be hard-deleted** (a trigger refuses it), because learner progress would cascade away; lessons are hidden instead. Courses are soft-deleted through `delete_course()`, which is audit-logged, and only admins can remove a live one.
 - **The learner loop can't be gamed from the browser:** lessons complete only when every question has a correct server-graded attempt (`complete_lesson()`), Light is awarded once per lesson, review Light only for ideas that were actually due (`review_answer()`), the FSRS schedule is computed in Postgres (`fsrs_next()`), and the flame helper (`bump_flame()`) can't be called by clients. Placement only moves the START marker, so nothing is awarded by it.
 - **Generation jobs:** only one active job of a kind per course (a unique index), editors can cancel, and only the worker (service role, server side) writes progress.
+- **AI content is never shown unreviewed:** drafted units are unpublished, which hides them and their lessons and questions from learners (row-level policies, and the review function skips them), and `publish_unit()` refuses while any answer key is unchecked. The AI key lives only in the worker's `.env.worker`, never in the browser.
 
 ## Tests
 
@@ -110,6 +137,7 @@ supabase/
 video/                    lesson videos: script → narration (Kokoro) → captions → Remotion render (see video/README.md)
 scripts/
   write-env.mjs           writes .env for the local stack (public anon key only)
-  fake-worker.mjs         the local stand-in for the AI pipeline (npm run worker)
+  ai-worker.mjs           the content worker (npm run worker): write → check → verify → save → render
+  ai/                     the draft format and prompt, AI providers (Gemini, stand-in), the code sandbox
   tests/database/         pgTAP tests
 ```

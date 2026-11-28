@@ -1,4 +1,14 @@
-import { ArrowDown, ArrowUp, Eye, EyeOff, Film, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Eye,
+  EyeOff,
+  Film,
+  Pencil,
+  Plus,
+  Sparkles,
+  Trash2,
+} from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button, ConfirmDialog, Dialog, Field, cardClasses } from '../../components/ui';
@@ -9,6 +19,7 @@ import {
   deleteUnit,
   reorderLessons,
   reorderUnits,
+  publishUnit,
   setLessonHidden,
   updateUnit,
 } from '../../lib/api/studio';
@@ -192,6 +203,39 @@ export function PathEditor({
               )}
             </div>
 
+            {!unit.published &&
+              (() => {
+                const unchecked = unit.lessons.reduce((n, l) => n + l.unchecked_count, 0);
+                return (
+                  <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-violet-soft px-3 py-2">
+                    <Sparkles aria-hidden="true" className="h-5 w-5 shrink-0 text-violet-ink" />
+                    <span className="min-w-0 flex-1 text-sm font-bold text-violet-deep">
+                      Drafted by Wisp · hidden from learners.{' '}
+                      {unchecked > 0
+                        ? `Open the quiz and check ${unchecked} question${unchecked === 1 ? '' : 's'} to publish it.`
+                        : 'Every question is checked: ready to publish.'}
+                    </span>
+                    <Button
+                      size="sm"
+                      variant="lagoon"
+                      disabled={unchecked > 0 || busy !== null}
+                      loading={busy === `publish-${unit.id}`}
+                      onClick={() =>
+                        void run(
+                          `publish-${unit.id}`,
+                          () => publishUnit(unit.id),
+                          course.status === 'live'
+                            ? 'Unit published: learners can see it now.'
+                            : 'Unit published. Learners see it once the course is live.',
+                        )
+                      }
+                    >
+                      Publish unit
+                    </Button>
+                  </div>
+                );
+              })()}
+
             {unit.lessons.length > 0 && (
               <ol className="m-0 flex list-none flex-col gap-2 p-0">
                 {unit.lessons.map((lesson, li) => {
@@ -228,6 +272,9 @@ export function PathEditor({
                             </span>
                           )}
                           <span>{lesson.xp} Light</span>
+                          {lesson.unchecked_count > 0 && (
+                            <span className="text-glow-ink">{lesson.unchecked_count} to check</span>
+                          )}
                           {hidden && <span className="text-ember-ink">Hidden from learners</span>}
                         </span>
                       </div>

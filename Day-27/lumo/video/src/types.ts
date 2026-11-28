@@ -16,9 +16,11 @@ export interface Show {
   done?: boolean;
   /** Show the Start / Check / Step recap chips. */
   steps?: boolean;
+  /** Key phrases revealed so far (points and recap scenes). */
+  points?: string[];
 }
 
-export type Visual = 'title' | 'code' | 'trace' | 'recap';
+export type Visual = 'title' | 'points' | 'code' | 'trace' | 'recap';
 
 /** One spoken line, placed on the timeline by scripts/make-video.mjs after its audio is generated. */
 export interface Cue {
@@ -32,6 +34,8 @@ export interface Cue {
 
 export interface SceneSpan {
   visual: Visual;
+  /** A heading for points scenes ("Key ideas"). */
+  heading?: string;
   from: number;
   durationInFrames: number;
   cues: Cue[];
@@ -41,6 +45,8 @@ export interface Timeline {
   id: string;
   title: string;
   island: string;
+  /** Which guardian narrates (the island's own). */
+  guardian?: 'byte' | 'nova' | 'mystery';
   code: string;
   parts: Record<string, string>;
   fps: number;

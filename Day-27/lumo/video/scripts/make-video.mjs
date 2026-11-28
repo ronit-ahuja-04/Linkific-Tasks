@@ -93,7 +93,13 @@ for (const [si, scene] of script.scenes.entries()) {
     t += durationInFrames + GAP_LINE;
   }
   t += si === script.scenes.length - 1 ? OUTRO : GAP_SCENE;
-  scenes.push({ visual: scene.visual, from, durationInFrames: t - from, cues });
+  scenes.push({
+    visual: scene.visual,
+    heading: scene.heading,
+    from,
+    durationInFrames: t - from,
+    cues,
+  });
 }
 tts = null; // free the voice model's memory before rendering
 
@@ -101,6 +107,7 @@ const timeline = {
   id: script.id,
   title: script.title,
   island: script.island ?? 'Code Reef',
+  guardian: script.guardian ?? 'byte',
   code: script.code ?? '',
   parts: script.parts ?? {},
   fps: FPS,
