@@ -1,0 +1,53 @@
+{
+  "id": "charts",
+  "title": "Reading a chart in 90 seconds",
+  "island": "Chart Cove",
+  "guardian": "nova",
+  "voice": "af_bella",
+  "code": "",
+  "parts": {},
+  "scenes": [
+    {
+      "visual": "title",
+      "lines": [
+        { "say": "Hi, I'm Nova. I read the stars, and charts too.", "show": { "bubble": "Hi!" } },
+        { "say": "A chart can tell the truth, or quietly bend it.", "show": { "bubble": "Hmm…" } }
+      ]
+    },
+    {
+      "visual": "points",
+      "heading": "Read it in three steps",
+      "lines": [
+        {
+          "say": "First, read the title and the labels. What is being measured?",
+          "show": { "points": ["Title and labels"] }
+        },
+        {
+          "say": "Next, check the axis. Where does it start, and how big is each step?",
+          "show": { "points": ["Title and labels", "Where the axis starts"] }
+        },
+        {
+          "say": "Then compare. A bar chart compares lengths, so its axis must start at zero.",
+          "show": { "points": ["Title and labels", "Where the axis starts", "Bars start at zero"] }
+        },
+        {
+          "say": "Start a bar chart at ninety, and a tiny difference looks enormous.",
+          "show": { "points": ["Title and labels", "Where the axis starts", "Bars start at zero"] }
+        }
+      ]
+    },
+    {
+      "visual": "recap",
+      "lines": [
+        {
+          "say": "Labels first, then the axis, then compare.",
+          "show": { "points": ["Labels", "Axis", "Compare"] }
+        },
+        {
+          "say": "Let's see if you can spot a sneaky chart.",
+          "show": { "bubble": "Quiz!", "points": ["Labels", "Axis", "Compare"] }
+        }
+      ]
+    }
+  ]
+}

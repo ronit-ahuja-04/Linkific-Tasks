@@ -1,0 +1,55 @@
+{
+  "id": "money",
+  "title": "Where money goes in 90 seconds",
+  "island": "Coin Keys",
+  "guardian": "byte",
+  "voice": "am_puck",
+  "code": "",
+  "parts": {},
+  "scenes": [
+    {
+      "visual": "title",
+      "lines": [
+        {
+          "say": "Ahoy, it's Byte, guarding the treasure of Coin Keys.",
+          "show": { "bubble": "Ahoy!" }
+        },
+        {
+          "say": "Every month, money arrives, and then it goes somewhere. Let's map where.",
+          "show": { "bubble": "Map it!" }
+        }
+      ]
+    },
+    {
+      "visual": "points",
+      "heading": "The 50/30/20 map",
+      "lines": [
+        {
+          "say": "Fifty percent for needs: rent, food, getting to work.",
+          "show": { "points": ["50% needs"] }
+        },
+        {
+          "say": "Thirty percent for wants: films, games, eating out.",
+          "show": { "points": ["50% needs", "30% wants"] }
+        },
+        {
+          "say": "And twenty percent for the future you: saving, and paying off debt.",
+          "show": { "points": ["50% needs", "30% wants", "20% future you"] }
+        }
+      ]
+    },
+    {
+      "visual": "recap",
+      "lines": [
+        {
+          "say": "Needs, wants, and the future you.",
+          "show": { "points": ["50 needs", "30 wants", "20 future"] }
+        },
+        {
+          "say": "Ready to test your treasure map?",
+          "show": { "bubble": "Quiz!", "points": ["50 needs", "30 wants", "20 future"] }
+        }
+      ]
+    }
+  ]
+}
