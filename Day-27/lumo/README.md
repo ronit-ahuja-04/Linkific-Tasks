@@ -9,15 +9,15 @@
 
 ## Status
 
-| Milestone | What                                                                                | State                                                                  |
-| --------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles   | **done**                                                               |
-| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)            | **done**                                                               |
-| M2b       | Video spike: script → local voice → captions → animated Remotion video              | **done**                                                               |
-| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                   | **done**                                                               |
-| M4        | AI pipeline: topic → script + quiz → code check → rendered video → review → publish | **built** (tested with the stand-in AI; the Gemini run needs your key) |
-| M5        | Certificates, comeback, admin review and Wisp safety                                | **done**                                                               |
-| M6        | E2E, accessibility, performance, deployment                                         |                                                                        |
+| Milestone | What                                                                                | State                                                                         |
+| --------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles   | **done**                                                                      |
+| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)            | **done**                                                                      |
+| M2b       | Video spike: script → local voice → captions → animated Remotion video              | **done**                                                                      |
+| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                   | **done**                                                                      |
+| M4        | AI pipeline: topic → script + quiz → code check → rendered video → review → publish | **built** (tested with the stand-in AI; the Gemini run needs your key)        |
+| M5        | Certificates, comeback, admin review and Wisp safety                                | **done**                                                                      |
+| M6        | E2E, accessibility, performance, deployment                                         | **tests and checks done**; deployment needs your Supabase and Vercel sign-ins |
 
 ## Run it locally
 
@@ -122,13 +122,46 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **Certificates are earned, never typed in:** `claim_certificate()` checks that every visible lesson was finished, and `verify_certificate()` (public) returns only the name, island, date and lesson count. **Reports** go through `report_content()` (signed in, a known category, at most 20 a day); learners can't read the queue, instructors see reports on their own courses, and only admins close them with `review_flag()`, which is audit-logged.
 - **AI content is never shown unreviewed:** drafted units are unpublished, which hides them and their lessons and questions from learners (row-level policies, and the review function skips them), and `publish_unit()` refuses while any answer key is unchecked. The AI key lives only in the worker's `.env.worker`, never in the browser.
 
-## Tests
+## Tests and quality (M6)
 
 ```bash
-npm test          # unit + component tests (Vitest, 45 tests)
-npm run db:test   # pgTAP: the security rules above, inside the real database (118 tests)
+npm test                 # unit + component tests (Vitest, 45 tests)
+npm run db:test          # pgTAP: the security rules above, inside the real database (118 tests)
+npm run e2e              # Playwright: both journeys + accessibility on every page (18 tests, about 1 minute)
+LUMO_E2E_WORKER=1 npm run e2e   # also has Wisp draft a unit end to end (needs npm run worker)
+npm run build && npm run lighthouse   # Lighthouse scores for the production build
 npm run typecheck && npm run lint && npm run format:check
 ```
+
+**End-to-end (`e2e/`)** runs against the local stack with Chrome. The tests create their own accounts and islands and delete them afterwards, files included. `e2e/helpers.ts` refuses to run unless `.env` points at a local database.
+
+- **Learner journey:** a visitor tries Code Reef, then signs up and goes through the setup chat. They take a captioned video lesson, get an explanation for a wrong answer, report the question, and see missed questions come back. The server awards Light and the flame. The next day fog returns and a review clears it. After days away a welcome back appears. They earn a certificate and a signed-out stranger verifies it. The admin closes the report, with a note, in the activity log.
+- **Staff journey:** an instructor's forms reject bad input, a wrong file type is refused, and a video uploads and plays back through a signed link. A question is saved with its answer key and the island is sent for review. The admin publishes it from the review queue, and a learner finds it with search and filters. With the worker running, Wisp drafts a unit that can't be published until every question is checked.
+- **Accessibility:** axe (WCAG 2.1 AA) on 16 pages for all four roles. Any serious or critical problem fails the test, and so does sideways scrolling at 375 px. Every page currently has zero violations.
+- **Same tests, production build:** `npm run build && npx vite preview --port 5181`, then `LUMO_E2E_URL=http://localhost:5181 npm run e2e`. Preview serves the same security headers as Vercel, so this also proves the Content-Security-Policy blocks nothing the app needs.
+
+**Lighthouse** (production build, mobile profile with slow 4G and a 4× slower CPU):
+
+| Page        | Performance | Accessibility | Best practices | SEO |
+| ----------- | ----------- | ------------- | -------------- | --- |
+| `/`         | 95          | 100           | 100            | 100 |
+| `/taste`    | 93          | 100           | 100            | 100 |
+| `/login`    | 93          | 100           | 100            | 100 |
+| `/register` | 95          | 100           | 100            | 100 |
+
+**Security headers** (`vercel.json`): a strict Content-Security-Policy (scripts only from Lumo itself, network calls only to Supabase, no framing), plus `nosniff`, a referrer policy, a permissions policy and HSTS. Built assets are cached for a year because their file names change on every build.
+
+## Deploy (free: Supabase free plan + Vercel Hobby)
+
+The hosted project never gets the demo accounts; their password is in this README.
+
+1. **Supabase:** run `npx supabase login`, create a free project (Mumbai region), then run `npx supabase link --project-ref <ref>` and `npx supabase db push` to apply the migrations.
+2. **Auth URLs:** in the Supabase dashboard, open Authentication → URL configuration and set the site URL to the Vercel address.
+3. **Vercel:** from this folder, run `vercel link`. Then run `vercel env add VITE_SUPABASE_URL production` and `vercel env add VITE_SUPABASE_ANON_KEY production`; the publishable key is public, and Row Level Security protects the data. Then run `vercel --prod`.
+4. **Your admin account:** sign up on the live site, then run `node scripts/cloud-content.mjs you@example.com` and paste its output into the Supabase SQL editor. It makes you the admin and the owner of the starter islands, with no demo accounts.
+5. **Videos:** sign in to the studio and upload a lesson video (for example `video/out/for-loops.mp4`) to its lesson. The video pipeline's `--attach` option only works with the local stack.
+
+The AI worker stays on your computer: it needs the voice model and Chrome to render videos, which Vercel can't host.
 
 ## Project layout
 
@@ -144,8 +177,11 @@ supabase/
   migrations/             the schema, policies, functions, storage buckets
   seed.sql                demo accounts, Code Reef, Starfall Lagoon (draft) and three more live islands
 video/                    lesson videos: script → narration (Kokoro) → captions → Remotion render (see video/README.md)
+e2e/                      Playwright: learner and staff journeys, accessibility on every page (axe)
 scripts/
   write-env.mjs           writes .env for the local stack (public anon key only)
+  cloud-content.mjs       SQL that makes your hosted account the admin and owner of the starter islands
+  lighthouse.mjs          Lighthouse scores for the production build
   ai-worker.mjs           the content worker (npm run worker): write → check → verify → save → render
   ai/                     the draft format and prompt, AI providers (Gemini, stand-in), the code sandbox
   tests/database/         pgTAP tests

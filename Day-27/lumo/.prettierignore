@@ -7,3 +7,5 @@ video/node_modules/
 video/out/
 video/public/generated/
 video/scripts/lessons/generated/
+playwright-report/
+test-results/

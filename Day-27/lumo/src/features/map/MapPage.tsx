@@ -184,6 +184,7 @@ export function MapPage() {
         </div>
         <div className="flex items-center gap-4 font-black">
           <span
+            role="img"
             aria-label={`Flame: ${flame} days${lit ? ', lit today' : ', not lit yet today'}`}
             className={`flex items-center gap-1 ${lit ? 'text-glow' : 'text-moon'}`}
           >
@@ -194,6 +195,7 @@ export function MapPage() {
             {flame}
           </span>
           <span
+            role="img"
             aria-label={`${profile?.light ?? 0} Light`}
             className="flex items-center gap-1 text-[#7cf5da]"
           >
