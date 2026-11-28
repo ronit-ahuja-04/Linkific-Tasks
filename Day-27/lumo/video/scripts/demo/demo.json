@@ -7,14 +7,14 @@
       "card": "intro",
       "lines": [
         "Meet Lumo, a learning game where every lesson you finish lights a lantern on an island.",
-        "I'm Wisp, your guide. Everything you're about to see is the real app, and this video was made by Lumo's own video pipeline."
+        "I'm Wisp, your guide. This is the real app, in a video Lumo made itself."
       ]
     },
     {
       "card": "fog",
       "lines": [
         "Here's the problem. Most of what we learn is forgotten within a few weeks.",
-        "In Lumo, forgetting has a face. It's Gloom, the fog of forgetting, and your job is to keep it away."
+        "Here, forgetting has a face: Gloom, the fog. Your job is to keep it away."
       ]
     },
     {
@@ -22,7 +22,11 @@
       "chapter": "Visitors",
       "lines": ["Anyone can try an island before signing up."]
     },
-    { "shot": "taste-pick", "chapter": "Visitors", "lines": ["A visitor picks an island,"] },
+    {
+      "shot": "taste-pick",
+      "chapter": "Visitors",
+      "lines": ["A visitor picks an island,"]
+    },
     {
       "shot": "taste-lesson",
       "chapter": "Visitors",
@@ -37,11 +41,16 @@
       ]
     },
     {
-      "shot": "setup-start",
+      "shot": "register",
       "chapter": "Learners",
       "lines": [
-        "Signing up starts a short chat with me. I ask what you'd like to learn, and how much time you have each day."
+        "Signing up takes a minute. Lumo suggests a handle from your name, and coaches you towards a strong password."
       ]
+    },
+    {
+      "shot": "setup-start",
+      "chapter": "Learners",
+      "lines": ["Then a short chat with me: what to learn, and how much time you have."]
     },
     {
       "shot": "setup-persona",
@@ -60,9 +69,7 @@
       "chapter": "Learners",
       "video": "generated/demo/lesson.mp4",
       "videoStart": 9,
-      "lines": [
-        "Lessons are short animated videos. Lumo writes the script, voices it locally, adds captions, and renders the animation itself."
-      ]
+      "lines": ["Lessons are short videos that Lumo writes, voices and animates itself."]
     },
     {
       "shot": "quiz-wrong",
@@ -107,14 +114,11 @@
       ]
     },
     {
-      "shot": "studio",
-      "chapter": "Instructors",
-      "lines": ["Instructors build islands in the studio, unit by unit."]
-    },
-    {
       "shot": "topic",
       "chapter": "Instructors",
-      "lines": ["Or they can ask me to draft a whole unit from just a topic."]
+      "lines": [
+        "Instructors build islands in the studio, or ask me to draft a whole unit from just a topic."
+      ]
     },
     {
       "shot": "drafting",
@@ -134,21 +138,26 @@
       "shot": "admin-reports",
       "chapter": "Admins",
       "lines": [
-        "Learners can report any question. Admins see exactly what the learner was shown, and every decision is logged."
+        "Learners can report any question. Admins see exactly what they saw, and every decision is logged."
       ]
     },
     {
-      "shot": "admin-roles",
-      "chapter": "Admins",
-      "lines": ["Admins also review courses before they go live, and decide who can teach."]
+      "shot": "not-found",
+      "chapter": "Polish",
+      "lines": [
+        "The edges are cared for too: a lost link lands on its own island, and a crash never shows a blank page."
+      ]
     },
     {
       "card": "tech",
       "lines": [
-        "Under the hood, the database makes every decision. Row level security guards every table, and grading happens inside Postgres.",
-        "A hundred and sixty three automated tests keep it honest. And it costs nothing to run: free tiers only, with the voice and the video made on one laptop."
+        "Under the hood, the database makes every decision, with row level security on every table.",
+        "Two hundred automated tests keep it honest. And it costs nothing to run: free tiers, with the voice and video made on one laptop."
       ]
     },
-    { "card": "outro", "lines": ["That's Lumo. Learn it once, and keep it for good."] }
+    {
+      "card": "outro",
+      "lines": ["That's Lumo, live today. Learn it once, and keep it for good."]
+    }
   ]
 }

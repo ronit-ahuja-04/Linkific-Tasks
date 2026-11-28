@@ -42,7 +42,18 @@ async function shot(page, key, focus = []) {
     const b = await loc.boundingBox();
     if (b) boxes.push(b);
   }
-  await page.waitForTimeout(350); // let entrance animations settle
+  // Let entrance animations finish (pages rise in, stones pop one by one); endless ones (stars) don't count.
+  await page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every((a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity),
+      null,
+      { timeout: 5000 },
+    )
+    .catch(() => {});
+  await page.waitForTimeout(150);
   // Measure again after scrolling settles.
   boxes.length = 0;
   for (const loc of [focus].flat()) {
@@ -124,15 +135,21 @@ try {
   const cont = p.getByRole('button', { name: 'Continue' });
   await cont.waitFor();
   await shot(p, 'taste-feedback', [p.getByRole('radiogroup'), cont]);
+  await p.goto(`${BASE}/islands/atlantis`);
+  const lost = p.getByRole('heading', { name: /isn’t on the map/ });
+  await lost.waitFor();
+  await shot(p, 'not-found', [lost, p.getByRole('link', { name: /Back to the isles/ })]);
   await p.context().close();
 
   // ---- 2. Ana signs up and meets Wisp -----------------------------------------------------------------------------
   p = await newPage(browser);
   await p.goto(`${BASE}/register`);
   await p.getByLabel('What should Wisp call you?').fill(ANA.name);
-  await p.getByLabel('Handle').fill(ANA.handle);
   await p.getByLabel('Email').fill(ANA.email);
-  await p.getByLabel('Password', { exact: true }).fill('lumo-demo-123');
+  await p.getByLabel('Password', { exact: true }).fill('Lanterns at dawn 42!');
+  // The handle was suggested from the name; the meter coaches the password.
+  await shot(p, 'register', [p.getByLabel('Handle'), p.getByText(/Password strength/)]);
+  await p.getByLabel('Handle').fill(ANA.handle);
   await p.getByRole('button', { name: 'Create my account' }).click();
   await p.waitForURL(/\/setup/);
   const reefBtn = p.getByRole('button', { name: /Code Reef/ });
@@ -221,11 +238,6 @@ try {
 
   // ---- 6. The studio: Wisp drafts a unit --------------------------------------------------------------------------
   p = await login(browser, 'riya@lumo.local');
-  await p.goto(`${BASE}/studio/${CODE_REEF}`);
-  const pathHeading = p.getByRole('heading', { name: 'The path' });
-  await pathHeading.waitFor();
-  await p.waitForTimeout(800);
-  await shot(p, 'studio', [pathHeading, p.getByRole('heading', { name: "Wisp's workshop" })]);
   await p.goto(`${BASE}/studio/new`);
   await p.getByLabel('Course title').fill('Arrays Atoll');
   await p.getByLabel('Link').fill('arrays-atoll-demo');
@@ -270,9 +282,6 @@ try {
   const card = p.locator('li').filter({ hasText: NOTE });
   await card.waitFor();
   await shot(p, 'admin-reports', card);
-  await p.getByRole('tab', { name: 'People & roles' }).click();
-  await p.waitForTimeout(900);
-  await shot(p, 'admin-roles', p.getByRole('tabpanel'));
   await p.context().close();
 
   writeFileSync(path.join(OUT, 'shots.json'), JSON.stringify(shots, null, 2));

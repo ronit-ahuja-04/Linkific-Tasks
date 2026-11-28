@@ -68,7 +68,7 @@ const SANS = "'Nunito Variable', sans-serif";
 const WIN = { x: 210, y: 34, w: 1500, bar: 46 };
 const VIEW_H = (WIN.w * 720) / 1280;
 const XFADE = 12;
-const CHAPTERS = ['Visitors', 'Learners', 'Memory', 'Instructors', 'Admins'];
+const CHAPTERS = ['Visitors', 'Learners', 'Memory', 'Instructors', 'Admins', 'Polish'];
 
 function useFonts() {
   const [handle] = useState(() => delayRender('Loading fonts'));
@@ -459,7 +459,7 @@ function TechCard({ seg }: { seg: DemoSegment }) {
   const rows = [
     ['Row Level Security on every table', 'Postgres decides who sees what'],
     ['Answers graded inside the database', 'the key never reaches the browser'],
-    ['163 automated tests', '118 database tests · 45 app tests'],
+    ['200 automated tests', '125 database · 52 unit · 23 in a real browser'],
     ['Zero cost to run', 'free tiers · local voice · local video'],
   ];
   const second = seg.cues[1] ? seg.cues[1].from - seg.from : seg.durationInFrames / 2;
@@ -551,6 +551,21 @@ function OutroCard({ seg }: { seg: DemoSegment }) {
         <Rise at={40}>
           <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 30, color: C.moon }}>
             Built by Ronit Ahuja · Linkific internship
+          </span>
+        </Rise>
+        <Rise at={52}>
+          <span
+            style={{
+              fontFamily: SANS,
+              fontWeight: 800,
+              fontSize: 34,
+              color: C.night,
+              background: C.glow,
+              borderRadius: 999,
+              padding: '8px 26px',
+            }}
+          >
+            Live at lumo-alpha-seven.vercel.app
           </span>
         </Rise>
       </AbsoluteFill>
