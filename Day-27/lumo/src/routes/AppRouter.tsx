@@ -1,11 +1,10 @@
-import { lazy, Suspense, type ComponentType } from 'react';
-import { Link, Route, Routes } from 'react-router-dom';
-import { Wisp } from '../components/characters';
+import { lazy, Suspense, type ComponentType, type ReactNode } from 'react';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { LearnerShell } from '../components/layout/LearnerShell';
 import { StaffShell } from '../components/layout/StaffShell';
-import { buttonClasses } from '../components/ui';
-import { Loading } from '../components/ui';
+import { PageTransition, RouteLoading } from '../components/motion/Motion';
 import { LoginPage, RegisterPage } from '../features/auth/AuthPages';
+import { ErrorBoundary, NotFoundPage } from '../features/errors/ErrorScreens';
 import { MapPage } from '../features/map/MapPage';
 import { WelcomePage } from '../features/welcome/WelcomePage';
 import { RequireRole } from './RequireRole';
@@ -31,93 +30,75 @@ const SetupPage = named(() => import('../features/onboarding/SetupPage'), 'Setup
 const TastePage = named(() => import('../features/taste/TastePage'), 'TastePage');
 const VerifyPage = named(() => import('../features/certificate/VerifyPage'), 'VerifyPage');
 const AdminPage = named(() => import('../features/admin/AdminPage'), 'AdminPage');
+const ForgotPasswordPage = named(
+  () => import('../features/auth/PasswordPages'),
+  'ForgotPasswordPage',
+);
+const ResetPasswordPage = named(
+  () => import('../features/auth/PasswordPages'),
+  'ResetPasswordPage',
+);
 
-function NotFoundPage() {
-  return (
-    <main
-      id="main"
-      className="flex min-h-dvh flex-col items-center justify-center gap-4 px-6 text-center"
-    >
-      <Wisp size={120} mood="think" />
-      <h1 className="m-0 text-3xl font-bold">This island isn't on the map</h1>
-      <p className="m-0 text-dusk">The page you were looking for doesn't exist.</p>
-      <Link to="/" className={buttonClasses({ variant: 'glow' })}>
-        Back to the isles
-      </Link>
-    </main>
-  );
-}
+/** Full-screen pages fade in on arrival (pages inside a shell get this from the shell). */
+const page = (element: ReactNode) => <PageTransition>{element}</PageTransition>;
 
 export function AppRouter() {
+  const { pathname } = useLocation();
   return (
-    <Suspense fallback={<Loading label="Loading…" />}>
-      <Routes>
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        {/* Public: no account needed. */}
-        <Route path="/taste" element={<TastePage />} />
-        <Route path="/taste/:slug" element={<TastePage />} />
-        <Route path="/verify/:code" element={<VerifyPage />} />
-        {/* Full-screen learner flows (no tab bar). */}
-        <Route
-          path="/setup"
-          element={
-            <RequireRole>
-              <SetupPage />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="/learn/:lessonId"
-          element={
-            <RequireRole>
-              <LessonPlayer />
-            </RequireRole>
-          }
-        />
-        <Route
-          path="/review"
-          element={
-            <RequireRole>
-              <ReviewPage />
-            </RequireRole>
-          }
-        />
-        <Route
-          element={
-            <RequireRole>
-              <LearnerShell />
-            </RequireRole>
-          }
-        >
-          <Route path="/map" element={<MapPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
-          <Route path="/me" element={<MePage />} />
-        </Route>
-        <Route
-          element={
-            <RequireRole roles={['instructor', 'admin']}>
-              <StaffShell />
-            </RequireRole>
-          }
-        >
-          <Route path="/studio" element={<StudioPage />} />
-          <Route path="/studio/new" element={<NewCoursePage />} />
-          <Route path="/studio/:courseId" element={<CourseEditorPage />} />
-          <Route path="/studio/:courseId/lessons/:lessonId" element={<LessonEditorPage />} />
-        </Route>
-        <Route
-          element={
-            <RequireRole roles={['admin']}>
-              <StaffShell />
-            </RequireRole>
-          }
-        >
-          <Route path="/admin" element={<AdminPage />} />
-        </Route>
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
-    </Suspense>
+    <ErrorBoundary resetKey={pathname}>
+      <Suspense fallback={<RouteLoading />}>
+        <Routes>
+          <Route path="/" element={page(<WelcomePage />)} />
+          <Route path="/login" element={page(<LoginPage />)} />
+          <Route path="/register" element={page(<RegisterPage />)} />
+          <Route path="/forgot-password" element={page(<ForgotPasswordPage />)} />
+          <Route path="/reset-password" element={page(<ResetPasswordPage />)} />
+          {/* Public: no account needed. */}
+          <Route path="/taste" element={page(<TastePage />)} />
+          <Route path="/taste/:slug" element={page(<TastePage />)} />
+          <Route path="/verify/:code" element={page(<VerifyPage />)} />
+          {/* Full-screen learner flows (no tab bar). */}
+          <Route path="/setup" element={<RequireRole>{page(<SetupPage />)}</RequireRole>} />
+          <Route
+            path="/learn/:lessonId"
+            element={<RequireRole>{page(<LessonPlayer />)}</RequireRole>}
+          />
+          <Route path="/review" element={<RequireRole>{page(<ReviewPage />)}</RequireRole>} />
+          <Route
+            element={
+              <RequireRole>
+                <LearnerShell />
+              </RequireRole>
+            }
+          >
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/explore" element={<ExplorePage />} />
+            <Route path="/me" element={<MePage />} />
+          </Route>
+          <Route
+            element={
+              <RequireRole roles={['instructor', 'admin']}>
+                <StaffShell />
+              </RequireRole>
+            }
+          >
+            <Route path="/studio" element={<StudioPage />} />
+            <Route path="/studio/new" element={<NewCoursePage />} />
+            <Route path="/studio/:courseId" element={<CourseEditorPage />} />
+            <Route path="/studio/:courseId/lessons/:lessonId" element={<LessonEditorPage />} />
+          </Route>
+          <Route
+            element={
+              <RequireRole roles={['admin']}>
+                <StaffShell />
+              </RequireRole>
+            }
+          >
+            <Route path="/admin" element={<AdminPage />} />
+          </Route>
+          <Route path="*" element={page(<NotFoundPage />)} />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   );
 }

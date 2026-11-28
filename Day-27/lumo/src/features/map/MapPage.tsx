@@ -9,7 +9,7 @@ import {
   Sparkles,
   Swords,
 } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { Gloom, Guardian, Wisp } from '../../components/characters';
@@ -77,50 +77,53 @@ function Stone({
   }[state];
   const label = `${lesson.title}, ${guardian ? 'guardian battle' : lesson.kind}, ${stateText}`;
   return (
-    <li
-      className="flex flex-col items-center gap-2"
-      style={{ transform: `translateX(${offset}rem)` }}
-    >
-      {state === 'current' && (
-        <span
-          aria-hidden="true"
-          className="animate-bounce rounded-xl bg-white px-3 py-1 font-display text-sm font-bold tracking-wider text-ink shadow-[0_3px_0_var(--color-moon)]"
-        >
-          START
-        </span>
-      )}
-      <button
-        type="button"
-        aria-label={label}
-        aria-disabled={state === 'locked' || undefined}
-        title={lesson.title}
-        onClick={onOpen}
-        className={[
-          'press flex items-center justify-center rounded-full',
-          state === 'current'
-            ? 'h-20 w-20 bg-glow text-ink shadow-[0_7px_0_var(--color-glow-deep),0_0_0_10px_rgba(255,185,56,0.25)]'
-            : state === 'done'
-              ? 'h-16 w-16 bg-lagoon text-white shadow-[0_6px_0_var(--color-lagoon-deep)]'
-              : state === 'open'
-                ? 'h-16 w-16 bg-violet text-white shadow-[0_6px_0_var(--color-violet-deep)]'
-                : 'h-16 w-16 cursor-not-allowed bg-night-3 text-moon shadow-[0_6px_0_#221c52]',
-        ].join(' ')}
+    <li style={{ transform: `translateX(${offset}rem)` }}>
+      {/* The stones pop in one after another down the path. */}
+      <div
+        className="stagger flex animate-pop flex-col items-center gap-2"
+        style={{ '--i': index } as CSSProperties}
       >
-        {state === 'current' ? (
-          <Play aria-hidden="true" className="h-8 w-8 fill-current" />
-        ) : state === 'done' ? (
-          <Check aria-hidden="true" className="h-8 w-8" strokeWidth={3} />
-        ) : state === 'open' ? (
-          <RotateCcw aria-hidden="true" className="h-7 w-7" />
-        ) : guardian ? (
-          <Swords aria-hidden="true" className="h-7 w-7" />
-        ) : (
-          <Lock aria-hidden="true" className="h-6 w-6" />
+        {state === 'current' && (
+          <span
+            aria-hidden="true"
+            className="animate-bounce rounded-xl bg-white px-3 py-1 font-display text-sm font-bold tracking-wider text-ink shadow-[0_3px_0_var(--color-moon)]"
+          >
+            START
+          </span>
         )}
-      </button>
-      <span className="max-w-40 text-center text-xs font-bold text-moon" aria-hidden="true">
-        {lesson.title}
-      </span>
+        <button
+          type="button"
+          aria-label={label}
+          aria-disabled={state === 'locked' || undefined}
+          title={lesson.title}
+          onClick={onOpen}
+          className={[
+            'press flex items-center justify-center rounded-full',
+            state === 'current'
+              ? 'h-20 w-20 bg-glow text-ink shadow-[0_7px_0_var(--color-glow-deep),0_0_0_10px_rgba(255,185,56,0.25)]'
+              : state === 'done'
+                ? 'h-16 w-16 bg-lagoon text-white shadow-[0_6px_0_var(--color-lagoon-deep)]'
+                : state === 'open'
+                  ? 'h-16 w-16 bg-violet text-white shadow-[0_6px_0_var(--color-violet-deep)]'
+                  : 'h-16 w-16 cursor-not-allowed bg-night-3 text-moon shadow-[0_6px_0_#221c52]',
+          ].join(' ')}
+        >
+          {state === 'current' ? (
+            <Play aria-hidden="true" className="h-8 w-8 fill-current" />
+          ) : state === 'done' ? (
+            <Check aria-hidden="true" className="h-8 w-8" strokeWidth={3} />
+          ) : state === 'open' ? (
+            <RotateCcw aria-hidden="true" className="h-7 w-7" />
+          ) : guardian ? (
+            <Swords aria-hidden="true" className="h-7 w-7" />
+          ) : (
+            <Lock aria-hidden="true" className="h-6 w-6" />
+          )}
+        </button>
+        <span className="max-w-40 text-center text-xs font-bold text-moon" aria-hidden="true">
+          {lesson.title}
+        </span>
+      </div>
     </li>
   );
 }

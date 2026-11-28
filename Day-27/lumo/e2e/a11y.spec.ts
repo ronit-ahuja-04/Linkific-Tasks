@@ -32,6 +32,16 @@ const pages: {
   },
   {
     role: 'visitor',
+    path: () => '/forgot-password',
+    ready: (p) => p.getByRole('heading', { name: 'Forgot your password?' }).waitFor(),
+  },
+  {
+    role: 'visitor',
+    path: () => '/islands/atlantis',
+    ready: (p) => p.getByRole('heading', { name: 'This island isn’t on the map' }).waitFor(),
+  },
+  {
+    role: 'visitor',
     path: () => '/verify/NOTAREAL01',
     ready: (p) => p.getByRole('heading', { name: 'No certificate with this code' }).waitFor(),
   },
@@ -91,7 +101,14 @@ for (const role of ['visitor', 'maya', 'riya', 'admin'] as const) {
         const path = entry.path();
         await page.goto(path);
         await entry.ready(page);
-        await page.waitForTimeout(400); // entrance animations
+        // Let entrance animations finish (axe would measure half-faded text); endless ones (stars) don't count.
+        await page.waitForFunction(() =>
+          document
+            .getAnimations()
+            .every(
+              (a) => a.playState !== 'running' || a.effect?.getTiming().iterations === Infinity,
+            ),
+        );
         const results = await new AxeBuilder({ page })
           .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
           .analyze();

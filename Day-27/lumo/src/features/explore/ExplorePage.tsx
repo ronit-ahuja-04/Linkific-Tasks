@@ -1,5 +1,5 @@
 import { Search, X } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Guardian, Wisp } from '../../components/characters';
 import { CardSkeletons, ErrorPanel, Field, SelectField, cardClasses } from '../../components/ui';
@@ -145,8 +145,12 @@ export function ExplorePage() {
             </div>
           ) : (
             <ul className="m-0 grid list-none grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-4 p-0">
-              {courses.data.map((course) => (
-                <li key={course.id} className={cardClasses('flex flex-col gap-3 p-5')}>
+              {courses.data.map((course, i) => (
+                <li
+                  key={course.id}
+                  className={cardClasses('stagger lift flex animate-enter flex-col gap-3 p-5')}
+                  style={{ '--i': i } as CSSProperties}
+                >
                   <div className="flex items-center gap-3">
                     <Guardian guardian={course.guardian} size={56} decorative />
                     <div className="flex flex-col">
