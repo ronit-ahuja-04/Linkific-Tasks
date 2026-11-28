@@ -44,16 +44,20 @@ export function Toaster() {
   return (
     <div className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
       <div className="flex w-full max-w-md flex-col gap-2">
-        <ul role="alert" aria-live="assertive" className="m-0 flex list-none flex-col gap-2 p-0">
-          {errors.map((t) => (
-            <ToastItem key={t.id} toast={t} />
-          ))}
-        </ul>
-        <ul role="status" aria-live="polite" className="m-0 flex list-none flex-col gap-2 p-0">
-          {others.map((t) => (
-            <ToastItem key={t.id} toast={t} />
-          ))}
-        </ul>
+        <div role="alert" aria-live="assertive">
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {errors.map((t) => (
+              <ToastItem key={t.id} toast={t} />
+            ))}
+          </ul>
+        </div>
+        <div role="status" aria-live="polite">
+          <ul className="m-0 flex list-none flex-col gap-2 p-0">
+            {others.map((t) => (
+              <ToastItem key={t.id} toast={t} />
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
