@@ -8,3 +8,6 @@ test-results/
 playwright-report/
 supabase/.branches/
 .env.worker
+.vercel
+.env*
+!.env.example

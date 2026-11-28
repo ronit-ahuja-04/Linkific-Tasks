@@ -9,15 +9,15 @@
 
 ## Status
 
-| Milestone | What                                                                                | State                                                                         |
-| --------- | ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles   | **done**                                                                      |
-| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)            | **done**                                                                      |
-| M2b       | Video spike: script → local voice → captions → animated Remotion video              | **done**                                                                      |
-| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                   | **done**                                                                      |
-| M4        | AI pipeline: topic → script + quiz → code check → rendered video → review → publish | **built** (tested with the stand-in AI; the Gemini run needs your key)        |
-| M5        | Certificates, comeback, admin review and Wisp safety                                | **done**                                                                      |
-| M6        | E2E, accessibility, performance, deployment                                         | **tests and checks done**; deployment needs your Supabase and Vercel sign-ins |
+| Milestone | What                                                                                | State                                                                  |
+| --------- | ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| M1        | Foundation: design tokens, characters, schema + RLS + pgTAP, auth, the four roles   | **done**                                                               |
+| M2        | Studio CRUD, uploads, Explore search, Realtime job status (Day 27 brief)            | **done**                                                               |
+| M2b       | Video spike: script → local voice → captions → animated Remotion video              | **done**                                                               |
+| M3        | Learner loop: lessons, server-graded quizzes, rewards, fog review                   | **done**                                                               |
+| M4        | AI pipeline: topic → script + quiz → code check → rendered video → review → publish | **built** (tested with the stand-in AI; the Gemini run needs your key) |
+| M5        | Certificates, comeback, admin review and Wisp safety                                | **done**                                                               |
+| M6        | E2E, accessibility, performance, deployment                                         | **done**: live at https://lumo-alpha-seven.vercel.app                  |
 
 ## Run it locally
 
@@ -118,6 +118,7 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 - **A question is never saved without its key.** `save_question()` writes both in one transaction and checks that the correct option exists and no two options are the same. Questions Wisp drafts stay "unverified" until a person saves them.
 - **Live content can't be hard-deleted** (a trigger refuses it), because learner progress would cascade away; lessons are hidden instead. Courses are soft-deleted through `delete_course()`, which is audit-logged, and only admins can remove a live one.
 - **The learner loop can't be gamed from the browser:** lessons complete only when every question has a correct server-graded attempt (`complete_lesson()`), Light is awarded once per lesson, review Light only for ideas that were actually due (`review_answer()`), the FSRS schedule is computed in Postgres (`fsrs_next()`), and the flame helper (`bump_flame()`) can't be called by clients. Placement only moves the START marker, so nothing is awarded by it.
+- **Explicit table privileges** (`…07_explicit_grants.sql`): visitors can read only the catalogue, and signed-in people get only what their RLS policies use. Learners can update only their own name, handle, timezone, goal and persona. No API role can `TRUNCATE`, which would skip RLS. New hosted projects grant nothing by default, while the local stack grants everything, so this keeps local and cloud identical, and `08_privileges` tests it.
 - **Generation jobs:** only one active job of a kind per course (a unique index), editors can cancel, and only the worker (service role, server side) writes progress.
 - **Certificates are earned, never typed in:** `claim_certificate()` checks that every visible lesson was finished, and `verify_certificate()` (public) returns only the name, island, date and lesson count. **Reports** go through `report_content()` (signed in, a known category, at most 20 a day); learners can't read the queue, instructors see reports on their own courses, and only admins close them with `review_flag()`, which is audit-logged.
 - **AI content is never shown unreviewed:** drafted units are unpublished, which hides them and their lessons and questions from learners (row-level policies, and the review function skips them), and `publish_unit()` refuses while any answer key is unchecked. The AI key lives only in the worker's `.env.worker`, never in the browser.
@@ -126,7 +127,7 @@ The browser holds only the public anon key and the signed-in user's token; **Pos
 
 ```bash
 npm test                 # unit + component tests (Vitest, 45 tests)
-npm run db:test          # pgTAP: the security rules above, inside the real database (118 tests)
+npm run db:test          # pgTAP: the security rules above, inside the real database (125 tests)
 npm run e2e              # Playwright: both journeys + accessibility on every page (18 tests, about 1 minute)
 LUMO_E2E_WORKER=1 npm run e2e   # also has Wisp draft a unit end to end (needs npm run worker)
 npm run build && npm run lighthouse   # Lighthouse scores for the production build
@@ -155,9 +156,9 @@ npm run typecheck && npm run lint && npm run format:check
 
 The hosted project never gets the demo accounts; their password is in this README.
 
-1. **Supabase:** run `npx supabase login`, create a free project (Mumbai region), then run `npx supabase link --project-ref <ref>` and `npx supabase db push` to apply the migrations.
+1. **Supabase:** run `npx supabase login`, create a free project (Mumbai region), then run `npx supabase link --project-ref <ref>` and `npx supabase db push --remote` to apply the migrations. Without `--remote`, this CLI version targets the local stack. No seed runs.
 2. **Auth URLs:** in the Supabase dashboard, open Authentication → URL configuration and set the site URL to the Vercel address.
-3. **Vercel:** from this folder, run `vercel link`. Then run `vercel env add VITE_SUPABASE_URL production` and `vercel env add VITE_SUPABASE_ANON_KEY production`; the publishable key is public, and Row Level Security protects the data. Then run `vercel --prod`.
+3. **Vercel:** from this folder, run `vercel link`. Then run `vercel env add VITE_SUPABASE_URL production` and `vercel env add VITE_SUPABASE_ANON_KEY production --type config`; the publishable key is public, and Row Level Security protects the data. Then run `vercel deploy --prod`. `.vercelignore` keeps the upload to the web app only.
 4. **Your admin account:** sign up on the live site, then run `node scripts/cloud-content.mjs you@example.com` and paste its output into the Supabase SQL editor. It makes you the admin and the owner of the starter islands, with no demo accounts.
 5. **Videos:** sign in to the studio and upload a lesson video (for example `video/out/for-loops.mp4`) to its lesson. The video pipeline's `--attach` option only works with the local stack.
 
