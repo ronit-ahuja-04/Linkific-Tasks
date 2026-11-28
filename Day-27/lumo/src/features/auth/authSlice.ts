@@ -44,6 +44,10 @@ const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    /** Server-confirmed changes (Light and flame after a lesson, settings after onboarding). */
+    profilePatched(state, action: { payload: Partial<Profile> }) {
+      if (state.profile) state.profile = { ...state.profile, ...action.payload };
+    },
     profileLoaded(state, action: { payload: Profile | null }) {
       state.profile = action.payload;
       state.status = action.payload ? 'signedIn' : 'signedOut';
@@ -91,5 +95,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { profileLoaded, clearAuthError } = authSlice.actions;
+export const { profileLoaded, profilePatched, clearAuthError } = authSlice.actions;
 export default authSlice.reducer;

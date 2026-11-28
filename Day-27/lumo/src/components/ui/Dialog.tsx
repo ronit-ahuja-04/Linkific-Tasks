@@ -87,6 +87,7 @@ export function ConfirmDialog({
   title,
   message,
   confirmLabel,
+  cancelLabel = 'Keep it',
   busy,
   onConfirm,
   onClose,
@@ -95,6 +96,7 @@ export function ConfirmDialog({
   title: string;
   message: string;
   confirmLabel: string;
+  cancelLabel?: string;
   busy?: boolean;
   onConfirm: () => void;
   onClose: () => void;
@@ -104,7 +106,7 @@ export function ConfirmDialog({
       <p className="m-0 mb-5 text-dusk">{message}</p>
       <div className="flex flex-wrap justify-end gap-3">
         <Button variant="ghost" onClick={onClose}>
-          Keep it
+          {cancelLabel}
         </Button>
         <Button variant="ember" loading={busy} onClick={onConfirm}>
           {confirmLabel}

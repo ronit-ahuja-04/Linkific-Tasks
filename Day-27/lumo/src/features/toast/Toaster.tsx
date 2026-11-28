@@ -42,7 +42,7 @@ export function Toaster() {
   const errors = toasts.filter((t) => t.tone === 'error');
   const others = toasts.filter((t) => t.tone !== 'error');
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-20 z-50 flex justify-center px-4 md:bottom-6">
+    <div className="pointer-events-none fixed inset-x-0 top-4 z-50 flex justify-center px-4">
       <div className="flex w-full max-w-md flex-col gap-2">
         <ul role="alert" aria-live="assertive" className="m-0 flex list-none flex-col gap-2 p-0">
           {errors.map((t) => (

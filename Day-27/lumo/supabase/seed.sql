@@ -135,3 +135,6 @@ begin
   end loop;
 end;
 $$;
+
+-- The demo accounts skip the first-run setup chat (new sign-ups see it).
+update public.profiles set onboarded_at = now() where onboarded_at is null;

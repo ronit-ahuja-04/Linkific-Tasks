@@ -18,6 +18,8 @@ export interface Profile {
   best_flame: number;
   last_goal_date: string | null;
   embers: number;
+  /** Null until the learner has finished the first-run setup chat with Wisp. */
+  onboarded_at: string | null;
 }
 
 export interface Course {
@@ -45,6 +47,8 @@ export interface Lesson {
   summary: string;
   duration_seconds: number | null;
   xp: number;
+  /** The ideas this lesson's questions check (for fog on the map). Present on map loads. */
+  concepts?: string[];
 }
 
 export interface Unit {
@@ -117,4 +121,48 @@ export interface GenerationJob {
   attempts: number;
   created_at: string;
   updated_at: string;
+}
+
+// ---------------------------------------------------------------------------------------------------------------
+// The learner loop (M3)
+// ---------------------------------------------------------------------------------------------------------------
+
+/** A question as a learner sees it: never the answer key. */
+export interface LearnQuestion {
+  id: string;
+  prompt: string;
+  code: string | null;
+  options: string[];
+  concept: string;
+}
+
+/** What the server says after an answer (lesson or review). */
+export interface Grade {
+  correct: boolean;
+  correct_index: number;
+  explanation: string;
+  mistake: string | null;
+}
+
+export interface LessonCompletion {
+  xp_awarded: number;
+  light: number;
+  flame_days: number;
+  first_time: boolean;
+}
+
+export interface Enrollment {
+  course_id: string;
+  start_unit: number;
+  last_opened_at: string;
+}
+
+export interface ReviewItem extends LearnQuestion {
+  course_id: string;
+  island_name: string;
+}
+
+export interface ReviewGrade extends Grade {
+  next_due_at: string;
+  light_awarded: number;
 }

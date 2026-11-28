@@ -32,16 +32,25 @@ export async function getCourseMap(slug: string): Promise<CourseMap> {
   const { data, error } = await supabase()
     .from('courses')
     .select(
-      `${COURSE_COLUMNS}, units(id, course_id, position, title, summary, lessons(id, unit_id, position, kind, title, summary, duration_seconds, xp))`,
+      `${COURSE_COLUMNS}, units(id, course_id, position, title, summary, lessons(id, unit_id, position, kind, title, summary, duration_seconds, xp, questions(concept)))`,
     )
     .eq('slug', slug)
     .is('deleted_at', null)
     .single();
   if (error) throw toAppError(error);
-  const course = data as unknown as Course & { units: (Unit & { lessons: Lesson[] })[] };
+  type RawLesson = Lesson & { questions: { concept: string }[] };
+  const course = data as unknown as Course & { units: (Unit & { lessons: RawLesson[] })[] };
   const units = [...course.units]
     .sort((a, b) => a.position - b.position)
-    .map((u) => ({ ...u, lessons: [...u.lessons].sort((a, b) => a.position - b.position) }));
+    .map((u) => ({
+      ...u,
+      lessons: [...u.lessons]
+        .sort((a, b) => a.position - b.position)
+        .map(({ questions, ...l }) => ({
+          ...l,
+          concepts: [...new Set(questions.map((q) => q.concept))],
+        })),
+    }));
   return { ...course, units };
 }
 
