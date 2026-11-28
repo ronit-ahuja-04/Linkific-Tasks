@@ -7,6 +7,7 @@
   "scripts": {
     "studio": "remotion studio src/index.ts",
     "make": "node --experimental-websocket --no-warnings scripts/make-video.mjs",
+    "demo": "node --no-warnings scripts/make-demo.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

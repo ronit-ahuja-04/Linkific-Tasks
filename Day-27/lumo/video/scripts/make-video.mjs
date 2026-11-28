@@ -9,12 +9,11 @@
 //      lesson. Uses the local service-role key from `supabase status` (kept in memory, never printed); refuses any
 //      non-local URL. In M4 the generation worker does this step for drafted lessons.
 import { execSync } from 'node:child_process';
-import { createHash, randomUUID } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { FPS, bundleVideo, createVoice, renderTo, root, toVtt } from './lib.mjs';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const scriptPath = args.find((a) => a.endsWith('.json'));
 const attachAt = args.indexOf('--attach');
@@ -27,7 +26,6 @@ if (!scriptPath) {
 }
 
 const script = JSON.parse(readFileSync(path.resolve(root, scriptPath), 'utf8'));
-const FPS = 30;
 const GAP_LINE = 8; // frames of breath between lines
 const GAP_SCENE = 14;
 const INTRO = 12;
@@ -36,47 +34,9 @@ const OUTRO = 36;
 // ---------------------------------------------------------------------------------------------------------------
 // 1–2. Narration and timing
 // ---------------------------------------------------------------------------------------------------------------
-const audioDir = path.join(root, 'public', 'generated', script.id);
-mkdirSync(audioDir, { recursive: true });
-
-let tts = null;
-async function speak(text, voice) {
-  const name = `${createHash('sha1').update(`${voice}|${text}`).digest('hex').slice(0, 12)}.wav`;
-  const file = path.join(audioDir, name);
-  if (!existsSync(file)) {
-    if (!tts) {
-      process.stdout.write('Loading the voice model… ');
-      const { KokoroTTS } = await import('kokoro-js');
-      tts = await KokoroTTS.from_pretrained('onnx-community/Kokoro-82M-v1.0-ONNX', {
-        dtype: 'q8',
-        device: 'cpu',
-      });
-      console.log('ready');
-    }
-    const audio = await tts.generate(text, { voice });
-    await audio.save(file);
-  }
-  return { rel: `generated/${script.id}/${name}`, seconds: wavSeconds(file) };
-}
-
-/** Length of a PCM WAV file from its header (sample rate, channels, bits) and data size. */
-function wavSeconds(file) {
-  const b = readFileSync(file);
-  let offset = 12;
-  let rate = 24000;
-  let blockAlign = 4;
-  while (offset < b.length - 8) {
-    const id = b.toString('ascii', offset, offset + 4);
-    const size = b.readUInt32LE(offset + 4);
-    if (id === 'fmt ') {
-      rate = b.readUInt32LE(offset + 12);
-      blockAlign = b.readUInt16LE(offset + 20);
-    }
-    if (id === 'data') return size / blockAlign / rate;
-    offset += 8 + size + (size % 2);
-  }
-  throw new Error(`No audio data in ${file}`);
-}
+const voice = createVoice(script.id);
+const audioDir = voice.audioDir;
+const speak = voice.speak;
 
 console.log(
   `Script: ${script.title} (${script.scenes.reduce((n, s) => n + s.lines.length, 0)} lines)`,
@@ -101,7 +61,7 @@ for (const [si, scene] of script.scenes.entries()) {
     cues,
   });
 }
-tts = null; // free the voice model's memory before rendering
+voice.release();
 
 const timeline = {
   id: script.id,
@@ -122,24 +82,8 @@ console.log(`Timeline: ${seconds.toFixed(1)} s`);
 // ---------------------------------------------------------------------------------------------------------------
 const outDir = path.join(root, 'out');
 mkdirSync(outDir, { recursive: true });
-const stamp = (frames) => {
-  const ms = Math.round((frames / FPS) * 1000);
-  const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
-  const m = String(Math.floor(ms / 60000) % 60).padStart(2, '0');
-  const s = String(Math.floor(ms / 1000) % 60).padStart(2, '0');
-  return `${h}:${m}:${s}.${String(ms % 1000).padStart(3, '0')}`;
-};
 const cues = scenes.flatMap((s) => s.cues);
-const vtt = [
-  'WEBVTT',
-  '',
-  ...cues.flatMap((c, n) => [
-    String(n + 1),
-    `${stamp(c.from)} --> ${stamp(c.from + c.durationInFrames + GAP_LINE / 2)}`,
-    c.text,
-    '',
-  ]),
-].join('\n');
+const vtt = toVtt(cues, GAP_LINE / 2);
 const transcript = cues.map((c) => c.text).join(' ');
 writeFileSync(path.join(outDir, `${script.id}.vtt`), vtt);
 writeFileSync(path.join(outDir, `${script.id}.txt`), `${transcript}\n`);
@@ -148,51 +92,10 @@ writeFileSync(path.join(audioDir, 'timeline.json'), JSON.stringify(timeline, nul
 // ---------------------------------------------------------------------------------------------------------------
 // 3. Render
 // ---------------------------------------------------------------------------------------------------------------
-const { bundle } = await import('@remotion/bundler');
-const { renderMedia, selectComposition } = await import('@remotion/renderer');
-const videoNodeModules = path.join(root, 'node_modules');
-process.stdout.write('Bundling… ');
-const serveUrl = await bundle({
-  entryPoint: path.join(root, 'src', 'index.ts'),
-  publicDir: path.join(root, 'public'),
-  // Byte is imported from the app (../src); make sure both use this package's single copy of React.
-  webpackOverride: (config) => ({
-    ...config,
-    resolve: {
-      ...config.resolve,
-      alias: {
-        ...(config.resolve?.alias ?? {}),
-        react: path.join(videoNodeModules, 'react'),
-        'react-dom': path.join(videoNodeModules, 'react-dom'),
-      },
-    },
-  }),
-});
-console.log('done');
-
-const inputProps = { timeline };
-const composition = await selectComposition({ serveUrl, id: 'Lesson', inputProps });
+const serveUrl = await bundleVideo();
 const output = path.join(outDir, `${script.id}.mp4`);
-let last = -1;
-await renderMedia({
-  composition,
-  serveUrl,
-  codec: 'h264',
-  crf: 24,
-  audioBitrate: '96k',
-  outputLocation: output,
-  inputProps,
-  // This Mac has 8 GB shared with Docker: two browser tabs at a time is the safe ceiling.
-  concurrency: 2,
-  onProgress: ({ progress }) => {
-    const pct = Math.floor(progress * 100);
-    if (pct % 10 === 0 && pct !== last) {
-      last = pct;
-      process.stdout.write(`${pct}% `);
-    }
-  },
-});
-console.log(`\nVideo: ${path.relative(root, output)} · captions: out/${script.id}.vtt`);
+await renderTo({ serveUrl, id: 'Lesson', inputProps: { timeline }, output });
+console.log(`Video: ${path.relative(root, output)} · captions: out/${script.id}.vtt`);
 
 // ---------------------------------------------------------------------------------------------------------------
 // 5. Attach to a lesson on the local stack

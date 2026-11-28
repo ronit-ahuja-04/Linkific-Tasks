@@ -1,0 +1,154 @@
+{
+  "id": "lumo-demo",
+  "title": "Lumo in three minutes",
+  "voice": "af_heart",
+  "segments": [
+    {
+      "card": "intro",
+      "lines": [
+        "Meet Lumo, a learning game where every lesson you finish lights a lantern on an island.",
+        "I'm Wisp, your guide. Everything you're about to see is the real app, and this video was made by Lumo's own video pipeline."
+      ]
+    },
+    {
+      "card": "fog",
+      "lines": [
+        "Here's the problem. Most of what we learn is forgotten within a few weeks.",
+        "In Lumo, forgetting has a face. It's Gloom, the fog of forgetting, and your job is to keep it away."
+      ]
+    },
+    {
+      "shot": "welcome",
+      "chapter": "Visitors",
+      "lines": ["Anyone can try an island before signing up."]
+    },
+    { "shot": "taste-pick", "chapter": "Visitors", "lines": ["A visitor picks an island,"] },
+    {
+      "shot": "taste-lesson",
+      "chapter": "Visitors",
+      "video": "generated/demo/lesson.mp4",
+      "lines": ["watches its first short lesson,"]
+    },
+    {
+      "shot": "taste-feedback",
+      "chapter": "Visitors",
+      "lines": [
+        "and answers real questions. The server grades every answer, so the answer key never reaches the browser."
+      ]
+    },
+    {
+      "shot": "setup-start",
+      "chapter": "Learners",
+      "lines": [
+        "Signing up starts a short chat with me. I ask what you'd like to learn, and how much time you have each day."
+      ]
+    },
+    {
+      "shot": "setup-persona",
+      "chapter": "Learners",
+      "lines": ["You even choose my personality: gentle, cheerful, or a little cheeky."]
+    },
+    {
+      "shot": "map",
+      "chapter": "Learners",
+      "lines": [
+        "Then, the map. Every stone is a lesson, and each island has its own guardian. Byte looks after Code Reef."
+      ]
+    },
+    {
+      "shot": "lesson-video",
+      "chapter": "Learners",
+      "video": "generated/demo/lesson.mp4",
+      "videoStart": 9,
+      "lines": [
+        "Lessons are short animated videos. Lumo writes the script, voices it locally, adds captions, and renders the animation itself."
+      ]
+    },
+    {
+      "shot": "quiz-wrong",
+      "chapter": "Learners",
+      "lines": [
+        "Quick checks come next. Pick a wrong answer, and I explain that exact mistake, not just the right answer."
+      ]
+    },
+    {
+      "shot": "rewards",
+      "chapter": "Learners",
+      "lines": [
+        "Get it right, and the lantern lights. You earn Light, and a daily flame keeps you coming back."
+      ]
+    },
+    {
+      "shot": "map-fog",
+      "chapter": "Memory",
+      "lines": [
+        "And here's the heart of Lumo. The next day, as you start to forget, the fog creeps back over the map."
+      ]
+    },
+    {
+      "shot": "review",
+      "chapter": "Memory",
+      "lines": [
+        "A spaced repetition model called FSRS works out when each idea is fading, and a two minute review clears the fog."
+      ]
+    },
+    {
+      "shot": "comeback",
+      "chapter": "Memory",
+      "lines": [
+        "Miss a few days, and there's no guilt trip. Lumo welcomes you back, and your best flame is kept forever."
+      ]
+    },
+    {
+      "shot": "certificate",
+      "chapter": "Memory",
+      "lines": [
+        "Finish an island and claim a certificate. Anyone can verify it with its public link."
+      ]
+    },
+    {
+      "shot": "studio",
+      "chapter": "Instructors",
+      "lines": ["Instructors build islands in the studio, unit by unit."]
+    },
+    {
+      "shot": "topic",
+      "chapter": "Instructors",
+      "lines": ["Or they can ask me to draft a whole unit from just a topic."]
+    },
+    {
+      "shot": "drafting",
+      "chapter": "Instructors",
+      "lines": [
+        "I write the lesson and its questions, run the code in a sandbox to check every answer, and render the video."
+      ]
+    },
+    {
+      "shot": "drafted",
+      "chapter": "Instructors",
+      "lines": [
+        "But nothing reaches learners until a person has checked every question. The unit stays hidden until it's published."
+      ]
+    },
+    {
+      "shot": "admin-reports",
+      "chapter": "Admins",
+      "lines": [
+        "Learners can report any question. Admins see exactly what the learner was shown, and every decision is logged."
+      ]
+    },
+    {
+      "shot": "admin-roles",
+      "chapter": "Admins",
+      "lines": ["Admins also review courses before they go live, and decide who can teach."]
+    },
+    {
+      "card": "tech",
+      "lines": [
+        "Under the hood, the database makes every decision. Row level security guards every table, and grading happens inside Postgres.",
+        "A hundred and sixty three automated tests keep it honest. And it costs nothing to run: free tiers only, with the voice and the video made on one laptop."
+      ]
+    },
+    { "card": "outro", "lines": ["That's Lumo. Learn it once, and keep it for good."] }
+  ]
+}
