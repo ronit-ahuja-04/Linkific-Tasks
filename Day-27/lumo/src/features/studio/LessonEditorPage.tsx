@@ -121,6 +121,7 @@ export function LessonEditorPage() {
           courseId={courseId}
           lessonId={lesson.id}
           videoPath={lesson.video_path}
+          captionsPath={lesson.captions_path}
           onChanged={refresh}
         />
       )}

@@ -1,0 +1,81 @@
+{
+  "id": "for-loops",
+  "title": "For-loops in 60 seconds",
+  "island": "Code Reef",
+  "guardian": "byte",
+  "voice": "am_puck",
+  "code": "for (let i = 0; i < 3; i++) {\n  console.log(i)\n}",
+  "parts": {
+    "start": "let i = 0",
+    "check": "i < 3",
+    "step": "i++",
+    "body": "console.log(i)"
+  },
+  "scenes": [
+    {
+      "visual": "title",
+      "lines": [
+        { "say": "Hi, I'm Byte!", "show": { "bubble": "Hi!" } },
+        { "say": "Ever needed to do the same thing three times?", "show": { "bubble": "×3" } },
+        { "say": "Don't copy and paste. Use a for-loop.", "show": { "bubble": "for-loop" } }
+      ]
+    },
+    {
+      "visual": "code",
+      "lines": [
+        { "say": "A for-loop has three parts." },
+        { "say": "Start. Let i equal zero.", "show": { "highlight": "start", "label": "Start" } },
+        {
+          "say": "Check. Keep going while i is less than three.",
+          "show": { "highlight": "check", "label": "Check" }
+        },
+        {
+          "say": "Step. Add one to i after every lap.",
+          "show": { "highlight": "step", "label": "Step" }
+        }
+      ]
+    },
+    {
+      "visual": "trace",
+      "lines": [
+        { "say": "Watch it run. i starts at zero.", "show": { "highlight": "start", "i": 0 } },
+        {
+          "say": "Zero is less than three, so we print zero.",
+          "show": { "highlight": "body", "i": 0, "out": ["0"] }
+        },
+        {
+          "say": "Step. i becomes one, and we print one.",
+          "show": { "highlight": "step", "i": 1, "out": ["0", "1"] }
+        },
+        {
+          "say": "Step again. Two. Print two.",
+          "show": { "highlight": "step", "i": 2, "out": ["0", "1", "2"] }
+        },
+        {
+          "say": "Now i is three.",
+          "show": { "highlight": "step", "i": 3, "out": ["0", "1", "2"] }
+        },
+        {
+          "say": "Is three less than three? No!",
+          "show": { "highlight": "check", "i": 3, "out": ["0", "1", "2"], "fail": true }
+        },
+        {
+          "say": "The check fails, and the loop stops. Three is never printed.",
+          "show": { "i": 3, "out": ["0", "1", "2"], "done": true }
+        }
+      ]
+    },
+    {
+      "visual": "recap",
+      "lines": [
+        { "say": "So this loop prints zero, one, two.", "show": { "bubble": "0 1 2" } },
+        { "say": "Start, check, step.", "show": { "steps": true } },
+        {
+          "say": "Remember those three, and loops will never trick you.",
+          "show": { "steps": true }
+        },
+        { "say": "Ready? Let's try the quiz!", "show": { "bubble": "Quiz time!" } }
+      ]
+    }
+  ]
+}

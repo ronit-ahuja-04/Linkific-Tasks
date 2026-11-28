@@ -41,11 +41,13 @@ export function VideoPanel({
   courseId,
   lessonId,
   videoPath,
+  captionsPath,
   onChanged,
 }: {
   courseId: string;
   lessonId: string;
   videoPath: string | null;
+  captionsPath: string | null;
   onChanged: () => Promise<void>;
 }) {
   const toast = useToast();
@@ -53,21 +55,29 @@ export function VideoPanel({
   const abortRef = useRef<AbortController | null>(null);
   const [phase, setPhase] = useState<Phase>({ name: 'idle' });
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<{ path: string; url: string } | null>(null);
+  const [preview, setPreview] = useState<{
+    path: string;
+    url: string;
+    captions: string | null;
+  } | null>(null);
   const [dragging, setDragging] = useState(false);
   const [confirmRemove, setConfirmRemove] = useState(false);
 
   useEffect(() => {
     if (!videoPath) return;
     let current = true;
-    signedUrl('course-media', videoPath).then(
-      (url) => current && setPreview({ path: videoPath, url }),
+    Promise.all([
+      signedUrl('course-media', videoPath),
+      // Captions are optional: a missing or unreadable file just means no track.
+      captionsPath ? signedUrl('course-media', captionsPath).catch(() => null) : null,
+    ]).then(
+      ([url, captions]) => current && setPreview({ path: videoPath, url, captions }),
       () => current && setPreview(null),
     );
     return () => {
       current = false;
     };
-  }, [videoPath]);
+  }, [videoPath, captionsPath]);
 
   // Leaving the page mid-upload cancels it.
   useEffect(() => () => abortRef.current?.abort(), []);
@@ -91,7 +101,8 @@ export function VideoPanel({
         ),
       ]);
       setPhase({ name: 'saving' });
-      const update: Parameters<typeof updateLesson>[1] = { video_path: path };
+      // Captions belonged to the old video, so they go with it.
+      const update: Parameters<typeof updateLesson>[1] = { video_path: path, captions_path: null };
       if (duration !== null && duration >= 10 && duration <= 1800)
         update.duration_seconds = duration;
       try {
@@ -101,6 +112,7 @@ export function VideoPanel({
         throw saveError;
       }
       if (videoPath) await removeFile('course-media', videoPath);
+      if (captionsPath) await removeFile('course-media', captionsPath);
       toast.success(
         duration !== null && duration > 180
           ? 'Video uploaded. Tip: bites under 2 minutes keep learners coming back.'
@@ -145,9 +157,13 @@ export function VideoPanel({
           src={preview.url}
           controls
           preload="metadata"
+          // Captions come from another origin (Storage); the track only loads with CORS.
+          crossOrigin="anonymous"
           className="aspect-video w-full rounded-2xl bg-night"
         >
-          <track kind="captions" />
+          {preview.captions && (
+            <track kind="captions" src={preview.captions} srcLang="en" label="English" default />
+          )}
         </video>
       )}
 
@@ -241,8 +257,9 @@ export function VideoPanel({
           if (!videoPath) return;
           setPhase({ name: 'saving' });
           try {
-            await updateLesson(lessonId, { video_path: null });
+            await updateLesson(lessonId, { video_path: null, captions_path: null });
             await removeFile('course-media', videoPath);
+            if (captionsPath) await removeFile('course-media', captionsPath);
             setConfirmRemove(false);
             toast.success('Video removed.');
             await onChanged();

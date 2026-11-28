@@ -2,10 +2,17 @@
 begin;
 select plan(15);
 
+-- What a visitor should see of Code Reef: every lesson that isn't hidden (counted here as the owner, so the test
+-- still holds after people add lessons in the studio).
+create temporary table expected on commit drop as
+select count(*) as reef_lessons from public.lessons l join public.units u on u.id = l.unit_id
+where u.course_id = 'c0000000-0000-4000-8000-000000000001' and l.deleted_at is null;
+grant select on expected to anon;
+
 -- A visitor who isn't signed in (Explore before sign-up).
 set local role anon;
 select is((select count(*) from public.courses where status <> 'live'), 0::bigint, 'a visitor sees only live courses');
-select is((select count(*) from public.lessons l join public.units u on u.id = l.unit_id where u.course_id = 'c0000000-0000-4000-8000-000000000001'), 5::bigint, 'a visitor can see the live course''s lessons');
+select is((select count(*) from public.lessons l join public.units u on u.id = l.unit_id where u.course_id = 'c0000000-0000-4000-8000-000000000001'), (select reef_lessons from expected), 'a visitor can see the live course''s lessons (hidden ones excluded)');
 select is((select count(*) from public.answer_keys), 0::bigint, 'a visitor sees no answer keys');
 reset role;
 
