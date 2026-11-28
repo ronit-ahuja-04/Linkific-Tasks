@@ -1,0 +1,95 @@
+@import 'tailwindcss';
+@import '@fontsource/fredoka/500.css';
+@import '@fontsource/fredoka/600.css';
+@import '@fontsource/fredoka/700.css';
+@import '@fontsource-variable/nunito';
+@import '@fontsource-variable/jetbrains-mono';
+
+/* Lumo design tokens (see the canvas "Look & feel" board). Every colour pair used for text passes WCAG AA. */
+@theme {
+  --font-display: 'Fredoka', 'Nunito Variable', system-ui, sans-serif;
+  --font-sans: 'Nunito Variable', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
+
+  --color-night: #1b1640;
+  --color-night-2: #241d55;
+  --color-night-3: #2e2766;
+  --color-night-line: #3a3274;
+  --color-moon: #c9c3ee;
+
+  --color-glow: #ffb938;
+  --color-glow-deep: #d08209;
+  --color-glow-soft: #fff1d1;
+  --color-glow-ink: #7a4b00;
+
+  --color-violet: #5b3de0;
+  --color-violet-deep: #3a22a8;
+  --color-violet-soft: #ece7ff;
+  --color-violet-ink: #4b2fd6;
+
+  --color-lagoon: #0b7a68;
+  --color-lagoon-deep: #075347;
+  --color-lagoon-soft: #ddf7f1;
+  --color-lagoon-ink: #0b5c4f;
+
+  --color-ember: #c8303f;
+  --color-ember-deep: #94202c;
+  --color-ember-soft: #ffe3e6;
+  --color-ember-ink: #9b1f2d;
+
+  --color-fog: #bdb6de;
+  --color-fog-soft: #e9e6f5;
+
+  --color-paper: #fbfaff;
+  --color-mist: #eeebfa;
+  --color-line: #e6e1f7;
+  --color-line-strong: #dcd6f2;
+  --color-ink: #1b1640;
+  --color-dusk: #5e5885;
+
+  --radius-chunk: 1rem;
+  --radius-card: 1.25rem;
+  --radius-panel: 1.75rem;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  body {
+    margin: 0;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-violet);
+    outline-offset: 2px;
+  }
+}
+
+/* The "pressable" base: the 5 px shadow that disappears when pressed. */
+@utility press {
+  transition:
+    transform 60ms ease-out,
+    box-shadow 60ms ease-out;
+  &:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
