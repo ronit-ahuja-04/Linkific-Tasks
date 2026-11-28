@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAppDispatch } from './app/hooks';
 import { Wisp } from './components/characters';
 import { profileLoaded, restoreSession } from './features/auth/authSlice';
+import { Toaster } from './features/toast/Toaster';
 import { loadProfile, onAuthChange } from './lib/api/auth';
 import { supabaseConfigured } from './lib/supabase';
 import { AppRouter } from './routes/AppRouter';
@@ -38,7 +39,12 @@ function Session() {
       );
     });
   }, [dispatch]);
-  return <AppRouter />;
+  return (
+    <>
+      <AppRouter />
+      <Toaster />
+    </>
+  );
 }
 
 export function App() {

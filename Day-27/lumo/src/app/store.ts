@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import auth, { type AuthState } from '../features/auth/authSlice';
+import toast from '../features/toast/toastSlice';
 
 const initialAuth: AuthState = {
   status: 'checking',
@@ -11,8 +12,10 @@ const initialAuth: AuthState = {
 
 export function createAppStore(preloaded?: { auth?: Partial<AuthState> }) {
   return configureStore({
-    reducer: { auth },
-    preloadedState: preloaded?.auth ? { auth: { ...initialAuth, ...preloaded.auth } } : undefined,
+    reducer: { auth, toast },
+    preloadedState: preloaded?.auth
+      ? { auth: { ...initialAuth, ...preloaded.auth }, toast: [] }
+      : undefined,
   });
 }
 
