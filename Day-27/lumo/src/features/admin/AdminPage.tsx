@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ActivityPanel, ReportsPanel, ReviewPanel } from './AdminPanels';
 import { useAppSelector } from '../../app/hooks';
 import { ErrorPanel, Loading, cardClasses } from '../../components/ui';
 import { listPeople, setRole } from '../../lib/api/people';
@@ -9,7 +10,7 @@ import { useAsync } from '../../lib/useAsync';
 const ROLES: Role[] = ['learner', 'instructor', 'admin'];
 
 /** People and roles. Role changes go through set_user_role(): admin-only, logged, never the last admin. */
-export function AdminPage() {
+function PeoplePanel() {
   const me = useAppSelector((s) => s.auth.profile);
   const people = useAsync(() => listPeople(), []);
   const [message, setMessage] = useState<{ tone: 'ok' | 'error'; text: string } | null>(null);
@@ -31,11 +32,7 @@ export function AdminPage() {
   };
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-bold text-dusk">Admin</span>
-        <h1 className="m-0 text-3xl font-bold">People &amp; roles</h1>
-      </div>
+    <div className="flex flex-col gap-6">
       <div aria-live="polite">
         {message && (
           <p
@@ -114,6 +111,63 @@ export function AdminPage() {
         Only admins can change roles, every change is logged, and Lumo always keeps at least one
         admin.
       </p>
+    </div>
+  );
+}
+
+const TABS = [
+  { id: 'reports', label: 'Reports' },
+  { id: 'review', label: 'Review queue' },
+  { id: 'people', label: 'People & roles' },
+  { id: 'activity', label: 'Activity' },
+] as const;
+type Tab = (typeof TABS)[number]['id'];
+
+/** The admin's desk: what learners reported (wellbeing first), courses waiting to go live, roles, and the log. */
+export function AdminPage() {
+  const [tab, setTab] = useState<Tab>('reports');
+  return (
+    <div className="mx-auto flex max-w-5xl flex-col gap-6">
+      <div className="flex flex-col gap-1">
+        <span className="text-sm font-bold text-dusk">Admin</span>
+        <h1 className="m-0 text-3xl font-bold">Keeping the isles safe</h1>
+      </div>
+      <div role="tablist" aria-label="Admin sections" className="flex flex-wrap gap-2">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            id={`tab-${t.id}`}
+            type="button"
+            role="tab"
+            aria-selected={tab === t.id}
+            aria-controls={`panel-${t.id}`}
+            onClick={() => setTab(t.id)}
+            onKeyDown={(e) => {
+              const i = TABS.findIndex((x) => x.id === tab);
+              const next = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : null;
+              if (next === null) return;
+              const target = TABS[(next + TABS.length) % TABS.length]!;
+              setTab(target.id);
+              document.getElementById(`tab-${target.id}`)?.focus();
+            }}
+            tabIndex={tab === t.id ? 0 : -1}
+            className={[
+              'min-h-11 rounded-full border-2 px-4 text-sm font-extrabold',
+              tab === t.id
+                ? 'border-violet bg-violet text-white'
+                : 'border-line-strong bg-white text-ink hover:border-violet',
+            ].join(' ')}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+      <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
+        {tab === 'reports' && <ReportsPanel />}
+        {tab === 'review' && <ReviewPanel />}
+        {tab === 'people' && <PeoplePanel />}
+        {tab === 'activity' && <ActivityPanel />}
+      </div>
     </div>
   );
 }

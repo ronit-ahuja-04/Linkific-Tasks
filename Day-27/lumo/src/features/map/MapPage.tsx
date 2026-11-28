@@ -1,12 +1,31 @@
-import { Check, Compass, Flame, Lock, Play, RotateCcw, Sparkles, Swords } from 'lucide-react';
-import { useMemo } from 'react';
+import {
+  Award,
+  Check,
+  Compass,
+  Flame,
+  Lock,
+  Play,
+  RotateCcw,
+  Sparkles,
+  Swords,
+} from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '../../app/hooks';
 import { Gloom, Guardian, Wisp } from '../../components/characters';
-import { ErrorPanel, Loading, buttonClasses } from '../../components/ui';
+import { Button, Dialog, ErrorPanel, Loading, buttonClasses } from '../../components/ui';
 import { getCourseMap, listVisibleCourses } from '../../lib/api/courses';
 import { completedLessonIds, fogConcepts, myEnrollments } from '../../lib/api/learn';
-import { litToday, pathState, type StoneState } from '../../lib/game/path';
+import { claimCertificate } from '../../lib/api/trust';
+import { toAppError } from '../../lib/errors';
+import {
+  daysAway,
+  effectiveFlame,
+  litToday,
+  pathState,
+  todayIn,
+  type StoneState,
+} from '../../lib/game/path';
 import type { CourseMap, Lesson } from '../../lib/types';
 import { useAsync } from '../../lib/useAsync';
 import { useToast } from '../toast/useToast';
@@ -123,6 +142,27 @@ export function MapPage() {
   );
 
   const lit = profile ? litToday(profile.last_goal_date, profile.timezone) : false;
+  const flame = profile ? effectiveFlame(profile) : 0;
+  const away = profile ? daysAway(profile.last_goal_date, profile.timezone) : null;
+  // Back after 3+ days: a warm welcome, once a day (remembered in this browser only).
+  const comebackKey = profile ? `lumo-comeback-${profile.id}-${todayIn(profile.timezone)}` : '';
+  const [comebackSeen, setComebackSeen] = useState(() => {
+    try {
+      return comebackKey ? localStorage.getItem(comebackKey) === '1' : true;
+    } catch {
+      return true;
+    }
+  });
+  const showComeback = away !== null && away >= 3 && !comebackSeen;
+  const closeComeback = () => {
+    setComebackSeen(true);
+    try {
+      localStorage.setItem(comebackKey, '1');
+    } catch {
+      // private mode: it just shows again next visit
+    }
+  };
+  const [claiming, setClaiming] = useState(false);
   const ready = data.status === 'ready' ? data.data : null;
   const fogCount = ready?.fog.size ?? 0;
   const allLessons = ready ? ready.map.units.flatMap((u) => u.lessons) : [];
@@ -144,14 +184,14 @@ export function MapPage() {
         </div>
         <div className="flex items-center gap-4 font-black">
           <span
-            aria-label={`Flame: ${profile?.flame_days ?? 0} days${lit ? ', lit today' : ', not lit yet today'}`}
+            aria-label={`Flame: ${flame} days${lit ? ', lit today' : ', not lit yet today'}`}
             className={`flex items-center gap-1 ${lit ? 'text-glow' : 'text-moon'}`}
           >
             <Flame
               aria-hidden="true"
               className={`h-5 w-5 ${lit ? 'fill-[#ff9b3d] text-[#ff9b3d]' : 'text-moon'}`}
             />
-            {profile?.flame_days ?? 0}
+            {flame}
           </span>
           <span
             aria-label={`${profile?.light ?? 0} Light`}
@@ -183,6 +223,36 @@ export function MapPage() {
       )}
       {ready && (
         <div className="mx-auto flex max-w-xl flex-col gap-10">
+          {allLessons.length > 0 && allLessons.every((l) => states.get(l.id) === 'done') && (
+            <div className="flex flex-wrap items-center gap-4 rounded-[var(--radius-card)] border-2 border-glow bg-night-2 p-4">
+              <Award aria-hidden="true" className="h-10 w-10 text-glow" />
+              <div className="flex min-w-0 flex-1 flex-col">
+                <b className="font-display text-lg">
+                  Every lantern on {ready.map.island_name} is lit!
+                </b>
+                <span className="text-sm text-moon">
+                  Claim your certificate: anyone can verify it from its link.
+                </span>
+              </div>
+              <Button
+                variant="glow"
+                size="sm"
+                loading={claiming}
+                onClick={async () => {
+                  setClaiming(true);
+                  try {
+                    const code = await claimCertificate(ready.map.id);
+                    navigate(`/verify/${code}`);
+                  } catch (e) {
+                    toast.error(toAppError(e).message);
+                    setClaiming(false);
+                  }
+                }}
+              >
+                Claim certificate
+              </Button>
+            </div>
+          )}
           {fogCount > 0 && (
             <div className="flex items-center gap-4 rounded-[var(--radius-card)] border-2 border-fog/40 bg-night-2 p-4">
               <Gloom size={72} decorative />
@@ -260,6 +330,42 @@ export function MapPage() {
           })}
         </div>
       )}
+      <Dialog
+        open={showComeback}
+        onClose={closeComeback}
+        title={`Welcome back, ${profile?.display_name.split(' ')[0] ?? 'friend'}!`}
+      >
+        <div className="flex flex-col items-center gap-4 text-center">
+          <Wisp size={110} mood="happy" />
+          <p className="m-0 text-lg">
+            The isles missed you. No guilt, no catching up: two minutes today is a great restart.
+          </p>
+          {profile && profile.flame_days > 0 && flame === 0 && (
+            <p className="m-0 rounded-2xl bg-glow-soft px-4 py-3 text-sm font-bold text-glow-ink">
+              Your {profile.flame_days}-day flame went out, but your best (
+              {Math.max(profile.best_flame, profile.flame_days)} days) is saved forever. Finish one
+              thing today to light a new one.
+            </p>
+          )}
+          <div className="flex w-full flex-col gap-3">
+            <Button
+              variant="glow"
+              size="lg"
+              fullWidth
+              onClick={() => {
+                closeComeback();
+                if (fogCount > 0) navigate('/review');
+                else if (currentLesson) navigate(`/learn/${currentLesson.id}`);
+              }}
+            >
+              {fogCount > 0 ? 'Warm up: clear the fog (2 min)' : 'Warm up with the next lesson'}
+            </Button>
+            <Button variant="ghost" fullWidth onClick={closeComeback}>
+              Just look around
+            </Button>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }

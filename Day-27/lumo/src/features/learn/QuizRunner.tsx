@@ -33,6 +33,7 @@ export function QuizRunner({
   onProgress,
   onDone,
   renderExtra,
+  onReport,
 }: {
   questions: LearnQuestion[];
   grade: (question: LearnQuestion, choice: number) => Promise<Grade>;
@@ -42,6 +43,8 @@ export function QuizRunner({
   onDone: (result: QuizResult) => void;
   /** Extra line under the feedback (e.g. "+2 Light" in reviews). */
   renderExtra?: (grade: Grade) => string | null;
+  /** Shows "Report a problem" under the feedback (signed-in learners only). */
+  onReport?: (question: LearnQuestion) => void;
 }) {
   const [queue, setQueue] = useState(() => questions.map((_, i) => i));
   const [selected, setSelected] = useState<number | null>(null);
@@ -214,6 +217,15 @@ export function QuizRunner({
                 )}
                 {!feedback.grade.correct && requeue && (
                   <p className="m-0 text-sm text-dusk">This one comes back at the end.</p>
+                )}
+                {onReport && (
+                  <button
+                    type="button"
+                    onClick={() => onReport(question)}
+                    className="self-start text-sm font-bold text-dusk underline hover:text-ink"
+                  >
+                    Report a problem
+                  </button>
                 )}
               </div>
               <Button variant={feedback.grade.correct ? 'lagoon' : 'ember'} onClick={next}>

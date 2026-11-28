@@ -10,6 +10,7 @@ import { wispSays } from '../../lib/game/wisp';
 import type { ReviewGrade } from '../../lib/types';
 import { useAsync } from '../../lib/useAsync';
 import { profilePatched } from '../auth/authSlice';
+import { ReportDialog } from '../learn/ReportDialog';
 import { QuizRunner, type QuizResult } from '../learn/QuizRunner';
 import { Rewards, type RewardNumbers } from '../learn/Rewards';
 
@@ -34,6 +35,7 @@ export function ReviewPage() {
   const before = useRef({ light: profile?.light ?? 0, flame: profile?.flame_days ?? 0 });
   const onProgress = useCallback((f: number) => setProgress(f), []);
   const persona = profile?.wisp_persona ?? 'cheeky';
+  const [reporting, setReporting] = useState<string | null>(null);
 
   async function done(result: QuizResult) {
     if (!profile) return;
@@ -150,9 +152,11 @@ export function ReviewPage() {
               return `${r.light_awarded ? `+${r.light_awarded} Light. ` : ''}${nextReviewText(r.next_due_at)}`;
             }}
             onDone={(r) => void done(r)}
+            onReport={(q) => setReporting(q.id)}
           />
         </>
       )}
+      <ReportDialog questionId={reporting} onClose={() => setReporting(null)} />
     </main>
   );
 }

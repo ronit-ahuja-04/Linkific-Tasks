@@ -28,6 +28,8 @@ const LessonEditorPage = named(
 const LessonPlayer = named(() => import('../features/learn/LessonPlayer'), 'LessonPlayer');
 const ReviewPage = named(() => import('../features/review/ReviewPage'), 'ReviewPage');
 const SetupPage = named(() => import('../features/onboarding/SetupPage'), 'SetupPage');
+const TastePage = named(() => import('../features/taste/TastePage'), 'TastePage');
+const VerifyPage = named(() => import('../features/certificate/VerifyPage'), 'VerifyPage');
 const AdminPage = named(() => import('../features/admin/AdminPage'), 'AdminPage');
 
 function NotFoundPage() {
@@ -53,6 +55,10 @@ export function AppRouter() {
         <Route path="/" element={<WelcomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        {/* Public: no account needed. */}
+        <Route path="/taste" element={<TastePage />} />
+        <Route path="/taste/:slug" element={<TastePage />} />
+        <Route path="/verify/:code" element={<VerifyPage />} />
         {/* Full-screen learner flows (no tab bar). */}
         <Route
           path="/setup"

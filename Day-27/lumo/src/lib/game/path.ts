@@ -44,3 +44,34 @@ export function todayIn(timezone: string, now = new Date()): string {
 export function litToday(lastGoalDate: string | null, timezone: string, now = new Date()): boolean {
   return lastGoalDate === todayIn(timezone, now);
 }
+
+function daysBetween(fromDay: string, toDay: string): number {
+  return Math.round(
+    (Date.parse(`${toDay}T00:00:00Z`) - Date.parse(`${fromDay}T00:00:00Z`)) / 86400000,
+  );
+}
+
+/** Whole days since the learner last lit their flame (null if never). */
+export function daysAway(
+  lastGoalDate: string | null,
+  timezone: string,
+  now = new Date(),
+): number | null {
+  return lastGoalDate ? daysBetween(lastGoalDate, todayIn(timezone, now)) : null;
+}
+
+/**
+ * The flame as it really stands today. The stored number only changes when the learner next finishes something,
+ * so a flame that has gone out would otherwise still show its old count. Same rule as the server: yesterday keeps
+ * it alive; one missed day is covered by an Ember if there is one.
+ */
+export function effectiveFlame(
+  p: { flame_days: number; last_goal_date: string | null; embers: number; timezone: string },
+  now = new Date(),
+): number {
+  const away = daysAway(p.last_goal_date, p.timezone, now);
+  if (away === null) return 0;
+  if (away <= 1) return p.flame_days;
+  if (away === 2 && p.embers > 0) return p.flame_days;
+  return 0;
+}
